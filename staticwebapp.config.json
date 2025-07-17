@@ -1,0 +1,16 @@
+[object Object]
+  routes: [    [object Object]   route": /*",
+    serve: index.html",
+      statusCode: 200  ],navigationFallback": {
+    rewrite:/index.html",
+exclude": [/images/*", /css/*", "/js/*, /api/*]
+  },
+  responseOverrides: {  404: [object Object]     rewrite: index.html",
+      statusCode: 200  }
+  },
+globalHeaders": {
+   content-security-policy": default-srcself'unsafe-inline' unsafe-evaldata: blob:; img-src self' data: blob:; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;",
+  x-content-type-options":nosniff",
+    x-frame-options": DENY,x-xss-protection":1; mode=block"
+  }
+} 

@@ -1,0 +1,2805 @@
+import { BrownianMotion, Diffusion, GasLaws } from './animations/particle-physics.js';
+import { Pendulum, OrbitalMotion, CollisionPhysics, FrictionInclinedPlanes } from './animations/classical-mechanics.js';
+import { SoundWaves, WavePropagation } from './animations/wave-phenomena.js';
+import { ElectricFields, MagneticFields, DiodeTransistor } from './animations/elelectro-magnetism.js';
+import { WaveParticleDuality } from './animations/quantum-physics.js';
+import { NuclearReactions } from './animations/nuclear-physics.js';
+import { FluidFlow, Bernoulli } from './animations/fluid-dynamics.js';
+import { NeuralNetwork, MemoryManagement } from './animations/computer-science.js';
+
+// Main animations controller
+export class ScientificAnimations {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.currentAnimation = 'brownian';
+        this.isRunning = true;
+        this.lastTime = 0;
+        
+        // Initialize animations
+        this.brownianMotion = new BrownianMotion(this.ctx);
+        this.pendulum = new Pendulum(this.ctx);
+        this.diffusion = new Diffusion(this.ctx);
+        this.waves = new WavePropagation(this.ctx);
+        this.orbital = new OrbitalMotion(this.ctx);
+        this.electricFields = new ElectricFields(this.ctx);
+
+        this.gasLaws = new GasLaws(this.ctx);
+        this.collisions = new CollisionPhysics(this.ctx);
+        this.friction = new FrictionInclinedPlanes(this.ctx);
+
+        this.magneticFields = new MagneticFields(this.ctx);
+        this.waveParticleDuality = new WaveParticleDuality(this.ctx);
+        this.nuclearReactions = new NuclearReactions(this.ctx);
+        
+        // Initialize fluid dynamics
+        this.fluidFlow = new FluidFlow(this.ctx);
+        this.bernoulli = new Bernoulli(this.ctx);
+        
+        // Initialize sound waves
+        this.soundWaves = new SoundWaves(this.ctx);
+        
+        // Initialize diode and transistor
+        this.diodeTransistor = new DiodeTransistor(this.ctx);
+        
+        // Initialize computer science animations
+        this.neuralNetwork = new NeuralNetwork(this.ctx);
+        this.memoryManagement = new MemoryManagement(this.ctx);
+        
+        this.setupEventListeners();
+        this.resizeCanvas();
+        
+        // Initialize all control panels with default values after a short delay
+        setTimeout(() => {
+            this.initializeWaveControls();
+            this.initializeSoundWavesControls();
+            this.initializeDiodeTransistorControls();
+        }, 100);
+        
+        this.animate();
+    }
+    
+    setupEventListeners() {
+        // Category header clicks
+        document.querySelectorAll('.category-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                const categoryItem = e.currentTarget.closest('.category-item');
+                const category = categoryItem.dataset.category;
+                const sideNav = document.querySelector('.side-navigation');
+                const mainContent = document.querySelector('.main-content');
+                
+                // If navigation is collapsed, expand it and don't switch animations
+                if (sideNav.classList.contains('collapsed')) {
+                    sideNav.classList.remove('collapsed');
+                    mainContent.classList.remove('nav-collapsed');
+                    return;
+                }
+                
+                // Close all other categories
+                document.querySelectorAll('.category-item').forEach(item => {
+                    if (item !== categoryItem) {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current category
+                categoryItem.classList.toggle('active');
+                
+                // If this category is now active, switch to its first animation
+                if (categoryItem.classList.contains('active')) {
+                    const firstAnimation = categoryItem.querySelector('.submenu-item');
+                    if (firstAnimation && !firstAnimation.classList.contains('active')) {
+                        this.switchAnimation(firstAnimation.dataset.animation);
+                    }
+                }
+            });
+        });
+
+        // Submenu item clicks
+        document.querySelectorAll('.submenu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const animation = e.currentTarget.dataset.animation;
+                
+                // Remove active class from all submenu items
+                document.querySelectorAll('.submenu-item').forEach(subItem => {
+                    subItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                e.currentTarget.classList.add('active');
+                
+                // Switch to the selected animation
+                this.switchAnimation(animation);
+            });
+        });
+
+        // Navigation toggle (collapse/expand)
+        const navToggleBtn = document.querySelector('.nav-toggle-btn');
+        const sideNav = document.querySelector('.side-navigation');
+        const mainContent = document.querySelector('.main-content');
+        
+        if (navToggleBtn) {
+            navToggleBtn.addEventListener('click', () => {
+                sideNav.classList.toggle('collapsed');
+                mainContent.classList.toggle('nav-collapsed');
+            });
+        }
+
+        // Mobile navigation toggle
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        
+        if (mobileNavToggle && sideNav) {
+            mobileNavToggle.addEventListener('click', () => {
+                mobileNavToggle.classList.toggle('open');
+                sideNav.classList.toggle('open');
+            });
+        }
+
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!e.target.closest('.side-navigation') && 
+                    !e.target.closest('.mobile-nav-toggle')) {
+                    if (mobileNavToggle && sideNav) {
+                        mobileNavToggle.classList.remove('open');
+                        sideNav.classList.remove('open');
+                    }
+                }
+            }
+        });
+
+        
+        // Control buttons
+        document.getElementById('playPauseBtn').addEventListener('click', () => {
+            this.togglePlayPause();
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            this.resetAnimation();
+        });
+        
+        // Learn More button
+        document.getElementById('learnMoreBtn').addEventListener('click', () => {
+            this.showScienceExplanation();
+        });
+        
+        // Modal close button
+        document.getElementById('closeModal').addEventListener('click', () => {
+            this.closeModal();
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('scienceModal').addEventListener('click', (e) => {
+            if (e.target.id === 'scienceModal') {
+                this.closeModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModal();
+            }
+        });
+        
+        // Brownian Motion Controls
+        this.setupSliderControl('particleCount', 'particleCountValue', (value) => {
+            this.brownianMotion.setParticleCount(parseInt(value));
+        });
+        
+        this.setupSliderControl('speed', 'speedValue', (value) => {
+            this.brownianMotion.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('temperature', 'temperatureValue', (value) => {
+            this.brownianMotion.setTemperature(parseFloat(value));
+        });
+        
+        this.setupSliderControl('particleSize', 'particleSizeValue', (value) => {
+            this.brownianMotion.setParticleSize(parseInt(value));
+        });
+        
+        document.getElementById('brownianVisualizationMode').addEventListener('change', (e) => {
+            this.updateBrownianVisualization(e.target.value);
+        });
+        
+        // Initialize Brownian visualization mode
+        this.updateBrownianVisualization('basic');
+        
+        // Pendulum Controls
+        this.setupSliderControl('pendulumLength', 'pendulumLengthValue', (value) => {
+            this.pendulum.setLength(parseInt(value));
+        });
+        
+        this.setupSliderControl('pendulumSpeed', 'pendulumSpeedValue', (value) => {
+            this.pendulum.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('initialAngle', 'initialAngleValue', (value) => {
+            this.pendulum.setInitialAngle(parseFloat(value));
+        });
+        
+        this.setupSliderControl('gravity', 'gravityValue', (value) => {
+            this.pendulum.setGravity(parseFloat(value));
+        });
+        
+        this.setupSliderControl('damping', 'dampingValue', (value) => {
+            this.pendulum.setDamping(parseFloat(value));
+        });
+        
+        document.getElementById('pendulumVisualizationMode').addEventListener('change', (e) => {
+            this.updatePendulumVisualization(e.target.value);
+        });
+        
+        // Initialize pendulum visualization mode
+        this.updatePendulumVisualization('basic');
+        
+        // Diffusion Controls
+        this.setupSliderControl('diffusionParticles', 'diffusionParticlesValue', (value) => {
+            this.diffusion.setParticleCount(parseInt(value));
+        });
+        
+        this.setupSliderControl('diffusionSpeed', 'diffusionSpeedValue', (value) => {
+            this.diffusion.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('diffusionRate', 'diffusionRateValue', (value) => {
+            this.diffusion.setDiffusionRate(parseFloat(value));
+        });
+        
+        this.setupSliderControl('concentrationGradient', 'concentrationGradientValue', (value) => {
+            this.diffusion.setConcentrationGradient(parseFloat(value));
+        });
+        
+        this.setupSliderControl('particleSize', 'particleSizeValue', (value) => {
+            this.diffusion.setParticleSize(parseInt(value));
+        });
+        
+        document.getElementById('diffusionVisualizationMode').addEventListener('change', (e) => {
+            this.updateDiffusionVisualization(e.target.value);
+        });
+        
+        // Remove the start diffusion button event listener since the button was removed
+        // Diffusion will now start on canvas click/touch
+        
+        // Initialize diffusion visualization mode
+        this.updateDiffusionVisualization('basic');
+        
+        // Wave Controls
+        const waveTypeElement = document.getElementById('waveType');
+        if (waveTypeElement) {
+            waveTypeElement.addEventListener('change', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                e.preventDefault(); // Prevent default behavior
+            this.waves.setWaveType(e.target.value);
+        });
+        }
+        
+        this.setupSliderControl('waveSpeed', 'waveSpeedValue', (value) => {
+            this.waves.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('waveFrequency', 'waveFrequencyValue', (value) => {
+            this.waves.setFrequency(parseFloat(value));
+        });
+        
+        this.setupSliderControl('waveAmplitude', 'waveAmplitudeValue', (value) => {
+            this.waves.setAmplitude(parseFloat(value));
+        });
+        
+        const waveShowAnalyticsElement = document.getElementById('waveShowAnalytics');
+        if (waveShowAnalyticsElement) {
+            waveShowAnalyticsElement.addEventListener('change', (e) => {
+            this.waves.setShowAnalytics(e.target.checked);
+        });
+        }
+        
+        // Sound Waves Controls
+        this.setupSliderControl('soundFrequency', 'soundFrequencyValue', (value) => {
+            this.soundWaves.setFrequency(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundAmplitude', 'soundAmplitudeValue', (value) => {
+            this.soundWaves.setAmplitude(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundSpeed', 'soundSpeedValue', (value) => {
+            this.soundWaves.setWaveSpeed(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundParticles', 'soundParticlesValue', (value) => {
+            this.soundWaves.setParticleCount(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
+            this.soundWaves.setAnimationSpeed(parseFloat(value));
+        });
+        
+        // Sound waves select and checkbox controls
+        const soundWaveTypeSelect = document.getElementById('soundWaveType');
+        if (soundWaveTypeSelect) {
+            soundWaveTypeSelect.addEventListener('change', (e) => {
+                this.soundWaves.setWaveType(e.target.value);
+            });
+        }
+        
+        // Orbital Motion Controls
+        this.setupSliderControl('orbitalSpeed', 'orbitalSpeedValue', (value) => {
+            this.orbital.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('eccentricity', 'eccentricityValue', (value) => {
+            this.orbital.setEccentricity(parseFloat(value));
+        });
+        
+        this.setupSliderControl('semiMajorAxis', 'semiMajorAxisValue', (value) => {
+            this.orbital.setSemiMajorAxis(parseInt(value));
+        });
+        
+        this.setupSliderControl('centralMass', 'centralMassValue', (value) => {
+            this.orbital.setCentralMass(parseFloat(value));
+        });
+        
+        document.getElementById('orbitalVisualizationMode').addEventListener('change', (e) => {
+            this.updateOrbitalVisualization(e.target.value);
+        });
+        
+        // Initialize orbital visualization mode
+        this.updateOrbitalVisualization('basic');
+        
+        // Electric Fields Controls
+        this.setupSliderControl('efSpeed', 'efSpeedValue', (value) => {
+            this.electricFields.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('efFieldStrength', 'efFieldStrengthValue', (value) => {
+            this.electricFields.setFieldStrength(parseFloat(value));
+        });
+        
+        this.setupSliderControl('efParticleCount', 'efParticleCountValue', (value) => {
+            this.electricFields.setParticleCount(parseInt(value));
+        });
+        
+        // Removed addChargeBtn and clearChargesBtn event listeners
+        
+
+        
+        // Magnetic Fields Controls
+        this.setupSliderControl('magneticSpeed', 'magneticSpeedValue', (value) => {
+            this.magneticFields.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('magneticFieldStrength', 'magneticFieldStrengthValue', (value) => {
+            this.magneticFields.setFieldStrength(parseFloat(value));
+        });
+        
+        this.setupSliderControl('magneticParticleCount', 'magneticParticleCountValue', (value) => {
+            this.magneticFields.setParticleCount(parseInt(value));
+        });
+        
+        document.getElementById('magneticShowFieldLines').addEventListener('change', (e) => {
+            this.magneticFields.setShowFieldLines(e.target.checked);
+        });
+        
+
+        
+        document.getElementById('magneticShowForceArrows').addEventListener('change', (e) => {
+            this.magneticFields.setShowForceArrows(e.target.checked);
+        });
+        
+        // Removed addMagnetBtn and clearMagnetsBtn event listeners
+        
+        // Canvas click for adding charges, magnets, toggling switch, starting diffusion, and neural network testing
+        this.canvas.addEventListener('click', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (this.currentAnimation === 'electric-fields') {
+                const chargeType = document.getElementById('efChargeType').value;
+                this.electricFields.addChargeAtPosition(chargeType, x, y);
+            } else if (this.currentAnimation === 'magnetic-fields') {
+                this.magneticFields.addMagnetAtPosition(x, y);
+
+            } else if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
+                this.diffusion.startDiffusion();
+            } else if (this.currentAnimation === 'sound-waves') {
+                const sx = this.soundWaves.sourceX;
+                const sy = this.soundWaves.sourceY;
+                const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
+                if (distance <= 50) {
+                    this.soundWaves.triggerWavePulse();
+                }
+            } else if (this.currentAnimation === 'neural-network') {
+                this.neuralNetwork.handleCanvasClick(x, y);
+            } else if (this.currentAnimation === 'memory-management' && this.memoryManagement) {
+                this.memoryManagement.handleClick(x, y);
+            }
+        });
+        
+        // Gas Laws Controls
+        this.setupSliderControl('gasSpeed', 'gasSpeedValue', (value) => {
+            this.gasLaws.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('gasParticleCount', 'gasParticleCountValue', (value) => {
+            this.gasLaws.setParticleCount(parseInt(value));
+        });
+        
+        this.setupSliderControl('gasTemperature', 'gasTemperatureValue', (value) => {
+            this.gasLaws.setTemperature(parseInt(value));
+        });
+        
+        this.setupSliderControl('gasVolume', 'gasVolumeValue', (value) => {
+            this.gasLaws.setVolume(parseInt(value));
+        });
+        
+        this.setupSliderControl('gasPressure', 'gasPressureValue', (value) => {
+            this.gasLaws.setPressure(parseFloat(value));
+        });
+        
+        document.getElementById('gasVisualizationMode').addEventListener('change', (e) => {
+            this.updateGasVisualization(e.target.value);
+        });
+        
+        document.getElementById('lawType').addEventListener('change', (e) => {
+            this.gasLaws.setLawType(e.target.value);
+        });
+        
+        // Initialize gas visualization mode
+        this.updateGasVisualization('basic');
+        
+
+        
+        // Collision Physics Controls
+        this.setupSliderControl('collisionSpeed', 'collisionSpeedValue', (value) => {
+            this.collisions.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('ballCount', 'ballCountValue', (value) => {
+            this.collisions.setBallCount(parseInt(value));
+        });
+        
+        this.setupSliderControl('restitution', 'restitutionValue', (value) => {
+            this.collisions.setRestitution(parseFloat(value));
+        });
+        
+
+        
+        this.setupSliderControl('collisionGravity', 'collisionGravityValue', (value) => {
+            this.collisions.setGravity(parseFloat(value));
+        });
+        
+        document.getElementById('showAnalytics').addEventListener('change', (e) => {
+            this.collisions.setShowAnalytics(e.target.checked);
+        });
+        
+        document.getElementById('collisionType').addEventListener('change', (e) => {
+            this.collisions.setCollisionType(e.target.value);
+        });
+        
+        // Friction & Inclined Planes Controls
+        this.setupSliderControl('frictionSpeed', 'frictionSpeedValue', (value) => {
+            this.friction.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('inclineAngle', 'inclineAngleValue', (value) => {
+            this.friction.setInclineAngle(parseFloat(value));
+        });
+        
+        this.setupSliderControl('objectMass', 'objectMassValue', (value) => {
+            this.friction.setObjectMass(parseInt(value));
+        });
+        
+        this.setupSliderControl('frictionGravity', 'frictionGravityValue', (value) => {
+            this.friction.setGravity(parseFloat(value));
+        });
+        
+        document.getElementById('showFrictionAnalytics').addEventListener('change', (e) => {
+            this.friction.setShowAnalytics(e.target.checked);
+        });
+        
+        this.setupSliderControl('frictionCoefficient', 'frictionCoefficientValue', (value) => {
+            this.friction.setFrictionCoefficient(parseFloat(value));
+        });
+        
+
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            this.resizeCanvas();
+        });
+        
+        // Touch event for diffusion (mobile support)
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
+                this.diffusion.startDiffusion();
+            }
+        });
+        
+
+        
+        // Wave-Particle Duality Controls
+        document.getElementById('dualityMode').addEventListener('change', (e) => {
+            this.waveParticleDuality.setMode(e.target.value);
+            this.updateDualityControls(e.target.value);
+        });
+        
+        this.setupSliderControl('dualitySpeed', 'dualitySpeedValue', (value) => {
+            this.waveParticleDuality.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('dualityEnergy', 'dualityEnergyValue', (value) => {
+            this.waveParticleDuality.setPhotonEnergy(parseFloat(value));
+        });
+        
+        this.setupSliderControl('dualityWavelength', 'dualityWavelengthValue', (value) => {
+            this.waveParticleDuality.setWavelength(parseFloat(value));
+        });
+        
+        document.getElementById('dualityShowAnalytics').addEventListener('change', (e) => {
+            const showAnalytics = e.target.checked;
+            this.waveParticleDuality.setShowWaveFunction(showAnalytics);
+            this.waveParticleDuality.setShowParticlePosition(showAnalytics);
+            this.waveParticleDuality.setShowInterference(showAnalytics);
+            this.waveParticleDuality.setShowMeasurementEffect(showAnalytics);
+        });
+        
+
+        
+        document.getElementById('performMeasurementBtn').addEventListener('click', () => {
+            this.waveParticleDuality.performMeasurement();
+        });
+        
+        // Removed resetDualityBtn event listener - main Reset button handles this
+        
+        // Initialize duality controls based on current mode
+        const initialMode = document.getElementById('dualityMode').value;
+        this.updateDualityControls(initialMode);
+        
+        this.setupSliderControl('nuclearSpeed', 'nuclearSpeedValue', (value) => {
+            this.nuclearReactions.setSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('neutronEnergy', 'neutronEnergyValue', (value) => {
+            this.nuclearReactions.setNeutronEnergy(parseFloat(value));
+        });
+        
+        this.setupSliderControl('nuclearTemperature', 'nuclearTemperatureValue', (value) => {
+            this.nuclearReactions.setTemperature(parseFloat(value));
+        });
+        
+        document.getElementById('nuclearMode').addEventListener('change', (e) => {
+            this.nuclearReactions.setMode(e.target.value);
+        });
+        
+        // Fluid Flow Controls
+        this.setupSliderControl('fluidSpeed', 'fluidSpeedValue', (value) => {
+            this.fluidFlow.setFlowRate(parseFloat(value));
+        });
+        
+        this.setupSliderControl('flowRate', 'flowRateValue', (value) => {
+            this.fluidFlow.setFlowRate(parseFloat(value));
+        });
+        
+        this.setupSliderControl('viscosity', 'viscosityValue', (value) => {
+            this.fluidFlow.setViscosity(parseFloat(value));
+        });
+        
+        this.setupSliderControl('reynoldsNumber', 'reynoldsNumberValue', (value) => {
+            this.fluidFlow.setReynoldsNumber(parseInt(value));
+        });
+        
+        document.getElementById('fluidVisualizationMode').addEventListener('change', (e) => {
+            this.fluidFlow.setVisualizationMode(e.target.value);
+        });
+        
+        // Bernoulli's Principle Controls
+        this.setupSliderControl('bernoulliSpeed', 'bernoulliSpeedValue', (value) => {
+            this.bernoulli.setPressureDifference(parseFloat(value));
+        });
+        
+        this.setupSliderControl('pipeWidth', 'pipeWidthValue', (value) => {
+            this.bernoulli.setPipeWidth(parseInt(value));
+        });
+        
+        this.setupSliderControl('fluidDensity', 'fluidDensityValue', (value) => {
+            this.bernoulli.setFluidDensity(parseFloat(value));
+        });
+        
+        this.setupSliderControl('pressureDifference', 'pressureDifferenceValue', (value) => {
+            this.bernoulli.setPressureDifference(parseFloat(value));
+        });
+        
+        document.getElementById('bernoulliVisualizationMode').addEventListener('change', (e) => {
+            this.bernoulli.setVisualizationMode(e.target.value);
+        });
+        
+        // Sound Waves Controls
+        this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
+            this.soundWaves.setAnimationSpeed(parseFloat(value));
+        });
+        
+        this.setupSliderControl('soundFrequency', 'soundFrequencyValue', (value) => {
+            this.soundWaves.setFrequency(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundAmplitude', 'soundAmplitudeValue', (value) => {
+            this.soundWaves.setAmplitude(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundSpeed', 'soundSpeedValue', (value) => {
+            this.soundWaves.setWaveSpeed(parseInt(value));
+        });
+        
+        this.setupSliderControl('soundParticles', 'soundParticlesValue', (value) => {
+            this.soundWaves.setParticleCount(parseInt(value));
+        });
+        
+        document.getElementById('soundWaveType').addEventListener('change', (e) => {
+            this.soundWaves.setWaveType(e.target.value);
+        });
+        
+        this.canvas.addEventListener('click', (e) => {
+            if (this.currentAnimation === 'sound-waves') {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const sx = this.soundWaves.sourceX;
+                const sy = this.soundWaves.sourceY;
+                const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
+                if (distance <= 50) { // Increased click radius from 30 to 50 pixels
+                    this.soundWaves.triggerWavePulse();
+                }
+            }
+        });
+
+        // Diode & Transistor Controls
+        const componentTypeSelect = document.getElementById('diodeComponentType');
+        const biasTypeSelect = document.getElementById('diodeBiasType');
+        
+        if (componentTypeSelect) {
+            componentTypeSelect.addEventListener('change', (e) => {
+                if (this.diodeTransistor) {
+                    this.diodeTransistor.setComponentType(e.target.value);
+                }
+            });
+        }
+        
+        if (biasTypeSelect) {
+            biasTypeSelect.addEventListener('change', (e) => {
+                if (this.diodeTransistor) {
+                    this.diodeTransistor.setBiasType(e.target.value);
+                }
+            });
+        }
+        
+        this.setupSliderControl('diodeInputVoltage', 'diodeInputVoltageValue', (value) => {
+            if (this.diodeTransistor) {
+                this.diodeTransistor.setInputVoltage(parseFloat(value));
+            }
+        });
+        
+        this.setupSliderControl('diodeBaseVoltage', 'diodeBaseVoltageValue', (value) => {
+            if (this.diodeTransistor) {
+                this.diodeTransistor.setBaseVoltage(parseFloat(value));
+            }
+        });
+        
+        this.setupSliderControl('diodeAnimationSpeed', 'diodeAnimationSpeedValue', (value) => {
+            if (this.diodeTransistor) {
+                this.diodeTransistor.setAnimationSpeed(parseFloat(value));
+            }
+        });
+        
+        // Neural Network Controls
+        this.setupSliderControl('neuralLearningRate', 'neuralLearningRateValue', (value) => {
+            if (this.neuralNetwork) {
+                this.neuralNetwork.setLearningRate(parseFloat(value));
+            }
+        });
+        
+        this.setupSliderControl('neuralSpeed', 'neuralSpeedValue', (value) => {
+            if (this.neuralNetwork) {
+                this.neuralNetwork.setSpeed(parseFloat(value));
+            }
+        });
+        
+        // Memory Management Controls
+        this.setupSliderControl('memorySpeed', 'memorySpeedValue', (value) => {
+            if (this.memoryManagement) {
+                this.memoryManagement.setAnimationSpeed(parseFloat(value));
+            }
+        });
+        
+        // Show Program Output toggle
+        const showOutputCheckbox = document.getElementById('showOutput');
+        if (showOutputCheckbox && this.memoryManagement) {
+            showOutputCheckbox.checked = this.memoryManagement.showOutput;
+            showOutputCheckbox.addEventListener('change', (e) => {
+                this.memoryManagement.setShowOutput(e.target.checked);
+            });
+        }
+
+        // Neural Network Mode Selector
+        const neuralMode = document.getElementById('neuralMode');
+        if (neuralMode) {
+            neuralMode.addEventListener('change', (e) => {
+                if (this.neuralNetwork) {
+                    const isTesting = e.target.value === 'testing';
+                    this.neuralNetwork.setTestingMode(isTesting);
+                    
+                    // Set appropriate defaults for each mode
+                    if (isTesting) {
+                        this.neuralNetwork.setShowWeights(true);
+                        this.neuralNetwork.setShowGradients(false);
+                        this.neuralNetwork.setShowLoss(false);
+                        this.neuralNetwork.setAutoTrain(false);
+                    } else {
+                        this.neuralNetwork.setShowWeights(true);
+                        this.neuralNetwork.setShowGradients(false);
+                        this.neuralNetwork.setShowLoss(true);
+                        this.neuralNetwork.setAutoTrain(true);
+                    }
+                }
+            });
+        }
+        
+
+    }
+    
+    setupSliderControl(sliderId, valueId, callback) {
+        const slider = document.getElementById(sliderId);
+        const valueDisplay = document.getElementById(valueId);
+        
+        if (!slider) {
+            console.warn(`Slider not found: ${sliderId}`);
+            return;
+        }
+        
+        if (!valueDisplay) {
+            console.warn(`Value display not found: ${valueId}`);
+            return;
+        }
+        
+        slider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            const unit = sliderId.includes('Speed') ? 'x' : 
+                        sliderId.includes('Angle') ? '°' : 
+                        sliderId.includes('Length') ? '' : 
+                        sliderId.includes('Wavelength') ? ' px' :
+                        sliderId.includes('Frequency') ? ' Hz' : 
+                        sliderId.includes('gasTemperature') ? 'K' : 
+                        sliderId.includes('frictionCoefficient') ? '' : 
+                        sliderId.includes('Voltage') ? 'V' : '';
+            
+            valueDisplay.textContent = value + unit;
+            callback(value);
+        });
+    }
+    
+    updateDualityControls(mode) {
+        const performMeasurementBtn = document.getElementById('performMeasurementBtn');
+        
+        // Show measurement button only for superposition and measurement modes
+        if (mode === 'superposition' || mode === 'measurement') {
+            performMeasurementBtn.style.display = 'inline-block';
+        } else {
+            performMeasurementBtn.style.display = 'none';
+        }
+    }
+    
+    updateBrownianVisualization(mode) {
+        // Reset all visualization options
+        this.brownianMotion.setShowTemperatureHeatmap(false);
+        this.brownianMotion.setShowVelocityDistribution(false);
+        this.brownianMotion.setShowMeanFreePath(false);
+        
+        // Enable features based on mode
+        switch(mode) {
+            case 'basic':
+                // Just basic particle motion, no extra visualizations
+                break;
+            case 'heatmap':
+                this.brownianMotion.setShowTemperatureHeatmap(true);
+                break;
+            case 'advanced':
+                // Show all advanced features
+                this.brownianMotion.setShowTemperatureHeatmap(true);
+                this.brownianMotion.setShowVelocityDistribution(true);
+                this.brownianMotion.setShowMeanFreePath(true);
+                break;
+        }
+    }
+    
+    updateDiffusionVisualization(mode) {
+        const diffusion = this.diffusion;
+        
+        switch (mode) {
+            case 'basic':
+                diffusion.setShowConcentration(false);
+                diffusion.setShowConcentrationProfile(false);
+                diffusion.setShowParticleTrails(false);
+                break;
+            case 'heatmap':
+                diffusion.setShowConcentration(true);
+                diffusion.setShowConcentrationProfile(false);
+                diffusion.setShowParticleTrails(false);
+                break;
+            case 'profile':
+                diffusion.setShowConcentration(false);
+                diffusion.setShowConcentrationProfile(true);
+                diffusion.setShowParticleTrails(false);
+                break;
+            case 'advanced':
+                diffusion.setShowConcentration(true);
+                diffusion.setShowConcentrationProfile(true);
+                diffusion.setShowParticleTrails(true);
+                break;
+        }
+    }
+    
+    updateGasVisualization(mode) {
+        const gasLaws = this.gasLaws;
+        
+        switch (mode) {
+            case 'basic':
+                gasLaws.setShowPressureGauge(true);
+                gasLaws.setShowPressureHeatmap(false);
+                gasLaws.setShowVelocityDistribution(false);
+                gasLaws.setShowGasLawGraph(false);
+                gasLaws.setShowParticleCollisions(false);
+                break;
+            case 'pressure':
+                gasLaws.setShowPressureGauge(true);
+                gasLaws.setShowPressureHeatmap(true);
+                gasLaws.setShowVelocityDistribution(false);
+                gasLaws.setShowGasLawGraph(true);
+                gasLaws.setShowParticleCollisions(false);
+                break;
+            case 'advanced':
+                gasLaws.setShowPressureGauge(true);
+                gasLaws.setShowPressureHeatmap(true);
+                gasLaws.setShowVelocityDistribution(true);
+                gasLaws.setShowGasLawGraph(true);
+                gasLaws.setShowParticleCollisions(true);
+                break;
+        }
+    }
+    
+    updatePendulumVisualization(mode) {
+        const pendulum = this.pendulum;
+        
+        switch (mode) {
+            case 'basic':
+                pendulum.setShowPath(false);
+                pendulum.setShowVelocityVectors(false);
+                pendulum.setShowForceVectors(true);
+                pendulum.setShowEnergyInfo(false);
+                pendulum.setShowPhaseSpace(false);
+                break;
+            case 'vectors':
+                pendulum.setShowPath(false);
+                pendulum.setShowVelocityVectors(true);
+                pendulum.setShowForceVectors(true);
+                pendulum.setShowEnergyInfo(false);
+                pendulum.setShowPhaseSpace(false);
+                break;
+            case 'advanced':
+                pendulum.setShowPath(true);
+                pendulum.setShowVelocityVectors(true);
+                pendulum.setShowForceVectors(true);
+                pendulum.setShowEnergyInfo(true);
+                pendulum.setShowPhaseSpace(true);
+                break;
+        }
+    }
+    
+    updateOrbitalVisualization(mode) {
+        switch(mode) {
+            case 'basic':
+                this.orbital.setShowOrbitPath(true);
+                this.orbital.setShowVelocityVector(false);
+                this.orbital.setShowKeplerInfo(false);
+                break;
+            case 'advanced':
+                this.orbital.setShowOrbitPath(true);
+                this.orbital.setShowVelocityVector(true);
+                this.orbital.setShowKeplerInfo(true);
+                break;
+        }
+    }
+    
+    switchCategory(category) {
+        
+        // Update category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        const categoryBtn = document.querySelector(`[data-category="${category}"]`);
+        if (categoryBtn) {
+            categoryBtn.classList.add('active');
+        }
+        
+        // Hide all animation groups
+        document.querySelectorAll('.animation-group').forEach(group => {
+            group.classList.remove('active');
+        });
+        
+        // Show current category's animations
+        const animationGroup = document.getElementById(`${category}-animations`);
+        if (animationGroup) {
+            animationGroup.classList.add('active');
+        }
+        
+        // Switch to first available animation in category
+        const firstAnimation = document.querySelector(`#${category}-animations .nav-btn:not(.disabled)`);
+        if (firstAnimation) {
+            this.switchAnimation(firstAnimation.dataset.animation);
+        } else {
+            console.warn('No available animations found for category:', category);
+        }
+    }
+    
+    switchAnimation(animationType) {
+        if (animationType === this.currentAnimation) {
+            return;
+        }
+        
+        // Update active submenu item
+        document.querySelectorAll('.submenu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        const activeItem = document.querySelector(`[data-animation="${animationType}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+            
+            // Ensure the parent category is active
+            const categoryItem = activeItem.closest('.category-item');
+            if (categoryItem) {
+                // Close all other categories
+                document.querySelectorAll('.category-item').forEach(item => {
+                    if (item !== categoryItem) {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // Open the parent category
+                categoryItem.classList.add('active');
+            }
+        }
+        
+
+        
+        // Hide all control panels
+        document.querySelectorAll('.animation-controls').forEach(panel => {
+            panel.style.display = 'none';
+        });
+        
+        // Show current control panel
+        const controlPanel = document.getElementById(`${animationType}-controls`);
+        if (controlPanel) {
+            controlPanel.style.display = 'block';
+        }
+        
+        // Hide all info panels
+        document.querySelectorAll('.animation-info').forEach(panel => {
+            panel.style.display = 'none';
+        });
+        
+        // Show current info panel
+        const infoPanel = document.getElementById(`${animationType}-info`);
+        if (infoPanel) {
+            infoPanel.style.display = 'block';
+        }
+        
+        this.currentAnimation = animationType;
+        this.resetAnimation();
+        
+        // Initialize wave controls if switching to waves animation
+        if (animationType === 'waves') {
+            this.initializeWaveControls();
+        }
+        
+        // Initialize sound waves controls if switching to sound-waves animation
+        if (animationType === 'sound-waves') {
+            this.initializeSoundWavesControls();
+        }
+        
+        // Initialize diode-transistor controls if switching to diode-transistor animation
+        if (animationType === 'diode-transistor') {
+            // Wait for the control panel to be visible before initializing
+            setTimeout(() => {
+                this.initializeDiodeTransistorControls();
+            }, 50);
+        }
+        
+        // Initialize memory management animation if switching to memory-management animation
+        if (animationType === 'memory-management') {
+            // Ensure memory management starts immediately
+            setTimeout(() => {
+                if (this.memoryManagement) {
+                    this.memoryManagement.startExecution();
+                }
+            }, 100);
+        }
+        
+
+    }
+    
+    initializeWaveControls() {
+        // Synchronize control values with wave parameters
+        const speedSlider = document.getElementById('waveSpeed');
+        const frequencySlider = document.getElementById('waveFrequency');
+        const amplitudeSlider = document.getElementById('waveAmplitude');
+        
+        if (speedSlider && this.waves) {
+            speedSlider.value = this.waves.speed;
+            document.getElementById('waveSpeedValue').textContent = this.waves.speed + 'x';
+        }
+        
+        if (frequencySlider && this.waves) {
+            frequencySlider.value = this.waves.frequency;
+            document.getElementById('waveFrequencyValue').textContent = this.waves.frequency;
+        }
+        
+        if (amplitudeSlider && this.waves) {
+            amplitudeSlider.value = this.waves.amplitude;
+            document.getElementById('waveAmplitudeValue').textContent = this.waves.amplitude;
+        }
+        
+        // Recalculate wave parameters to ensure they're correct
+        if (this.waves) {
+            this.waves.calculateWaveParameters();
+        }
+    }
+    
+    initializeSoundWavesControls() {
+        
+        // Synchronize control values with sound waves parameters
+        const frequencySlider = document.getElementById('soundFrequency');
+        const amplitudeSlider = document.getElementById('soundAmplitude');
+        const speedSlider = document.getElementById('soundSpeed');
+        const particlesSlider = document.getElementById('soundParticles');
+        const animationSpeedSlider = document.getElementById('soundAnimationSpeed');
+        const waveTypeSelect = document.getElementById('soundWaveType');
+        
+        if (frequencySlider && this.soundWaves) {
+            frequencySlider.value = this.soundWaves.frequency;
+            document.getElementById('soundFrequencyValue').textContent = this.soundWaves.frequency + ' Hz';
+        }
+        
+        if (amplitudeSlider && this.soundWaves) {
+            amplitudeSlider.value = this.soundWaves.amplitude;
+            document.getElementById('soundAmplitudeValue').textContent = this.soundWaves.amplitude + '%';
+        }
+        
+        if (speedSlider && this.soundWaves) {
+            speedSlider.value = this.soundWaves.waveSpeed;
+            document.getElementById('soundSpeedValue').textContent = this.soundWaves.waveSpeed + ' m/s';
+        }
+        
+        if (particlesSlider && this.soundWaves) {
+            particlesSlider.value = this.soundWaves.particleCount;
+            document.getElementById('soundParticlesValue').textContent = this.soundWaves.particleCount;
+        }
+        
+        if (animationSpeedSlider && this.soundWaves) {
+            animationSpeedSlider.value = this.soundWaves.animationSpeed;
+            document.getElementById('soundAnimationSpeedValue').textContent = this.soundWaves.animationSpeed + 'x';
+        }
+        
+        if (waveTypeSelect && this.soundWaves) {
+            waveTypeSelect.value = this.soundWaves.waveType;
+        }
+    }
+    
+    initializeDiodeTransistorControls() {
+        const componentTypeSelect = document.getElementById('diodeComponentType');
+        const biasTypeSelect = document.getElementById('diodeBiasType');
+        
+        if (componentTypeSelect && this.diodeTransistor) {
+            componentTypeSelect.value = this.diodeTransistor.componentType;
+            componentTypeSelect.dispatchEvent(new Event('change'));
+        }
+        if (biasTypeSelect && this.diodeTransistor) {
+            biasTypeSelect.value = this.diodeTransistor.biasType;
+            biasTypeSelect.dispatchEvent(new Event('change'));
+        }
+    }
+    
+    togglePlayPause() {
+        this.isRunning = !this.isRunning;
+        const btn = document.getElementById('playPauseBtn');
+        btn.textContent = this.isRunning ? 'Pause' : 'Play';
+    }
+    
+    resetAnimation() {
+        switch(this.currentAnimation) {
+            case 'brownian':
+                this.brownianMotion.reset();
+                break;
+            case 'pendulum':
+                this.pendulum.reset();
+                break;
+            case 'diffusion':
+                this.diffusion.reset();
+                break;
+            case 'waves':
+                this.waves.reset();
+                break;
+            case 'orbital':
+                this.orbital.reset();
+                break;
+            case 'electric-fields':
+                this.electricFields.reset();
+                break;
+            case 'gas-laws':
+                this.gasLaws.reset();
+                break;
+            case 'collisions':
+                this.collisions.reset();
+                break;
+            case 'friction':
+                this.friction.reset();
+                break;
+
+            case 'magnetic-fields':
+                this.magneticFields.reset();
+                break;
+
+            case 'wave-particle-duality':
+                this.waveParticleDuality.reset();
+                break;   
+            case 'nuclear-reactions':
+                this.nuclearReactions.reset();
+                break;
+            case 'fluid-flow':
+                this.fluidFlow.reset();
+                break;
+            case 'bernoulli':
+                this.bernoulli.reset();
+                break;
+            case 'sound-waves':
+                this.soundWaves.reset();
+                break;
+            case 'diode-transistor':
+                this.diodeTransistor.reset();
+                break;
+            case 'neural-network':
+                this.neuralNetwork.reset();
+                break;
+            case 'memory-management':
+                this.memoryManagement.reset();
+                break;
+        }
+    }
+    
+    resizeCanvas() {
+        const container = this.canvas.parentElement;
+        // Account for padding: container has 20px padding, animation-container has 20px padding
+        const availableWidth = container.clientWidth - 40; // 20px padding on each side
+        const maxWidth = Math.max(availableWidth, 800); // Minimum width of 800px
+        
+        // Maintain 4:3 aspect ratio with minimum height
+        this.canvas.width = maxWidth;
+        this.canvas.height = Math.max(maxWidth / 1.333, 400); // 4:3 aspect ratio (1.333) with min height of 400px
+        
+        // Update source and receiver positions for sound waves
+        if (this.soundWaves) {
+            this.soundWaves.setSourcePosition(100, this.canvas.height / 2);
+            this.soundWaves.setReceiverPosition(this.canvas.width - 100, this.canvas.height / 2);
+        }
+        
+        // Resize neural network to center it on the new canvas size
+        if (this.neuralNetwork) {
+            this.neuralNetwork.resize();
+        }
+        
+        // Initialize neural network if it hasn't been initialized yet
+        if (this.neuralNetwork && this.neuralNetwork.neurons.length === 0) {
+            this.neuralNetwork.initializeNetwork();
+        }
+    }
+    
+    animate(currentTime = 0) {
+        if (!this.isRunning) {
+            requestAnimationFrame((time) => this.animate(time));
+            return;
+        }
+        
+        // Initialize lastTime on first frame
+        if (this.lastTime === undefined) {
+            this.lastTime = currentTime;
+        }
+        
+        const deltaTime = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Update and render current animation
+        switch(this.currentAnimation) {
+            case 'brownian':
+                this.brownianMotion.update(deltaTime);
+                this.brownianMotion.render();
+                this.updateBrownianStats();
+                break;
+            case 'pendulum':
+                this.pendulum.update(deltaTime);
+                this.pendulum.render();
+                this.updatePendulumStats();
+                break;
+            case 'diffusion':
+                this.diffusion.update(deltaTime);
+                this.diffusion.render();
+                this.updateDiffusionStats();
+                break;
+            case 'waves':
+                this.waves.update(deltaTime);
+                this.waves.render();
+                this.updateWaveStats();
+                break;
+            case 'orbital':
+                this.orbital.update(deltaTime);
+                this.orbital.render();
+                this.updateOrbitalStats();
+                break;
+            case 'electric-fields':
+                this.electricFields.update(deltaTime);
+                this.electricFields.render();
+                this.updateElectricFieldsStats();
+                break;
+            case 'gas-laws':
+                this.gasLaws.update(deltaTime);
+                this.gasLaws.render();
+                this.updateGasLawsStats();
+                break;
+            case 'collisions':
+                this.collisions.update(deltaTime);
+                this.collisions.render();
+                this.updateCollisionStats();
+                break;
+            case 'friction':
+                this.friction.update(deltaTime);
+                this.friction.render();
+                this.updateFrictionStats();
+                break;
+
+            case 'magnetic-fields':
+                this.magneticFields.update(deltaTime);
+                this.magneticFields.render();
+                this.updateMagneticFieldsStats();
+                break;
+
+            case 'wave-particle-duality':
+                this.waveParticleDuality.update(deltaTime);
+                this.waveParticleDuality.render();
+                this.updateWaveParticleDualityStats();
+                break;
+            case 'nuclear-reactions':
+                this.nuclearReactions.update(deltaTime);
+                this.nuclearReactions.render();
+                break;
+            case 'fluid-flow':
+                if (this.fluidFlow) {
+                    this.fluidFlow.update(deltaTime);
+                    this.fluidFlow.render();
+                    this.updateFluidFlowStats();
+                }
+                break;
+            case 'bernoulli':
+                if (this.bernoulli) {
+                    this.bernoulli.update(deltaTime);
+                    this.bernoulli.render();
+                    this.updateBernoulliStats();
+                }
+                break;
+            case 'sound-waves':
+                if (this.soundWaves) {
+                    this.soundWaves.update(deltaTime);
+                    this.soundWaves.render();
+                    this.updateSoundWavesStats();
+                }
+                break;
+            case 'diode-transistor':
+                if (this.diodeTransistor) {
+                    this.diodeTransistor.update(deltaTime);
+                    this.diodeTransistor.render();
+                    this.updateDiodeTransistorStats();
+                }
+                break;
+            case 'neural-network':
+                if (this.neuralNetwork) {
+                    this.neuralNetwork.update(deltaTime);
+                    this.neuralNetwork.render();
+                    this.updateNeuralNetworkStats();
+                }
+                break;
+            case 'memory-management':
+                if (this.memoryManagement) {
+                    this.memoryManagement.update(deltaTime);
+                    this.memoryManagement.render();
+                    this.updateMemoryManagementStats();
+                }
+                break;
+        }
+        
+        requestAnimationFrame((time) => this.animate(time));
+    }
+    
+    updateBrownianStats() {
+        const stats = this.brownianMotion.getStats();
+        document.getElementById('activeParticles').textContent = stats.particleCount;
+        document.getElementById('avgSpeed').textContent = stats.avgSpeed.toFixed(2);
+        document.getElementById('simTime').textContent = (stats.time / 1000).toFixed(1) + 's';
+        
+        // Update new statistics if elements exist
+        const collisionElement = document.getElementById('brownianCollisionCount');
+        const meanFreePathElement = document.getElementById('brownianMeanFreePath');
+        const temperatureElement = document.getElementById('brownianTemperature');
+        
+        if (collisionElement) collisionElement.textContent = stats.collisionCount;
+        if (meanFreePathElement) meanFreePathElement.textContent = stats.meanFreePath.toFixed(1);
+        if (temperatureElement) temperatureElement.textContent = stats.temperature.toFixed(1);
+    }
+    
+    updatePendulumStats() {
+        const stats = this.pendulum.getStats();
+        document.getElementById('currentAngle').textContent = stats.angle.toFixed(1) + '°';
+        document.getElementById('angularVelocity').textContent = stats.angularVelocity.toFixed(2);
+        document.getElementById('period').textContent = stats.theoreticalPeriod.toFixed(2) + 's';
+        document.getElementById('pendulumTime').textContent = (stats.time / 1000).toFixed(1) + 's';
+        
+        // Update air resistance information
+        const airResistanceElement = document.getElementById('pendulumAirResistance');
+        const dampingElement = document.getElementById('pendulumDamping');
+        if (airResistanceElement) {
+            airResistanceElement.textContent = stats.airResistanceForce.toFixed(3);
+        }
+        if (dampingElement) {
+            dampingElement.textContent = stats.dampingCoefficient.toFixed(3);
+        }
+    }
+    
+    updateDiffusionStats() {
+        const stats = this.diffusion.getStats();
+        document.getElementById('diffusionParticleCount').textContent = stats.particleCount;
+        document.getElementById('diffusionAvgSpeed').textContent = stats.avgSpeed.toFixed(2);
+        document.getElementById('concentrationSpread').textContent = stats.concentrationSpread.toFixed(2);
+        document.getElementById('diffusionTime').textContent = (stats.time / 1000).toFixed(1) + 's';
+    }
+    
+
+    
+    updateWaveStats() {
+        const stats = this.waves.getStats();
+        document.getElementById('currentWaveType').textContent = stats.waveType;
+        document.getElementById('currentFrequency').textContent = stats.frequency + ' Hz';
+        document.getElementById('currentWavelength').textContent = stats.wavelength + ' px';
+        document.getElementById('currentAmplitude').textContent = stats.amplitude + ' px';
+        document.getElementById('currentWaveSpeed').textContent = stats.waveSpeed + ' px/s';
+        document.getElementById('currentWaveEnergy').textContent = stats.energy;
+        document.getElementById('wavesTime').textContent = stats.time + 's';
+    }
+    
+    updateOrbitalStats() {
+        const stats = this.orbital.getStats();
+        document.getElementById('orbitalPeriod').textContent = stats.period.toFixed(2) + 's';
+        document.getElementById('orbitalSpeed').textContent = stats.speed.toFixed(2);
+        document.getElementById('orbitalDistance').textContent = stats.distance.toFixed(1);
+        document.getElementById('orbitalTime').textContent = (stats.time / 1000).toFixed(1) + 's';
+        
+        // Display eccentricity value
+        if (stats.eccentricity !== undefined) {
+            document.getElementById('orbitalEccentricity').textContent = stats.eccentricity.toFixed(2);
+        }
+    }
+    
+    updateElectricFieldsStats() {
+        const stats = this.electricFields.getStats();
+        document.getElementById('activeCharges').textContent = stats.chargeCount;
+        document.getElementById('efParticleCount').textContent = stats.particleCount;
+        document.getElementById('efFieldStrength').textContent = stats.fieldStrength;
+        document.getElementById('efTime').textContent = stats.time + 's';
+    }
+    
+    updateGasLawsStats() {
+        const stats = this.gasLaws.getStats();
+        document.getElementById('gasParticleCount').textContent = stats.particleCount;
+        document.getElementById('gasTemperature').textContent = stats.temperature + 'K';
+        document.getElementById('gasPressure').textContent = stats.pressure.toFixed(2);
+        document.getElementById('gasVolume').textContent = stats.volume;
+    }
+    
+
+    
+    updateCollisionStats() {
+        const stats = this.collisions.getStats();
+        document.getElementById('collisionBallCount').textContent = stats.ballCount;
+        document.getElementById('collisionMomentum').textContent = stats.totalMomentum.toFixed(1);
+        document.getElementById('collisionEnergy').textContent = stats.totalEnergy.toFixed(1);
+        document.getElementById('collisionCount').textContent = stats.collisionCount;
+    }
+    
+    updateFrictionStats() {
+        const stats = this.friction.getStats();
+        document.getElementById('frictionSurface').textContent = stats.surfaceType;
+        document.getElementById('frictionAngle').textContent = stats.inclineAngle + '°';
+        document.getElementById('frictionNetForce').textContent = stats.netForce.toFixed(1);
+        document.getElementById('frictionAcceleration').textContent = stats.acceleration.toFixed(2);
+    }
+    
+
+    
+    updateMagneticFieldsStats() {
+        const stats = this.magneticFields.getStats();
+        document.getElementById('magneticFieldStrength').textContent = stats.fieldStrength;
+        document.getElementById('magneticParticleCount').textContent = stats.particleCount;
+        document.getElementById('magneticTime').textContent = stats.time + 's';
+    }
+    
+
+    
+    updateWaveParticleDualityStats() {
+        const stats = this.waveParticleDuality.getStats();
+        // Update stats display elements if they exist
+        const modeElement = document.getElementById('currentDualityMode');
+        const energyElement = document.getElementById('currentPhotonEnergy');
+        const wavelengthElement = document.getElementById('currentDualityWavelength');
+        const waveFunctionElement = document.getElementById('waveFunctionStatus');
+        const interferenceElement = document.getElementById('interferenceStatus');
+        const measurementElement = document.getElementById('measurementCount');
+        const timeElement = document.getElementById('dualityTime');
+        
+        if (modeElement) modeElement.textContent = stats.mode;
+        if (energyElement) energyElement.textContent = stats.photonEnergy + ' eV';
+        if (wavelengthElement) wavelengthElement.textContent = stats.wavelength + ' nm';
+        if (waveFunctionElement) waveFunctionElement.textContent = this.waveParticleDuality.showWaveFunction ? 'Active' : 'Hidden';
+        if (interferenceElement) interferenceElement.textContent = this.waveParticleDuality.showInterference ? 'Visible' : 'Hidden';
+        if (measurementElement) measurementElement.textContent = stats.measurementCount;
+        if (timeElement) timeElement.textContent = stats.time + 's';
+    }
+    
+    updateFluidFlowStats() {
+        if (!this.fluidFlow) return;
+        
+        const stats = this.fluidFlow.getStats();
+        // Update stats display elements if they exist
+        const flowRateElement = document.getElementById('fluidFlowRate');
+        const viscosityElement = document.getElementById('fluidViscosity');
+        const reynoldsElement = document.getElementById('reynoldsNumberValue');
+        const flowTypeElement = document.getElementById('flowType');
+        const avgVelocityElement = document.getElementById('averageVelocity');
+        const timeElement = document.getElementById('fluidTime');
+        
+        if (flowRateElement) flowRateElement.textContent = stats.flowRate.toFixed(1);
+        if (viscosityElement) viscosityElement.textContent = stats.viscosity.toFixed(1);
+        if (reynoldsElement) reynoldsElement.textContent = stats.reynoldsNumber;
+        if (flowTypeElement) flowTypeElement.textContent = stats.flowType;
+        if (avgVelocityElement) avgVelocityElement.textContent = stats.averageVelocity.toFixed(2);
+        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+    }
+    
+    updateBernoulliStats() {
+        if (!this.bernoulli) return;
+        
+        const stats = this.bernoulli.getStats();
+        // Update stats display elements if they exist
+        const pipeWidthElement = document.getElementById('bernoulliPipeWidth');
+        const densityElement = document.getElementById('bernoulliDensity');
+        const pressureElement = document.getElementById('bernoulliPressureDiff');
+        const velocityRatioElement = document.getElementById('velocityRatio');
+        const energyElement = document.getElementById('energyConservation');
+        const timeElement = document.getElementById('bernoulliTime');
+        
+        if (pipeWidthElement) pipeWidthElement.textContent = stats.pipeWidth;
+        if (densityElement) densityElement.textContent = stats.fluidDensity.toFixed(1);
+        if (pressureElement) pressureElement.textContent = stats.pressureDifference.toFixed(1);
+        if (velocityRatioElement) velocityRatioElement.textContent = stats.velocityRatio.toFixed(1);
+        if (energyElement) energyElement.textContent = stats.energyConservation;
+        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+    }
+    
+    updateSoundWavesStats() {
+        if (!this.soundWaves) return;
+        
+        const stats = this.soundWaves.getStats();
+        // Update stats display elements if they exist
+        const waveTypeElement = document.getElementById('soundWaveTypeDisplay');
+        const frequencyElement = document.getElementById('soundFrequency');
+        const wavelengthElement = document.getElementById('soundWavelength');
+        const waveSpeedElement = document.getElementById('soundWaveSpeed');
+        const amplitudeElement = document.getElementById('soundAmplitude');
+        const particleCountElement = document.getElementById('soundParticleCount');
+        const timeElement = document.getElementById('soundTime');
+        
+        if (waveTypeElement) waveTypeElement.textContent = stats.waveType.charAt(0).toUpperCase() + stats.waveType.slice(1);
+        if (frequencyElement) frequencyElement.textContent = stats.frequency + ' Hz';
+        if (wavelengthElement) wavelengthElement.textContent = stats.wavelength.toFixed(2) + ' m';
+        if (waveSpeedElement) waveSpeedElement.textContent = stats.waveSpeed + ' m/s';
+        if (amplitudeElement) amplitudeElement.textContent = stats.amplitude + '%';
+        if (particleCountElement) particleCountElement.textContent = stats.particleCount;
+        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+    }
+    
+    updateDiodeTransistorStats() {
+        if (!this.diodeTransistor) return;
+        
+        const stats = this.diodeTransistor.getStats();
+        // Update stats display elements if they exist
+        const componentTypeElement = document.getElementById('diodeComponentTypeDisplay');
+        const biasTypeElement = document.getElementById('diodeBiasTypeDisplay');
+        const inputVoltageElement = document.getElementById('diodeInputVoltageDisplay');
+        const baseVoltageElement = document.getElementById('diodeBaseVoltageDisplay');
+        const currentElement = document.getElementById('diodeCurrent');
+        const powerElement = document.getElementById('diodePower');
+        const statusElement = document.getElementById('diodeStatus');
+        const temperatureElement = document.getElementById('diodeTemperature');
+        const timeElement = document.getElementById('diodeTime');
+        
+        if (componentTypeElement) componentTypeElement.textContent = stats.componentType.toUpperCase();
+        if (biasTypeElement) biasTypeElement.textContent = stats.biasType.toUpperCase();
+        if (inputVoltageElement) inputVoltageElement.textContent = stats.inputVoltage + 'V';
+        if (baseVoltageElement) baseVoltageElement.textContent = stats.baseVoltage + 'V';
+        if (currentElement) currentElement.textContent = stats.current.toFixed(1) + 'mA';
+        if (powerElement) powerElement.textContent = stats.power.toFixed(1) + 'mW';
+        if (statusElement) statusElement.textContent = stats.isActive ? 'ACTIVE' : 'INACTIVE';
+        if (temperatureElement) temperatureElement.textContent = stats.temperature + '°C';
+        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+        
+        // Show/hide base voltage stat based on component type
+        const baseVoltageStat = document.getElementById('baseVoltageStat');
+        if (baseVoltageStat) {
+            baseVoltageStat.style.display = (stats.componentType === 'npn' || stats.componentType === 'pnp') ? 'block' : 'none';
+        }
+    }
+    
+    updateNeuralNetworkStats() {
+        if (!this.neuralNetwork) return;
+        
+        const stats = this.neuralNetwork.getStats();
+        // Update stats display elements if they exist
+        const epochElement = document.getElementById('neuralEpoch');
+        const lossElement = document.getElementById('neuralLoss');
+        const accuracyElement = document.getElementById('neuralAccuracy');
+        const learningRateElement = document.getElementById('neuralLearningRate');
+        const speedElement = document.getElementById('neuralSpeed');
+        const phaseElement = document.getElementById('neuralPhase');
+        const dataIndexElement = document.getElementById('neuralDataIndex');
+        
+        if (epochElement) epochElement.textContent = stats.epoch;
+        if (lossElement) lossElement.textContent = stats.currentLoss.toFixed(4);
+        if (accuracyElement) accuracyElement.textContent = (stats.currentAccuracy * 100).toFixed(1) + '%';
+        if (learningRateElement) learningRateElement.textContent = stats.learningRate;
+        if (speedElement) speedElement.textContent = stats.speed.toFixed(1) + 'x';
+        if (phaseElement) phaseElement.textContent = stats.animationPhase;
+        if (dataIndexElement) dataIndexElement.textContent = stats.trainingDataIndex;
+    }
+    
+    showScienceExplanation() {
+        const modal = document.getElementById('scienceModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        
+        // Get content based on current animation
+        const content = this.getScienceContent();
+        
+        // Update modal content
+        modalTitle.textContent = content.title;
+        modalContent.innerHTML = content.html;
+        
+        // Show modal
+        modal.style.display = 'block';
+    }
+    
+    closeModal() {
+        const modal = document.getElementById('scienceModal');
+        modal.style.display = 'none';
+    }
+    
+    getCurrentAnimationState() {
+        const state = {
+            animation: this.currentAnimation,
+            controls: {},
+            stats: {}
+        };
+        
+        // Get current control values and stats based on animation type
+        switch(this.currentAnimation) {
+            case 'brownian':
+                state.controls = {
+                    particleCount: document.getElementById('brownianParticleCount')?.value || '15',
+                    temperature: document.getElementById('brownianTemperature')?.value || '1.0',
+                    speed: document.getElementById('brownianSpeed')?.value || '1.0'
+                };
+                state.stats = this.brownianMotion?.getStats() || {};
+                break;
+            case 'pendulum':
+                state.controls = {
+                    length: document.getElementById('pendulumLength')?.value || '100',
+                    gravity: document.getElementById('pendulumGravity')?.value || '9.8',
+                    damping: document.getElementById('pendulumDamping')?.value || '0.01'
+                };
+                state.stats = this.pendulum?.getStats() || {};
+                break;
+            case 'waves':
+                state.controls = {
+                    waveType: document.getElementById('waveType')?.value || 'transverse',
+                    frequency: document.getElementById('waveFrequency')?.value || '1.0',
+                    amplitude: document.getElementById('waveAmplitude')?.value || '50'
+                };
+                state.stats = this.wavePropagation?.getStats() || {};
+                break;
+            case 'electric-fields':
+                state.controls = {
+                    fieldStrength: document.getElementById('efFieldStrength')?.value || '1.0',
+                    particleCount: document.getElementById('efParticleCount')?.value || '20'
+                };
+                state.stats = this.electricFields?.getStats() || {};
+                break;
+            case 'magnetic-fields':
+                state.controls = {
+                    fieldStrength: document.getElementById('magneticFieldStrength')?.value || '1.0',
+                    particleCount: document.getElementById('magneticParticleCount')?.value || '15'
+                };
+                state.stats = this.magneticFields?.getStats() || {};
+                break;
+            case 'gas-laws':
+                state.controls = {
+                    temperature: document.getElementById('gasTemperature')?.value || '300',
+                    pressure: document.getElementById('gasPressure')?.value || '1.0',
+                    volume: document.getElementById('gasVolume')?.value || '300'
+                };
+                state.stats = this.gasLaws?.getStats() || {};
+                break;
+            case 'collisions':
+                state.controls = {
+                    ballCount: document.getElementById('ballCount')?.value || '5',
+                    restitution: document.getElementById('restitution')?.value || '0.8',
+                    gravity: document.getElementById('collisionGravity')?.value || '9.8'
+                };
+                state.stats = this.collisions?.getStats() || {};
+                break;
+            case 'friction':
+                state.controls = {
+                    angle: document.getElementById('inclineAngle')?.value || '20',
+                    frictionCoefficient: document.getElementById('frictionCoefficient')?.value || '0.3',
+                    mass: document.getElementById('objectMass')?.value || '1'
+                };
+                state.stats = this.friction?.getStats() || {};
+                break;
+
+            case 'wave-particle-duality':
+                state.controls = {
+                    mode: document.getElementById('dualityMode')?.value || 'wave',
+                    energy: document.getElementById('dualityEnergy')?.value || '5.0',
+                    wavelength: document.getElementById('dualityWavelength')?.value || '150'
+                };
+                state.stats = this.waveParticleDuality?.getStats() || {};
+                break;
+            case 'sound-waves':
+                state.controls = {
+                    waveType: document.getElementById('soundWaveType')?.value || 'transverse',
+                    frequency: document.getElementById('soundFrequency')?.value || '5',
+                    amplitude: document.getElementById('soundAmplitude')?.value || '50',
+                    waveSpeed: document.getElementById('soundSpeed')?.value || '343',
+                    particleCount: document.getElementById('soundParticles')?.value || '15',
+                    animationSpeed: document.getElementById('soundAnimationSpeed')?.value || '1.0'
+                };
+                state.stats = this.soundWaves?.getStats() || {};
+                break;
+            case 'diode-transistor':
+                state.controls = {
+                    componentType: document.getElementById('diodeComponentType')?.value || 'diode',
+                    biasType: document.getElementById('diodeBiasType')?.value || 'forward',
+                    inputVoltage: document.getElementById('diodeInputVoltage')?.value || '5',
+                    baseVoltage: document.getElementById('diodeBaseVoltage')?.value || '0.7',
+                    animationSpeed: document.getElementById('diodeAnimationSpeed')?.value || '1.0'
+                };
+                state.stats = this.diodeTransistor?.getStats() || {};
+                break;
+            case 'neural-network':
+                state.controls = {
+                    learningRate: document.getElementById('neuralLearningRate')?.value || '0.1',
+                    speed: document.getElementById('neuralSpeed')?.value || '1.0',
+                    mode: document.getElementById('neuralMode')?.value || 'training'
+                };
+                state.stats = this.neuralNetwork?.getStats() || {};
+                break;
+            case 'memory-management':
+                state.controls = {
+                    mode: document.getElementById('memoryMode')?.value || 'random',
+                    retentionRate: document.getElementById('retentionRate')?.value || '0.5',
+                    decayRate: document.getElementById('decayRate')?.value || '0.1'
+                };
+                state.stats = this.memoryManagement?.getStats() || {};
+                break;
+        }
+        
+        return state;
+    }
+    
+    getScienceContent() {
+        switch (this.currentAnimation) {
+            case 'brownian':
+                return {
+                    title: 'Brownian Motion - Random Particle Movement',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Brownian Motion?</h3>
+                            <p>Brownian motion is the random, erratic movement of particles suspended in a fluid (liquid or gas) caused by collisions with fast-moving molecules in the surrounding medium. This phenomenon was first observed by botanist Robert Brown in 1827 when studying pollen grains in water.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Molecular Motion:</strong> All particles are in constant motion due to thermal energy</li>
+                                <li><strong>Random Walk:</strong> Each collision changes the particle's direction randomly</li>
+                                <li><strong>Temperature Dependence:</strong> Higher temperature = faster molecular motion = more vigorous Brownian motion</li>
+                                <li><strong>Particle Size Effect:</strong> Smaller particles show more dramatic Brownian motion</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Particles moving in seemingly random directions</li>
+                                <li>No predictable path - each particle follows a "random walk"</li>
+                                <li>Particles occasionally changing direction due to collisions</li>
+                                <li>Faster movement at higher temperatures</li>
+                                <li>Different colored particles for easy tracking</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Diffusion of molecules in cells</li>
+                                <li>Particle movement in air pollution</li>
+                                <li>Understanding molecular motion in chemistry</li>
+                                <li>Brownian motion in financial markets</li>
+                            </ul>
+                            
+                            <h3>Mathematical Description</h3>
+                            <p>The mean squared displacement (MSD) of a Brownian particle follows: <strong>MSD = 6Dt</strong>, where D is the diffusion coefficient and t is time. This relationship shows that the average distance a particle travels increases with the square root of time.</p>
+                        </div>
+                    `
+                };
+            case 'sound-waves':
+                return {
+                    title: 'Sound Waves - Wave Propagation',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Sound Waves?</h3>
+                            <p>Sound waves are mechanical waves that propagate through a medium (like air, water, or solids) by causing particles to vibrate. They are longitudinal waves, meaning the particles move back and forth in the same direction as the wave travels.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Longitudinal Waves:</strong> Particles oscillate parallel to wave direction</li>
+                                <li><strong>Transverse Waves:</strong> Particles oscillate perpendicular to wave direction</li>
+                                <li><strong>Compression & Rarefaction:</strong> High and low pressure regions in the medium</li>
+                                <li><strong>Wave Speed:</strong> v = fλ, where f is frequency and λ is wavelength</li>
+                                <li><strong>Amplitude:</strong> Maximum displacement of particles from equilibrium</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Wave pulse traveling from source to receiver</li>
+                                <li>Particles moving as the wave passes through</li>
+                                <li>Compression zones (orange) and rarefaction zones (cyan)</li>
+                                <li>Different wave types: transverse, longitudinal, and combined</li>
+                                <li>Wave speed and frequency effects on propagation</li>
+                            </ul>
+                            
+                            <h3>Wave Types Explained</h3>
+                            <ul>
+                                <li><strong>Transverse:</strong> Like waves on a string - particles move up and down</li>
+                                <li><strong>Longitudinal:</strong> Like sound in air - particles move back and forth</li>
+                                <li><strong>Combined:</strong> Shows both transverse and longitudinal components</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Musical instruments and sound production</li>
+                                <li>Ultrasound imaging in medicine</li>
+                                <li>Seismic waves in earthquake detection</li>
+                                <li>Sonar and underwater communication</li>
+                                <li>Acoustic engineering and noise control</li>
+                            </ul>
+                            
+                            <h3>Mathematical Description</h3>
+                            <p>For a sound wave: <strong>v = √(B/ρ)</strong>, where v is wave speed, B is bulk modulus, and ρ is density. The frequency determines pitch, while amplitude determines loudness. The relationship <strong>v = fλ</strong> connects speed, frequency, and wavelength.</p>
+                        </div>
+                    `
+                };
+            case 'diode-transistor':
+                return {
+                    title: 'Diode & Transistor - Electronic Components',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Diodes and Transistors?</h3>
+                            <p>Diodes and transistors are fundamental electronic components that control the flow of electrical current. Diodes allow current to flow in one direction only, while transistors can amplify signals and act as electronic switches.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Semiconductor Physics:</strong> Materials with conductivity between conductors and insulators</li>
+                                <li><strong>P-N Junction:</strong> Boundary between P-type (holes) and N-type (electrons) materials</li>
+                                <li><strong>Forward Bias:</strong> Positive voltage applied to P-side, negative to N-side</li>
+                                <li><strong>Reverse Bias:</strong> Opposite voltage polarity blocks current flow</li>
+                                <li><strong>Transistor Amplification:</strong> Small base current controls large collector current</li>
+                                <li><strong>Particle Flow:</strong> Electrons and holes flow in opposite directions but contribute to current in the same direction</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li><strong>Electrons (blue circles):</strong> Move from N-type to P-type material during forward bias</li>
+                                <li><strong>Holes (red outlined circles):</strong> Move from P-type to N-type material during forward bias</li>
+                                <li><strong>Current Flow:</strong> Only occurs in forward bias conditions with sufficient voltage</li>
+                                <li><strong>Voltage Drop:</strong> ~0.7V across diode in forward bias</li>
+                                <li><strong>Transistor Control:</strong> Base voltage controls collector current amplification</li>
+                                <li><strong>Energy Visualization:</strong> Pulsating circles represent electromagnetic field and power dissipation</li>
+                            </ul>
+                            
+                            <h3>Component Behavior</h3>
+                            <ul>
+                                <li><strong>Diode Forward Bias:</strong> Current flows when voltage > 0.7V, voltage drop ~0.7V</li>
+                                <li><strong>Diode Reverse Bias:</strong> No current flow, acts as insulator</li>
+                                <li><strong>NPN Transistor:</strong> Electron flow from emitter to collector, base controls amplification</li>
+                                <li><strong>PNP Transistor:</strong> Hole flow from emitter to collector, base controls amplification</li>
+                                <li><strong>Amplification Factor:</strong> β = Ic/Ib (collector current / base current) ≈ 100</li>
+                            </ul>
+                            
+                            <h3>Particle Physics</h3>
+                            <ul>
+                                <li><strong>Electrons:</strong> Filled blue circles representing negative charge carriers</li>
+                                <li><strong>Holes:</strong> Red outlined circles representing positive charge carriers (absence of electrons)</li>
+                                <li><strong>Flow Direction:</strong> Electrons and holes move in opposite directions but both contribute to conventional current flow</li>
+                                <li><strong>Energy Levels:</strong> Particles move faster and glow brighter with higher voltage</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Rectifiers in power supplies</li>
+                                <li>Amplifiers in audio systems</li>
+                                <li>Digital logic circuits</li>
+                                <li>Voltage regulators</li>
+                                <li>Radio frequency circuits</li>
+                                <li>Computer processors and memory</li>
+                            </ul>
+                            
+                            <h3>Mathematical Description</h3>
+                            <p>For a diode: <strong>I = I₀(e^(V/Vₜ) - 1)</strong>, where I is current, V is voltage, and Vₜ is thermal voltage (~26mV at room temperature). For a transistor: <strong>Ic = β × Ib</strong>, where β is the current gain factor (typically 50-200).</p>
+                            
+                            <h3>Interactive Features</h3>
+                            <ul>
+                                <li>Switch between diode, NPN, and PNP transistor modes</li>
+                                <li>Adjust input voltage to see current flow changes</li>
+                                <li>Control base voltage for transistor amplification</li>
+                                <li>Observe different bias conditions (forward, reverse, off)</li>
+                                <li>Watch real-time current and power calculations</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'pendulum':
+                return {
+                    title: 'Simple Pendulum - Harmonic Oscillation',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is a Simple Pendulum?</h3>
+                            <p>A simple pendulum consists of a point mass (bob) suspended from a fixed point by a massless, inextensible string. When displaced from its equilibrium position, it oscillates back and forth under the influence of gravity.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Simple Harmonic Motion:</strong> For small angles, the motion is approximately simple harmonic</li>
+                                <li><strong>Period Formula:</strong> T = 2π√(L/g), where L is length and g is gravitational acceleration</li>
+                                <li><strong>Energy Conservation:</strong> Kinetic and potential energy continuously convert between each other</li>
+                                <li><strong>Damping:</strong> Air resistance causes the amplitude to gradually decrease</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Regular back-and-forth oscillation</li>
+                                <li>Period remains constant regardless of amplitude (for small angles)</li>
+                                <li>Longer pendulum = longer period</li>
+                                <li>Gradual decrease in amplitude due to air resistance</li>
+                                <li>Maximum speed at the bottom, zero speed at the extremes</li>
+                            </ul>
+                            
+                            <h3>Energy Transformations</h3>
+                            <ul>
+                                <li><strong>At extremes:</strong> Maximum potential energy, zero kinetic energy</li>
+                                <li><strong>At bottom:</strong> Maximum kinetic energy, minimum potential energy</li>
+                                <li><strong>Total energy:</strong> Gradually decreases due to air resistance</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Clock mechanisms (grandfather clocks)</li>
+                                <li>Seismometers for earthquake detection</li>
+                                <li>Metronomes for musical timing</li>
+                                <li>Amusement park rides</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'waves':
+                return {
+                    title: 'Wave Propagation - Energy Transfer',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Waves?</h3>
+                            <p>Waves are disturbances that transfer energy through a medium without transferring matter. They can be mechanical (requiring a medium) or electromagnetic (can travel through vacuum).</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Transverse Waves:</strong> Particles move perpendicular to wave direction (like water waves)</li>
+                                <li><strong>Longitudinal Waves:</strong> Particles move parallel to wave direction (like sound waves)</li>
+                                <li><strong>Wave Properties:</strong> Amplitude, frequency, wavelength, and speed</li>
+                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
+                                <li><strong>Interference:</strong> Waves can add together or cancel each other out</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Regular, repeating pattern of disturbance</li>
+                                <li>Waves traveling at constant speed</li>
+                                <li>Different wave types (transverse vs longitudinal)</li>
+                                <li>Interference patterns when waves overlap</li>
+                                <li>Energy transfer without matter movement</li>
+                            </ul>
+                            
+                            <h3>Wave Characteristics</h3>
+                            <ul>
+                                <li><strong>Amplitude:</strong> Maximum displacement from equilibrium</li>
+                                <li><strong>Frequency:</strong> Number of complete cycles per second (Hz)</li>
+                                <li><strong>Wavelength:</strong> Distance between consecutive identical points</li>
+                                <li><strong>Period:</strong> Time for one complete cycle</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Sound waves in air and water</li>
+                                <li>Light waves and electromagnetic radiation</li>
+                                <li>Earthquake waves (seismic waves)</li>
+                                <li>Radio waves for communication</li>
+                                <li>Ocean waves and tides</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'diffusion':
+                return {
+                    title: 'Diffusion - Particle Spread',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Diffusion?</h3>
+                            <p>Diffusion is the process by which particles spread from regions of high concentration to regions of low concentration, driven by random molecular motion. This is a fundamental process in nature that leads to the uniform distribution of particles.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Fick's First Law:</strong> J = -D∇C (flux is proportional to concentration gradient)</li>
+                                <li><strong>Concentration Gradient:</strong> Difference in concentration between regions</li>
+                                <li><strong>Diffusion Coefficient:</strong> Measure of how quickly particles diffuse</li>
+                                <li><strong>Temperature Effect:</strong> Higher temperature increases diffusion rate</li>
+                                <li><strong>Particle Size:</strong> Smaller particles diffuse faster</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Particles spreading from concentrated areas</li>
+                                <li>Gradual mixing of different particle types</li>
+                                <li>Faster diffusion at higher temperatures</li>
+                                <li>Concentration gradient decreasing over time</li>
+                                <li>Eventually uniform distribution</li>
+                            </ul>
+                            
+                            <h3>Diffusion Process</h3>
+                            <ul>
+                                <li><strong>Initial State:</strong> High concentration in one region</li>
+                                <li><strong>Random Motion:</strong> Particles move randomly due to thermal energy</li>
+                                <li><strong>Net Movement:</strong> More particles move from high to low concentration</li>
+                                <li><strong>Equilibrium:</strong> Eventually uniform concentration throughout</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Oxygen diffusion in lungs</li>
+                                <li>Nutrient absorption in cells</li>
+                                <li>Perfume spreading in air</li>
+                                <li>Salt dissolving in water</li>
+                                <li>Heat conduction in materials</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'orbital':
+                return {
+                    title: 'Orbital Motion - Gravitational Dynamics',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Orbital Motion?</h3>
+                            <p>Orbital motion describes the path of one object around another under the influence of gravity. This fundamental concept explains planetary orbits, satellite motion, and many other celestial phenomena.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Kepler's Laws:</strong> Three laws describing planetary motion</li>
+                                <li><strong>Gravitational Force:</strong> F = GMm/r² (inverse square law)</li>
+                                <li><strong>Orbital Velocity:</strong> v = √(GM/r) for circular orbits</li>
+                                <li><strong>Eccentricity:</strong> Measure of how elliptical an orbit is (0 = circular, 1 = parabolic)</li>
+                                <li><strong>Conservation of Angular Momentum:</strong> Orbital angular momentum remains constant</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Elliptical or circular paths around central mass</li>
+                                <li>Faster motion when closer to the center (Kepler's Second Law)</li>
+                                <li>Slower motion when farther from the center</li>
+                                <li>Different orbital shapes based on eccentricity</li>
+                                <li>Consistent orbital period for same central mass</li>
+                            </ul>
+                            
+                            <h3>Kepler's Three Laws</h3>
+                            <ol>
+                                <li><strong>First Law:</strong> Orbits are ellipses with the central mass at one focus</li>
+                                <li><strong>Second Law:</strong> Equal areas are swept in equal times (faster when closer)</li>
+                                <li><strong>Third Law:</strong> Orbital period squared is proportional to semi-major axis cubed</li>
+                            </ol>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Planetary orbits around the Sun</li>
+                                <li>Satellite orbits around Earth</li>
+                                <li>Electron orbits in atoms (Bohr model)</li>
+                                <li>Binary star systems</li>
+                                <li>Spacecraft trajectories</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'electric-fields':
+                return {
+                    title: 'Electric Fields - Charged Particle Interactions',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Electric Fields?</h3>
+                            <p>Electric fields are regions of space around charged particles where other charges experience forces. They are invisible but can be visualized through their effects on test charges and field lines.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Coulomb's Law:</strong> F = kq₁q₂/r² (force between charges)</li>
+                                <li><strong>Electric Field:</strong> E = F/q (force per unit charge)</li>
+                                <li><strong>Field Lines:</strong> Imaginary lines showing field direction</li>
+                                <li><strong>Superposition:</strong> Total field is sum of individual fields</li>
+                                <li><strong>Conservation of Charge:</strong> Net charge remains constant</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Test particles moving along field lines</li>
+                                <li>Positive particles repelled by positive charges</li>
+                                <li>Negative particles attracted to positive charges</li>
+                                <li>Field strength decreases with distance</li>
+                                <li>Complex field patterns with multiple charges</li>
+                            </ul>
+                            
+                            <h3>Field Properties</h3>
+                            <ul>
+                                <li><strong>Direction:</strong> Field lines point away from positive, toward negative</li>
+                                <li><strong>Strength:</strong> Closer lines indicate stronger fields</li>
+                                <li><strong>Superposition:</strong> Fields add vectorially</li>
+                                <li><strong>Conservative:</strong> Work done is path-independent</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Electrostatic precipitators</li>
+                                <li>Capacitors and electronic circuits</li>
+                                <li>Lightning and atmospheric electricity</li>
+                                <li>Particle accelerators</li>
+                                <li>Electron microscopes</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'gas-laws':
+                return {
+                    title: 'Gas Laws - Pressure, Volume, Temperature Relationships',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Gas Laws?</h3>
+                            <p>Gas laws describe the relationships between pressure, volume, temperature, and amount of gas. These fundamental laws help us understand how gases behave under different conditions.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Boyle's Law:</strong> P₁V₁ = P₂V₂ (inverse relationship between pressure and volume)</li>
+                                <li><strong>Charles's Law:</strong> V₁/T₁ = V₂/T₂ (direct relationship between volume and temperature)</li>
+                                <li><strong>Gay-Lussac's Law:</strong> P₁/T₁ = P₂/T₂ (direct relationship between pressure and temperature)</li>
+                                <li><strong>Combined Gas Law:</strong> P₁V₁/T₁ = P₂V₂/T₂</li>
+                                <li><strong>Ideal Gas Law:</strong> PV = nRT (universal gas law)</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Particles moving faster at higher temperatures</li>
+                                <li>More frequent collisions at higher pressure</li>
+                                <li>Particles spreading out in larger volumes</li>
+                                <li>Pressure changes with volume and temperature</li>
+                                <li>Random motion of gas particles</li>
+                            </ul>
+                            
+                            <h3>Gas Law Relationships</h3>
+                            <ul>
+                                <li><strong>Boyle's Law:</strong> Decrease volume → increase pressure</li>
+                                <li><strong>Charles's Law:</strong> Increase temperature → increase volume</li>
+                                <li><strong>Gay-Lussac's Law:</strong> Increase temperature → increase pressure</li>
+                                <li><strong>Avogadro's Law:</strong> More particles → larger volume</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Internal combustion engines</li>
+                                <li>Refrigeration and air conditioning</li>
+                                <li>Weather and atmospheric pressure</li>
+                                <li>Scuba diving and pressure changes</li>
+                                <li>Hot air balloons</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'collisions':
+                return {
+                    title: 'Collision Physics - Momentum and Energy Conservation',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Collisions?</h3>
+                            <p>Collisions are interactions between objects that result in changes in their motion. Understanding collisions involves principles of momentum conservation and energy transfer.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Momentum Conservation:</strong> Total momentum before = total momentum after</li>
+                                <li><strong>Elastic Collisions:</strong> Kinetic energy is conserved</li>
+                                <li><strong>Inelastic Collisions:</strong> Some kinetic energy is lost</li>
+                                <li><strong>Impulse:</strong> Change in momentum = force × time</li>
+                                <li><strong>Coefficient of Restitution:</strong> Measure of collision elasticity</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Objects changing direction after collision</li>
+                                <li>Speed changes based on collision type</li>
+                                <li>Energy transfer between objects</li>
+                                <li>Momentum conservation in all collisions</li>
+                                <li>Different outcomes for elastic vs inelastic collisions</li>
+                            </ul>
+                            
+                            <h3>Collision Types</h3>
+                            <ul>
+                                <li><strong>Elastic:</strong> Perfect bounce, energy conserved</li>
+                                <li><strong>Inelastic:</strong> Objects stick together, energy lost</li>
+                                <li><strong>Partially Elastic:</strong> Some energy lost, some bounce</li>
+                                <li><strong>Explosive:</strong> Energy added, objects separate</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Car crash safety design</li>
+                                <li>Sports equipment design</li>
+                                <li>Particle physics experiments</li>
+                                <li>Billiards and pool</li>
+                                <li>Rocket propulsion</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'friction':
+                return {
+                    title: 'Friction & Inclined Planes - Force Analysis',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Friction?</h3>
+                            <p>Friction is a force that opposes the relative motion of objects in contact. On inclined planes, friction plays a crucial role in determining whether objects slide or remain stationary.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Static Friction:</strong> Prevents motion when object is at rest</li>
+                                <li><strong>Kinetic Friction:</strong> Opposes motion when object is sliding</li>
+                                <li><strong>Friction Force:</strong> f = μN (coefficient × normal force)</li>
+                                <li><strong>Normal Force:</strong> Component of weight perpendicular to surface</li>
+                                <li><strong>Net Force:</strong> Determines acceleration down the incline</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Objects sliding down inclined surfaces</li>
+                                <li>Different sliding speeds based on friction</li>
+                                <li>Objects stopping when friction is high</li>
+                                <li>Force vectors showing gravity and friction</li>
+                                <li>Acceleration changes with angle and friction</li>
+                            </ul>
+                            
+                            <h3>Force Analysis</h3>
+                            <ul>
+                                <li><strong>Gravity Component:</strong> mg sin(θ) down the incline</li>
+                                <li><strong>Normal Force:</strong> mg cos(θ) perpendicular to surface</li>
+                                <li><strong>Friction Force:</strong> μmg cos(θ) opposing motion</li>
+                                <li><strong>Net Force:</strong> mg sin(θ) - μmg cos(θ)</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Vehicle braking systems</li>
+                                <li>Walking and running mechanics</li>
+                                <li>Rock climbing and mountaineering</li>
+                                <li>Industrial conveyor systems</li>
+                                <li>Sports equipment design</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'magnetic-fields':
+                return {
+                    title: 'Magnetic Fields - Magnetic Force Interactions',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Magnetic Fields?</h3>
+                            <p>Magnetic fields are regions of space around magnets where magnetic materials and moving charges experience forces. They are fundamental to electromagnetism and many modern technologies.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Magnetic Force:</strong> F = qvB sin(θ) on moving charges</li>
+                                <li><strong>Field Lines:</strong> Imaginary lines showing field direction</li>
+                                <li><strong>Right-Hand Rule:</strong> Determines force direction on moving charges</li>
+                                <li><strong>Field Strength:</strong> Measured in Tesla (T) or Gauss</li>
+                                <li><strong>Superposition:</strong> Total field is sum of individual fields</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Charged particles moving in curved paths</li>
+                                <li>Different motion for positive vs negative charges</li>
+                                <li>Circular motion in uniform magnetic fields</li>
+                                <li>Field lines showing magnetic field direction</li>
+                                <li>Force perpendicular to both velocity and field</li>
+                            </ul>
+                            
+                            <h3>Magnetic Field Properties</h3>
+                            <ul>
+                                <li><strong>Direction:</strong> Field lines point from north to south pole</li>
+                                <li><strong>Strength:</strong> Decreases with distance from magnet</li>
+                                <li><strong>Force Direction:</strong> Perpendicular to both velocity and field</li>
+                                <li><strong>No Work:</strong> Magnetic force does no work on charges</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Electric motors and generators</li>
+                                <li>Magnetic resonance imaging (MRI)</li>
+                                <li>Particle accelerators</li>
+                                <li>Magnetic levitation trains</li>
+                                <li>Compass navigation</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'wave-particle-duality':
+                return {
+                    title: 'Wave-Particle Duality - Quantum Mechanics',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Wave-Particle Duality?</h3>
+                            <p>Wave-particle duality is a fundamental concept in quantum mechanics where particles exhibit both wave-like and particle-like properties depending on how we observe them. This challenges our classical understanding of matter.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>De Broglie Wavelength:</strong> λ = h/p (wavelength = Planck's constant/momentum)</li>
+                                <li><strong>Wave Function:</strong> Mathematical description of quantum state</li>
+                                <li><strong>Superposition:</strong> Particles can exist in multiple states simultaneously</li>
+                                <li><strong>Measurement Effect:</strong> Observation affects the system</li>
+                                <li><strong>Interference:</strong> Wave-like behavior in experiments</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Wave-like interference patterns</li>
+                                <li>Particle-like discrete measurements</li>
+                                <li>Superposition of states</li>
+                                <li>Measurement affecting the system</li>
+                                <li>Dual behavior depending on observation method</li>
+                            </ul>
+                            
+                            <h3>Quantum Phenomena</h3>
+                            <ul>
+                                <li><strong>Double-Slit Experiment:</strong> Shows both wave and particle behavior</li>
+                                <li><strong>Uncertainty Principle:</strong> Can't know position and momentum precisely</li>
+                                <li><strong>Quantum Tunneling:</strong> Particles can pass through barriers</li>
+                                <li><strong>Entanglement:</strong> Particles can be correlated across distance</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Electron microscopes</li>
+                                <li>Quantum computing</li>
+                                <li>Quantum cryptography</li>
+                                <li>Semiconductor technology</li>
+                                <li>Quantum sensors</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'nuclear-reactions':
+                return {
+                    title: 'Nuclear Reactions - Fission and Fusion',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Nuclear Reactions?</h3>
+                            <p>Nuclear reactions involve changes in the nucleus of atoms, releasing or absorbing tremendous amounts of energy. Fission (splitting) and fusion (combining) are the two main types of nuclear reactions.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Nuclear Fission:</strong> Heavy nucleus splits into lighter nuclei + energy</li>
+                                <li><strong>Nuclear Fusion:</strong> Light nuclei combine to form heavier nucleus + energy</li>
+                                <li><strong>Mass-Energy Equivalence:</strong> E = mc² (Einstein's equation)</li>
+                                <li><strong>Chain Reaction:</strong> Neutrons from one fission trigger more fissions</li>
+                                <li><strong>Critical Mass:</strong> Minimum mass needed for sustained chain reaction</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Nuclei splitting or combining</li>
+                                <li>Energy release in the form of particles</li>
+                                <li>Neutrons triggering additional reactions</li>
+                                <li>Chain reactions spreading through material</li>
+                                <li>Different reaction rates based on conditions</li>
+                            </ul>
+                            
+                            <h3>Nuclear Processes</h3>
+                            <ul>
+                                <li><strong>Fission:</strong> Uranium-235 + neutron → lighter nuclei + 2-3 neutrons + energy</li>
+                                <li><strong>Fusion:</strong> Hydrogen nuclei → Helium + energy (like in stars)</li>
+                                <li><strong>Radioactive Decay:</strong> Unstable nuclei emit particles</li>
+                                <li><strong>Neutron Capture:</strong> Nuclei absorb neutrons</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Nuclear power plants</li>
+                                <li>Nuclear weapons</li>
+                                <li>Medical radiation therapy</li>
+                                <li>Radioactive dating</li>
+                                <li>Fusion power research</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'fluid-flow':
+                return {
+                    title: 'Fluid Flow - Laminar and Turbulent Dynamics',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Fluid Flow?</h3>
+                            <p>Fluid flow describes how liquids and gases move through space. Understanding flow patterns is crucial for engineering applications, from blood flow in arteries to air flow over airplane wings.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Laminar Flow:</strong> Smooth, parallel streamlines with no mixing between layers</li>
+                                <li><strong>Turbulent Flow:</strong> Chaotic, swirling motion with rapid mixing</li>
+                                <li><strong>Reynolds Number:</strong> Re = ρvL/μ (determines flow type)</li>
+                                <li><strong>Viscosity:</strong> Internal friction that resists flow</li>
+                                <li><strong>Boundary Layer:</strong> Region near surfaces where flow is affected by friction</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Smooth, parallel streamlines in laminar flow</li>
+                                <li>Chaotic, swirling patterns in turbulent flow</li>
+                                <li>Flow separation around obstacles</li>
+                                <li>Velocity changes with viscosity</li>
+                                <li>Reynolds number transitions</li>
+                            </ul>
+                            
+                            <h3>Flow Regimes</h3>
+                            <ul>
+                                <li><strong>Re < 2300:</strong> Laminar flow (smooth, predictable)</li>
+                                <li><strong>2300 < Re < 4000:</strong> Transitional flow (unstable)</li>
+                                <li><strong>Re > 4000:</strong> Turbulent flow (chaotic, mixing)</li>
+                                <li><strong>High Re:</strong> Inertia dominates over viscosity</li>
+                                <li><strong>Low Re:</strong> Viscosity dominates over inertia</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Blood flow in cardiovascular system</li>
+                                <li>Air flow over aircraft wings</li>
+                                <li>Water flow in pipes and channels</li>
+                                <li>Weather patterns and atmospheric flow</li>
+                                <li>Industrial mixing and processing</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'bernoulli':
+                return {
+                    title: "Bernoulli's Principle - Energy Conservation in Fluids",
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Bernoulli's Principle?</h3>
+                            <p>Bernoulli's principle states that in a flowing fluid, an increase in velocity is accompanied by a decrease in pressure. This is a consequence of energy conservation in fluid flow.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Bernoulli's Equation:</strong> P + ½ρv² + ρgh = constant</li>
+                                <li><strong>Energy Conservation:</strong> Total energy remains constant along a streamline</li>
+                                <li><strong>Pressure-Velocity Trade-off:</strong> Higher velocity = lower pressure</li>
+                                <li><strong>Continuity Equation:</strong> A₁v₁ = A₂v₂ (mass conservation)</li>
+                                <li><strong>Venturi Effect:</strong> Pressure drop in constricted flow</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Fluid speeding up in narrow sections</li>
+                                <li>Pressure decreasing in constricted areas</li>
+                                <li>Energy conservation maintained</li>
+                                <li>Velocity and pressure inversely related</li>
+                                <li>Flow rate remains constant</li>
+                            </ul>
+                            
+                            <h3>Energy Components</h3>
+                            <ul>
+                                <li><strong>Pressure Energy:</strong> P (work done by pressure)</li>
+                                <li><strong>Kinetic Energy:</strong> ½ρv² (energy of motion)</li>
+                                <li><strong>Potential Energy:</strong> ρgh (gravitational energy)</li>
+                                <li><strong>Total Energy:</strong> Sum remains constant</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Airplane wing lift generation</li>
+                                <li>Carburetor fuel mixing</li>
+                                <li>Venturi meters for flow measurement</li>
+                                <li>Spray bottles and atomizers</li>
+                                <li>Blood flow in arteries</li>
+                            </ul>
+                        </div>
+                    `
+                };
+                        case 'neural-network':
+                return {
+                    title: 'Neural Network Training - Object Recognition',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Neural Networks?</h3>
+                            <p>Neural networks are computational models inspired by biological neurons in the brain. They consist of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This animation demonstrates how neural networks learn to recognize and classify different geometric objects.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Artificial Neurons:</strong> Mathematical functions that receive inputs, apply weights, and produce outputs. Each neuron computes: output = σ(Σ(inputs × weights) + bias)</li>
+                                <li><strong>Network Architecture:</strong> Input layer (2 neurons) → Hidden layer 1 (4 neurons) → Hidden layer 2 (3 neurons) → Output layer (1 neuron)</li>
+                            </ul>
+                            
+                            <h3>Why This Architecture?</h3>
+                            <ul>
+                                <li><strong>2 Input Neurons:</strong> Perfect for our 2-feature problem (symmetry, edges)</li>
+                                <li><strong>4 Hidden Neurons:</strong> Provides enough capacity to learn non-linear patterns without overfitting</li>
+                                <li><strong>3 Hidden Neurons:</strong> Allows further feature refinement and abstraction</li>
+                                <li><strong>1 Output Neuron:</strong> Binary classification (simple vs complex objects)</li>
+                            </ul>
+                            
+                            <h3>Layer Size Effects</h3>
+                            <ul>
+                                <li><strong>Too Few Neurons:</strong> Network can't learn complex patterns (underfitting)</li>
+                                <li><strong>Too Many Neurons:</strong> Network memorizes training data (overfitting)</li>
+                                <li><strong>Optimal Size:</strong> Balances learning capacity with generalization</li>
+                                <li><strong>Our Choice:</strong> 4→3 hidden layers provide sufficient complexity for this task</li>
+                            </ul>
+                                <li><strong>Weights & Biases:</strong> Numerical values that determine connection strength and neuron activation thresholds</li>
+                                <li><strong>Sigmoid Activation:</strong> σ(x) = 1/(1 + e^(-x)) - transforms any input to a value between 0 and 1</li>
+                                <li><strong>Backpropagation:</strong> Algorithm that calculates how much each weight should change to reduce prediction errors</li>
+                                <li><strong>Learning Rate:</strong> Controls how big weight updates are during training</li>
+                            </ul>
+                            
+                            <h3>Training Process Explained</h3>
+                            <ol>
+                                <li><strong>Forward Propagation:</strong> Input features flow through the network, each neuron computes its output using weights and activation function</li>
+                                <li><strong>Loss Calculation:</strong> Compare network output with target value using Mean Squared Error: Loss = (target - output)²</li>
+                                <li><strong>Backward Propagation:</strong> Calculate error gradients for each weight using chain rule of calculus</li>
+                                <li><strong>Weight Updates:</strong> Adjust weights using gradient descent: Δw = learning_rate × gradient</li>
+                            </ol>
+                            
+                            <h3>Object Recognition Task</h3>
+                            <p>This network learns to classify geometric objects based on their complexity using 2 features:</p>
+                            <ul>
+                                <li><strong>Feature 1 - Symmetry Score (0-1):</strong> How symmetrical the object is (high = simple)</li>
+                                <li><strong>Feature 2 - Edge Complexity (0-1):</strong> How many edges/corners the object has (high = complex)</li>
+                                <li><strong>Simple Objects:</strong> Circle [0.9,0.1], Square [0.8,0.3] → Output: 0 (classified as simple)</li>
+                                <li><strong>Complex Objects:</strong> Triangle [0.6,0.5], Star [0.3,0.9] → Output: 1 (classified as complex)</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li><strong>Training Mode:</strong> Watch data flow forward (blue particles), errors flow backward (red particles), and weights update (flashing connections)</li>
+                                <li><strong>Testing Mode:</strong> See how the trained network processes new inputs and makes predictions with confidence scores</li>
+                                <li><strong>Visual Indicators:</strong> Active neurons pulse, weight changes are highlighted, and prediction accuracy improves over time</li>
+                                <li><strong>Object Context:</strong> Each training example shows the actual geometric object being learned</li>
+                            </ul>
+                            
+                            <h3>Mathematical Foundation</h3>
+                            <ul>
+                                <li><strong>Neuron Output:</strong> y = σ(w₁x₁ + w₂x₂ + ... + wₙxₙ + b)</li>
+                                <li><strong>Loss Function:</strong> L = (y_target - y_predicted)²</li>
+                                <li><strong>Weight Update:</strong> w_new = w_old - α × ∂L/∂w</li>
+                                <li><strong>Gradient Calculation:</strong> ∂L/∂w = ∂L/∂y × ∂y/∂w (chain rule)</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li><strong>Computer Vision:</strong> Image classification, object detection, facial recognition</li>
+                                <li><strong>Natural Language Processing:</strong> Text classification, language translation, chatbots</li>
+                                <li><strong>Speech Recognition:</strong> Voice assistants, transcription services</li>
+                                <li><strong>Autonomous Systems:</strong> Self-driving cars, robotics, drones</li>
+                                <li><strong>Medical Diagnosis:</strong> Disease detection, medical image analysis</li>
+                                <li><strong>Financial Analysis:</strong> Fraud detection, stock prediction, risk assessment</li>
+                            </ul>
+                            
+                            <h3>Educational Insights</h3>
+                            <ul>
+                                <li><strong>Learning Process:</strong> Neural networks learn by adjusting weights to minimize prediction errors</li>
+                                <li><strong>Feature Learning:</strong> Hidden layers automatically learn useful features from raw input data</li>
+                                <li><strong>Generalization:</strong> Well-trained networks can make accurate predictions on unseen data</li>
+                                <li><strong>Overfitting:</strong> Networks can memorize training data instead of learning general patterns</li>
+                                <li><strong>Hyperparameters:</strong> Learning rate, network architecture, and activation functions affect training success</li>
+                            </ul>
+                            
+                            <h3>Interactive Features</h3>
+                            <ul>
+                                <li><strong>Training Mode:</strong> Watch the network learn through forward/backward propagation cycles</li>
+                                <li><strong>Testing Mode:</strong> Test the trained network on different objects and see predictions</li>
+                                <li><strong>Parameter Control:</strong> Adjust learning rate and animation speed to observe different training behaviors</li>
+                                <li><strong>Visual Feedback:</strong> See real-time loss, accuracy, and confidence metrics</li>
+                            </ul>
+                            
+                            <h3>Advanced Concepts</h3>
+                            <ul>
+                                <li><strong>Gradient Descent:</strong> Optimization algorithm that finds the best weights by following the steepest descent</li>
+                                <li><strong>Vanishing Gradients:</strong> Problem where gradients become very small in deep networks</li>
+                                <li><strong>Regularization:</strong> Techniques to prevent overfitting (dropout, weight decay)</li>
+                                <li><strong>Batch Processing:</strong> Training on multiple examples simultaneously for better gradient estimates</li>
+                                <li><strong>Transfer Learning:</strong> Using pre-trained networks for new tasks</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'sound-waves':
+                return {
+                    title: 'Sound Waves - Wave Propagation in Air',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Sound Waves?</h3>
+                            <p>Sound waves are longitudinal mechanical waves that travel through a medium (like air, water, or solids) by compressing and rarefying the particles of the medium. These waves carry energy and information, allowing us to hear sounds.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Longitudinal Waves:</strong> Particles oscillate parallel to wave direction (compression and rarefaction)</li>
+                                <li><strong>Transverse Waves:</strong> Particles oscillate perpendicular to wave direction (like guitar strings)</li>
+                                <li><strong>Wave Properties:</strong> Frequency (pitch), amplitude (loudness), wavelength, and speed</li>
+                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
+                                <li><strong>Pressure Variations:</strong> High pressure (compression) and low pressure (rarefaction) zones</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li><strong>Transverse Mode:</strong> Particles moving up and down like a guitar string</li>
+                                <li><strong>Longitudinal Mode:</strong> Particles moving back and forth in the direction of wave travel</li>
+                                <li><strong>Pressure Zones:</strong> Red areas (compression) and blue areas (rarefaction) in longitudinal waves</li>
+                                <li><strong>Wave Speed:</strong> How fast the wave pattern travels through the medium</li>
+                                <li><strong>Frequency Effect:</strong> Higher frequency = shorter wavelength = higher pitch</li>
+                            </ul>
+                            
+                            <h3>Wave Characteristics</h3>
+                            <ul>
+                                <li><strong>Frequency (f):</strong> Number of complete cycles per second (Hz) - determines pitch</li>
+                                <li><strong>Amplitude (A):</strong> Maximum displacement from equilibrium - determines loudness</li>
+                                <li><strong>Wavelength (λ):</strong> Distance between consecutive identical points</li>
+                                <li><strong>Wave Speed (v):</strong> How fast the wave travels through the medium</li>
+                                <li><strong>Period (T):</strong> Time for one complete cycle (T = 1/f)</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Musical instruments (guitar strings, air columns)</li>
+                                <li>Human speech and hearing</li>
+                <li>Ultrasound imaging in medicine</li>
+                                <li>Sonar for underwater detection</li>
+                                <li>Acoustic engineering and sound design</li>
+                                <li>Earthquake detection (seismic waves)</li>
+                            </ul>
+                            
+                            <h3>Mathematical Relationships</h3>
+                            <ul>
+                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
+                                <li><strong>Period and Frequency:</strong> T = 1/f (period = 1/frequency)</li>
+                                <li><strong>Energy:</strong> E ∝ A²f² (energy proportional to amplitude² × frequency²)</li>
+                                <li><strong>Intensity:</strong> I ∝ A² (intensity proportional to amplitude squared)</li>
+                            </ul>
+                            
+                            <h3>Wave Types Comparison</h3>
+                            <ul>
+                                <li><strong>Transverse Waves:</strong> Guitar strings, water waves, light waves</li>
+                                <li><strong>Longitudinal Waves:</strong> Sound waves in air, seismic P-waves</li>
+                                <li><strong>Combined Waves:</strong> Complex wave patterns with both components</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'neural-network':
+                return {
+                    title: 'Neural Network Training - Object Recognition',
+                    html: `
+                        <div class="science-content">
+                            <h3>What are Neural Networks?</h3>
+                            <p>Neural networks are computational models inspired by biological neurons in the brain. They consist of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This animation demonstrates how neural networks learn to recognize and classify different geometric objects.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Artificial Neurons:</strong> Mathematical functions that receive inputs, apply weights, and produce outputs. Each neuron computes: output = σ(Σ(inputs × weights) + bias)</li>
+                                <li><strong>Network Architecture:</strong> Input layer (2 neurons) → Hidden layer 1 (4 neurons) → Hidden layer 2 (3 neurons) → Output layer (1 neuron)</li>
+                            </ul>
+                            
+                            <h3>Why This Architecture?</h3>
+                            <ul>
+                                <li><strong>2 Input Neurons:</strong> Perfect for our 2-feature problem (symmetry, edges)</li>
+                                <li><strong>4 Hidden Neurons:</strong> Provides enough capacity to learn non-linear patterns without overfitting</li>
+                                <li><strong>3 Hidden Neurons:</strong> Allows further feature refinement and abstraction</li>
+                                <li><strong>1 Output Neuron:</strong> Binary classification (simple vs complex objects)</li>
+                            </ul>
+                            
+                            <h3>Layer Size Effects</h3>
+                            <ul>
+                                <li><strong>Too Few Neurons:</strong> Network can't learn complex patterns (underfitting)</li>
+                                <li><strong>Too Many Neurons:</strong> Network memorizes training data (overfitting)</li>
+                                <li><strong>Optimal Size:</strong> Balances learning capacity with generalization</li>
+                                <li><strong>Our Choice:</strong> 4→3 hidden layers provide sufficient complexity for this task</li>
+                            </ul>
+                                <li><strong>Weights & Biases:</strong> Numerical values that determine connection strength and neuron activation thresholds</li>
+                                <li><strong>Sigmoid Activation:</strong> σ(x) = 1/(1 + e^(-x)) - transforms any input to a value between 0 and 1</li>
+                                <li><strong>Backpropagation:</strong> Algorithm that calculates how much each weight should change to reduce prediction errors</li>
+                                <li><strong>Learning Rate:</strong> Controls how big weight updates are during training</li>
+                            </ul>
+                            
+                            <h3>Training Process Explained</h3>
+                            <ol>
+                                <li><strong>Forward Propagation:</strong> Input features flow through the network, each neuron computes its output using weights and activation function</li>
+                                <li><strong>Loss Calculation:</strong> Compare network output with target value using Mean Squared Error: Loss = (target - output)²</li>
+                                <li><strong>Backward Propagation:</strong> Calculate error gradients for each weight using chain rule of calculus</li>
+                                <li><strong>Weight Updates:</strong> Adjust weights using gradient descent: Δw = learning_rate × gradient</li>
+                            </ol>
+                            
+                            <h3>Object Recognition Task</h3>
+                            <p>This network learns to classify geometric objects based on their complexity using 2 features:</p>
+                            <ul>
+                                <li><strong>Feature 1 - Symmetry Score (0-1):</strong> How symmetrical the object is (high = simple)</li>
+                                <li><strong>Feature 2 - Edge Complexity (0-1):</strong> How many edges/corners the object has (high = complex)</li>
+                                <li><strong>Simple Objects:</strong> Circle [0.9,0.1], Square [0.8,0.3] → Output: 0 (classified as simple)</li>
+                                <li><strong>Complex Objects:</strong> Triangle [0.6,0.5], Star [0.3,0.9] → Output: 1 (classified as complex)</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li><strong>Training Mode:</strong> Watch data flow forward (blue particles), errors flow backward (red particles), and weights update (flashing connections)</li>
+                                <li><strong>Testing Mode:</strong> See how the trained network processes new inputs and makes predictions with confidence scores</li>
+                                <li><strong>Visual Indicators:</strong> Active neurons pulse, weight changes are highlighted, and prediction accuracy improves over time</li>
+                                <li><strong>Object Context:</strong> Each training example shows the actual geometric object being learned</li>
+                            </ul>
+                            
+                            <h3>Mathematical Foundation</h3>
+                            <ul>
+                                <li><strong>Neuron Output:</strong> y = σ(w₁x₁ + w₂x₂ + ... + wₙxₙ + b)</li>
+                                <li><strong>Loss Function:</strong> L = (y_target - y_predicted)²</li>
+                                <li><strong>Weight Update:</strong> w_new = w_old - α × ∂L/∂w</li>
+                                <li><strong>Gradient Calculation:</strong> ∂L/∂w = ∂L/∂y × ∂y/∂w (chain rule)</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li><strong>Computer Vision:</strong> Image classification, object detection, facial recognition</li>
+                                <li><strong>Natural Language Processing:</strong> Text classification, language translation, chatbots</li>
+                                <li><strong>Speech Recognition:</strong> Voice assistants, transcription services</li>
+                                <li><strong>Autonomous Systems:</strong> Self-driving cars, robotics, drones</li>
+                                <li><strong>Medical Diagnosis:</strong> Disease detection, medical image analysis</li>
+                                <li><strong>Financial Analysis:</strong> Fraud detection, stock prediction, risk assessment</li>
+                            </ul>
+                            
+                            <h3>Educational Insights</h3>
+                            <ul>
+                                <li><strong>Learning Process:</strong> Neural networks learn by adjusting weights to minimize prediction errors</li>
+                                <li><strong>Feature Learning:</strong> Hidden layers automatically learn useful features from raw input data</li>
+                                <li><strong>Generalization:</strong> Well-trained networks can make accurate predictions on unseen data</li>
+                                <li><strong>Overfitting:</strong> Networks can memorize training data instead of learning general patterns</li>
+                                <li><strong>Hyperparameters:</strong> Learning rate, network architecture, and activation functions affect training success</li>
+                            </ul>
+                            
+                            <h3>Interactive Features</h3>
+                            <ul>
+                                <li><strong>Training Mode:</strong> Watch the network learn through forward/backward propagation cycles</li>
+                                <li><strong>Testing Mode:</strong> Test the trained network on different objects and see predictions</li>
+                                <li><strong>Parameter Control:</strong> Adjust learning rate and animation speed to observe different training behaviors</li>
+                                <li><strong>Visual Feedback:</strong> See real-time loss, accuracy, and confidence metrics</li>
+                            </ul>
+                            
+                            <h3>Advanced Concepts</h3>
+                            <ul>
+                                <li><strong>Gradient Descent:</strong> Optimization algorithm that finds the best weights by following the steepest descent</li>
+                                <li><strong>Vanishing Gradients:</strong> Problem where gradients become very small in deep networks</li>
+                                <li><strong>Regularization:</strong> Techniques to prevent overfitting (dropout, weight decay)</li>
+                                <li><strong>Batch Processing:</strong> Training on multiple examples simultaneously for better gradient estimates</li>
+                                <li><strong>Transfer Learning:</strong> Using pre-trained networks for new tasks</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            case 'memory-management':
+                return {
+                    title: 'Memory Management - Data Retention and Decay',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Memory Management?</h3>
+                            <p>Memory management is the process of allocating and deallocating memory resources efficiently. In computer systems, this involves managing the use of RAM, hard disk space, and other storage devices. The goal is to ensure that programs have access to the necessary resources when they need them, while also freeing up space for new programs or data.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Data Retention:</strong> The ability of a system to maintain data in memory for a long period of time</li>
+                                <li><strong>Data Decay:</strong> The gradual loss of data over time due to various factors such as hardware wear, software updates, or user activity</li>
+                                <li><strong>Memory Allocation:</strong> The process of assigning memory to programs or data as needed</li>
+                                <li><strong>Memory Deallocation:</strong> The process of freeing up memory that is no longer needed</li>
+                                <li><strong>Fragmentation:</strong> The phenomenon where free memory becomes fragmented and unusable</li>
+                            </ul>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li>Programs using more memory as they run</li>
+                                <li>Programs being closed and reopened multiple times</li>
+                                <li>Programs experiencing slower performance over time</li>
+                                <li>Programs being terminated and restarted</li>
+                                <li>Programs being swapped out and swapped in</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li>Operating systems</li>
+                                <li>Database management systems</li>
+                                <li>Virtual memory systems</li>
+                                <li>Web browsers and cache management</li>
+                                <li>Software development and debugging</li>
+                            </ul>
+                        </div>
+                    `
+                };
+            default:
+                return {
+                    title: 'Animation Information',
+                    html: '<p>Select an animation to learn more about the physics concepts it demonstrates.</p>'
+                };
+        }
+    }
+    
+    updateMemoryManagementStats() {
+        if (!this.memoryManagement) return;
+        const stats = this.memoryManagement.getStats();
+        const buildingsElement = document.getElementById('memoryBuildings');
+        const allocatedElement = document.getElementById('memoryAllocated');
+        const gcCyclesElement = document.getElementById('memoryGCCycles');
+        const efficiencyElement = document.getElementById('memoryEfficiency');
+        
+        if (buildingsElement) buildingsElement.textContent = stats.totalHeapUsed || 0;
+        if (allocatedElement) allocatedElement.textContent = stats.totalHeapUsed || 0;
+        if (gcCyclesElement) gcCyclesElement.textContent = stats.gcCycles || 0;
+        if (efficiencyElement) {
+            const efficiency = stats.fragmentation ? (100 - stats.fragmentation) : 100;
+            efficiencyElement.textContent = efficiency.toFixed(1) + '%';
+        }
+    }
+}
