@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Animations - Interactive Physics Simulations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/ScienceAnim/assets/index-CZsN36xL.js"></script>
+  <link rel="stylesheet" crossorigin href="/ScienceAnim/assets/index-D5uueVDt.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile Navigation Toggle -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" title="Toggle Navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <header class="header">
+            <h1 class="title">Science Animations</h1>
+            <p class="subtitle">Interactive simulations for scientific exploration</p>
+        </header>
+
+        <nav class="side-navigation">
+            <div class="side-nav-header">
+                <h3>Categories</h3>
+                <button class="nav-toggle-btn" id="navToggleBtn" title="Toggle Navigation"></button>
+            </div>
+            
+            <div class="category-menu">
+                <!-- Particle Physics -->
+                <div class="category-item active" data-category="particle-physics">
+                    <div class="category-header" data-category="Particle Physics">
+                        <span class="category-icon">🧪</span>
+                        <span class="category-name">Particle Physics</span>
+                        <span class="category-count">3</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item active" data-animation="brownian" data-animation-name="Brownian Motion">
+                            <span class="item-icon">🔴</span>
+                            <span class="item-name">Brownian Motion</span>
+                        </button>
+                        <button class="submenu-item" data-animation="diffusion" data-animation-name="Diffusion">
+                            <span class="item-icon">🟢</span>
+                            <span class="item-name">Diffusion</span>
+                        </button>
+                        <button class="submenu-item" data-animation="gas-laws" data-animation-name="Gas Laws">
+                            <span class="item-icon">💨</span>
+                            <span class="item-name">Gas Laws</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Classical Mechanics -->
+                <div class="category-item" data-category="classical-mechanics">
+                    <div class="category-header" data-category="Classical Mechanics">
+                        <span class="category-icon">⏰</span>
+                        <span class="category-name">Classical Mechanics</span>
+                        <span class="category-count">4</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="pendulum" data-animation-name="Simple Pendulum">
+                            <span class="item-icon">⏰</span>
+                            <span class="item-name">Simple Pendulum</span>
+                        </button>
+                        <button class="submenu-item" data-animation="orbital" data-animation-name="Orbital Motion">
+                            <span class="item-icon">🪐</span>
+                            <span class="item-name">Orbital Motion</span>
+                        </button>
+                        <button class="submenu-item" data-animation="collisions" data-animation-name="Collision Physics">
+                            <span class="item-icon">💥</span>
+                            <span class="item-name">Collision Physics</span>
+                        </button>
+                        <button class="submenu-item" data-animation="friction" data-animation-name="Friction & Inclined Planes">
+                            <span class="item-icon">🛷</span>
+                            <span class="item-name">Friction & Inclined Planes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Wave Phenomena -->
+                <div class="category-item" data-category="wave-phenomena">
+                    <div class="category-header" data-category="Wave Phenomena">
+                        <span class="category-icon">🌊</span>
+                        <span class="category-name">Wave Phenomena</span>
+                        <span class="category-count">2</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="waves" data-animation-name="Wave Propagation">
+                            <span class="item-icon">🌊</span>
+                            <span class="item-name">Wave Propagation</span>
+                        </button>
+                        <button class="submenu-item" data-animation="sound-waves" data-animation-name="Sound Waves">
+                            <span class="item-icon">🎵</span>
+                            <span class="item-name">Sound Waves</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Electromagnetism -->
+                <div class="category-item" data-category="electromagnetism">
+                    <div class="category-header" data-category="Electromagnetism">
+                        <span class="category-icon">⚡</span>
+                        <span class="category-name">Electromagnetism</span>
+                        <span class="category-count">3</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="electric-fields" data-animation-name="Electric Fields">
+                            <span class="item-icon">⚡</span>
+                            <span class="item-name">Electric Fields</span>
+                        </button>
+                        <button class="submenu-item" data-animation="magnetic-fields" data-animation-name="Magnetic Fields">
+                            <span class="item-icon">🧲</span>
+                            <span class="item-name">Magnetic Fields</span>
+                        </button>
+                        <button class="submenu-item" data-animation="diode-transistor" data-animation-name="Diode & Transistor">
+                            <span class="item-icon">🔌</span>
+                            <span class="item-name">Diode & Transistor</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quantum Physics -->
+                <div class="category-item" data-category="quantum-physics">
+                    <div class="category-header" data-category="Quantum Physics">
+                        <span class="category-icon">⚛️</span>
+                        <span class="category-name">Quantum Physics</span>
+                        <span class="category-count">1</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="wave-particle-duality" data-animation-name="Wave-Particle Duality">
+                            <span class="item-icon">🌊</span>
+                            <span class="item-name">Wave-Particle Duality</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nuclear Physics -->
+                <div class="category-item" data-category="nuclear-physics">
+                    <div class="category-header" data-category="Nuclear Physics">
+                        <span class="category-icon">☢️</span>
+                        <span class="category-name">Nuclear Physics</span>
+                        <span class="category-count">1</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="nuclear-reactions" data-animation-name="Nuclear Reactions">
+                            <span class="item-icon">☢️</span>
+                            <span class="item-name">Nuclear Reactions</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fluid Dynamics -->
+                <div class="category-item" data-category="fluid-dynamics">
+                    <div class="category-header" data-category="Fluid Dynamics">
+                        <span class="category-icon">🌊</span>
+                        <span class="category-name">Fluid Dynamics</span>
+                        <span class="category-count">2</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="fluid-flow" data-animation-name="Fluid Flow">
+                            <span class="item-icon">💧</span>
+                            <span class="item-name">Fluid Flow</span>
+                        </button>
+                        <button class="submenu-item" data-animation="bernoulli" data-animation-name="Bernoulli's Principle">
+                            <span class="item-icon">🌪️</span>
+                            <span class="item-name">Bernoulli's Principle</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Computer Science -->
+                <div class="category-item" data-category="computer-science">
+                    <div class="category-header" data-category="Computer Science">
+                        <span class="category-icon">💻</span>
+                        <span class="category-name">Computer Science</span>
+                        <span class="category-count">2</span>
+                    </div>
+                    <div class="submenu">
+                        <button class="submenu-item" data-animation="neural-network" data-animation-name="Neural Network Training">
+                            <span class="item-icon">🧠</span>
+                            <span class="item-name">Neural Network Training</span>
+                        </button>
+                        <button class="submenu-item" data-animation="memory-management" data-animation-name="Memory Management">
+                            <span class="item-icon">🏙️</span>
+                            <span class="item-name">Memory Management</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="controls-panel">
+                <!-- Brownian Motion Controls -->
+                <div id="brownian-controls" class="animation-controls">
+                    <div class="control-group">
+                        <label for="particleCount">Number of Particles:</label>
+                        <input type="range" id="particleCount" min="5" max="50" value="15" class="slider">
+                        <span id="particleCountValue">15</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="speed">Animation Speed:</label>
+                        <input type="range" id="speed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="speedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="temperature">Temperature (Motion Intensity):</label>
+                        <input type="range" id="temperature" min="0.5" max="3" value="1" step="0.1" class="slider">
+                        <span id="temperatureValue">1.0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="particleSize">Particle Size:</label>
+                        <input type="range" id="particleSize" min="2" max="8" value="4" class="slider">
+                        <span id="particleSizeValue">4</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="brownianVisualizationMode">Visualization Mode:</label>
+                        <select id="brownianVisualizationMode" class="select-control">
+                            <option value="basic">Basic Motion</option>
+                            <option value="heatmap">Temperature Heatmap</option>
+                            <option value="advanced">Advanced Analysis</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Pendulum Controls -->
+                <div id="pendulum-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="pendulumLength">Pendulum Length:</label>
+                        <input type="range" id="pendulumLength" min="100" max="300" value="200" class="slider">
+                        <span id="pendulumLengthValue">200</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="pendulumSpeed">Animation Speed:</label>
+                        <input type="range" id="pendulumSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="pendulumSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="initialAngle">Initial Angle (degrees):</label>
+                        <input type="range" id="initialAngle" min="5" max="90" value="45" class="slider">
+                        <span id="initialAngleValue">45°</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="gravity">Gravity Strength:</label>
+                        <input type="range" id="gravity" min="0.5" max="2" value="1" step="0.1" class="slider">
+                        <span id="gravityValue">1.0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="damping">Air Resistance:</label>
+                        <input type="range" id="damping" min="0" max="0.1" value="0.01" step="0.001" class="slider">
+                        <span id="dampingValue">0.01</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="pendulumVisualizationMode">Visualization Mode:</label>
+                        <select id="pendulumVisualizationMode" class="select-control">
+                            <option value="basic">Basic Motion</option>
+                            <option value="vectors">Force & Velocity Vectors</option>
+                            <option value="advanced">Advanced Analysis</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Diffusion Controls -->
+                <div id="diffusion-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="diffusionParticles">Number of Particles:</label>
+                        <input type="range" id="diffusionParticles" min="50" max="500" value="200" class="slider">
+                        <span id="diffusionParticlesValue">200</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="diffusionSpeed">Animation Speed:</label>
+                        <input type="range" id="diffusionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="diffusionSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="diffusionRate">Diffusion Rate:</label>
+                        <input type="range" id="diffusionRate" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="diffusionRateValue">1.0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="concentrationGradient">Concentration Gradient:</label>
+                        <input type="range" id="concentrationGradient" min="0.1" max="2" value="1" step="0.1" class="slider">
+                        <span id="concentrationGradientValue">1.0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="particleSize">Particle Size:</label>
+                        <input type="range" id="particleSize" min="2" max="8" value="4" class="slider">
+                        <span id="particleSizeValue">4</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="diffusionVisualizationMode">Visualization Mode:</label>
+                        <select id="diffusionVisualizationMode" class="select-control">
+                            <option value="basic">Basic Diffusion</option>
+                            <option value="heatmap">Concentration Heatmap</option>
+                            <option value="profile">Concentration Profile</option>
+                            <option value="advanced">Advanced Analysis</option>
+                        </select>
+                    </div>
+                    
+                </div>
+
+
+                <!-- Orbital Motion Controls -->
+                <div id="orbital-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="orbitalSpeed">Animation Speed:</label>
+                        <input type="range" id="orbitalSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="orbitalSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="eccentricity">Orbit Eccentricity:</label>
+                        <input type="range" id="eccentricity" min="0" max="0.8" value="0.2" step="0.05" class="slider">
+                        <span id="eccentricityValue">0.20</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="semiMajorAxis">Orbit Size:</label>
+                        <input type="range" id="semiMajorAxis" min="100" max="300" value="200" class="slider">
+                        <span id="semiMajorAxisValue">200</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="centralMass">Gravitational Strength:</label>
+                        <input type="range" id="centralMass" min="0.5" max="3" value="1" step="0.1" class="slider">
+                        <span id="centralMassValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="orbitalVisualizationMode">Visualization Mode:</label>
+                        <select id="orbitalVisualizationMode" class="select-control">
+                            <option value="basic">Basic Orbit</option>
+                            <option value="advanced">Advanced Analysis</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Gas Laws Controls -->
+                <div id="gas-laws-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="lawType">Gas Law Demonstration:</label>
+                        <select id="lawType" class="select-control">
+                            <option value="boyle">Boyle's Law</option>
+                            <option value="charles">Charles's Law</option>
+                            <option value="gay-lussac">Gay-Lussac's Law</option>
+                            <option value="combined">Combined Gas Law</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="gasSpeed">Animation Speed:</label>
+                        <input type="range" id="gasSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="gasSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="gasParticleCount">Number of Particles:</label>
+                        <input type="range" id="gasParticleCount" min="10" max="100" value="50" class="slider">
+                        <span id="gasParticleCountValue">50</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="gasTemperature">Temperature (K):</label>
+                        <input type="range" id="gasTemperature" min="200" max="600" value="300" class="slider">
+                        <span id="gasTemperatureValue">300K</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="gasVolume">Volume (Container Height):</label>
+                        <input type="range" id="gasVolume" min="100" max="400" value="300" class="slider">
+                        <span id="gasVolumeValue">300</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="gasPressure">Pressure (External):</label>
+                        <input type="range" id="gasPressure" min="0.5" max="2" value="1" step="0.1" class="slider">
+                        <span id="gasPressureValue">1.0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="gasVisualizationMode">Visualization Mode:</label>
+                        <select id="gasVisualizationMode" class="select-control">
+                            <option value="basic">Basic Gas Motion</option>
+                            <option value="pressure">Pressure Analysis</option>
+                            <option value="advanced">Advanced Analysis</option>
+                        </select>
+                    </div>
+                </div>
+
+
+
+                <!-- Collision Physics Controls -->
+                <div id="collisions-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="collisionSpeed">Animation Speed:</label>
+                        <input type="range" id="collisionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="collisionSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="collisionType">Collision Scenario:</label>
+                        <select id="collisionType" class="select-control">
+                            <option value="elastic">Elastic Bouncing</option>
+                            <option value="head-on">Head-on Impact</option>
+                            <option value="inelastic">Energy Loss</option>
+                            <option value="cascade">Domino Effect</option>
+                            <option value="mixed">Mixed Physics</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="ballCount">Number of Objects:</label>
+                        <input type="range" id="ballCount" min="2" max="8" value="4" class="slider">
+                        <span id="ballCountValue">4</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="restitution">Bounciness:</label>
+                        <input type="range" id="restitution" min="0" max="1" value="0.8" step="0.1" class="slider">
+                        <span id="restitutionValue">0.8</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="collisionGravity">Gravity:</label>
+                        <input type="range" id="collisionGravity" min="0.5" max="2" value="1" step="0.1" class="slider">
+                        <span id="collisionGravityValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="showAnalytics">Show Analytics:</label>
+                        <input type="checkbox" id="showAnalytics" class="checkbox">
+                    </div>
+                </div>
+
+                <!-- Friction & Inclined Planes Controls -->
+                <div id="friction-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="frictionSpeed">Animation Speed:</label>
+                        <input type="range" id="frictionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="frictionSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="frictionCoefficient">Friction Coefficient:</label>
+                        <input type="range" id="frictionCoefficient" min="0.01" max="1" value="0.3" step="0.01" class="slider">
+                        <span id="frictionCoefficientValue">0.3</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="inclineAngle">Incline Angle:</label>
+                        <input type="range" id="inclineAngle" min="0" max="45" value="20" class="slider">
+                        <span id="inclineAngleValue">20°</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="objectMass">Object Mass:</label>
+                        <input type="range" id="objectMass" min="1" max="10" value="5" class="slider">
+                        <span id="objectMassValue">5</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="frictionGravity">Gravity:</label>
+                        <input type="range" id="frictionGravity" min="0.5" max="2" value="1" step="0.1" class="slider">
+                        <span id="frictionGravityValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="showFrictionAnalytics">Show Analytics:</label>
+                        <input type="checkbox" id="showFrictionAnalytics" class="checkbox">
+                    </div>
+                </div>
+
+
+
+                <!-- Electric Fields Controls -->
+                <div id="electric-fields-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="efSpeed">Animation Speed:</label>
+                        <input type="range" id="efSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="efSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="efFieldStrength">Field Strength:</label>
+                        <input type="range" id="efFieldStrength" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="efFieldStrengthValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="efParticleCount">Particles:</label>
+                        <input type="range" id="efParticleCount" min="5" max="40" value="20" class="slider">
+                        <span id="efParticleCountValue">20</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="efChargeType">Charge Type:</label>
+                        <select id="efChargeType" class="select-control">
+                            <option value="positive">Positive (+)</option>
+                            <option value="negative">Negative (−)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Removed redundant buttons - Reset button handles clearing charges -->
+                </div>
+
+
+
+
+                <!-- Magnetic Fields Controls -->
+                <div id="magnetic-fields-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="magneticSpeed">Animation Speed:</label>
+                        <input type="range" id="magneticSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="magneticSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="magneticFieldStrength">Magnetic Field Strength:</label>
+                        <input type="range" id="magneticFieldStrength" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="magneticFieldStrengthValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="magneticParticleCount">Number of Particles:</label>
+                        <input type="range" id="magneticParticleCount" min="5" max="30" value="15" class="slider">
+                        <span id="magneticParticleCountValue">15</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="magneticShowFieldLines">Show Magnetic Field Lines:</label>
+                        <input type="checkbox" id="magneticShowFieldLines" class="checkbox" checked>
+                    </div>
+                    
+
+                    
+                    <div class="control-group">
+                        <label for="magneticShowForceArrows">Show Force Arrows:</label>
+                        <input type="checkbox" id="magneticShowForceArrows" class="checkbox">
+                    </div>
+                    
+                    <!-- Removed redundant buttons - Reset button handles clearing magnets -->
+                </div>
+
+                <!-- Wave-Particle Duality Controls -->
+                <div id="wave-particle-duality-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="dualityMode">Observation Mode:</label>
+                        <select id="dualityMode" class="select-control">
+                            <option value="wave">Wave Behavior</option>
+                            <option value="particle">Particle Behavior</option>
+                            <option value="superposition">Superposition</option>
+                            <option value="measurement">Measurement Effect</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="dualitySpeed">Animation Speed:</label>
+                        <input type="range" id="dualitySpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="dualitySpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="dualityEnergy">Photon Energy:</label>
+                        <input type="range" id="dualityEnergy" min="1" max="10" value="5" step="0.5" class="slider">
+                        <span id="dualityEnergyValue">5.0 eV</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="dualityWavelength">Wavelength:</label>
+                        <input type="range" id="dualityWavelength" min="50" max="300" value="150" class="slider">
+                        <span id="dualityWavelengthValue">150 nm</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="dualityShowAnalytics">Show Analytics:</label>
+                        <input type="checkbox" id="dualityShowAnalytics" class="checkbox" checked>
+                    </div>
+                    
+
+                    
+                    <div class="button-group">
+                        <button id="performMeasurementBtn" class="btn btn-primary">Perform Measurement</button>
+                        <!-- Removed redundant Reset Experiment button - main Reset button handles this -->
+                    </div>
+                </div>
+
+                <!-- Nuclear Reactions Controls -->
+                <div id="nuclear-reactions-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="nuclearMode">Reaction Type:</label>
+                        <select id="nuclearMode" class="select-control">
+                            <option value="fission">Nuclear Fission</option>
+                            <option value="fusion">Nuclear Fusion</option>
+                            <option value="chain">Chain Reaction</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="nuclearSpeed">Animation Speed:</label>
+                        <input type="range" id="nuclearSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="nuclearSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="neutronEnergy">Neutron Energy:</label>
+                        <input type="range" id="neutronEnergy" min="0.1" max="2" value="1" step="0.1" class="slider">
+                        <span id="neutronEnergyValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="nuclearTemperature">Reaction Intensity:</label>
+                        <input type="range" id="nuclearTemperature" min="0.5" max="3" value="1" step="0.1" class="slider">
+                        <span id="nuclearTemperatureValue">1.0</span>
+                    </div>
+                </div>
+
+                <!-- Fluid Flow Controls -->
+                <div id="fluid-flow-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="fluidSpeed">Animation Speed:</label>
+                        <input type="range" id="fluidSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="fluidSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="flowRate">Flow Rate:</label>
+                        <input type="range" id="flowRate" min="0.1" max="5" value="1" step="0.1" class="slider">
+                        <span id="flowRateValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="viscosity">Viscosity:</label>
+                        <input type="range" id="viscosity" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="viscosityValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="reynoldsNumber">Reynolds Number:</label>
+                        <input type="range" id="reynoldsNumber" min="10" max="5000" value="100" step="10" class="slider">
+                        <span id="reynoldsNumberValue">100</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="fluidVisualizationMode">Visualization Mode:</label>
+                        <select id="fluidVisualizationMode" class="select-control">
+                            <option value="particles">Particle Flow</option>
+                            <option value="streamlines">Streamlines</option>
+                            <option value="velocity">Velocity Field</option>
+                            <option value="pressure">Pressure Field</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bernoulli's Principle Controls -->
+                <div id="bernoulli-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="bernoulliSpeed">Animation Speed:</label>
+                        <input type="range" id="bernoulliSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="bernoulliSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="pipeWidth">Pipe Width:</label>
+                        <input type="range" id="pipeWidth" min="20" max="100" value="50" step="5" class="slider">
+                        <span id="pipeWidthValue">50</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="fluidDensity">Fluid Density:</label>
+                        <input type="range" id="fluidDensity" min="0.5" max="2" value="1" step="0.1" class="slider">
+                        <span id="fluidDensityValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="pressureDifference">Pressure Difference:</label>
+                        <input type="range" id="pressureDifference" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="pressureDifferenceValue">1.0</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="bernoulliVisualizationMode">Visualization Mode:</label>
+                        <select id="bernoulliVisualizationMode" class="select-control">
+                            <option value="basic">Basic Flow</option>
+                            <option value="pressure">Pressure Analysis</option>
+                            <option value="velocity">Velocity Analysis</option>
+                            <option value="energy">Energy Conservation</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Wave Propagation Controls -->
+                <div id="waves-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="waveType">Wave Type:</label>
+                                                    <select id="waveType" class="select-control">
+                                <option value="transverse">Transverse Wave</option>
+                                <option value="longitudinal">Longitudinal Wave</option>
+                                <option value="interference">Wave Interference</option>
+                                <option value="standing">Standing Wave</option>
+                            </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="waveSpeed">Animation Speed:</label>
+                        <input type="range" id="waveSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="waveSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="waveFrequency">Frequency (Hz):</label>
+                        <input type="range" id="waveFrequency" min="0.5" max="5" value="1" step="0.1" class="slider">
+                        <span id="waveFrequencyValue">1.0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="waveAmplitude">Amplitude:</label>
+                        <input type="range" id="waveAmplitude" min="10" max="100" value="50" class="slider">
+                        <span id="waveAmplitudeValue">50</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="waveShowAnalytics">Show Analytics:</label>
+                        <input type="checkbox" id="waveShowAnalytics" class="checkbox">
+                    </div>
+                </div>
+
+                <!-- Sound Waves Controls -->
+                <div id="sound-waves-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="soundWaveType">Wave Type:</label>
+                        <select id="soundWaveType" class="select-control">
+                            <option value="transverse" selected>Transverse (String)</option>
+                            <option value="longitudinal">Longitudinal (Air)</option>
+                            <option value="combined">Combined View</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="soundAnimationSpeed">Animation Speed:</label>
+                        <input type="range" id="soundAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="soundAnimationSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="soundFrequency">Frequency (Hz):</label>
+                        <input type="range" id="soundFrequency" min="1" max="10" value="5" class="slider">
+                        <span id="soundFrequencyValue">5 Hz</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="soundAmplitude">Amplitude:</label>
+                        <input type="range" id="soundAmplitude" min="10" max="100" value="50" class="slider">
+                        <span id="soundAmplitudeValue">50%</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="soundSpeed">Wave Speed (m/s):</label>
+                        <input type="range" id="soundSpeed" min="100" max="500" value="343" class="slider">
+                        <span id="soundSpeedValue">343 m/s</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="soundParticles">Particle Count:</label>
+                        <input type="range" id="soundParticles" min="10" max="50" value="20" class="slider">
+                        <span id="soundParticlesValue">20</span>
+                    </div>
+
+                    <div class="control-group">
+
+                        
+
+                    </div>
+                </div>
+
+                <!-- Diode & Transistor Controls -->
+                <div id="diode-transistor-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="diodeComponentType">Component Type:</label>
+                        <select id="diodeComponentType" class="select-control">
+                            <option value="diode" selected>Diode</option>
+                            <option value="npn">NPN Transistor</option>
+                            <option value="pnp">PNP Transistor</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="diodeBiasType">Bias Type:</label>
+                        <select id="diodeBiasType" class="select-control">
+                            <option value="forward" selected>Forward Bias</option>
+                            <option value="reverse">Reverse Bias</option>
+                            <option value="off">Off</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="diodeInputVoltage">Input Voltage (V):</label>
+                        <input type="range" id="diodeInputVoltage" min="0" max="12" value="5" step="0.5" class="slider">
+                        <span id="diodeInputVoltageValue">5V</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="diodeBaseVoltage">Base Voltage (V):</label>
+                        <input type="range" id="diodeBaseVoltage" min="0" max="2" value="0.7" step="0.1" class="slider">
+                        <span id="diodeBaseVoltageValue">0.7V</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="diodeAnimationSpeed">Animation Speed:</label>
+                        <input type="range" id="diodeAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="diodeAnimationSpeedValue">1.0x</span>
+                    </div>
+                </div>
+
+                <!-- Neural Network Controls -->
+                <div id="neural-network-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="neuralLearningRate">Learning Rate:</label>
+                        <input type="range" id="neuralLearningRate" min="0.01" max="0.5" value="0.1" step="0.01" class="slider">
+                        <span id="neuralLearningRateValue">0.1</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="neuralSpeed">Animation Speed:</label>
+                        <input type="range" id="neuralSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="neuralSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="neuralMode">Mode:</label>
+                        <select id="neuralMode" class="select-control">
+                            <option value="training">Training Mode</option>
+                            <option value="testing">Testing Mode</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Memory Management Controls -->
+                <div id="memory-management-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="memorySpeed">Animation Speed:</label>
+                        <input type="range" id="memorySpeed" min="0.1" max="3.0" value="1.0" step="0.1" class="slider">
+                        <span id="memorySpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="showOutput">Show Program Output:</label>
+                        <input type="checkbox" id="showOutput" class="checkbox">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Mode:</label>
+                        <select id="memoryMode" class="select-control">
+                            <option value="random">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="retentionRate">Retention Rate:</label>
+                        <input type="range" id="retentionRate" min="0" max="1" value="0.5" step="0.01" class="slider">
+                        <span id="retentionRateValue">0.5</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="decayRate">Decay Rate:</label>
+                        <input type="range" id="decayRate" min="0" max="1" value="0.1" step="0.01" class="slider">
+                        <span id="decayRateValue">0.1</span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="playPauseBtn" class="btn btn-primary">Pause</button>
+                    <button id="resetBtn" class="btn btn-secondary">Reset</button>
+                    <button id="learnMoreBtn" class="btn btn-info">📚 Learn More</button>
+                </div>
+            </div>
+
+            <div class="animation-container">
+                <div class="controls-toggle" aria-label="Animation Settings">
+                    <span class="toggle-icon">⚙️</span>
+                    <span class="toggle-text">Settings</span>
+                </div>
+                <canvas id="animationCanvas" width="800" height="600"></canvas>
+                <div class="info-panel">
+                    <!-- Brownian Motion Info -->
+                    <div id="brownian-info" class="animation-info">
+                        <h3>Brownian Motion Simulation</h3>
+                        <p>Watch particles move randomly due to molecular collisions. Each particle has a unique color for easy tracking.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Active Particles:</span>
+                                <span id="activeParticles" class="stat-value">15</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Average Speed:</span>
+                                <span id="avgSpeed" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="simTime" class="stat-value">0.0s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Collision Count:</span>
+                                <span id="brownianCollisionCount" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Mean Free Path:</span>
+                                <span id="brownianMeanFreePath" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Temperature:</span>
+                                <span id="brownianTemperature" class="stat-value">1.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pendulum Info -->
+                    <div id="pendulum-info" class="animation-info" style="display: none;">
+                        <h3>Simple Pendulum Simulation</h3>
+                        <p>Observe the oscillatory motion of a simple pendulum. The period depends on length and gravity, not the mass or amplitude.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Current Angle:</span>
+                                <span id="currentAngle" class="stat-value">0.0°</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Angular Velocity:</span>
+                                <span id="angularVelocity" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Period:</span>
+                                <span id="period" class="stat-value">0.0s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="pendulumTime" class="stat-value">0.0s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Air Resistance:</span>
+                                <span id="pendulumAirResistance" class="stat-value">0.000</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Damping Coefficient:</span>
+                                <span id="pendulumDamping" class="stat-value">0.010</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diffusion Info -->
+                    <div id="diffusion-info" class="animation-info" style="display: none;">
+                        <h3>Diffusion Simulation</h3>
+                        <p>Watch particles spread from high concentration to low concentration areas, demonstrating Fick's laws of diffusion.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Active Particles:</span>
+                                <span id="diffusionParticleCount" class="stat-value">200</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Average Speed:</span>
+                                <span id="diffusionAvgSpeed" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Concentration Spread:</span>
+                                <span id="concentrationSpread" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="diffusionTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orbital Motion Info -->
+                    <div id="orbital-info" class="animation-info" style="display: none;">
+                        <h3>Orbital Motion Simulation</h3>
+                        <p>Observe how objects orbit around a central mass, demonstrating Kepler's laws of planetary motion.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Orbital Period:</span>
+                                <span id="orbitalPeriod" class="stat-value">0.0s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Current Speed:</span>
+                                <span id="orbitalSpeed" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Distance from Center:</span>
+                                <span id="orbitalDistance" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Eccentricity:</span>
+                                <span id="orbitalEccentricity" class="stat-value">0.20</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="orbitalTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gas Laws Info -->
+                    <div id="gas-laws-info" class="animation-info" style="display: none;">
+                        <h3>Gas Laws Simulation</h3>
+                        <p>Explore the relationships between pressure, volume, and temperature in gases. Watch how particles behave under different conditions.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Active Particles:</span>
+                                <span id="gasParticleCount" class="stat-value">50</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Temperature:</span>
+                                <span id="gasTemperature" class="stat-value">300K</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Pressure:</span>
+                                <span id="gasPressure" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Volume:</span>
+                                <span id="gasVolume" class="stat-value">300</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Collision Physics Info -->
+                    <div id="collisions-info" class="animation-info" style="display: none;">
+                        <h3>Collision Physics Simulation</h3>
+                        <p>Explore momentum conservation, energy transfer, and different types of collisions between objects.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Objects:</span>
+                                <span id="collisionBallCount" class="stat-value">4</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Momentum:</span>
+                                <span id="collisionMomentum" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Energy:</span>
+                                <span id="collisionEnergy" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Collisions:</span>
+                                <span id="collisionCount" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Friction & Inclined Planes Info -->
+                    <div id="friction-info" class="animation-info" style="display: none;">
+                        <h3>Friction & Inclined Planes Simulation</h3>
+                        <p>Explore how objects move on inclined surfaces with different friction coefficients and surface materials.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Surface:</span>
+                                <span id="frictionSurface" class="stat-value">Concrete</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Angle:</span>
+                                <span id="frictionAngle" class="stat-value">20°</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Net Force:</span>
+                                <span id="frictionNetForce" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Acceleration:</span>
+                                <span id="frictionAcceleration" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Electric Fields Info -->
+                    <div id="electric-fields-info" class="animation-info" style="display: none;">
+                        <h3>Electric Fields Simulation</h3>
+                        <p>Watch how test particles move in electric fields. Red circles are positive charges (+), blue circles are negative charges (−). Click anywhere to add charges!</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Charges:</span>
+                                <span id="activeCharges" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Particles:</span>
+                                <span id="efParticleCount" class="stat-value">20</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Field Strength:</span>
+                                <span id="efFieldStrength" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="efTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Magnetic Fields Info -->
+                    <div id="magnetic-fields-info" class="animation-info" style="display: none;">
+                        <h3>Magnetic Fields Simulation</h3>
+                        <p>Watch how charged particles move in magnetic fields. Red particles are positive (+), blue particles are negative (−). Click anywhere to add magnets!</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Magnets:</span>
+                                <span id="magnetCount" class="stat-value">1</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Particles:</span>
+                                <span id="magneticParticleCount" class="stat-value">15</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Field Strength:</span>
+                                <span id="magneticFieldStrength" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="magneticTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wave Propagation Info -->
+                    <div id="waves-info" class="animation-info" style="display: none;">
+                        <h3>Wave Propagation Simulation</h3>
+                        <p>Explore different types of waves including transverse, longitudinal, interference, and standing waves.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Wave Type:</span>
+                                <span id="currentWaveType" class="stat-value">Transverse</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Frequency:</span>
+                                <span id="currentFrequency" class="stat-value">1.0 Hz</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wavelength:</span>
+                                <span id="currentWavelength" class="stat-value">150 px</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Amplitude:</span>
+                                <span id="currentAmplitude" class="stat-value">50 px</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wave Speed:</span>
+                                <span id="currentWaveSpeed" class="stat-value">150 px/s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wave Energy:</span>
+                                <span id="currentWaveEnergy" class="stat-value">1250</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="wavesTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wave-Particle Duality Info -->
+                    <div id="wave-particle-duality-info" class="animation-info" style="display: none;">
+                        <h3>Wave-Particle Duality Simulation</h3>
+                        <p>Explore the fundamental quantum phenomenon where light and matter exhibit both wave-like and particle-like properties depending on how we observe them.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Observation Mode:</span>
+                                <span id="currentDualityMode" class="stat-value">Wave</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Photon Energy:</span>
+                                <span id="currentPhotonEnergy" class="stat-value">5.0 eV</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wavelength:</span>
+                                <span id="currentDualityWavelength" class="stat-value">150 nm</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wave Function:</span>
+                                <span id="waveFunctionStatus" class="stat-value">Active</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Interference Pattern:</span>
+                                <span id="interferenceStatus" class="stat-value">Visible</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Measurement Count:</span>
+                                <span id="measurementCount" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="dualityTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nuclear Reactions Info -->
+                    <div id="nuclear-reactions-info" class="animation-info" style="display: none;">
+                        <h3>Nuclear Fission & Fusion Simulation</h3>
+                        <p>Explore the fundamental processes that power stars and nuclear reactors. Watch atoms split and combine, releasing tremendous energy.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Reaction Type:</span>
+                                <span id="nuclearReactionType" class="stat-value">Fission</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Energy Released:</span>
+                                <span id="nuclearEnergyReleased" class="stat-value">0.0 MeV</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Neutrons Produced:</span>
+                                <span id="neutronsProduced" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Chain Reactions:</span>
+                                <span id="chainReactions" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Temperature:</span>
+                                <span id="nuclearTemperature" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="nuclearTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fluid Flow Info -->
+                    <div id="fluid-flow-info" class="animation-info" style="display: none;">
+                        <h3>Fluid Flow Simulation</h3>
+                        <p>Explore laminar and turbulent flow patterns, viscosity effects, and Reynolds number transitions. Click to add obstacles and observe flow changes.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Flow Rate:</span>
+                                <span id="fluidFlowRate" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Viscosity:</span>
+                                <span id="fluidViscosity" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Reynolds Number:</span>
+                                <span id="reynoldsNumberValue" class="stat-value">100</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Flow Type:</span>
+                                <span id="flowType" class="stat-value">Laminar</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Average Velocity:</span>
+                                <span id="averageVelocity" class="stat-value">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="fluidTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bernoulli's Principle Info -->
+                    <div id="bernoulli-info" class="animation-info" style="display: none;">
+                        <h3>Bernoulli's Principle Simulation</h3>
+                        <p>Observe how fluid velocity and pressure change in constricted pipes. Higher velocity leads to lower pressure, demonstrating energy conservation.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Pipe Width:</span>
+                                <span id="bernoulliPipeWidth" class="stat-value">50</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Fluid Density:</span>
+                                <span id="bernoulliDensity" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Pressure Difference:</span>
+                                <span id="bernoulliPressureDiff" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Velocity Ratio:</span>
+                                <span id="velocityRatio" class="stat-value">1.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Energy Conservation:</span>
+                                <span id="energyConservation" class="stat-value">✓</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="bernoulliTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sound Waves Info -->
+                    <div id="sound-waves-info" class="animation-info" style="display: none;">
+                        <h3>Sound Waves Simulation</h3>
+                        <p>Explore how sound waves propagate through different mediums. Watch transverse waves on strings and longitudinal waves in air molecules.</p>
+                        <div class="stats">
+                                                    <div class="stat">
+                            <span class="stat-label">Wave Type:</span>
+                            <span id="soundWaveTypeDisplay" class="stat-value">Transverse</span>
+                        </div>
+                            <div class="stat">
+                                <span class="stat-label">Frequency:</span>
+                                <span id="soundFrequency" class="stat-value">440 Hz</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wavelength:</span>
+                                <span id="soundWavelength" class="stat-value">0.78 m</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Wave Speed:</span>
+                                <span id="soundWaveSpeed" class="stat-value">343 m/s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Amplitude:</span>
+                                <span id="soundAmplitude" class="stat-value">50%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Particle Count:</span>
+                                <span id="soundParticleCount" class="stat-value">15</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="soundTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diode & Transistor Info -->
+                    <div id="diode-transistor-info" class="animation-info" style="display: none;">
+                        <h3>Diode & Transistor Simulation</h3>
+                        <p>Explore semiconductor physics and electronic components. Watch electrons (blue) and holes (red) flow through P-N junctions. See how transistors amplify signals with base voltage control.</p>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: #0066ff; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                <span>Electrons (negative charge)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: transparent; border: 1px solid #ff3333; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                <span>Holes (positive charge)</span>
+                            </div>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Component Type:</span>
+                                <span id="diodeComponentTypeDisplay" class="stat-value">DIODE</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Bias Type:</span>
+                                <span id="diodeBiasTypeDisplay" class="stat-value">FORWARD</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Input Voltage:</span>
+                                <span id="diodeInputVoltageDisplay" class="stat-value">5V</span>
+                            </div>
+                            <div class="stat" id="baseVoltageStat" style="display: none;">
+                                <span class="stat-label">Base Voltage:</span>
+                                <span id="diodeBaseVoltageDisplay" class="stat-value">0.7V</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Current:</span>
+                                <span id="diodeCurrent" class="stat-value">0.0mA</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Power:</span>
+                                <span id="diodePower" class="stat-value">0.0mW</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Status:</span>
+                                <span id="diodeStatus" class="stat-value">INACTIVE</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Temperature:</span>
+                                <span id="diodeTemperature" class="stat-value">25°C</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Simulation Time:</span>
+                                <span id="diodeTime" class="stat-value">0.0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neural Network Info -->
+                    <div id="neural-network-info" class="animation-info" style="display: none;">
+                        <h3>Neural Network Training Simulation</h3>
+                        <p>Watch a neural network learn to solve the XOR problem through backpropagation. Observe forward propagation, gradient calculation, and weight updates in real-time.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Epoch:</span>
+                                <span id="neuralEpoch" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Current Loss:</span>
+                                <span id="neuralLoss" class="stat-value">0.0000</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Accuracy:</span>
+                                <span id="neuralAccuracy" class="stat-value">0.0%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Learning Rate:</span>
+                                <span id="neuralLearningRate" class="stat-value">0.1</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Animation Speed:</span>
+                                <span id="neuralSpeed" class="stat-value">1.0x</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Training Phase:</span>
+                                <span id="neuralPhase" class="stat-value">forward</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Data Index:</span>
+                                <span id="neuralDataIndex" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Management Info -->
+                    <div id="memory-management-info" class="animation-info" style="display: none;">
+                        <h3>Memory Management Simulation</h3>
+                        <p>Visualize memory allocation, deallocation, garbage collection, and fragmentation as a vibrant city. Build, demolish, and clean up to keep Memory City efficient!</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Buildings:</span>
+                                <span id="memoryBuildings" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Allocated:</span>
+                                <span id="memoryAllocated" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Cleanup Cycles:</span>
+                                <span id="memoryGCCycles" class="stat-value">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Efficiency:</span>
+                                <span id="memoryEfficiency" class="stat-value">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Science Explanation Modal -->
+    <div id="scienceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Scientific Explanation</h2>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent">
+                    <!-- Content will be dynamically loaded -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html> 
