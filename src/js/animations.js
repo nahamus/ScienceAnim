@@ -2743,37 +2743,41 @@ export class ScientificAnimations {
                 };
             case 'memory-management':
                 return {
-                    title: 'Memory Management - Data Retention and Decay',
+                    title: 'Program Execution - Code, Memory, and Data Flow',
                     html: `
                         <div class="science-content">
-                            <h3>What is Memory Management?</h3>
-                            <p>Memory management is the process of allocating and deallocating memory resources efficiently. In computer systems, this involves managing the use of RAM, hard disk space, and other storage devices. The goal is to ensure that programs have access to the necessary resources when they need them, while also freeing up space for new programs or data.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
+                            <h3>What is Program Execution?</h3>
+                            <p>Program execution is the process by which a computer runs code, manages memory, and processes data. This animation visualizes how a real program is executed, showing the flow of control, function calls, memory allocation and deallocation, and the movement of data between stack and heap. It provides a unique window into what happens "under the hood" when a computer runs software.</p>
+                            <h3>Key Concepts Demonstrated</h3>
                             <ul>
-                                <li><strong>Data Retention:</strong> The ability of a system to maintain data in memory for a long period of time</li>
-                                <li><strong>Data Decay:</strong> The gradual loss of data over time due to various factors such as hardware wear, software updates, or user activity</li>
-                                <li><strong>Memory Allocation:</strong> The process of assigning memory to programs or data as needed</li>
-                                <li><strong>Memory Deallocation:</strong> The process of freeing up memory that is no longer needed</li>
-                                <li><strong>Fragmentation:</strong> The phenomenon where free memory becomes fragmented and unusable</li>
+                                <li><strong>Code Execution:</strong> Step-by-step execution of a real program, including function calls and returns</li>
+                                <li><strong>Call Stack Visualization:</strong> See how function calls create stack frames and how the stack grows and shrinks</li>
+                                <li><strong>Heap Memory Management:</strong> Watch memory blocks being allocated (malloc) and freed (free), and observe fragmentation and memory usage</li>
+                                <li><strong>Data Flow:</strong> Visualize how data moves between functions, stack, and heap during program execution</li>
+                                <li><strong>Garbage Collection:</strong> Observe how unreachable memory is detected and cleaned up (if enabled)</li>
+                                <li><strong>Performance Metrics:</strong> Track memory usage, allocation/deallocation counts, fragmentation, and efficiency</li>
                             </ul>
-                            
                             <h3>What You Should Observe</h3>
                             <ul>
-                                <li>Programs using more memory as they run</li>
-                                <li>Programs being closed and reopened multiple times</li>
-                                <li>Programs experiencing slower performance over time</li>
-                                <li>Programs being terminated and restarted</li>
-                                <li>Programs being swapped out and swapped in</li>
+                                <li>How function calls and returns affect the call stack</li>
+                                <li>How memory is allocated and deallocated on the heap</li>
+                                <li>How data is passed between functions and stored in memory</li>
+                                <li>How memory fragmentation and leaks can occur</li>
+                                <li>How the program completes its execution and cleans up resources</li>
                             </ul>
-                            
                             <h3>Real-World Applications</h3>
                             <ul>
-                                <li>Operating systems</li>
-                                <li>Database management systems</li>
-                                <li>Virtual memory systems</li>
-                                <li>Web browsers and cache management</li>
-                                <li>Software development and debugging</li>
+                                <li>Understanding how operating systems and programming languages manage memory</li>
+                                <li>Debugging and optimizing software for performance and reliability</li>
+                                <li>Learning about stack overflows, memory leaks, and efficient resource management</li>
+                                <li>Building better software by understanding what happens at runtime</li>
+                            </ul>
+                            <h3>Interactive Features</h3>
+                            <ul>
+                                <li>Step through program execution or watch it run automatically</li>
+                                <li>View real-time statistics and performance metrics</li>
+                                <li>Observe visual effects for memory allocation, deallocation, and data flow</li>
+                                <li>Toggle output and statistics panels for deeper insights</li>
                             </ul>
                         </div>
                     `

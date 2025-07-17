@@ -114,7 +114,7 @@ npm run format
 ### Performance Optimization
 - **Canvas Rendering**: Efficient 2D canvas for smooth animations
 - **RequestAnimationFrame**: Optimized animation loop
-- **Memory Management**: Proper cleanup and resource management
+- **Program Execution**: Proper cleanup and resource management
 
 ### Responsive Design
 - **Mobile-First**: Responsive layout that works on all devices
@@ -149,7 +149,7 @@ npm run format
 
 - **60 FPS Animations**: Smooth, optimized rendering
 - **Efficient Algorithms**: Optimized physics calculations
-- **Memory Efficient**: Proper cleanup and resource management
+- **Program Execution**: Proper cleanup and resource management
 - **Fast Loading**: Minimal bundle size with Vite
 
 ## Contributing

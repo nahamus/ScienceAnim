@@ -4216,7 +4216,7 @@ export class MemoryManagement {
         this.ctx.fillStyle = '#4ECDC4';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('📊 Memory Management Stats', statsX + 15, statsY + 22);
+        this.ctx.fillText('📊 Program Execution Stats', statsX + 15, statsY + 22);
         
         this.ctx.font = '12px Inter';
         
