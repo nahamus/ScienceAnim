@@ -6,6 +6,7 @@ import { WaveParticleDuality } from './animations/quantum-physics.js';
 import { NuclearReactions } from './animations/nuclear-physics.js';
 import { FluidFlow, Bernoulli } from './animations/fluid-dynamics.js';
 import { NeuralNetwork, MemoryManagement } from './animations/computer-science.js';
+import { Blockchain } from './animations/blockchain.js';
 
 // Main animations controller
 export class ScientificAnimations {
@@ -45,6 +46,7 @@ export class ScientificAnimations {
         // Initialize computer science animations
         this.neuralNetwork = new NeuralNetwork(this.ctx);
         this.memoryManagement = new MemoryManagement(this.ctx);
+        this.blockchain = new Blockchain(this.ctx);
         
         this.setupEventListeners();
         this.resizeCanvas();
@@ -727,6 +729,52 @@ export class ScientificAnimations {
             });
         }
 
+        // Blockchain Controls
+        this.setupSliderControl('blockchainSpeed', 'blockchainSpeedValue', (value) => {
+            if (this.blockchain) {
+                this.blockchain.setSpeed(parseFloat(value));
+            }
+        });
+        
+        this.setupSliderControl('blockchainDifficulty', 'blockchainDifficultyValue', (value) => {
+            if (this.blockchain) {
+                this.blockchain.setDifficulty(parseInt(value));
+            }
+        });
+        
+        // Blockchain checkboxes
+        const showHashesCheckbox = document.getElementById('showHashes');
+        if (showHashesCheckbox && this.blockchain) {
+            showHashesCheckbox.checked = this.blockchain.showHashes;
+            showHashesCheckbox.addEventListener('change', (e) => {
+                this.blockchain.setShowHashes(e.target.checked);
+            });
+        }
+        
+        const showMiningCheckbox = document.getElementById('showMining');
+        if (showMiningCheckbox && this.blockchain) {
+            showMiningCheckbox.checked = this.blockchain.showMining;
+            showMiningCheckbox.addEventListener('change', (e) => {
+                this.blockchain.setShowMining(e.target.checked);
+            });
+        }
+        
+        const showNetworkCheckbox = document.getElementById('showNetwork');
+        if (showNetworkCheckbox && this.blockchain) {
+            showNetworkCheckbox.checked = this.blockchain.showNetwork;
+            showNetworkCheckbox.addEventListener('change', (e) => {
+                this.blockchain.setShowNetwork(e.target.checked);
+            });
+        }
+        
+        const autoMineCheckbox = document.getElementById('autoMine');
+        if (autoMineCheckbox && this.blockchain) {
+            autoMineCheckbox.checked = this.blockchain.autoMine;
+            autoMineCheckbox.addEventListener('change', (e) => {
+                this.blockchain.setAutoMine(e.target.checked);
+            });
+        }
+
         // Neural Network Mode Selector
         const neuralMode = document.getElementById('neuralMode');
         if (neuralMode) {
@@ -1180,6 +1228,9 @@ export class ScientificAnimations {
             case 'memory-management':
                 this.memoryManagement.reset();
                 break;
+            case 'blockchain':
+                this.blockchain.reset();
+                break;
         }
     }
     
@@ -1330,6 +1381,15 @@ export class ScientificAnimations {
                     this.memoryManagement.update(deltaTime);
                     this.memoryManagement.render();
                     this.updateMemoryManagementStats();
+                }
+                break;
+            case 'blockchain':
+                if (this.blockchain) {
+                    this.blockchain.update(deltaTime);
+                    this.blockchain.render();
+                    this.updateBlockchainStats();
+                } else {
+                    console.error('Blockchain instance not found!');
                 }
                 break;
         }
@@ -2782,6 +2842,138 @@ export class ScientificAnimations {
                         </div>
                     `
                 };
+            case 'blockchain':
+                return {
+                    title: 'Blockchain - Distributed Ledger Technology',
+                    html: `
+                        <div class="science-content">
+                            <h3>What is Blockchain?</h3>
+                            <p>Blockchain is a distributed ledger technology that enables secure, transparent, and tamper-resistant record-keeping across a network of computers. Each block contains a list of transactions, and blocks are linked together in a chain using cryptographic hashes, creating an immutable record of all transactions.</p>
+                            
+                            <h3>Key Scientific Concepts</h3>
+                            <ul>
+                                <li><strong>Cryptographic Hashing:</strong> Mathematical function that converts data into a fixed-size string (hash) - any change in data produces a completely different hash</li>
+                                <li><strong>Proof of Work:</strong> Consensus mechanism where miners solve complex mathematical puzzles to validate transactions and create new blocks</li>
+                                <li><strong>Distributed Network:</strong> Multiple nodes maintain identical copies of the blockchain, ensuring redundancy and security</li>
+                                <li><strong>Merkle Trees:</strong> Data structure that efficiently verifies transaction integrity by creating a single hash from multiple transactions</li>
+                                <li><strong>Difficulty Adjustment:</strong> Network automatically adjusts mining difficulty to maintain consistent block creation rate</li>
+                            </ul>
+                            
+                            <h3>Block Structure</h3>
+                            <ul>
+                                <li><strong>Block Header:</strong> Contains metadata including previous block hash, timestamp, nonce, and Merkle root</li>
+                                <li><strong>Transactions:</strong> List of validated transactions waiting to be included in the block</li>
+                                <li><strong>Nonce:</strong> Number that miners change to find a hash meeting the difficulty requirement</li>
+                                <li><strong>Hash:</strong> Unique fingerprint of the block's content - any change invalidates the hash</li>
+                                <li><strong>Previous Hash:</strong> Links each block to its predecessor, creating the chain</li>
+                            </ul>
+                            
+                            <h3>Mining Process Explained</h3>
+                            <ol>
+                                <li><strong>Transaction Collection:</strong> Network collects pending transactions into a candidate block</li>
+                                <li><strong>Hash Calculation:</strong> Block header is hashed using SHA-256 algorithm</li>
+                                <li><strong>Difficulty Check:</strong> Hash must start with a specific number of zeros (target)</li>
+                                <li><strong>Nonce Increment:</strong> If hash doesn't meet target, nonce is incremented and process repeats</li>
+                                <li><strong>Block Discovery:</strong> When valid hash is found, block is broadcast to network</li>
+                                <li><strong>Network Validation:</strong> Other nodes verify the block and add it to their chain</li>
+                            </ol>
+                            
+                            <h3>What You Should Observe</h3>
+                            <ul>
+                                <li><strong>Mining Process:</strong> Watch miners (orange nodes) working to find valid hashes</li>
+                                <li><strong>Block Creation:</strong> See new blocks being added to the chain with celebration particles</li>
+                                <li><strong>Network Propagation:</strong> Observe animated arrows showing blocks spreading through the network</li>
+                                <li><strong>Transaction Flow:</strong> Watch pending transactions being included in blocks</li>
+                                <li><strong>Difficulty Effects:</strong> Lower difficulty = faster mining, higher difficulty = slower mining</li>
+                                <li><strong>Guided Mode:</strong> Step-by-step visualization of the entire block addition process</li>
+                            </ul>
+                            
+                            <h3>Guided Mode Steps</h3>
+                            <ol>
+                                <li><strong>Mining Success:</strong> Block is successfully mined with valid hash</li>
+                                <li><strong>Validation:</strong> Network nodes validate the block's transactions and hash</li>
+                                <li><strong>Propagation:</strong> Block spreads through the network via peer-to-peer communication</li>
+                                <li><strong>Consensus:</strong> Network reaches agreement on block validity</li>
+                                <li><strong>Finalization:</strong> Block is permanently added to the blockchain</li>
+                            </ol>
+                            
+                            <h3>Cryptographic Security</h3>
+                            <ul>
+                                <li><strong>Hash Function:</strong> SHA-256 produces 256-bit hashes - practically impossible to reverse</li>
+                                <li><strong>Chain Integrity:</strong> Changing any block invalidates all subsequent blocks</li>
+                                <li><strong>Immutability:</strong> Once added, blocks cannot be modified without detection</li>
+                                <li><strong>Digital Signatures:</strong> Transactions are cryptographically signed to prevent forgery</li>
+                                <li><strong>51% Attack Resistance:</strong> Network security depends on honest majority of computing power</li>
+                            </ul>
+                            
+                            <h3>Network Architecture</h3>
+                            <ul>
+                                <li><strong>Full Nodes:</strong> Store complete blockchain and validate all transactions</li>
+                                <li><strong>Mining Nodes:</strong> Specialized nodes that create new blocks through proof of work</li>
+                                <li><strong>Light Nodes:</strong> Store only block headers for efficiency</li>
+                                <li><strong>Peer-to-Peer:</strong> Direct communication between nodes without central authority</li>
+                                <li><strong>Fork Resolution:</strong> Network automatically chooses the longest valid chain</li>
+                            </ul>
+                            
+                            <h3>Mathematical Foundation</h3>
+                            <ul>
+                                <li><strong>Hash Function:</strong> H(x) = SHA-256(block_header) - deterministic and collision-resistant</li>
+                                <li><strong>Difficulty Target:</strong> T = 2^(256-D) where D is difficulty level</li>
+                                <li><strong>Mining Probability:</strong> P = T/2^256 - probability of finding valid hash in one attempt</li>
+                                <li><strong>Expected Time:</strong> E[T] = 1/P attempts to find valid block</li>
+                                <li><strong>Hashrate:</strong> H = attempts_per_second × network_size</li>
+                            </ul>
+                            
+                            <h3>Real-World Applications</h3>
+                            <ul>
+                                <li><strong>Cryptocurrencies:</strong> Bitcoin, Ethereum, and other digital currencies</li>
+                                <li><strong>Smart Contracts:</strong> Self-executing contracts with predefined conditions</li>
+                                <li><strong>Supply Chain:</strong> Transparent tracking of goods from source to consumer</li>
+                                <li><strong>Digital Identity:</strong> Secure, decentralized identity management</li>
+                                <li><strong>Voting Systems:</strong> Tamper-resistant electronic voting</li>
+                                <li><strong>Decentralized Finance (DeFi):</strong> Financial services without intermediaries</li>
+                                <li><strong>NFTs:</strong> Non-fungible tokens for digital asset ownership</li>
+                            </ul>
+                            
+                            <h3>Interactive Features</h3>
+                            <ul>
+                                <li><strong>Difficulty Control:</strong> Adjust mining difficulty to see how it affects block creation speed</li>
+                                <li><strong>Animation Speed:</strong> Control how fast the simulation runs</li>
+                                <li><strong>Visual Modes:</strong> Toggle hashes, mining details, and network visualization</li>
+                                <li><strong>Real-time Stats:</strong> Monitor blocks, transactions, hashrate, and network status</li>
+                                <li><strong>Guided Mode:</strong> Step-by-step explanation of the entire block addition process</li>
+                            </ul>
+                            
+                            <h3>Advanced Concepts</h3>
+                            <ul>
+                                <li><strong>Consensus Mechanisms:</strong> Proof of Work, Proof of Stake, Delegated Proof of Stake</li>
+                                <li><strong>Forking:</strong> Temporary chain splits that resolve through consensus</li>
+                                <li><strong>Mempool:</strong> Pool of unconfirmed transactions waiting to be mined</li>
+                                <li><strong>Block Rewards:</strong> Incentive system for miners to secure the network</li>
+                                <li><strong>Transaction Fees:</strong> Additional incentive for miners to prioritize transactions</li>
+                                <li><strong>Lightning Network:</strong> Layer 2 scaling solution for faster, cheaper transactions</li>
+                            </ul>
+                            
+                            <h3>Security Considerations</h3>
+                            <ul>
+                                <li><strong>Double Spending:</strong> Prevented through consensus and transaction ordering</li>
+                                <li><strong>Sybil Attacks:</strong> Mitigated through proof of work cost</li>
+                                <li><strong>51% Attacks:</strong> Theoretical but economically unfeasible for large networks</li>
+                                <li><strong>Quantum Resistance:</strong> Future consideration for post-quantum cryptography</li>
+                                <li><strong>Privacy:</strong> Techniques like zero-knowledge proofs for transaction privacy</li>
+                            </ul>
+                            
+                            <h3>Educational Insights</h3>
+                            <ul>
+                                <li><strong>Decentralization:</strong> No single point of failure or control</li>
+                                <li><strong>Transparency:</strong> All transactions are publicly verifiable</li>
+                                <li><strong>Immutability:</strong> Historical record cannot be altered</li>
+                                <li><strong>Trustlessness:</strong> Participants don't need to trust each other, only the protocol</li>
+                                <li><strong>Incentive Alignment:</strong> Economic incentives ensure network security and participation</li>
+                            </ul>
+                        </div>
+                    `
+                };
             default:
                 return {
                     title: 'Animation Information',
@@ -2805,5 +2997,29 @@ export class ScientificAnimations {
             const efficiency = stats.fragmentation ? (100 - stats.fragmentation) : 100;
             efficiencyElement.textContent = efficiency.toFixed(1) + '%';
         }
+    }
+    
+    updateBlockchainStats() {
+        if (!this.blockchain) return;
+        const stats = this.blockchain.getStats();
+        const blocksElement = document.getElementById('blockchainBlocks');
+        const transactionsElement = document.getElementById('blockchainTransactions');
+        const pendingElement = document.getElementById('blockchainPending');
+        const difficultyElement = document.getElementById('blockchainDifficulty');
+        const hashrateElement = document.getElementById('blockchainHashrate');
+        const minersElement = document.getElementById('blockchainMiners');
+        const nodesElement = document.getElementById('blockchainNodes');
+        const phaseElement = document.getElementById('blockchainPhase');
+        const miningElement = document.getElementById('blockchainMining');
+        
+        if (blocksElement) blocksElement.textContent = stats.blocks || 0;
+        if (transactionsElement) transactionsElement.textContent = stats.transactions || 0;
+        if (pendingElement) pendingElement.textContent = stats.pending || 0;
+        if (difficultyElement) difficultyElement.textContent = stats.difficulty || 0;
+        if (hashrateElement) hashrateElement.textContent = (stats.hashrate || 0) + ' H/s';
+        if (minersElement) minersElement.textContent = stats.miners || 0;
+        if (nodesElement) nodesElement.textContent = stats.nodes || 0;
+        if (phaseElement) phaseElement.textContent = stats.phase || 'idle';
+        if (miningElement) miningElement.textContent = stats.isMining ? 'Yes' : 'No';
     }
 }

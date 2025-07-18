@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/ScienceAnim/', // <-- set this to your repo name, with slashes
+  base: process.env.NODE_ENV === 'production' ? '/ScienceAnim/' : '/',
   root: 'src',
   publicDir: '../public',
   build: {

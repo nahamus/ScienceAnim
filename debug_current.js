@@ -1,88 +1,48 @@
-// Debug current neural network state
-function sigmoid(x) { 
-    return 1 / (1 + Math.exp(-x)); 
-}
-function sigmoidDerivative(x) { return x * (1 - x); }
+// Debug script to test blockchain animation
+import { Blockchain } from './src/js/animations/blockchain.js';
 
-// Simpler network: 2-2-1 with small random weights
-const weights = [
-    [[0.1, -0.2], [0.3, 0.1]],  // Input to hidden (2x2)
-    [[0.2], [-0.1]]               // Hidden to output (2x1)
-];
-const biases = [
-    [0.1, -0.1],  // Hidden layer biases
-    [0.05]        // Output layer bias
-];
-const trainingData = [
-    { input: [0.9, 0.1], output: [0], object: 'circle' },
-    { input: [0.8, 0.3], output: [0], object: 'square' },
-    { input: [0.6, 0.5], output: [1], object: 'triangle' },
-    { input: [0.3, 0.9], output: [1], object: 'star' }
-];
+// Create a canvas element
+const canvas = document.createElement('canvas');
+canvas.width = 800;
+canvas.height = 600;
+document.body.appendChild(canvas);
 
-function forwardPropagate(inputs) {
-    let activations = [inputs];
-    let current = inputs;
-    for (let l = 0; l < weights.length; l++) {
-        let next = [];
-        for (let j = 0; j < weights[l][0].length; j++) {
-            let sum = biases[l][j];
-            for (let i = 0; i < current.length; i++) {
-                sum += current[i] * weights[l][i][j];
-            }
-            next.push(sigmoid(sum));
-        }
-        activations.push(next);
-        current = next;
-    }
-    return activations;
-}
+// Get the context
+const ctx = canvas.getContext('2d');
 
-function backwardPropagate(activations, targets) {
-    let deltas = [];
-    // Output layer delta
-    let output = activations[activations.length - 1];
-    let delta = [];
-    for (let i = 0; i < output.length; i++) {
-        delta.push((targets[i] - output[i]) * sigmoidDerivative(output[i]));
-    }
-    deltas.unshift(delta);
-    // Hidden layers
-    for (let l = weights.length - 1; l > 0; l--) {
-        let layer = activations[l];
-        let nextDelta = [];
-        for (let i = 0; i < layer.length; i++) {
-            let error = 0;
-            for (let j = 0; j < deltas[0].length; j++) {
-                error += deltas[0][j] * weights[l][i][j];
-            }
-            nextDelta.push(error * sigmoidDerivative(layer[i]));
-        }
-        deltas.unshift(nextDelta);
-    }
-    return deltas;
-}
+// Create blockchain instance
+const blockchain = new Blockchain(ctx);
 
-function updateWeights(activations, deltas, learningRate) {
-    for (let l = 0; l < weights.length; l++) {
-        for (let i = 0; i < weights[l].length; i++) {
-            for (let j = 0; j < weights[l][0].length; j++) {
-                weights[l][i][j] += learningRate * deltas[l][j] * activations[l][i];
-            }
-        }
-        for (let j = 0; j < biases[l].length; j++) {
-            biases[l][j] += learningRate * deltas[l][j];
-        }
-    }
-}
+// Test the blockchain
+console.log('Blockchain created:', blockchain);
+console.log('Initial blocks:', blockchain.blocks.length);
+console.log('Initial pending transactions:', blockchain.pendingTransactions.length);
 
-// Training the neural network
-const learningRate = 0.1;
-for (let epoch = 0; epoch < 100; epoch++) {
-    for (let dataIndex = 0; dataIndex < trainingData.length; dataIndex++) {
-        const data = trainingData[dataIndex];
-        const activations = forwardPropagate(data.input);
-        const deltas = backwardPropagate(activations, data.output);
-        updateWeights(activations, deltas, learningRate);
-    }
-} 
+// Test mining
+blockchain.startMining();
+console.log('Mining started:', blockchain.isMining);
+
+// Test difficulty change
+blockchain.setDifficulty(2);
+console.log('Difficulty changed to 2');
+
+// Test speed change
+blockchain.setSpeed(2.0);
+console.log('Speed changed to 2.0');
+
+// Test controls
+blockchain.setShowHashes(true);
+blockchain.setShowMining(true);
+blockchain.setShowNetwork(true);
+blockchain.setAutoMine(true);
+
+console.log('All controls set successfully');
+
+// Test update and render
+blockchain.update(0.016); // 16ms delta time
+blockchain.render();
+console.log('Update and render completed');
+
+// Test stats
+const stats = blockchain.getStats();
+console.log('Stats:', stats); 

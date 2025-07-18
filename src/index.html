@@ -174,7 +174,7 @@
                     <div class="category-header" data-category="Computer Science">
                         <span class="category-icon">💻</span>
                         <span class="category-name">Computer Science</span>
-                        <span class="category-count">2</span>
+                        <span class="category-count">3</span>
                     </div>
                     <div class="submenu">
                         <button class="submenu-item" data-animation="neural-network" data-animation-name="Neural Network Training">
@@ -184,6 +184,10 @@
                         <button class="submenu-item" data-animation="memory-management" data-animation-name="Program Execution">
                             <span class="item-icon">🏙️</span>
                             <span class="item-name">Program Execution</span>
+                        </button>
+                        <button class="submenu-item" data-animation="blockchain" data-animation-name="Blockchain">
+                            <span class="item-icon">⛓️</span>
+                            <span class="item-name">Blockchain</span>
                         </button>
                     </div>
                 </div>
@@ -880,6 +884,41 @@
                     </div>
                 </div>
 
+                <!-- Blockchain Controls -->
+                <div id="blockchain-controls" class="animation-controls" style="display: none;">
+                    <div class="control-group">
+                        <label for="blockchainSpeed">Animation Speed:</label>
+                        <input type="range" id="blockchainSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
+                        <span id="blockchainSpeedValue">1.0x</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="blockchainDifficulty">Mining Difficulty:</label>
+                        <input type="range" id="blockchainDifficulty" min="1" max="8" value="4" step="1" class="slider">
+                        <span id="blockchainDifficultyValue">4</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="showHashes">Show Block Hashes:</label>
+                        <input type="checkbox" id="showHashes" class="checkbox" checked>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="showMining">Show Mining Process:</label>
+                        <input type="checkbox" id="showMining" class="checkbox" checked>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="showNetwork">Show Network:</label>
+                        <input type="checkbox" id="showNetwork" class="checkbox" checked>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="autoMine">Auto Mining:</label>
+                        <input type="checkbox" id="autoMine" class="checkbox" checked>
+                    </div>
+                </div>
+
                 <div class="button-group">
                     <button id="playPauseBtn" class="btn btn-primary">Pause</button>
                     <button id="resetBtn" class="btn btn-secondary">Reset</button>
@@ -1450,6 +1489,50 @@
                             <div class="stat">
                                 <span class="stat-label">Efficiency:</span>
                                 <span id="memoryEfficiency" class="stat-value">100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blockchain Info -->
+                    <div id="blockchain-info" class="animation-info" style="display: none;">
+                        <h3>Blockchain Simulation</h3>
+                        <p>Watch blocks being mined, validated, and connected in a decentralized network. Observe consensus mechanisms, smart contracts, and network propagation in real-time.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Blocks:</span>
+                                <span id="blockchainBlocks" class="stat-value">1</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Transactions:</span>
+                                <span id="blockchainTransactions" class="stat-value">2</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Pending:</span>
+                                <span id="blockchainPending" class="stat-value">3</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Difficulty:</span>
+                                <span id="blockchainDifficulty" class="stat-value">4</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Hashrate:</span>
+                                <span id="blockchainHashrate" class="stat-value">3600 H/s</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Miners:</span>
+                                <span id="blockchainMiners" class="stat-value">3</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Nodes:</span>
+                                <span id="blockchainNodes" class="stat-value">6</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Phase:</span>
+                                <span id="blockchainPhase" class="stat-value">idle</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Mining:</span>
+                                <span id="blockchainMining" class="stat-value">No</span>
                             </div>
                         </div>
                     </div>
