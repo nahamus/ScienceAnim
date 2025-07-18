@@ -742,38 +742,11 @@ export class ScientificAnimations {
             }
         });
         
-        // Blockchain checkboxes
-        const showHashesCheckbox = document.getElementById('showHashes');
-        if (showHashesCheckbox && this.blockchain) {
-            showHashesCheckbox.checked = this.blockchain.showHashes;
-            showHashesCheckbox.addEventListener('change', (e) => {
-                this.blockchain.setShowHashes(e.target.checked);
-            });
-        }
+
         
-        const showMiningCheckbox = document.getElementById('showMining');
-        if (showMiningCheckbox && this.blockchain) {
-            showMiningCheckbox.checked = this.blockchain.showMining;
-            showMiningCheckbox.addEventListener('change', (e) => {
-                this.blockchain.setShowMining(e.target.checked);
-            });
-        }
+
         
-        const showNetworkCheckbox = document.getElementById('showNetwork');
-        if (showNetworkCheckbox && this.blockchain) {
-            showNetworkCheckbox.checked = this.blockchain.showNetwork;
-            showNetworkCheckbox.addEventListener('change', (e) => {
-                this.blockchain.setShowNetwork(e.target.checked);
-            });
-        }
-        
-        const autoMineCheckbox = document.getElementById('autoMine');
-        if (autoMineCheckbox && this.blockchain) {
-            autoMineCheckbox.checked = this.blockchain.autoMine;
-            autoMineCheckbox.addEventListener('change', (e) => {
-                this.blockchain.setAutoMine(e.target.checked);
-            });
-        }
+
 
         // Neural Network Mode Selector
         const neuralMode = document.getElementById('neuralMode');
@@ -2880,22 +2853,43 @@ export class ScientificAnimations {
                             
                             <h3>What You Should Observe</h3>
                             <ul>
-                                <li><strong>Mining Process:</strong> Watch miners (orange nodes) working to find valid hashes</li>
+                                <li><strong>Modern Block Design:</strong> Rounded blocks with gradients, inner highlights, and modern typography</li>
+                                <li><strong>Enhanced Mining Process:</strong> Watch miners (orange nodes with pulsing rings) working to find valid hashes</li>
+                                <li><strong>Successful Miner Zoom:</strong> The successful miner node pulses and zooms to draw attention</li>
+                                <li><strong>Dynamic Transaction Blocks:</strong> Transactions fade over time, show age indicators, and have priority colors</li>
                                 <li><strong>Block Creation:</strong> See new blocks being added to the chain with celebration particles</li>
                                 <li><strong>Network Propagation:</strong> Observe animated arrows showing blocks spreading through the network</li>
-                                <li><strong>Transaction Flow:</strong> Watch pending transactions being included in blocks</li>
+                                <li><strong>Transaction Flow:</strong> Watch pending transactions being included in blocks with real-time updates</li>
                                 <li><strong>Difficulty Effects:</strong> Lower difficulty = faster mining, higher difficulty = slower mining</li>
-                                <li><strong>Guided Mode:</strong> Step-by-step visualization of the entire block addition process</li>
+                                <li><strong>Dynamic Network:</strong> Nodes join and leave the network automatically with enhanced visual effects</li>
+                                <li><strong>Block Hashes:</strong> Always visible with modern monospace font (truncated for readability)</li>
+                                <li><strong>Consensus Process:</strong> Watch network nodes reach agreement during guided mode</li>
+                                <li><strong>Block Rejection:</strong> See blocks rejected with red particles when consensus fails (60% threshold)</li>
+                                <li><strong>Transparent Info Panel:</strong> Network status panel with reduced opacity for better integration</li>
                             </ul>
                             
-                            <h3>Guided Mode Steps</h3>
+                            <h3>Block Rejection & Consensus</h3>
+                            <p>In guided mode (difficulty 2+), the network implements a realistic consensus mechanism:</p>
+                            <ul>
+                                <li><strong>Consensus Threshold:</strong> 60% of network nodes must agree to accept a block</li>
+                                <li><strong>Rejection Process:</strong> If consensus fails, the block is rejected with visual feedback</li>
+                                <li><strong>Red Particles:</strong> Rejection particles appear around the mining block position</li>
+                                <li><strong>Automatic Recovery:</strong> Mining automatically restarts after rejection</li>
+                                <li><strong>Network Reset:</strong> All nodes return to default state after rejection</li>
+                                <li><strong>Statistics Update:</strong> Phase indicator shows consensus percentage and rejection status</li>
+                            </ul>
+                            
+                            <h3>Guided Mode (Difficulty 2+)</h3>
+                            <p>When mining difficulty is set to 2 or higher, the simulation automatically activates a step-by-step guided mode that walks you through the entire block addition process:</p>
                             <ol>
                                 <li><strong>Mining Success:</strong> Block is successfully mined with valid hash</li>
                                 <li><strong>Validation:</strong> Network nodes validate the block's transactions and hash</li>
                                 <li><strong>Propagation:</strong> Block spreads through the network via peer-to-peer communication</li>
-                                <li><strong>Consensus:</strong> Network reaches agreement on block validity</li>
-                                <li><strong>Finalization:</strong> Block is permanently added to the blockchain</li>
+                                <li><strong>Consensus:</strong> Network reaches agreement on block validity (requires 60% of nodes)</li>
+                                <li><strong>Finalization:</strong> Block is permanently added to the blockchain OR rejected if consensus fails</li>
                             </ol>
+                            <p><strong>Consensus Mechanism:</strong> The network requires 60% of nodes to reach consensus. If consensus fails, the block is rejected and mining restarts automatically.</p>
+                            <p><strong>Note:</strong> For difficulty levels 1, blocks are added directly without guided mode for faster simulation.</p>
                             
                             <h3>Cryptographic Security</h3>
                             <ul>
@@ -2935,13 +2929,43 @@ export class ScientificAnimations {
                                 <li><strong>NFTs:</strong> Non-fungible tokens for digital asset ownership</li>
                             </ul>
                             
+                            <h3>Visual Enhancements</h3>
+                            <ul>
+                                <li><strong>Modern Block Design:</strong> Rounded corners, gradient backgrounds, inner highlights, and enhanced typography</li>
+                                <li><strong>Golden Genesis Block:</strong> Special golden gradient to distinguish the first block</li>
+                                <li><strong>Enhanced Node Design:</strong> Multi-stop gradients, gradient borders, and inner highlights for depth</li>
+                                <li><strong>Successful Miner Zoom:</strong> Pulsing zoom effect (0.7x-1.3x) with additional rings for emphasis</li>
+                                <li><strong>Dynamic Transaction Display:</strong> Age-based fading, priority indicators, and real-time updates</li>
+                                <li><strong>Transaction Priority Colors:</strong> Green (High), Orange (Medium), Red (Low) based on fees</li>
+                                <li><strong>Pulsing New Transactions:</strong> Fresh transactions have animated borders for 5 seconds</li>
+                                <li><strong>Transparent Info Panel:</strong> Reduced opacity (75%-55%) with text shadows for readability</li>
+                                <li><strong>Enhanced Typography:</strong> Modern fonts, better spacing, and improved readability</li>
+                                <li><strong>Realistic Transaction Aging:</strong> Transactions expire after 30 seconds with visual feedback</li>
+                            </ul>
+                            
                             <h3>Interactive Features</h3>
                             <ul>
-                                <li><strong>Difficulty Control:</strong> Adjust mining difficulty to see how it affects block creation speed</li>
-                                <li><strong>Animation Speed:</strong> Control how fast the simulation runs</li>
-                                <li><strong>Visual Modes:</strong> Toggle hashes, mining details, and network visualization</li>
-                                <li><strong>Real-time Stats:</strong> Monitor blocks, transactions, hashrate, and network status</li>
-                                <li><strong>Guided Mode:</strong> Step-by-step explanation of the entire block addition process</li>
+                                <li><strong>Mining Difficulty (1-8):</strong> Control how hard it is to mine blocks - affects block creation speed and guided mode activation</li>
+                                <li><strong>Simulation Speed (0.1x-3x):</strong> Control how fast the entire simulation runs</li>
+                                <li><strong>Auto Mining:</strong> Always enabled - simulation continuously mines new blocks</li>
+                                <li><strong>Network Visualization:</strong> Always visible - watch nodes join, leave, and validate blocks</li>
+                                <li><strong>Block Hashes:</strong> Always visible with modern monospace font (truncated for readability)</li>
+                                <li><strong>Real-time Statistics:</strong> Monitor blocks, transactions, hashrate, network status, and current phase</li>
+                                <li><strong>Guided Mode:</strong> Automatically activates for difficulty 2+ with step-by-step process visualization</li>
+                            </ul>
+                            
+                            <h3>Dynamic Transaction System</h3>
+                            <ul>
+                                <li><strong>Real-time Generation:</strong> 1-4 new transactions every 1.5-3.5 seconds</li>
+                                <li><strong>Transaction Types:</strong> Transfer, Smart Contract, Token Mint, Stake, Swap, Liquidity</li>
+                                <li><strong>Dynamic Fees:</strong> Fees vary based on transaction type and complexity</li>
+                                <li><strong>Age-based Fading:</strong> Transactions fade over 30 seconds with visual feedback</li>
+                                <li><strong>Priority System:</strong> High/Medium/Low priority based on fee amounts</li>
+                                <li><strong>Automatic Expiration:</strong> Transactions older than 30 seconds are removed</li>
+                                <li><strong>Random Failures:</strong> 10% chance of low-fee transactions being rejected</li>
+                                <li><strong>Mempool Management:</strong> Maximum 100 transactions with fee-based replacement</li>
+                                <li><strong>Realistic Descriptions:</strong> Dynamic transaction descriptions for each type</li>
+                                <li><strong>Visual Age Indicators:</strong> "Xs ago" display instead of absolute timestamps</li>
                             </ul>
                             
                             <h3>Advanced Concepts</h3>
@@ -2961,6 +2985,21 @@ export class ScientificAnimations {
                                 <li><strong>51% Attacks:</strong> Theoretical but economically unfeasible for large networks</li>
                                 <li><strong>Quantum Resistance:</strong> Future consideration for post-quantum cryptography</li>
                                 <li><strong>Privacy:</strong> Techniques like zero-knowledge proofs for transaction privacy</li>
+                            </ul>
+                            
+                            <h3>Current Control Panel</h3>
+                            <ul>
+                                <li><strong>Mining Difficulty:</strong> Set to 1-8 (default: 4) - controls mining speed and guided mode activation</li>
+                                <li><strong>Simulation Speed:</strong> Set to 0.1x-3x (default: 1.0x) - controls overall animation speed</li>
+                                <li><strong>Reset Button:</strong> Resets the entire simulation to initial state</li>
+                            </ul>
+                            
+                            <h3>Always Active Features</h3>
+                            <ul>
+                                <li><strong>Auto Mining:</strong> Continuously mines new blocks</li>
+                                <li><strong>Network Visualization:</strong> Shows all nodes and their activities</li>
+                                <li><strong>Block Hashes:</strong> Always visible in blocks (truncated for readability)</li>
+                                <li><strong>Real-time Statistics:</strong> Live updates of all blockchain metrics</li>
                             </ul>
                             
                             <h3>Educational Insights</h3>
@@ -3019,7 +3058,20 @@ export class ScientificAnimations {
         if (hashrateElement) hashrateElement.textContent = (stats.hashrate || 0) + ' H/s';
         if (minersElement) minersElement.textContent = stats.miners || 0;
         if (nodesElement) nodesElement.textContent = stats.nodes || 0;
-        if (phaseElement) phaseElement.textContent = stats.phase || 'idle';
+        
+        // Update phase with consensus information
+        if (phaseElement) {
+            let phaseText = stats.phase || 'idle';
+            if (stats.phase === 'finalization' && stats.consensusPercentage !== undefined) {
+                if (stats.consensusReached) {
+                    phaseText = `Finalization (${stats.consensusPercentage}% consensus)`;
+                } else {
+                    phaseText = `Rejection (${stats.consensusPercentage}% < ${stats.consensusThreshold}%)`;
+                }
+            }
+            phaseElement.textContent = phaseText;
+        }
+        
         if (miningElement) miningElement.textContent = stats.isMining ? 'Yes' : 'No';
     }
 }

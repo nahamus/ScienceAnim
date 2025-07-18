@@ -887,7 +887,7 @@
                 <!-- Blockchain Controls -->
                 <div id="blockchain-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
-                        <label for="blockchainSpeed">Animation Speed:</label>
+                        <label for="blockchainSpeed">Simulation Speed:</label>
                         <input type="range" id="blockchainSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
                         <span id="blockchainSpeedValue">1.0x</span>
                     </div>
@@ -898,25 +898,11 @@
                         <span id="blockchainDifficultyValue">4</span>
                     </div>
                     
-                    <div class="control-group">
-                        <label for="showHashes">Show Block Hashes:</label>
-                        <input type="checkbox" id="showHashes" class="checkbox" checked>
-                    </div>
+
                     
-                    <div class="control-group">
-                        <label for="showMining">Show Mining Process:</label>
-                        <input type="checkbox" id="showMining" class="checkbox" checked>
-                    </div>
+
                     
-                    <div class="control-group">
-                        <label for="showNetwork">Show Network:</label>
-                        <input type="checkbox" id="showNetwork" class="checkbox" checked>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="autoMine">Auto Mining:</label>
-                        <input type="checkbox" id="autoMine" class="checkbox" checked>
-                    </div>
+
                 </div>
 
                 <div class="button-group">
@@ -1495,8 +1481,36 @@
 
                     <!-- Blockchain Info -->
                     <div id="blockchain-info" class="animation-info" style="display: none;">
-                        <h3>Blockchain Simulation</h3>
-                        <p>Watch blocks being mined, validated, and connected in a decentralized network. Observe consensus mechanisms, smart contracts, and network propagation in real-time.</p>
+                        <h3>Blockchain Network Simulation</h3>
+                        <p>Experience a live blockchain network with Proof-of-Work consensus. Watch miners compete to solve cryptographic puzzles, blocks propagate through the network, and smart contracts execute automatically. Observe real-time consensus, validation, and network dynamics.</p>
+                        
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: linear-gradient(45deg, #4CAF50, #45A049); width: 12px; height: 8px; border-radius: 2px; display: inline-block;"></span>
+                                <span>Genesis Block</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: linear-gradient(45deg, #2196F3, #1976D2); width: 12px; height: 8px; border-radius: 2px; display: inline-block;"></span>
+                                <span>Regular Blocks</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: linear-gradient(45deg, #FF9800, #F57C00); width: 12px; height: 8px; border-radius: 2px; display: inline-block;"></span>
+                                <span>Mining Block</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: #FF9800; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                <span>Mining Nodes</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: #4CAF50; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                <span>Validating Nodes</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-symbol" style="background: #2196F3; width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                <span>Network Nodes</span>
+                            </div>
+                        </div>
+                        
                         <div class="stats">
                             <div class="stat">
                                 <span class="stat-label">Blocks:</span>
