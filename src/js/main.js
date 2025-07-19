@@ -18,29 +18,22 @@ function initializeControlsToggle() {
     
     // Check if user has a preference stored
     const isCollapsed = localStorage.getItem('controlsCollapsed') === 'true';
-    const toggleText = toggleButton.querySelector('.toggle-text');
     
     if (isCollapsed) {
         controlsPanel.classList.add('collapsed');
-        if (toggleText) toggleText.textContent = 'Settings';
-    } else {
-        if (toggleText) toggleText.textContent = 'Hide';
     }
     
     toggleButton.addEventListener('click', () => {
         const isCurrentlyCollapsed = controlsPanel.classList.contains('collapsed');
-        const toggleText = toggleButton.querySelector('.toggle-text');
         
         if (isCurrentlyCollapsed) {
             // Expand the panel
             controlsPanel.classList.remove('collapsed');
             localStorage.setItem('controlsCollapsed', 'false');
-            if (toggleText) toggleText.textContent = 'Hide';
         } else {
             // Collapse the panel
             controlsPanel.classList.add('collapsed');
             localStorage.setItem('controlsCollapsed', 'true');
-            if (toggleText) toggleText.textContent = 'Settings';
         }
     });
     

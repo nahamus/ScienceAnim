@@ -721,6 +721,15 @@ export class Blockchain {
         // Create reward particles for the successful miner
         this.createRewardParticles();
         
+        // Clear the successful miner's pulsating effect
+        if (this.successfulMiner) {
+            this.successfulMiner.pulseIntensity = 0;
+            this.successfulMiner.color = this.successfulMiner.originalColor || `hsl(${this.miners.indexOf(this.successfulMiner) * 60}, 80%, 65%)`;
+        }
+        this.successfulMiner = null;
+        this.minerBlockConnection = null;
+        this.minerRewardDisplay = null;
+        
 
         
         // Start mining the next block after a delay
@@ -756,6 +765,15 @@ export class Blockchain {
         
         // Create reward particles for the successful miner
         this.createRewardParticles();
+        
+        // Clear the successful miner's pulsating effect
+        if (this.successfulMiner) {
+            this.successfulMiner.pulseIntensity = 0;
+            this.successfulMiner.color = this.successfulMiner.originalColor || `hsl(${this.miners.indexOf(this.successfulMiner) * 60}, 80%, 65%)`;
+        }
+        this.successfulMiner = null;
+        this.minerBlockConnection = null;
+        this.minerRewardDisplay = null;
         
         // Clear guided mode state
         this.guidedBlock = null;
@@ -1217,6 +1235,11 @@ export class Blockchain {
                 // Determine which miner found the block (simplified)
                 const successfulMinerIndex = Math.floor(Math.random() * this.miners.length);
                 this.successfulMiner = this.miners[successfulMinerIndex];
+                
+                // Store original color for restoration
+                if (!this.successfulMiner.originalColor) {
+                    this.successfulMiner.originalColor = this.successfulMiner.color;
+                }
                 
                 // Create beaming/bouncing effect around successful miner (no arrow)
                 this.successfulMiner.pulseIntensity = 2.0;
