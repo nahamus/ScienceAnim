@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist --repo https://github.com/nahamus/ScienceAnim.git",
     "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write ."
   },
@@ -17,12 +18,16 @@
     "prettier": "^3.1.0",
     "vite": "^5.0.0"
   },
+  "gh-pages": {
+    "repo": "https://github.com/nahamus/ScienceAnim.git"
+  },
   "keywords": [
     "science",
     "animations",
     "physics",
     "simulations"
   ],
-  "author": "Your Name",
-  "license": "MIT"
+  "author": "Tes W",
+  "license": "MIT",
+  "homepage": "https://nahamus.github.io/ScienceAnim"
 }
