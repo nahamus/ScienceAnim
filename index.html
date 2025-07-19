@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Animations - Interactive Physics Simulations</title>
+    <title>Science Animations - Interactive Physics Simulations</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/ScienceAnim/assets/index-DizVB7zA.js"></script>
-  <link rel="stylesheet" crossorigin href="/ScienceAnim/assets/index-7AO203Sf.css">
+  <script type="module" crossorigin src="/ScienceAnim/assets/index-BhH-nA0I.js"></script>
+  <link rel="stylesheet" crossorigin href="/ScienceAnim/assets/index-CKAdEsK7.css">
 </head>
 <body>
     <div class="container">
@@ -21,8 +21,7 @@
             <div class="title-container">
                 <div class="title-icon">🔬</div>
                 <h1 class="title">
-                    <span class="title-main">Science</span>
-                    <span class="title-accent">Animations</span>
+                    <span class="title-main">Science</span><span class="title-accent">Animations</span>
                 </h1>
             </div>
             <p class="subtitle">
@@ -227,9 +226,9 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="particleSize">Particle Size:</label>
-                        <input type="range" id="particleSize" min="2" max="8" value="4" class="slider">
-                        <span id="particleSizeValue">4</span>
+                        <label for="brownianParticleSize">Particle Size:</label>
+                        <input type="range" id="brownianParticleSize" min="2" max="8" value="4" class="slider">
+                        <span id="brownianParticleSizeValue">4</span>
                     </div>
 
                     <div class="control-group">
@@ -311,9 +310,9 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="particleSize">Particle Size:</label>
-                        <input type="range" id="particleSize" min="2" max="8" value="4" class="slider">
-                        <span id="particleSizeValue">4</span>
+                        <label for="diffusionParticleSize">Particle Size:</label>
+                        <input type="range" id="diffusionParticleSize" min="2" max="8" value="4" class="slider">
+                        <span id="diffusionParticleSizeValue">4</span>
                     </div>
 
                     <div class="control-group">
@@ -600,10 +599,7 @@
                         <span id="dualityWavelengthValue">150 nm</span>
                     </div>
                     
-                    <div class="control-group">
-                        <label for="dualityShowAnalytics">Show Analytics:</label>
-                        <input type="checkbox" id="dualityShowAnalytics" class="checkbox" checked>
-                    </div>
+
                     
 
                     
@@ -1495,7 +1491,7 @@
                         
                         <div class="legend">
                             <div class="legend-item">
-                                <span class="legend-symbol" style="background: linear-gradient(45deg, #4CAF50, #45A049); width: 12px; height: 8px; border-radius: 2px; display: inline-block;"></span>
+                                <span class="legend-symbol" style="background: linear-gradient(45deg, #4CAF50, #2E7D32); width: 12px; height: 8px; border-radius: 2px; display: inline-block;"></span>
                                 <span>Genesis Block</span>
                             </div>
                             <div class="legend-item">
@@ -1542,20 +1538,8 @@
                                 <span id="blockchainHashrate" class="stat-value">3600 H/s</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-label">Miners:</span>
-                                <span id="blockchainMiners" class="stat-value">3</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Nodes:</span>
-                                <span id="blockchainNodes" class="stat-value">6</span>
-                            </div>
-                            <div class="stat">
                                 <span class="stat-label">Phase:</span>
                                 <span id="blockchainPhase" class="stat-value">idle</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Mining:</span>
-                                <span id="blockchainMining" class="stat-value">No</span>
                             </div>
                         </div>
                     </div>
@@ -1578,7 +1562,7 @@
             </div>
         </div>
     </div>
-
+
 
 </body>
 </html> 
