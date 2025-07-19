@@ -433,9 +433,9 @@ export class Diffusion {
         for (let i = 0; i < rows; i++) {
             this.concentrationMap[i] = [];
             for (let j = 0; j < cols; j++) {
-                // Much stronger concentration gradient - high on left, zero on right
+                // Gentler concentration gradient - high on left, low on right
                 const x = j / cols;
-                this.concentrationMap[i][j] = Math.max(0, 1 - x * 2); // Steeper gradient
+                this.concentrationMap[i][j] = Math.max(0, 1 - x * 1.5); // Gentler gradient
             }
         }
     }
@@ -513,7 +513,9 @@ export class Diffusion {
             if (gridX > 0 && gridX < this.concentrationMap[0].length - 1 && 
                 gridY >= 0 && gridY < this.concentrationMap.length) {
                 const concentrationDiff = this.concentrationMap[gridY]?.[gridX] - this.concentrationMap[gridY]?.[gridX + 1];
-                particle.vx += concentrationDiff * 0.2; // Stronger gradient force
+                // Reduce gradient force over time to allow for uniform distribution
+                const timeFactor = Math.max(0.1, 1 - (this.time / 10000)); // Gradually reduce force
+                particle.vx += concentrationDiff * 0.1 * timeFactor; // Weaker, time-dependent gradient force
             }
             
             // Apply damping
@@ -532,11 +534,23 @@ export class Diffusion {
                 }
             }
             
-            // Wrap around edges with bounds checking
-            if (particle.x < 0) particle.x = this.ctx.canvas.width;
-            if (particle.x > this.ctx.canvas.width) particle.x = 0;
-            if (particle.y < 0) particle.y = this.ctx.canvas.height;
-            if (particle.y > this.ctx.canvas.height) particle.y = 0;
+            // Realistic boundary conditions - particles stay within canvas
+            if (particle.x < 0) {
+                particle.x = 0;
+                particle.vx *= -0.5; // Bounce with energy loss
+            }
+            if (particle.x > this.ctx.canvas.width) {
+                particle.x = this.ctx.canvas.width;
+                particle.vx *= -0.5; // Bounce with energy loss
+            }
+            if (particle.y < 0) {
+                particle.y = 0;
+                particle.vy *= -0.5; // Bounce with energy loss
+            }
+            if (particle.y > this.ctx.canvas.height) {
+                particle.y = this.ctx.canvas.height;
+                particle.vy *= -0.5; // Bounce with energy loss
+            }
             
             // Final validation check
             if (!isFinite(particle.x) || !isFinite(particle.y) || 
@@ -551,26 +565,52 @@ export class Diffusion {
     }
     
     render() {
-        // Draw concentration heatmap with stronger colors
+        // Draw enhanced concentration heatmap with modern gradient
         if (this.showConcentration) {
             const gridSize = 15;
             for (let i = 0; i < this.concentrationMap.length; i++) {
                 for (let j = 0; j < this.concentrationMap[i].length; j++) {
                     const concentration = this.concentrationMap[i][j];
-                    const alpha = concentration * 0.6; // Stronger visibility
-                    this.ctx.fillStyle = `rgba(102, 126, 234, ${alpha})`;
+                    const alpha = concentration * 0.8; // Enhanced visibility
+                    
+                    // Create gradient for each grid cell
+                    const gradient = this.ctx.createLinearGradient(
+                        j * gridSize, i * gridSize,
+                        (j + 1) * gridSize, (i + 1) * gridSize
+                    );
+                    gradient.addColorStop(0, `rgba(102, 126, 234, ${alpha * 0.8})`);
+                    gradient.addColorStop(0.5, `rgba(118, 75, 162, ${alpha})`);
+                    gradient.addColorStop(1, `rgba(102, 126, 234, ${alpha * 0.6})`);
+                    
+                    this.ctx.fillStyle = gradient;
                     this.ctx.fillRect(j * gridSize, i * gridSize, gridSize, gridSize);
+                    
+                    // Add subtle border for grid definition
+                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.1})`;
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.strokeRect(j * gridSize, i * gridSize, gridSize, gridSize);
                 }
             }
         }
         
-        // Draw particle trails
+        // Draw enhanced particle trails with gradient
         if (this.showParticleTrails) {
             this.particles.forEach(particle => {
                 if (particle.trail.length > 1) {
+                    // Create gradient trail
+                    const gradient = this.ctx.createLinearGradient(
+                        particle.trail[0].x, particle.trail[0].y,
+                        particle.trail[particle.trail.length - 1].x, 
+                        particle.trail[particle.trail.length - 1].y
+                    );
+                    gradient.addColorStop(0, 'rgba(255, 107, 107, 0.8)');
+                    gradient.addColorStop(0.5, 'rgba(255, 107, 107, 0.4)');
+                    gradient.addColorStop(1, 'rgba(255, 107, 107, 0.1)');
+                    
                     this.ctx.beginPath();
-                    this.ctx.strokeStyle = 'rgba(255, 107, 107, 0.3)';
-                    this.ctx.lineWidth = 1;
+                    this.ctx.strokeStyle = gradient;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.lineCap = 'round';
                     this.ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
                     for (let i = 1; i < particle.trail.length; i++) {
                         this.ctx.lineTo(particle.trail[i].x, particle.trail[i].y);
@@ -580,7 +620,7 @@ export class Diffusion {
             });
         }
         
-        // Draw particles with enhanced styling
+        // Draw particles with modern enhanced styling
         this.particles.forEach(particle => {
             // Check if particle coordinates are valid
             if (!isFinite(particle.x) || !isFinite(particle.y) || 
@@ -588,28 +628,45 @@ export class Diffusion {
                 return; // Skip invalid particles
             }
             
-            // Add soft glow effect
-            this.ctx.shadowColor = 'rgba(102, 126, 234, 0.3)';
-            this.ctx.shadowBlur = 8;
+            // Calculate particle velocity for dynamic effects
+            const velocity = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+            const velocityFactor = Math.min(velocity / 5, 1); // Normalize velocity
             
-            // Draw particle with gradient
+            // Enhanced glow effect based on velocity
+            this.ctx.shadowColor = `rgba(255, 107, 107, ${0.4 + velocityFactor * 0.3})`;
+            this.ctx.shadowBlur = 12 + velocityFactor * 8;
+            
+            // Create dynamic gradient based on velocity
             const gradient = this.ctx.createRadialGradient(
                 particle.x, particle.y, 0,
-                particle.x, particle.y, this.particleSize
+                particle.x, particle.y, this.particleSize * (1 + velocityFactor * 0.3)
             );
-            gradient.addColorStop(0, 'rgba(255, 107, 107, 0.9)');
-            gradient.addColorStop(1, 'rgba(255, 107, 107, 0.6)');
+            
+            // Dynamic colors based on velocity
+            const baseColor = velocityFactor > 0.5 ? 255 : 200;
+            const alpha = 0.9 + velocityFactor * 0.1;
+            
+            gradient.addColorStop(0, `rgba(${baseColor}, 107, 107, ${alpha})`);
+            gradient.addColorStop(0.6, `rgba(255, 107, 107, ${0.8 - velocityFactor * 0.2})`);
+            gradient.addColorStop(1, `rgba(255, 107, 107, 0.4)`);
             
             this.ctx.beginPath();
             this.ctx.fillStyle = gradient;
-            this.ctx.arc(particle.x, particle.y, this.particleSize, 0, Math.PI * 2);
+            this.ctx.arc(particle.x, particle.y, this.particleSize * (1 + velocityFactor * 0.2), 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Add subtle border
+            // Enhanced border with velocity-based opacity
             this.ctx.shadowBlur = 0;
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.9 + velocityFactor * 0.1})`;
+            this.ctx.lineWidth = 1.5;
             this.ctx.stroke();
+            
+            // Add inner highlight for depth
+            this.ctx.beginPath();
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + velocityFactor * 0.2})`;
+            this.ctx.arc(particle.x - this.particleSize * 0.3, particle.y - this.particleSize * 0.3, 
+                         this.particleSize * 0.3, 0, Math.PI * 2);
+            this.ctx.fill();
         });
         
         // Draw concentration profile
@@ -627,16 +684,22 @@ export class Diffusion {
     }
     
     drawConcentrationProfile() {
-        const profileHeight = 80;
-        const profileY = this.ctx.canvas.height - profileHeight - 20;
-        const profileWidth = this.ctx.canvas.width - 40;
+        const profileHeight = 100;
+        const profileY = this.ctx.canvas.height - profileHeight - 25;
+        const profileWidth = this.ctx.canvas.width - 50;
         
-        // Background
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.fillRect(20, profileY, profileWidth, profileHeight);
-        this.ctx.strokeStyle = '#333';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(20, profileY, profileWidth, profileHeight);
+        // Enhanced background with glassmorphism effect
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        this.ctx.fillRect(25, profileY, profileWidth, profileHeight);
+        
+        // Add subtle border and shadow
+        this.ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(25, profileY, profileWidth, profileHeight);
+        
+        // Add inner shadow effect
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        this.ctx.fillRect(27, profileY + 2, profileWidth - 4, profileHeight - 4);
         
         // Calculate concentration profile
         const bins = 50;
@@ -654,54 +717,112 @@ export class Diffusion {
         const maxConcentration = Math.max(...concentrationProfile);
         const scale = (profileHeight - 20) / Math.max(maxConcentration, 1);
         
-        // Draw concentration profile
-        this.ctx.strokeStyle = '#FF6B6B';
-        this.ctx.lineWidth = 2;
+        // Draw enhanced concentration profile with gradient
+        const gradient = this.ctx.createLinearGradient(25, profileY, 25 + profileWidth, profileY);
+        gradient.addColorStop(0, '#FF6B6B');
+        gradient.addColorStop(0.5, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        
+        this.ctx.strokeStyle = gradient;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         this.ctx.beginPath();
-        this.ctx.moveTo(20, profileY + profileHeight - 10);
+        this.ctx.moveTo(25, profileY + profileHeight - 15);
         
         for (let i = 0; i < bins; i++) {
-            const x = 20 + i * binWidth;
-            const y = profileY + profileHeight - 10 - (concentrationProfile[i] * scale);
+            const x = 25 + i * binWidth;
+            const y = profileY + profileHeight - 15 - (concentrationProfile[i] * scale);
             this.ctx.lineTo(x, y);
         }
         this.ctx.stroke();
         
-        // Labels
+        // Add area fill under the curve
+        this.ctx.fillStyle = 'rgba(255, 107, 107, 0.2)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(25, profileY + profileHeight - 15);
+        for (let i = 0; i < bins; i++) {
+            const x = 25 + i * binWidth;
+            const y = profileY + profileHeight - 15 - (concentrationProfile[i] * scale);
+            this.ctx.lineTo(x, y);
+        }
+        this.ctx.lineTo(25 + profileWidth, profileY + profileHeight - 15);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Enhanced labels with better styling
         this.ctx.fillStyle = '#333';
-        this.ctx.font = '14px Inter';
+        this.ctx.font = 'bold 16px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Concentration Profile', this.ctx.canvas.width / 2, profileY - 5);
-        this.ctx.fillText('High', 30, profileY + 15);
-        this.ctx.fillText('Low', this.ctx.canvas.width - 30, profileY + 15);
+        this.ctx.fillText('Concentration Profile', this.ctx.canvas.width / 2, profileY - 8);
+        
+        // Add gradient text effect for labels
+        const labelGradient = this.ctx.createLinearGradient(30, profileY + 15, this.ctx.canvas.width - 30, profileY + 15);
+        labelGradient.addColorStop(0, '#FF6B6B');
+        labelGradient.addColorStop(1, '#764ba2');
+        
+        this.ctx.fillStyle = labelGradient;
+        this.ctx.font = 'bold 14px Inter';
+        this.ctx.fillText('High Concentration', 35, profileY + 20);
+        this.ctx.fillText('Low Concentration', this.ctx.canvas.width - 35, profileY + 20);
     }
     
     drawStartBarrier() {
-        // Draw a barrier line to show where particles are contained
-        this.ctx.strokeStyle = '#FF0000';
-        this.ctx.lineWidth = 3;
-        this.ctx.setLineDash([10, 5]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.ctx.canvas.width * 0.2, 0);
-        this.ctx.lineTo(this.ctx.canvas.width * 0.2, this.ctx.canvas.height);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
+        // Draw enhanced barrier with gradient and glow
+        const barrierX = this.ctx.canvas.width * 0.2;
         
-        // Add instruction text at the bottom of canvas
-        this.ctx.fillStyle = 'rgba(102, 126, 234, 0.9)';
-        this.ctx.font = 'bold 20px Inter';
+        // Create gradient for barrier
+        const barrierGradient = this.ctx.createLinearGradient(barrierX - 2, 0, barrierX + 2, 0);
+        barrierGradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)');
+        barrierGradient.addColorStop(0.5, 'rgba(255, 107, 107, 1)');
+        barrierGradient.addColorStop(1, 'rgba(255, 0, 0, 0.8)');
+        
+        this.ctx.strokeStyle = barrierGradient;
+        this.ctx.lineWidth = 4;
+        this.ctx.setLineDash([15, 8]);
+        this.ctx.lineCap = 'round';
+        
+        // Add glow effect
+        this.ctx.shadowColor = 'rgba(255, 0, 0, 0.6)';
+        this.ctx.shadowBlur = 10;
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(barrierX, 0);
+        this.ctx.lineTo(barrierX, this.ctx.canvas.height);
+        this.ctx.stroke();
+        
+        this.ctx.setLineDash([]);
+        this.ctx.shadowBlur = 0;
+        
+        // Enhanced instruction text with modern styling
+        const text = 'Click or tap to start diffusion';
+        const textWidth = this.ctx.measureText(text).width;
+        
+        // Create glassmorphism background
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        this.ctx.fillRect(this.ctx.canvas.width / 2 - textWidth / 2 - 20, 
+                         this.ctx.canvas.height - 60, textWidth + 40, 40);
+        
+        // Add border and shadow
+        this.ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(this.ctx.canvas.width / 2 - textWidth / 2 - 20, 
+                           this.ctx.canvas.height - 60, textWidth + 40, 40);
+        
+        // Add gradient text
+        const textGradient = this.ctx.createLinearGradient(
+            this.ctx.canvas.width / 2 - textWidth / 2, this.ctx.canvas.height - 50,
+            this.ctx.canvas.width / 2 + textWidth / 2, this.ctx.canvas.height - 50
+        );
+        textGradient.addColorStop(0, '#667eea');
+        textGradient.addColorStop(1, '#764ba2');
+        
+        this.ctx.fillStyle = textGradient;
+        this.ctx.font = 'bold 18px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Click or tap to start diffusion', this.ctx.canvas.width / 2, this.ctx.canvas.height - 30);
-        
-        // Add subtle background for better readability
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillRect(this.ctx.canvas.width / 2 - 150, this.ctx.canvas.height - 50, 300, 30);
-        
-        // Redraw text on top of background
-        this.ctx.fillStyle = 'rgba(102, 126, 234, 0.9)';
-        this.ctx.fillText('Click or tap to start diffusion', this.ctx.canvas.width / 2, this.ctx.canvas.height - 30);
+        this.ctx.fillText(text, this.ctx.canvas.width / 2, this.ctx.canvas.height - 35);
     }
     
     getStats() {

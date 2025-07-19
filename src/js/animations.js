@@ -197,7 +197,7 @@ export class ScientificAnimations {
             this.brownianMotion.setTemperature(parseFloat(value));
         });
         
-        this.setupSliderControl('particleSize', 'particleSizeValue', (value) => {
+        this.setupSliderControl('brownianParticleSize', 'brownianParticleSizeValue', (value) => {
             this.brownianMotion.setParticleSize(parseInt(value));
         });
         
@@ -253,7 +253,7 @@ export class ScientificAnimations {
             this.diffusion.setConcentrationGradient(parseFloat(value));
         });
         
-        this.setupSliderControl('particleSize', 'particleSizeValue', (value) => {
+        this.setupSliderControl('diffusionParticleSize', 'diffusionParticleSizeValue', (value) => {
             this.diffusion.setParticleSize(parseInt(value));
         });
         
