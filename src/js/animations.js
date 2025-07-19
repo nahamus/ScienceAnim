@@ -401,6 +401,7 @@ export class ScientificAnimations {
                 const chargeType = document.getElementById('efChargeType').value;
                 this.electricFields.addChargeAtPosition(chargeType, x, y);
             } else if (this.currentAnimation === 'magnetic-fields') {
+                // Add complete magnet with both poles
                 this.magneticFields.addMagnetAtPosition(x, y);
 
             } else if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
@@ -512,7 +513,7 @@ export class ScientificAnimations {
             this.resizeCanvas();
         });
         
-        // Touch event for diffusion (mobile support)
+        // Comprehensive touch event handling for mobile support
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const rect = this.canvas.getBoundingClientRect();
@@ -520,9 +521,44 @@ export class ScientificAnimations {
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
             
+            // Handle different animations based on current animation
             if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
                 this.diffusion.startDiffusion();
+            } else if (this.currentAnimation === 'electric-fields') {
+                const chargeType = document.getElementById('efChargeType').value;
+                this.electricFields.addChargeAtPosition(chargeType, x, y);
+            } else if (this.currentAnimation === 'magnetic-fields') {
+                // Add complete magnet with both poles
+                this.magneticFields.addMagnetAtPosition(x, y);
+            } else if (this.currentAnimation === 'sound-waves') {
+                const sx = this.soundWaves.sourceX;
+                const sy = this.soundWaves.sourceY;
+                const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
+                if (distance <= 50) {
+                    this.soundWaves.triggerWavePulse();
+                }
+            } else if (this.currentAnimation === 'neural-network') {
+                this.neuralNetwork.handleCanvasClick(x, y);
+            } else if (this.currentAnimation === 'memory-management' && this.memoryManagement) {
+                this.memoryManagement.handleClick(x, y);
+            } else if (this.currentAnimation === 'nuclear-reactions') {
+                // Start reacting particle movement for nuclear reactions
+                this.nuclearReactions.reactingParticles.forEach(particle => {
+                    if (!particle.moving) {
+                        this.nuclearReactions.findTargetForParticle(particle);
+                        particle.moving = true;
+                    }
+                });
             }
+        });
+        
+        // Prevent default touch behaviors that might interfere
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
         });
         
 
@@ -545,13 +581,7 @@ export class ScientificAnimations {
             this.waveParticleDuality.setWavelength(parseFloat(value));
         });
         
-        document.getElementById('dualityShowAnalytics').addEventListener('change', (e) => {
-            const showAnalytics = e.target.checked;
-            this.waveParticleDuality.setShowWaveFunction(showAnalytics);
-            this.waveParticleDuality.setShowParticlePosition(showAnalytics);
-            this.waveParticleDuality.setShowInterference(showAnalytics);
-            this.waveParticleDuality.setShowMeasurementEffect(showAnalytics);
-        });
+
         
 
         

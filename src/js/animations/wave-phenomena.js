@@ -610,6 +610,21 @@ export class SoundWaves {
                 this.triggerWavePulse();
             }
         });
+        
+        // Add touch event listener for mobile support
+        this.ctx.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            // Check if touch is near the source
+            const distanceFromSource = Math.sqrt((x - this.sourceX) ** 2 + (y - this.sourceY) ** 2);
+            if (distanceFromSource < 50) {
+                this.triggerWavePulse();
+            }
+        });
     }
     
     initializeParticles() {

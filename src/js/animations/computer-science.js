@@ -3555,29 +3555,42 @@ export class MemoryManagement {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(this.codePanel.x, this.codePanel.y, this.codePanel.width, this.codePanel.height);
         
-        // Enhanced border with glow effect
+        // Enhanced border with rounded corners and gradient
         this.ctx.shadowColor = '#4ECDC4';
-        this.ctx.shadowBlur = 8;
-        this.ctx.strokeStyle = '#4ECDC4';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(this.codePanel.x, this.codePanel.y, this.codePanel.width, this.codePanel.height);
+        this.ctx.shadowBlur = 12;
+        this.ctx.lineWidth = 3;
+        
+        // Create gradient border
+        const borderGradient = this.ctx.createLinearGradient(
+            this.codePanel.x, this.codePanel.y, 
+            this.codePanel.x + this.codePanel.width, this.codePanel.y + this.codePanel.height
+        );
+        borderGradient.addColorStop(0, '#4ECDC4');
+        borderGradient.addColorStop(0.5, '#2ECC71');
+        borderGradient.addColorStop(1, '#4ECDC4');
+        
+        this.ctx.strokeStyle = borderGradient;
+        this.roundRect(this.codePanel.x, this.codePanel.y, this.codePanel.width, this.codePanel.height, 12);
+        this.ctx.stroke();
         this.ctx.shadowBlur = 0;
         
-        // Title with better styling
+        // Title with crisp font rendering
         this.ctx.fillStyle = '#4ECDC4';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('💻 Code Execution', this.codePanel.x + 15, this.codePanel.y + 25);
         
-        // Current function with improved styling
+        // Current function with crisp font rendering
         const currentFunc = this.program.functions[this.currentFunction];
         this.ctx.fillStyle = '#FFD700';
         this.ctx.font = 'bold 14px Inter';
         this.ctx.fillText(`Current: ${currentFunc.name}`, this.codePanel.x + 15, this.codePanel.y + 45);
         
-        // Draw code lines with better spacing
+        // Draw code lines with crisp font rendering
         this.ctx.font = '12px Inter';
         this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
         
         for (let i = 0; i < currentFunc.lines.length; i++) {
             const line = currentFunc.lines[i];
@@ -3595,12 +3608,12 @@ export class MemoryManagement {
                 this.ctx.strokeRect(this.codePanel.x + 8, y - 16, this.codePanel.width - 16, 22);
             }
             
-            // Line number with better styling
+            // Line number with crisp font rendering
             this.ctx.fillStyle = '#666666';
             this.ctx.font = '10px Inter';
             this.ctx.fillText(`${i + 1}`, this.codePanel.x + 15, y);
             
-            // Code line with single color
+            // Code line with crisp font rendering
             this.ctx.fillStyle = i === this.highlightedLine ? '#4ECDC4' : '#FFFFFF';
             this.ctx.font = '12px Inter';
             this.ctx.fillText(line, this.codePanel.x + 35, y);
@@ -3619,20 +3632,36 @@ export class MemoryManagement {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(this.stackPanel.x, this.stackPanel.y, this.stackPanel.width, this.stackPanel.height);
         
-        // Border with gradient
-        this.ctx.strokeStyle = '#3498db';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(this.stackPanel.x, this.stackPanel.y, this.stackPanel.width, this.stackPanel.height);
+        // Enhanced border with rounded corners and gradient
+        this.ctx.shadowColor = '#3498db';
+        this.ctx.shadowBlur = 10;
+        this.ctx.lineWidth = 3;
         
-        // Title with better styling
-            this.ctx.fillStyle = '#3498db';
+        // Create gradient border
+        const stackBorderGradient = this.ctx.createLinearGradient(
+            this.stackPanel.x, this.stackPanel.y, 
+            this.stackPanel.x + this.stackPanel.width, this.stackPanel.y + this.stackPanel.height
+        );
+        stackBorderGradient.addColorStop(0, '#3498db');
+        stackBorderGradient.addColorStop(0.5, '#2980b9');
+        stackBorderGradient.addColorStop(1, '#3498db');
+        
+        this.ctx.strokeStyle = stackBorderGradient;
+        this.roundRect(this.stackPanel.x, this.stackPanel.y, this.stackPanel.width, this.stackPanel.height, 12);
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+        
+                // Title with crisp font rendering
+        this.ctx.fillStyle = '#3498db';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('📚 Call Stack', this.stackPanel.x + 15, this.stackPanel.y + 25);
             
-        // Draw call stack with improved styling
+        // Draw call stack with crisp font rendering
             this.ctx.font = '12px Inter';
             this.ctx.textAlign = 'left';
+            this.ctx.textBaseline = 'middle';
         
         // Draw older stacks at the bottom with more subtle styling
         for (let i = 0; i < this.callStack.length; i++) {
@@ -3644,10 +3673,11 @@ export class MemoryManagement {
             this.ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
             this.ctx.fillRect(this.stackPanel.x + 10, y - 12, this.stackPanel.width - 20, 20);
             
-            // Stack frame border
+            // Stack frame border with rounded corners
             this.ctx.strokeStyle = '#3498db';
             this.ctx.lineWidth = 1;
-            this.ctx.strokeRect(this.stackPanel.x + 10, y - 12, this.stackPanel.width - 20, 20);
+            this.roundRect(this.stackPanel.x + 10, y - 12, this.stackPanel.width - 20, 20, 6);
+            this.ctx.stroke();
             
             // Function name and return address on one line
             this.ctx.fillStyle = '#FFFFFF';
@@ -3663,10 +3693,11 @@ export class MemoryManagement {
         this.ctx.fillStyle = 'rgba(78, 205, 196, 0.4)';
         this.ctx.fillRect(this.stackPanel.x + 10, currentY - 12, this.stackPanel.width - 20, 20);
         
-        // Current function border
+        // Current function border with rounded corners
         this.ctx.strokeStyle = '#4ECDC4';
         this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(this.stackPanel.x + 10, currentY - 12, this.stackPanel.width - 20, 20);
+        this.roundRect(this.stackPanel.x + 10, currentY - 12, this.stackPanel.width - 20, 20, 6);
+        this.ctx.stroke();
         
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.font = 'bold 11px Inter';
@@ -3685,15 +3716,30 @@ export class MemoryManagement {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(this.heapPanel.x, this.heapPanel.y, this.heapPanel.width, this.heapPanel.height);
         
-        // Border with gradient
-        this.ctx.strokeStyle = '#2ecc71';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(this.heapPanel.x, this.heapPanel.y, this.heapPanel.width, this.heapPanel.height);
+        // Enhanced border with rounded corners and gradient
+        this.ctx.shadowColor = '#2ecc71';
+        this.ctx.shadowBlur = 10;
+        this.ctx.lineWidth = 3;
         
-        // Title with better styling - positioned outside the box
+        // Create gradient border
+        const heapBorderGradient = this.ctx.createLinearGradient(
+            this.heapPanel.x, this.heapPanel.y, 
+            this.heapPanel.x + this.heapPanel.width, this.heapPanel.y + this.heapPanel.height
+        );
+        heapBorderGradient.addColorStop(0, '#2ecc71');
+        heapBorderGradient.addColorStop(0.5, '#27ae60');
+        heapBorderGradient.addColorStop(1, '#2ecc71');
+        
+        this.ctx.strokeStyle = heapBorderGradient;
+        this.roundRect(this.heapPanel.x, this.heapPanel.y, this.heapPanel.width, this.heapPanel.height, 12);
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+        
+        // Title with crisp font rendering - positioned outside the box
         this.ctx.fillStyle = '#2ecc71';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('🗑️ Heap Memory', this.heapPanel.x + 15, this.heapPanel.y - 10);
         
         // Draw memory grid for better organization
@@ -3717,12 +3763,23 @@ export class MemoryManagement {
             this.ctx.fillStyle = blockGradient;
             this.ctx.fillRect(block.x, block.y, block.width, block.height);
             
-            // Enhanced block border with glow
+            // Enhanced block border with rounded corners and glow
             this.ctx.shadowColor = '#4ECDC4';
-            this.ctx.shadowBlur = 6;
-            this.ctx.strokeStyle = '#FFFFFF';
+            this.ctx.shadowBlur = 8;
             this.ctx.lineWidth = 2;
-            this.ctx.strokeRect(block.x, block.y, block.width, block.height);
+            
+            // Create gradient border for memory blocks
+            const blockBorderGradient = this.ctx.createLinearGradient(
+                block.x, block.y, 
+                block.x + block.width, block.y + block.height
+            );
+            blockBorderGradient.addColorStop(0, '#FFFFFF');
+            blockBorderGradient.addColorStop(0.5, '#4ECDC4');
+            blockBorderGradient.addColorStop(1, '#FFFFFF');
+            
+            this.ctx.strokeStyle = blockBorderGradient;
+            this.roundRect(block.x, block.y, block.width, block.height, 6);
+            this.ctx.stroke();
             this.ctx.shadowBlur = 0;
             
             // Add inner highlight for 3D effect
@@ -3732,11 +3789,11 @@ export class MemoryManagement {
             this.ctx.fillStyle = innerGradient;
             this.ctx.fillRect(block.x, block.y, block.width, block.height * 0.3);
             
-            // Block label with proportional font size and better contrast
+            // Block label with crisp font rendering and better contrast
             this.ctx.fillStyle = '#000000';
             const fontSize = Math.max(8, Math.min(12, block.width / 8));
             this.ctx.font = `bold ${fontSize}px Inter`;
-        this.ctx.textAlign = 'center';
+            this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText(block.name, block.x + block.width / 2, block.y + block.height / 2 - 8);
             
@@ -4197,12 +4254,23 @@ export class MemoryManagement {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(statsX, statsY, 380, 160);
         
-        // Enhanced border with glow and gradient
+        // Enhanced border with rounded corners and gradient
         this.ctx.shadowColor = '#4ECDC4';
-        this.ctx.shadowBlur = 8;
-        this.ctx.strokeStyle = '#4ECDC4';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(statsX, statsY, 380, 160);
+        this.ctx.shadowBlur = 12;
+        this.ctx.lineWidth = 3;
+        
+        // Create gradient border
+        const statsBorderGradient = this.ctx.createLinearGradient(
+            statsX, statsY, 
+            statsX + 380, statsY + 160
+        );
+        statsBorderGradient.addColorStop(0, '#4ECDC4');
+        statsBorderGradient.addColorStop(0.5, '#2ECC71');
+        statsBorderGradient.addColorStop(1, '#4ECDC4');
+        
+        this.ctx.strokeStyle = statsBorderGradient;
+        this.roundRect(statsX, statsY, 380, 160, 12);
+        this.ctx.stroke();
         this.ctx.shadowBlur = 0;
         
         // Add inner highlight for 3D effect
@@ -4212,13 +4280,15 @@ export class MemoryManagement {
         this.ctx.fillStyle = innerGradient;
         this.ctx.fillRect(statsX, statsY, 380, 30);
         
-        // Title with modern styling
+        // Title with crisp font rendering
         this.ctx.fillStyle = '#4ECDC4';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('📊 Program Execution Stats', statsX + 15, statsY + 22);
         
         this.ctx.font = '12px Inter';
+        this.ctx.textBaseline = 'middle';
         
         // Basic stats with icons and better spacing
         this.ctx.fillStyle = '#4ECDC4';
@@ -4247,6 +4317,20 @@ export class MemoryManagement {
         const efficiencyColor = efficiency > 80 ? '#4ECDC4' : efficiency > 60 ? '#F39C12' : '#FF6B6B';
         this.ctx.fillStyle = efficiencyColor;
         this.ctx.fillText(`🎯 Performance: ${efficiency > 80 ? 'Excellent' : efficiency > 60 ? 'Good' : 'Poor'}`, statsX + 10, statsY + 160);
+    }
+    
+    roundRect(x, y, width, height, radius) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + radius, y);
+        this.ctx.lineTo(x + width - radius, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.ctx.lineTo(x + width, y + height - radius);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.ctx.lineTo(x + radius, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.ctx.lineTo(x, y + radius);
+        this.ctx.quadraticCurveTo(x, y, x + radius, y);
+        this.ctx.closePath();
     }
     
 

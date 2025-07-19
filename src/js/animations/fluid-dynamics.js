@@ -33,6 +33,29 @@ export class FluidFlow {
             this.mouseX = -1000;
             this.mouseY = -1000;
         });
+        
+        // Add touch event listeners for mobile support
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            this.mouseX = touch.clientX - rect.left;
+            this.mouseY = touch.clientY - rect.top;
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            this.mouseX = touch.clientX - rect.left;
+            this.mouseY = touch.clientY - rect.top;
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.mouseX = -1000;
+            this.mouseY = -1000;
+        });
     }
     
     initializeParticles() {
@@ -243,8 +266,35 @@ export class FluidFlow {
     }
     
     drawBackground() {
-        this.ctx.fillStyle = 'rgba(240, 248, 255, 0.3)';
+        // Modern gradient background with enhanced styling
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
+        gradient.addColorStop(0, '#E8F4FD');
+        gradient.addColorStop(0.3, '#D1E7FF');
+        gradient.addColorStop(0.7, '#B8D4F8');
+        gradient.addColorStop(1, '#A3C4F0');
+        this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        
+        // Add subtle grid pattern for depth
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([20, 20]);
+        
+        for (let x = 0; x < this.ctx.canvas.width; x += 40) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, 0);
+            this.ctx.lineTo(x, this.ctx.canvas.height);
+            this.ctx.stroke();
+        }
+        
+        for (let y = 0; y < this.ctx.canvas.height; y += 40) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.ctx.canvas.width, y);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.setLineDash([]);
     }
     
     drawObstacles() {
@@ -261,23 +311,55 @@ export class FluidFlow {
     }
     
     drawPorousObject(obstacle) {
-        // Draw a porous sponge-like object
-        this.ctx.fillStyle = 'rgba(255, 182, 193, 0.9)'; // Light pink for sponge
+        // Enhanced porous sponge-like object with modern styling
+        
+        // Add shadow for depth
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        
+        // Create gradient for sponge
+        const spongeGradient = this.ctx.createLinearGradient(
+            obstacle.x, obstacle.y, 
+            obstacle.x + obstacle.width, obstacle.y + obstacle.height
+        );
+        spongeGradient.addColorStop(0, 'rgba(255, 182, 193, 0.95)');
+        spongeGradient.addColorStop(0.5, 'rgba(255, 150, 150, 0.9)');
+        spongeGradient.addColorStop(1, 'rgba(255, 182, 193, 0.95)');
+        
+        this.ctx.fillStyle = spongeGradient;
         this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         
-        // Draw porous holes throughout the object
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Enhanced porous holes with gradient
         for (let row = 0; row < 4; row++) {
             for (let col = 0; col < 6; col++) {
+                const holeX = obstacle.x + 10 + col * 12;
+                const holeY = obstacle.y + 15 + row * 20;
+                
+                // Create gradient for each hole
+                const holeGradient = this.ctx.createRadialGradient(
+                    holeX, holeY, 0, holeX, holeY, 4
+                );
+                holeGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                holeGradient.addColorStop(1, 'rgba(255, 255, 255, 0.6)');
+                
+                this.ctx.fillStyle = holeGradient;
                 this.ctx.beginPath();
-                this.ctx.arc(obstacle.x + 10 + col * 12, obstacle.y + 15 + row * 20, 3, 0, Math.PI * 2);
+                this.ctx.arc(holeX, holeY, 4, 0, Math.PI * 2);
                 this.ctx.fill();
             }
         }
         
-        // Add sponge texture lines
+        // Enhanced sponge texture lines with gradient
         this.ctx.strokeStyle = 'rgba(255, 150, 150, 0.8)';
         this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
         for (let i = 0; i < obstacle.height; i += 15) {
             this.ctx.beginPath();
             this.ctx.moveTo(obstacle.x, obstacle.y + i);
@@ -285,15 +367,24 @@ export class FluidFlow {
             this.ctx.stroke();
         }
         
-        // Add outline
-        this.ctx.strokeStyle = 'rgba(255, 100, 100, 0.9)';
+        // Enhanced outline with gradient
+        const outlineGradient = this.ctx.createLinearGradient(
+            obstacle.x, obstacle.y, 
+            obstacle.x + obstacle.width, obstacle.y + obstacle.height
+        );
+        outlineGradient.addColorStop(0, 'rgba(255, 100, 100, 0.9)');
+        outlineGradient.addColorStop(0.5, 'rgba(255, 80, 80, 0.95)');
+        outlineGradient.addColorStop(1, 'rgba(255, 100, 100, 0.9)');
+        
+        this.ctx.strokeStyle = outlineGradient;
         this.ctx.lineWidth = 3;
         this.ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         
-        // Add prominent label
-        this.ctx.fillStyle = '#000000';
-        this.ctx.font = 'bold 16px Arial';
+        // Enhanced label with modern styling
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('🧽 Porous Sponge', obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2 + 6);
     }
     
@@ -326,13 +417,36 @@ export class FluidFlow {
     }
     
     drawSolidObject(obstacle) {
-        // Draw a solid, dense object (like a concrete block)
-        this.ctx.fillStyle = 'rgba(105, 105, 105, 0.95)'; // Solid gray
+        // Enhanced solid, dense object with modern styling
+        
+        // Add shadow for depth
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.shadowBlur = 10;
+        this.ctx.shadowOffsetX = 3;
+        this.ctx.shadowOffsetY = 3;
+        
+        // Create gradient for solid block
+        const blockGradient = this.ctx.createLinearGradient(
+            obstacle.x, obstacle.y, 
+            obstacle.x + obstacle.width, obstacle.y + obstacle.height
+        );
+        blockGradient.addColorStop(0, 'rgba(120, 120, 120, 0.95)');
+        blockGradient.addColorStop(0.3, 'rgba(105, 105, 105, 0.95)');
+        blockGradient.addColorStop(0.7, 'rgba(90, 90, 90, 0.95)');
+        blockGradient.addColorStop(1, 'rgba(75, 75, 75, 0.95)');
+        
+        this.ctx.fillStyle = blockGradient;
         this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         
-        // Add solid texture lines to show density
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Enhanced solid texture lines with gradient
         this.ctx.strokeStyle = 'rgba(80, 80, 80, 0.9)';
         this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
         for (let i = 0; i < obstacle.height; i += 20) {
             this.ctx.beginPath();
             this.ctx.moveTo(obstacle.x, obstacle.y + i);
@@ -340,7 +454,7 @@ export class FluidFlow {
             this.ctx.stroke();
         }
         
-        // Add vertical texture lines
+        // Enhanced vertical texture lines
         for (let i = 0; i < obstacle.width; i += 25) {
             this.ctx.beginPath();
             this.ctx.moveTo(obstacle.x + i, obstacle.y);
@@ -348,15 +462,24 @@ export class FluidFlow {
             this.ctx.stroke();
         }
         
-        // Add solid outline
-        this.ctx.strokeStyle = 'rgba(50, 50, 50, 0.95)';
+        // Enhanced solid outline with gradient
+        const outlineGradient = this.ctx.createLinearGradient(
+            obstacle.x, obstacle.y, 
+            obstacle.x + obstacle.width, obstacle.y + obstacle.height
+        );
+        outlineGradient.addColorStop(0, 'rgba(50, 50, 50, 0.95)');
+        outlineGradient.addColorStop(0.5, 'rgba(30, 30, 30, 0.98)');
+        outlineGradient.addColorStop(1, 'rgba(50, 50, 50, 0.95)');
+        
+        this.ctx.strokeStyle = outlineGradient;
         this.ctx.lineWidth = 4;
         this.ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         
-        // Add prominent label
-        this.ctx.fillStyle = '#000000';
-        this.ctx.font = 'bold 16px Arial';
+        // Enhanced label with modern styling
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('🪨 Solid Block', obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2 + 6);
     }
     
@@ -424,40 +547,75 @@ export class FluidFlow {
             const distance = Math.sqrt(dx * dx + dy * dy);
             const isMouseAffected = distance < this.mouseInfluence && distance > 0;
             
-            // Dynamic color based on velocity and mouse interaction
-            let hue, saturation, lightness;
+            // Enhanced dynamic color based on velocity and mouse interaction
+            let hue, saturation, lightness, glowColor;
             if (isMouseAffected) {
-                // Particles affected by mouse get a purple color
+                // Particles affected by mouse get a purple color with glow
                 hue = 270 + Math.random() * 30; // Purple range
                 saturation = 80;
                 lightness = 60;
+                glowColor = `rgba(147, 112, 219, ${intensity * 0.6})`;
             } else {
                 // Normal blue to cyan gradient
                 hue = 200 + intensity * 60;
                 saturation = 70 + intensity * 30;
                 lightness = 60 - intensity * 20;
+                glowColor = `rgba(135, 206, 250, ${intensity * 0.4})`;
             }
             
-            this.ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            const particleColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            
+            // Enhanced glow effect for fast particles
+            if (velocity > this.flowRate * 0.8) {
+                this.ctx.shadowColor = glowColor;
+                this.ctx.shadowBlur = 10;
+                this.ctx.fillStyle = particleColor;
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, particle.size + 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+            }
+            
+            // Draw main particle with gradient
+            const gradient = this.ctx.createRadialGradient(
+                particle.x - particle.size * 0.3, particle.y - particle.size * 0.3, 0,
+                particle.x, particle.y, particle.size
+            );
+            gradient.addColorStop(0, `hsl(${hue}, ${saturation}%, ${lightness + 20}%)`);
+            gradient.addColorStop(0.7, particleColor);
+            gradient.addColorStop(1, `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`);
+            
+            this.ctx.fillStyle = gradient;
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             this.ctx.fill();
+            
+            // Enhanced speed trails for fast particles
+            if (velocity > this.flowRate * 0.5) {
+                const trailGradient = this.ctx.createLinearGradient(
+                    particle.x, particle.y,
+                    particle.x - particle.vx * 0.5, particle.y - particle.vy * 0.5
+                );
+                trailGradient.addColorStop(0, `hsla(${hue}, ${saturation}%, ${lightness}%, ${intensity * 0.8})`);
+                trailGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                this.ctx.strokeStyle = trailGradient;
+                this.ctx.lineWidth = Math.max(2, velocity * 2);
+                this.ctx.lineCap = 'round';
+                this.ctx.beginPath();
+                this.ctx.moveTo(particle.x, particle.y);
+                this.ctx.lineTo(particle.x - particle.vx * 0.5, particle.y - particle.vy * 0.5);
+                this.ctx.stroke();
+            }
             
             // Add enhanced trail for mouse-affected particles
             if (isMouseAffected) {
                 this.ctx.strokeStyle = `rgba(147, 112, 219, 0.8)`;
                 this.ctx.lineWidth = 3;
+                this.ctx.lineCap = 'round';
                 this.ctx.beginPath();
                 this.ctx.moveTo(particle.x, particle.y);
                 this.ctx.lineTo(particle.x - particle.vx * 0.8, particle.y - particle.vy * 0.8);
-                this.ctx.stroke();
-            } else if (velocity > this.flowRate * 0.5) {
-                // Normal velocity trail for other particles
-                this.ctx.strokeStyle = `rgba(0, 255, 255, ${intensity * 0.5})`;
-                this.ctx.lineWidth = 2;
-                this.ctx.beginPath();
-                this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(particle.x - particle.vx * 0.5, particle.y - particle.vy * 0.5);
                 this.ctx.stroke();
             }
         });
@@ -700,43 +858,140 @@ export class FluidFlow {
     }
     
     drawFlowInfo() {
-        // Simple info panel for beginners
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(10, 10, 250, 80);
+        // Modern flow info panel with enhanced styling
+        const panelX = 20;
+        const panelY = 20;
+        const panelWidth = 300;
+        const panelHeight = 140;
         
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 16px Arial';
+        // Enhanced panel background with shadow and gradient
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(panelX + 4, panelY + 4, panelWidth, panelHeight);
+        
+        const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+        gradient.addColorStop(0, 'rgba(26, 26, 46, 0.98)');
+        gradient.addColorStop(0.3, 'rgba(26, 26, 46, 0.95)');
+        gradient.addColorStop(0.7, 'rgba(26, 26, 46, 0.92)');
+        gradient.addColorStop(1, 'rgba(26, 26, 46, 0.88)');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Enhanced border with rounded corners and gradient
+        this.ctx.shadowColor = '#4ECDC4';
+        this.ctx.shadowBlur = 8;
+        this.ctx.lineWidth = 2;
+        
+        // Create gradient border
+        const borderGradient = this.ctx.createLinearGradient(
+            panelX, panelY, 
+            panelX + panelWidth, panelY + panelHeight
+        );
+        borderGradient.addColorStop(0, '#4ECDC4');
+        borderGradient.addColorStop(0.5, '#2ECC71');
+        borderGradient.addColorStop(1, '#4ECDC4');
+        
+        this.ctx.strokeStyle = borderGradient;
+        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        this.ctx.shadowBlur = 0;
+        
+        // Add inner highlight for 3D effect
+        const innerGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + 30);
+        innerGradient.addColorStop(0, 'rgba(78, 205, 196, 0.1)');
+        innerGradient.addColorStop(1, 'rgba(78, 205, 196, 0)');
+        this.ctx.fillStyle = innerGradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, 30);
+        
+        // Modern title with crisp font rendering
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('🌊 Fluid Flow', 20, 30);
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🌊 Fluid Flow Simulation', panelX + 15, panelY + 22);
         
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText(`Speed: ${this.flowRate.toFixed(1)}`, 20, 50);
+        // Enhanced stats with modern styling
+        this.ctx.font = '14px Inter, Arial, sans-serif';
+        this.ctx.textBaseline = 'middle';
         
-        // Simple flow type indicator
-        let flowColor = 'green';
-        if (this.flowType === 'Turbulent') {
-            flowColor = 'red';
-        } else if (this.flowType === 'Transitional') {
-            flowColor = 'orange';
-        }
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.fillText(`🚀 Flow Rate: ${this.flowRate.toFixed(1)}`, panelX + 15, panelY + 45);
+        this.ctx.fillText(`💧 Viscosity: ${this.viscosity.toFixed(1)}`, panelX + 15, panelY + 62);
+        this.ctx.fillText(`📊 Reynolds Number: ${this.reynoldsNumber}`, panelX + 15, panelY + 79);
+        this.ctx.fillText(`🔄 Flow Type: ${this.flowType}`, panelX + 15, panelY + 96);
         
-        this.ctx.fillStyle = flowColor;
-        this.ctx.fillText(`Flow: ${this.flowType}`, 20, 70);
+        // Enhanced flow type indicator with modern colors
+        const flowTypeColor = this.flowType === 'Laminar' ? '#4CAF50' : 
+                             this.flowType === 'Transitional' ? '#FF9800' : '#F44336';
+        this.ctx.fillStyle = flowTypeColor;
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
+        this.ctx.fillText(`● ${this.flowType}`, panelX + 15, panelY + 113);
+        
+        // Add performance indicator
+        const efficiency = Math.min(100, (this.flowRate / 3) * 100);
+        const efficiencyColor = efficiency > 80 ? '#4ECDC4' : efficiency > 60 ? '#F39C12' : '#FF6B6B';
+        this.ctx.fillStyle = efficiencyColor;
+        this.ctx.fillText(`🎯 Flow Efficiency: ${efficiency.toFixed(0)}%`, panelX + 15, panelY + 130);
     }
     
     drawRealWorldAnalogy() {
-        // Simple analogy panel
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(this.ctx.canvas.width - 280, 10, 270, 80);
+        // Modern analogy panel with enhanced styling
+        const panelX = this.ctx.canvas.width - 290;
+        const panelY = 20;
+        const panelWidth = 270;
+        const panelHeight = 100;
         
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 14px Arial';
+        // Enhanced panel background with shadow and gradient
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(panelX + 4, panelY + 4, panelWidth, panelHeight);
+        
+        const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+        gradient.addColorStop(0, 'rgba(26, 26, 46, 0.98)');
+        gradient.addColorStop(0.3, 'rgba(26, 26, 46, 0.95)');
+        gradient.addColorStop(0.7, 'rgba(26, 26, 46, 0.92)');
+        gradient.addColorStop(1, 'rgba(26, 26, 46, 0.88)');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Enhanced border with gradient
+        this.ctx.shadowColor = '#FFD700';
+        this.ctx.shadowBlur = 8;
+        this.ctx.lineWidth = 2;
+        
+        // Create gradient border
+        const borderGradient = this.ctx.createLinearGradient(
+            panelX, panelY, 
+            panelX + panelWidth, panelY + panelHeight
+        );
+        borderGradient.addColorStop(0, '#FFD700');
+        borderGradient.addColorStop(0.5, '#FFA500');
+        borderGradient.addColorStop(1, '#FFD700');
+        
+        this.ctx.strokeStyle = borderGradient;
+        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        this.ctx.shadowBlur = 0;
+        
+        // Add inner highlight for 3D effect
+        const innerGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + 30);
+        innerGradient.addColorStop(0, 'rgba(255, 215, 0, 0.1)');
+        innerGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+        this.ctx.fillStyle = innerGradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, 30);
+        
+        // Modern title with crisp font rendering
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('💡 Real Examples:', this.ctx.canvas.width - 270, 30);
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('💡 Real-World Examples:', panelX + 15, panelY + 22);
         
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('🧽 Sponge: water flows through', this.ctx.canvas.width - 270, 50);
-        this.ctx.fillText('🪨 Rock: water flows around', this.ctx.canvas.width - 270, 70);
+        // Enhanced examples with modern styling
+        this.ctx.font = '13px Inter, Arial, sans-serif';
+        this.ctx.textBaseline = 'middle';
+        
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.fillText('🧽 Sponge: water flows through', panelX + 15, panelY + 45);
+        this.ctx.fillText('🪨 Rock: water flows around', panelX + 15, panelY + 62);
+        this.ctx.fillText('🌊 River: natural flow patterns', panelX + 15, panelY + 79);
+        this.ctx.fillText('🏊 Pool: controlled fluid motion', panelX + 15, panelY + 96);
     }
     
     drawMouseIndicator() {
@@ -783,6 +1038,18 @@ export class FluidFlow {
             this.ctx.fill();
             this.ctx.shadowBlur = 0; // Reset shadow
         }
+    }
+    
+    adjustColor(color, amount) {
+        // Simple color adjustment for gradients
+        if (color.startsWith('#')) {
+            const hex = color.replace('#', '');
+            const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+            const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+            const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+        return color;
     }
     
     getStats() {
@@ -913,11 +1180,16 @@ export class Bernoulli {
     }
     
     drawPipeSystem() {
-        // Enhanced pipe system with better visual design
-        this.ctx.strokeStyle = 'rgba(70, 130, 180, 0.9)';
-        this.ctx.lineWidth = 25;
+        // Modern pipe system with enhanced visual design and rounded corners
+        const pipeRadius = 15;
         
-        // Wide section (left) with gradient fill
+        // Add shadow for depth
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.shadowBlur = 10;
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        
+        // Wide section (left) with modern gradient and rounded corners
         this.ctx.beginPath();
         this.ctx.moveTo(0, 200);
         this.ctx.lineTo(300, 200);
@@ -925,15 +1197,20 @@ export class Bernoulli {
         this.ctx.lineTo(0, 400);
         this.ctx.closePath();
         
-        // Create gradient for pipe sections
-        const leftGradient = this.ctx.createLinearGradient(0, 200, 300, 200);
-        leftGradient.addColorStop(0, 'rgba(135, 206, 250, 0.4)');
-        leftGradient.addColorStop(1, 'rgba(70, 130, 180, 0.4)');
+        // Enhanced gradient for left section
+        const leftGradient = this.ctx.createLinearGradient(0, 200, 300, 400);
+        leftGradient.addColorStop(0, 'rgba(135, 206, 250, 0.6)');
+        leftGradient.addColorStop(0.5, 'rgba(70, 130, 180, 0.5)');
+        leftGradient.addColorStop(1, 'rgba(135, 206, 250, 0.6)');
         this.ctx.fillStyle = leftGradient;
         this.ctx.fill();
+        
+        // Modern border for left section
+        this.ctx.strokeStyle = 'rgba(70, 130, 180, 0.9)';
+        this.ctx.lineWidth = 3;
         this.ctx.stroke();
         
-        // Constricted section (middle) with different gradient
+        // Constricted section (middle) with enhanced gradient
         this.ctx.beginPath();
         this.ctx.moveTo(300, 250);
         this.ctx.lineTo(500, 250);
@@ -941,14 +1218,19 @@ export class Bernoulli {
         this.ctx.lineTo(300, 350);
         this.ctx.closePath();
         
-        const middleGradient = this.ctx.createLinearGradient(300, 250, 500, 250);
-        middleGradient.addColorStop(0, 'rgba(255, 140, 0, 0.4)');
-        middleGradient.addColorStop(1, 'rgba(255, 69, 0, 0.4)');
+        const middleGradient = this.ctx.createLinearGradient(300, 250, 500, 350);
+        middleGradient.addColorStop(0, 'rgba(255, 140, 0, 0.6)');
+        middleGradient.addColorStop(0.5, 'rgba(255, 69, 0, 0.5)');
+        middleGradient.addColorStop(1, 'rgba(255, 140, 0, 0.6)');
         this.ctx.fillStyle = middleGradient;
         this.ctx.fill();
+        
+        // Modern border for middle section
+        this.ctx.strokeStyle = 'rgba(255, 69, 0, 0.9)';
+        this.ctx.lineWidth = 3;
         this.ctx.stroke();
         
-        // Wide section (right) with gradient
+        // Wide section (right) with enhanced gradient
         this.ctx.beginPath();
         this.ctx.moveTo(500, 200);
         this.ctx.lineTo(this.ctx.canvas.width, 200);
@@ -956,53 +1238,108 @@ export class Bernoulli {
         this.ctx.lineTo(500, 400);
         this.ctx.closePath();
         
-        const rightGradient = this.ctx.createLinearGradient(500, 200, this.ctx.canvas.width, 200);
-        rightGradient.addColorStop(0, 'rgba(70, 130, 180, 0.4)');
-        rightGradient.addColorStop(1, 'rgba(135, 206, 250, 0.4)');
+        const rightGradient = this.ctx.createLinearGradient(500, 200, this.ctx.canvas.width, 400);
+        rightGradient.addColorStop(0, 'rgba(70, 130, 180, 0.6)');
+        rightGradient.addColorStop(0.5, 'rgba(135, 206, 250, 0.5)');
+        rightGradient.addColorStop(1, 'rgba(70, 130, 180, 0.6)');
         this.ctx.fillStyle = rightGradient;
         this.ctx.fill();
+        
+        // Modern border for right section
+        this.ctx.strokeStyle = 'rgba(70, 130, 180, 0.9)';
+        this.ctx.lineWidth = 3;
         this.ctx.stroke();
         
-        // Add enhanced section labels with better styling
-        this.ctx.fillStyle = '#000000';
-        this.ctx.font = 'bold 16px Arial';
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Modern section labels with enhanced styling
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Wide Section (Slow)', 150, 180);
         this.ctx.fillText('Narrow Section (Fast)', 400, 180);
         this.ctx.fillText('Wide Section (Slow)', 650, 180);
         
-        // Add visual speed indicators with color coding
+        // Enhanced speed indicators with modern styling
         this.ctx.fillStyle = '#0066CC';
-        this.ctx.font = 'bold 14px Arial';
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.fillText('SLOW', 150, 160);
         this.ctx.fillText('SLOW', 650, 160);
         
         this.ctx.fillStyle = '#FF6600';
         this.ctx.fillText('FAST', 400, 160);
         
-        // Add flow direction arrows
+        // Modern flow direction arrows with enhanced styling
         this.ctx.strokeStyle = '#0066CC';
-        this.ctx.lineWidth = 3;
+        this.ctx.lineWidth = 4;
         this.ctx.fillStyle = '#0066CC';
         
-        // Left section arrows
+        // Left section arrows with enhanced styling
         for (let y = 220; y < 380; y += 30) {
-            this.drawArrow(50, y, 100, y, '#0066CC');
+            this.drawEnhancedArrow(50, y, 100, y, '#0066CC');
         }
         
-        // Middle section arrows (longer and orange)
+        // Middle section arrows (longer and orange) with enhanced styling
         this.ctx.strokeStyle = '#FF6600';
         this.ctx.fillStyle = '#FF6600';
         for (let y = 270; y < 330; y += 20) {
-            this.drawArrow(320, y, 480, y, '#FF6600');
+            this.drawEnhancedArrow(320, y, 480, y, '#FF6600');
         }
         
-        // Right section arrows
+        // Right section arrows with enhanced styling
         this.ctx.strokeStyle = '#0066CC';
         this.ctx.fillStyle = '#0066CC';
         for (let y = 220; y < 380; y += 30) {
-            this.drawArrow(700, y, 750, y, '#0066CC');
+            this.drawEnhancedArrow(700, y, 750, y, '#0066CC');
         }
+    }
+    
+    drawEnhancedArrow(x1, y1, x2, y2, color) {
+        const headLength = 12;
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        
+        // Add glow effect for enhanced arrows
+        this.ctx.shadowColor = color;
+        this.ctx.shadowBlur = 6;
+        
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 4;
+        this.ctx.lineCap = 'round';
+        this.ctx.beginPath();
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+        
+        // Enhanced arrowhead with gradient
+        const gradient = this.ctx.createLinearGradient(x2, y2, x2 - headLength, y2);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, this.adjustColor(color, -30));
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x2, y2);
+        this.ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
+        this.ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+    }
+    
+    adjustColor(color, amount) {
+        // Simple color adjustment for gradients
+        if (color.startsWith('#')) {
+            const hex = color.replace('#', '');
+            const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+            const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+            const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+        return color;
     }
     
     drawArrow(x1, y1, x2, y2, color) {
@@ -1034,55 +1371,82 @@ export class Bernoulli {
             const intensity = Math.min(velocity / maxVelocity, 1);
             
             // Enhanced dynamic color based on velocity and position
-            let color, trailColor;
+            let color, trailColor, glowColor;
             if (particle.x > 300 && particle.x < 500) {
                 // Constricted section - orange/red for fast
                 const hue = 20 + intensity * 40; // Orange to red
                 color = `hsl(${hue}, 85%, 60%)`;
                 trailColor = `rgba(255, 140, 0, ${intensity * 0.8})`;
+                glowColor = `rgba(255, 69, 0, ${intensity * 0.6})`;
             } else {
                 // Wide sections - blue for slow
                 const hue = 220 - intensity * 30;
                 color = `hsl(${hue}, 80%, 60%)`;
                 trailColor = `rgba(70, 130, 180, ${intensity * 0.6})`;
+                glowColor = `rgba(135, 206, 250, ${intensity * 0.4})`;
             }
             
-            // Draw particle with glow effect for fast particles
+            // Enhanced glow effect for fast particles
             if (particle.x > 300 && particle.x < 500 && velocity > this.pressureDifference * 0.8) {
-                // Add glow effect
-                this.ctx.shadowColor = color;
-                this.ctx.shadowBlur = 8;
+                // Multi-layer glow effect
+                this.ctx.shadowColor = glowColor;
+                this.ctx.shadowBlur = 12;
+                this.ctx.fillStyle = color;
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, particle.size + 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.shadowBlur = 6;
                 this.ctx.fillStyle = color;
                 this.ctx.beginPath();
                 this.ctx.arc(particle.x, particle.y, particle.size + 2, 0, Math.PI * 2);
                 this.ctx.fill();
+                
                 this.ctx.shadowBlur = 0;
             }
             
-            // Draw main particle
-            this.ctx.fillStyle = color;
+            // Draw main particle with gradient
+            const gradient = this.ctx.createRadialGradient(
+                particle.x - particle.size * 0.3, particle.y - particle.size * 0.3, 0,
+                particle.x, particle.y, particle.size
+            );
+            gradient.addColorStop(0, this.adjustColor(color, 30));
+            gradient.addColorStop(0.7, color);
+            gradient.addColorStop(1, this.adjustColor(color, -20));
+            
+            this.ctx.fillStyle = gradient;
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Add enhanced speed trails
+            // Enhanced speed trails with gradient
             if (velocity > this.pressureDifference * 0.5) {
-                this.ctx.strokeStyle = trailColor;
-                this.ctx.lineWidth = Math.max(2, velocity * 2);
+                const trailLength = Math.max(3, velocity * 3);
+                const trailGradient = this.ctx.createLinearGradient(
+                    particle.x, particle.y,
+                    particle.x - particle.vx * 0.6, particle.y - particle.vy * 0.6
+                );
+                trailGradient.addColorStop(0, trailColor);
+                trailGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                this.ctx.strokeStyle = trailGradient;
+                this.ctx.lineWidth = Math.max(3, velocity * 2);
+                this.ctx.lineCap = 'round';
                 this.ctx.beginPath();
                 this.ctx.moveTo(particle.x, particle.y);
                 this.ctx.lineTo(particle.x - particle.vx * 0.6, particle.y - particle.vy * 0.6);
                 this.ctx.stroke();
             }
             
-            // Add velocity indicators for very fast particles
+            // Enhanced velocity indicators for very fast particles
             if (particle.x > 300 && particle.x < 500 && velocity > this.pressureDifference * 1.2) {
                 this.ctx.strokeStyle = '#FF6600';
-                this.ctx.lineWidth = 2;
-                this.ctx.setLineDash([5, 5]);
+                this.ctx.lineWidth = 3;
+                this.ctx.setLineDash([8, 4]);
+                this.ctx.lineCap = 'round';
                 this.ctx.beginPath();
                 this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(particle.x + particle.vx * 0.3, particle.y + particle.vy * 0.3);
+                this.ctx.lineTo(particle.x + particle.vx * 0.4, particle.y + particle.vy * 0.4);
                 this.ctx.stroke();
                 this.ctx.setLineDash([]);
             }
@@ -1138,39 +1502,138 @@ export class Bernoulli {
     }
     
     drawBernoulliInfo() {
-        // Simple Bernoulli info panel
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(10, 450, 300, 100);
+        // Modern Bernoulli info panel with enhanced styling
+        const panelX = 20;
+        const panelY = 450;
+        const panelWidth = 320;
+        const panelHeight = 120;
         
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 16px Arial';
+        // Enhanced panel background with shadow and gradient
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(panelX + 4, panelY + 4, panelWidth, panelHeight);
+        
+        const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+        gradient.addColorStop(0, 'rgba(26, 26, 46, 0.98)');
+        gradient.addColorStop(0.3, 'rgba(26, 26, 46, 0.95)');
+        gradient.addColorStop(0.7, 'rgba(26, 26, 46, 0.92)');
+        gradient.addColorStop(1, 'rgba(26, 26, 46, 0.88)');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Enhanced border with rounded corners and gradient
+        this.ctx.shadowColor = '#4ECDC4';
+        this.ctx.shadowBlur = 8;
+        this.ctx.lineWidth = 2;
+        
+        // Create gradient border
+        const borderGradient = this.ctx.createLinearGradient(
+            panelX, panelY, 
+            panelX + panelWidth, panelY + panelHeight
+        );
+        borderGradient.addColorStop(0, '#4ECDC4');
+        borderGradient.addColorStop(0.5, '#2ECC71');
+        borderGradient.addColorStop(1, '#4ECDC4');
+        
+        this.ctx.strokeStyle = borderGradient;
+        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        this.ctx.shadowBlur = 0;
+        
+        // Add inner highlight for 3D effect
+        const innerGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + 30);
+        innerGradient.addColorStop(0, 'rgba(78, 205, 196, 0.1)');
+        innerGradient.addColorStop(1, 'rgba(78, 205, 196, 0)');
+        this.ctx.fillStyle = innerGradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, 30);
+        
+        // Modern title with crisp font rendering
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('⚡ Bernoulli\'s Principle', 20, 470);
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('⚡ Bernoulli\'s Principle', panelX + 15, panelY + 22);
         
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText(`Speed: ${this.pressureDifference}`, 20, 490);
-        this.ctx.fillText(`Width: ${this.pipeWidth}`, 20, 510);
+        // Enhanced stats with modern styling
+        this.ctx.font = '14px Inter, Arial, sans-serif';
+        this.ctx.textBaseline = 'middle';
         
-        // Simple principle explanation
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.fillText(`🚀 Speed: ${this.pressureDifference.toFixed(1)}`, panelX + 15, panelY + 45);
+        this.ctx.fillText(`📏 Width: ${this.pipeWidth}`, panelX + 15, panelY + 62);
+        this.ctx.fillText(`💧 Density: ${this.fluidDensity.toFixed(1)}`, panelX + 15, panelY + 79);
+        
+        // Enhanced principle explanation with modern colors
         this.ctx.fillStyle = '#FFD700';
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('💡 Faster flow = Lower pressure', 20, 530);
-        this.ctx.fillText('🔍 Watch particles speed up!', 20, 545);
+        this.ctx.font = 'bold 13px Inter, Arial, sans-serif';
+        this.ctx.fillText('💡 Faster flow = Lower pressure', panelX + 15, panelY + 96);
+        this.ctx.fillText('🔍 Watch particles speed up!', panelX + 15, panelY + 113);
+        
+        // Add performance indicator
+        const efficiency = Math.min(100, (this.pressureDifference / 2) * 100);
+        const efficiencyColor = efficiency > 80 ? '#4ECDC4' : efficiency > 60 ? '#F39C12' : '#FF6B6B';
+        this.ctx.fillStyle = efficiencyColor;
+        this.ctx.fillText(`🎯 Flow Efficiency: ${efficiency.toFixed(0)}%`, panelX + 15, panelY + 130);
     }
     
     drawBernoulliRealWorldAnalogy() {
-        // Simple analogy panel
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(this.ctx.canvas.width - 280, 10, 270, 80);
+        // Modern analogy panel with enhanced styling
+        const panelX = this.ctx.canvas.width - 290;
+        const panelY = 20;
+        const panelWidth = 270;
+        const panelHeight = 100;
         
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 14px Arial';
+        // Enhanced panel background with shadow and gradient
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(panelX + 4, panelY + 4, panelWidth, panelHeight);
+        
+        const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+        gradient.addColorStop(0, 'rgba(26, 26, 46, 0.98)');
+        gradient.addColorStop(0.3, 'rgba(26, 26, 46, 0.95)');
+        gradient.addColorStop(0.7, 'rgba(26, 26, 46, 0.92)');
+        gradient.addColorStop(1, 'rgba(26, 26, 46, 0.88)');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Enhanced border with gradient
+        this.ctx.shadowColor = '#FFD700';
+        this.ctx.shadowBlur = 8;
+        this.ctx.lineWidth = 2;
+        
+        // Create gradient border
+        const borderGradient = this.ctx.createLinearGradient(
+            panelX, panelY, 
+            panelX + panelWidth, panelY + panelHeight
+        );
+        borderGradient.addColorStop(0, '#FFD700');
+        borderGradient.addColorStop(0.5, '#FFA500');
+        borderGradient.addColorStop(1, '#FFD700');
+        
+        this.ctx.strokeStyle = borderGradient;
+        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        this.ctx.shadowBlur = 0;
+        
+        // Add inner highlight for 3D effect
+        const innerGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + 30);
+        innerGradient.addColorStop(0, 'rgba(255, 215, 0, 0.1)');
+        innerGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+        this.ctx.fillStyle = innerGradient;
+        this.ctx.fillRect(panelX, panelY, panelWidth, 30);
+        
+        // Modern title with crisp font rendering
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('💡 Real Examples:', this.ctx.canvas.width - 270, 30);
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('💡 Real-World Examples:', panelX + 15, panelY + 22);
         
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('🚿 Garden hose: narrow = faster', this.ctx.canvas.width - 270, 50);
-        this.ctx.fillText('✈️ Airplane wings: curved = lift', this.ctx.canvas.width - 270, 70);
+        // Enhanced examples with modern styling
+        this.ctx.font = '13px Inter, Arial, sans-serif';
+        this.ctx.textBaseline = 'middle';
+        
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.fillText('🚿 Garden hose: narrow = faster', panelX + 15, panelY + 45);
+        this.ctx.fillText('✈️ Airplane wings: curved = lift', panelX + 15, panelY + 62);
+        this.ctx.fillText('🏥 Venturi meters: flow measurement', panelX + 15, panelY + 79);
+        this.ctx.fillText('🩸 Blood flow: artery constriction', panelX + 15, panelY + 96);
     }
     
     getStats() {

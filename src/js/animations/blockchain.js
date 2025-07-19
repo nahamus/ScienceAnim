@@ -274,7 +274,7 @@ export class Blockchain {
             alpha: 1.0,
             pulseIntensity: 1.0,
             color: '#00FF88', // Bright green for mining success
-            y: 100 // Y position
+            y: 350 // Y position over network nodes
         };
         
         // Continue to next step after a delay
@@ -354,7 +354,7 @@ export class Blockchain {
             text: 'VALIDATION',
             color: '#FF6B35',
             alpha: 1.0,
-            y: 100
+            y: 350
         };
     }
     
@@ -379,7 +379,7 @@ export class Blockchain {
             text: 'PROPAGATION',
             color: '#4A90E2',
             alpha: 1.0,
-            y: 100
+            y: 350
         };
     }
     
@@ -425,7 +425,7 @@ export class Blockchain {
             text: 'CONSENSUS',
             color: '#9C27B0',
             alpha: 1.0,
-            y: 100
+            y: 350
         };
     }
     
@@ -488,7 +488,7 @@ export class Blockchain {
                 alpha: 1.0,
                 pulseIntensity: 1.0,
                 color: '#4CAF50', // Green for finalization
-                y: 100 // Y position
+                y: 350 // Y position
             };
             
             // Continue to next step - use shorter duration
@@ -505,7 +505,7 @@ export class Blockchain {
                 alpha: 1.0,
                 pulseIntensity: 1.0,
                 color: '#FF5722', // Red for rejection
-                y: 100 // Y position
+                y: 350 // Y position
             };
             
             // Reset network nodes to default colors and states
@@ -774,6 +774,14 @@ export class Blockchain {
         this.successfulMiner = null;
         this.minerBlockConnection = null;
         this.minerRewardDisplay = null;
+        
+        // Reset network nodes to default colors and states after successful block addition
+        this.networkNodes.forEach(node => {
+            node.consensusReached = false;
+            node.isValidating = false;
+            node.pulseIntensity = 1.0;
+            node.color = '#2196F3'; // Default blue color
+        });
         
         // Clear guided mode state
         this.guidedBlock = null;
@@ -2009,11 +2017,11 @@ export class Blockchain {
             // Modern block background with enhanced gradient and depth
             const blockGradient = this.ctx.createLinearGradient(x, y, x + this.blockWidth, y + this.blockHeight);
             if (block.isGenesis) {
-                // Genesis block - special golden gradient
-                blockGradient.addColorStop(0, '#FFD700');
-                blockGradient.addColorStop(0.3, '#FFC107');
-                blockGradient.addColorStop(0.7, '#FFB300');
-                blockGradient.addColorStop(1, '#FF8F00');
+                // Genesis block - special green gradient
+                blockGradient.addColorStop(0, '#4CAF50');
+                blockGradient.addColorStop(0.3, '#45A049');
+                blockGradient.addColorStop(0.7, '#388E3C');
+                blockGradient.addColorStop(1, '#2E7D32');
             } else {
                 // Regular blocks - modern blue gradient
                 blockGradient.addColorStop(0, '#42A5F5');
@@ -3024,7 +3032,7 @@ export class Blockchain {
         if (!this.guidedPhaseIndicator) return;
         
         const centerX = this.ctx.canvas.width / 2;
-        const y = this.guidedPhaseIndicator.y || 100; // Default y position if not set
+        const y = this.guidedPhaseIndicator.y || 350; // Default y position over network nodes
         const color = this.guidedPhaseIndicator.color || '#00FF88'; // Default color if not set
         
         // Set font first to measure text accurately

@@ -51,6 +51,24 @@ export class NuclearReactions {
                 }
             });
         });
+        
+        // Add touch event listener for mobile support
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            // Start reacting particle movement for all modes
+            this.reactingParticles.forEach(particle => {
+                if (!particle.moving) {
+                    // Find the target atom for this particle
+                    this.findTargetForParticle(particle);
+                    particle.moving = true;
+                }
+            });
+        });
     }
     
     initializeNuclei() {

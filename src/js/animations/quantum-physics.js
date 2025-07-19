@@ -298,11 +298,12 @@ export class WaveParticleDuality {
     }
     
     drawGrid() {
-        // Draw a very subtle grid for reference
-        this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.1)';
-        this.ctx.lineWidth = 0.5;
+        // Enhanced quantum grid with modern styling
+        this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.15)';
+        this.ctx.lineWidth = 0.8;
+        this.ctx.setLineDash([8, 8]);
         
-        // Vertical lines (less frequent)
+        // Vertical lines with subtle animation
         for (let x = 0; x < this.canvas.width; x += 100) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, 0);
@@ -310,40 +311,56 @@ export class WaveParticleDuality {
             this.ctx.stroke();
         }
         
-        // Horizontal lines (less frequent)
+        // Horizontal lines
         for (let y = 0; y < this.canvas.height; y += 100) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(this.canvas.width, y);
             this.ctx.stroke();
         }
+        
+        this.ctx.setLineDash([]);
+        
+        // Add subtle quantum field effect
+        this.ctx.fillStyle = 'rgba(138, 43, 226, 0.03)';
+        for (let x = 0; x < this.canvas.width; x += 120) {
+            for (let y = 0; y < this.canvas.height; y += 120) {
+                const pulse = Math.sin(this.time * 0.3 + x * 0.01 + y * 0.01) * 0.5 + 0.5;
+                this.ctx.globalAlpha = pulse * 0.08;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, 25, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        }
+        this.ctx.globalAlpha = 1;
     }
     
     drawSlits() {
-        // Draw main barrier with gradient for depth
+        // Enhanced barrier with modern gradient and depth
         const gradient = this.ctx.createLinearGradient(380, 0, 420, 0);
-        gradient.addColorStop(0, '#2c3e50');
-        gradient.addColorStop(0.5, '#34495e');
-        gradient.addColorStop(1, '#2c3e50');
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.3, '#16213e');
+        gradient.addColorStop(0.7, '#0f3460');
+        gradient.addColorStop(1, '#1a1a2e');
         
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(380, 0, 40, this.canvas.height);
         
-        // Add subtle shadow for depth
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.shadowBlur = 4;
-        this.ctx.shadowOffsetX = 2;
+        // Enhanced shadow for depth
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 3;
         this.ctx.fillRect(380, 0, 40, this.canvas.height);
         this.ctx.shadowBlur = 0;
         this.ctx.shadowOffsetX = 0;
         
-        // Cut out vertical slits with rounded corners
+        // Cut out vertical slits with enhanced styling
         this.ctx.clearRect(385, 200, 10, 200); // Left slit
         this.ctx.clearRect(405, 200, 10, 200); // Right slit
         
-        // Draw sharp slit borders with better contrast
-        this.ctx.strokeStyle = '#1a1a1a';
-        this.ctx.lineWidth = 3;
+        // Enhanced slit borders with modern styling
+        this.ctx.strokeStyle = '#0a0a0a';
+        this.ctx.lineWidth = 4;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         
@@ -367,9 +384,9 @@ export class WaveParticleDuality {
         this.ctx.lineTo(415, 400);
         this.ctx.stroke();
         
-        // Add inner highlight for slit edges
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
+        // Enhanced inner highlight for slit edges
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        this.ctx.lineWidth = 2;
         this.ctx.beginPath();
         this.ctx.moveTo(386, 200);
         this.ctx.lineTo(386, 400);
@@ -379,23 +396,24 @@ export class WaveParticleDuality {
         this.ctx.lineTo(414, 400);
         this.ctx.stroke();
         
-        // Add barrier label
-        this.ctx.fillStyle = '#2c3e50';
-        this.ctx.font = 'bold 12px Arial';
+        // Enhanced barrier label with modern styling
+        this.ctx.fillStyle = '#1a1a2e';
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('Barrier', 400, 190);
         
-        // Add arrows showing wave approach with improved styling
+        // Enhanced arrows showing wave approach
         this.ctx.strokeStyle = '#4CAF50';
-        this.ctx.lineWidth = 3;
+        this.ctx.lineWidth = 4;
         this.ctx.lineCap = 'round';
         this.ctx.beginPath();
         this.ctx.moveTo(350, 300);
         this.ctx.lineTo(380, 300);
         this.ctx.stroke();
         
-        // Arrow head with better shape
+        // Enhanced arrow head
         this.ctx.beginPath();
         this.ctx.moveTo(375, 295);
         this.ctx.lineTo(380, 300);
@@ -404,44 +422,55 @@ export class WaveParticleDuality {
         this.ctx.fillStyle = '#4CAF50';
         this.ctx.fill();
         
-        // Add arrow label
+        // Enhanced arrow label
         this.ctx.fillStyle = '#4CAF50';
-        this.ctx.font = 'bold 10px Arial';
+        this.ctx.font = 'bold 12px Inter, Arial, sans-serif';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
         this.ctx.fillText('Wave', 365, 290);
     }
     
     drawDetectionScreen() {
-        // Draw detection screen with reduced height to make more space
+        // Enhanced detection screen with modern styling
         const pulse = Math.sin(this.time * 2) * 0.3 + 0.7;
-        this.ctx.fillStyle = `rgba(200, 200, 255, ${0.6 * pulse})`;
+        
+        // Enhanced screen background with gradient
+        const screenGradient = this.ctx.createLinearGradient(this.screenX - 8, 150, this.screenX + 8, 450);
+        screenGradient.addColorStop(0, `rgba(200, 200, 255, ${0.7 * pulse})`);
+        screenGradient.addColorStop(0.5, `rgba(180, 180, 255, ${0.8 * pulse})`);
+        screenGradient.addColorStop(1, `rgba(200, 200, 255, ${0.7 * pulse})`);
+        
+        this.ctx.fillStyle = screenGradient;
         this.ctx.fillRect(this.screenX - 8, 150, 16, 300);
         
-        // Draw screen border
+        // Enhanced screen border with shadow
+        this.ctx.shadowColor = 'rgba(0, 102, 204, 0.5)';
+        this.ctx.shadowBlur = 6;
         this.ctx.strokeStyle = '#0066cc';
-        this.ctx.lineWidth = 3;
+        this.ctx.lineWidth = 4;
         this.ctx.strokeRect(this.screenX - 8, 150, 16, 300);
+        this.ctx.shadowBlur = 0;
         
-        // Add pulsing effect for wave/superposition modes
+        // Enhanced pulsing effect for wave/superposition modes
         if (this.mode === 'wave' || this.mode === 'superposition') {
             const activePulse = Math.sin(this.time * 4) * 0.4 + 0.6;
-            this.ctx.fillStyle = `rgba(100, 150, 255, ${activePulse * 0.3})`;
+            this.ctx.fillStyle = `rgba(100, 150, 255, ${activePulse * 0.4})`;
             this.ctx.fillRect(this.screenX - 10, 150, 20, 300);
         }
         
-        // Small detection screen label
-        this.ctx.fillStyle = '#000000';
-        this.ctx.font = 'bold 12px Arial';
+        // Enhanced detection screen label
+        this.ctx.fillStyle = '#1a1a2e';
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Screen', this.screenX, 145);
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('Detection Screen', this.screenX, 145);
         
-
-        
-        // Draw detection zones
-        this.ctx.strokeStyle = 'rgba(0, 102, 204, 0.5)';
-        this.ctx.lineWidth = 1;
+        // Enhanced detection zones with modern styling
+        this.ctx.strokeStyle = 'rgba(0, 102, 204, 0.6)';
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
         for (let i = 0; i < 6; i++) {
             const y = 170 + i * 45;
             this.ctx.beginPath();
@@ -454,11 +483,16 @@ export class WaveParticleDuality {
     renderWaveMode() {
         if (!this.showWaveFunction) return;
         
-        // Draw wave function with barrier interaction
-        this.ctx.strokeStyle = '#4CAF50';
-        this.ctx.lineWidth = 3;
+        // Enhanced wave function with modern styling and glow effects
         
-        // Draw wave before barrier
+        // Add glow effect for wave
+        this.ctx.shadowColor = '#4CAF50';
+        this.ctx.shadowBlur = 8;
+        this.ctx.strokeStyle = '#4CAF50';
+        this.ctx.lineWidth = 4;
+        this.ctx.lineCap = 'round';
+        
+        // Draw wave before barrier with enhanced styling
         this.ctx.beginPath();
         let started = false;
         for (let i = 0; i < this.waveFunction.length; i++) {
@@ -483,42 +517,54 @@ export class WaveParticleDuality {
             const point = this.waveFunction[i];
             if (point.x > 420) {
                 if (!started) {
-                this.ctx.moveTo(point.x, point.y);
+                    this.ctx.moveTo(point.x, point.y);
                     started = true;
-            } else {
-                this.ctx.lineTo(point.x, point.y);
+                } else {
+                    this.ctx.lineTo(point.x, point.y);
                 }
             }
         }
         this.ctx.stroke();
         
-        // Draw wave particles
-        this.ctx.fillStyle = '#4CAF50';
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        
+        // Enhanced wave particles with gradient
         for (let i = 0; i < this.waveFunction.length; i += 5) {
             const point = this.waveFunction[i];
+            const gradient = this.ctx.createRadialGradient(
+                point.x - 2, point.y - 2, 0,
+                point.x, point.y, 4
+            );
+            gradient.addColorStop(0, '#6BCF7F');
+            gradient.addColorStop(0.7, '#4CAF50');
+            gradient.addColorStop(1, '#2E7D32');
+            
+            this.ctx.fillStyle = gradient;
             this.ctx.beginPath();
-            this.ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+            this.ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
             this.ctx.fill();
         }
         
-
-        
-        // Add wave direction arrows (moved to avoid overlap)
+        // Enhanced wave direction arrows with modern styling
         this.ctx.strokeStyle = '#4CAF50';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
         for (let i = 0; i < 3; i++) {
             const x = 150 + i * 120;
             this.ctx.beginPath();
             this.ctx.moveTo(x, 350);
-            this.ctx.lineTo(x + 20, 350);
+            this.ctx.lineTo(x + 25, 350);
             this.ctx.stroke();
             
-            // Arrow head
+            // Enhanced arrow head
             this.ctx.beginPath();
-            this.ctx.moveTo(x + 15, 345);
-            this.ctx.lineTo(x + 20, 350);
-            this.ctx.lineTo(x + 15, 355);
-            this.ctx.stroke();
+            this.ctx.moveTo(x + 18, 345);
+            this.ctx.lineTo(x + 25, 350);
+            this.ctx.lineTo(x + 18, 355);
+            this.ctx.closePath();
+            this.ctx.fillStyle = '#4CAF50';
+            this.ctx.fill();
         }
     }
     
@@ -594,21 +640,45 @@ export class WaveParticleDuality {
     renderParticleMode() {
         if (!this.showParticlePosition) return;
         
-        // Draw particle
-        this.ctx.fillStyle = '#FF5722';
+        // Enhanced particle with modern styling and glow effects
+        
+        // Add glow effect for particle
+        this.ctx.shadowColor = '#FF5722';
+        this.ctx.shadowBlur = 10;
+        
+        // Enhanced particle with gradient
+        const gradient = this.ctx.createRadialGradient(
+            this.particleX - 3, this.particleY - 3, 0,
+            this.particleX, this.particleY, this.particleSize
+        );
+        gradient.addColorStop(0, '#FF8A65');
+        gradient.addColorStop(0.7, '#FF5722');
+        gradient.addColorStop(1, '#D84315');
+        
+        this.ctx.fillStyle = gradient;
         this.ctx.beginPath();
         this.ctx.arc(this.particleX, this.particleY, this.particleSize, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Draw particle trail
-        this.ctx.strokeStyle = 'rgba(255, 87, 34, 0.5)';
-        this.ctx.lineWidth = 2;
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        
+        // Enhanced particle trail with gradient
+        const trailGradient = this.ctx.createLinearGradient(
+            this.particleX - 50, this.particleY,
+            this.particleX + 50, this.particleY
+        );
+        trailGradient.addColorStop(0, 'rgba(255, 87, 34, 0.3)');
+        trailGradient.addColorStop(0.5, 'rgba(255, 87, 34, 0.6)');
+        trailGradient.addColorStop(1, 'rgba(255, 87, 34, 0.3)');
+        
+        this.ctx.strokeStyle = trailGradient;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
         this.ctx.beginPath();
         this.ctx.moveTo(this.particleX - 50, this.particleY);
         this.ctx.lineTo(this.particleX + 50, this.particleY);
         this.ctx.stroke();
-        
-
     }
     
     renderParticleModeWithoutLabel() {
@@ -652,48 +722,76 @@ export class WaveParticleDuality {
     }
     
     drawInterferencePattern() {
-        // Draw interference pattern with better visibility and animation
+        // Enhanced interference pattern with modern styling and effects
+        
+        // Add glow effect for interference pattern
+        this.ctx.shadowColor = '#9C27B0';
+        this.ctx.shadowBlur = 6;
+        
         for (let i = 0; i < this.interferencePattern.length; i++) {
             const point = this.interferencePattern[i];
-            const intensity = Math.min(point.intensity * 3, 1); // Increased intensity
+            const intensity = Math.min(point.intensity * 3, 1);
             const alpha = Math.min(intensity, 0.9);
             
-            // Add time-based animation
+            // Enhanced time-based animation
             const timeOffset = this.time * 2 + i * 0.1;
             const animatedIntensity = intensity * (0.7 + 0.3 * Math.sin(timeOffset));
             
-            // Use different colors for bright and dark fringes
+            // Enhanced colors for bright and dark fringes
             if (intensity > 0.2) {
-                this.ctx.fillStyle = `rgba(156, 39, 176, ${animatedIntensity})`; // Purple for bright fringes
+                // Bright fringes with gradient
+                const gradient = this.ctx.createRadialGradient(
+                    point.x, point.y, 0,
+                    point.x, point.y, 8
+                );
+                gradient.addColorStop(0, `rgba(156, 39, 176, ${animatedIntensity})`);
+                gradient.addColorStop(0.7, `rgba(123, 31, 162, ${animatedIntensity * 0.8})`);
+                gradient.addColorStop(1, `rgba(74, 20, 140, ${animatedIntensity * 0.6})`);
+                this.ctx.fillStyle = gradient;
             } else {
-                this.ctx.fillStyle = `rgba(0, 0, 0, ${animatedIntensity * 0.3})`; // Dark for destructive interference
+                // Dark fringes
+                this.ctx.fillStyle = `rgba(0, 0, 0, ${animatedIntensity * 0.4})`;
             }
             
-            // Draw larger, more visible dots
-            const dotSize = Math.max(6, animatedIntensity * 12);
-            this.ctx.fillRect(point.x - dotSize/2, point.y - dotSize/2, dotSize, dotSize);
+            // Enhanced dots with rounded corners
+            const dotSize = Math.max(8, animatedIntensity * 15);
+            this.ctx.beginPath();
+            this.ctx.arc(point.x, point.y, dotSize/2, 0, Math.PI * 2);
+            this.ctx.fill();
         }
         
-        // Add animated detection dots
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        
+        // Enhanced animated detection dots
         if (this.mode === 'wave' || this.mode === 'superposition') {
-            this.ctx.fillStyle = '#FFD700';
             for (let i = 0; i < 5; i++) {
                 const y = 170 + i * 50;
                 const x = this.screenX + 8;
                 const pulse = Math.sin(this.time * 3 + i) * 0.5 + 0.5;
+                
+                // Enhanced detection dot with gradient
+                const gradient = this.ctx.createRadialGradient(
+                    x - 2, y - 2, 0,
+                    x, y, 6
+                );
+                gradient.addColorStop(0, '#FFD700');
+                gradient.addColorStop(0.7, '#FFC107');
+                gradient.addColorStop(1, '#FF8F00');
+                
                 this.ctx.globalAlpha = pulse;
+                this.ctx.fillStyle = gradient;
                 this.ctx.beginPath();
-                this.ctx.arc(x, y, 4, 0, Math.PI * 2);
+                this.ctx.arc(x, y, 5, 0, Math.PI * 2);
                 this.ctx.fill();
             }
             this.ctx.globalAlpha = 1;
         }
         
-
-        
-        // Add wave arrows to slits with animation
+        // Enhanced wave arrows to slits with modern styling
         this.ctx.strokeStyle = '#9C27B0';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
         
         // Animated wave arrows
         const arrowPulse = Math.sin(this.time * 2) * 0.3 + 0.7;
@@ -712,8 +810,6 @@ export class WaveParticleDuality {
         this.ctx.stroke();
         
         this.ctx.globalAlpha = 1;
-        
-
     }
     
     drawMeasurementEffect() {
