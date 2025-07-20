@@ -5,6 +5,7 @@ import { BaseAnimation } from './base-animation.js';
 export class BrownianMotion extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'brownian-motion';
         this.particles = [];
         this.particleCount = 15;
         this.speed = 1;
@@ -370,6 +371,7 @@ export class BrownianMotion extends BaseAnimation {
 export class Diffusion extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'diffusion';
         this.particles = [];
         this.particleCount = 200;
         this.speed = 1;
@@ -832,6 +834,7 @@ export class Diffusion extends BaseAnimation {
 export class GasLaws extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'gas-laws';
         this.particles = [];
         this.particleCount = 50;
         this.temperature = 300; // Kelvin

@@ -4,6 +4,7 @@
 export class BaseAnimation {
     constructor(ctx) {
         this.ctx = ctx;
+        this.animationType = 'default'; // Default animation type
     }
     
     /**
@@ -27,15 +28,16 @@ export class BaseAnimation {
         let shadowColor = 'rgba(0, 0, 0, 0.8)';
         
         // Check for animations with transparent/light backgrounds that need dark text
-        if (this.constructor.name === 'FluidFlow' || 
-            this.constructor.name === 'Bernoulli' ||
-            this.constructor.name === 'BrownianMotion' || 
-            this.constructor.name === 'Diffusion' || 
-            this.constructor.name === 'GasLaws' ||
-            this.constructor.name === 'Pendulum' ||
-            this.constructor.name === 'OrbitalMotion' ||
-            this.constructor.name === 'WaveParticleDuality' ||
-            this.constructor.name === 'WavePropagation') {
+        // Use animationType property instead of constructor.name for reliability
+        if (this.animationType === 'fluid-flow' || 
+            this.animationType === 'bernoulli' ||
+            this.animationType === 'brownian-motion' || 
+            this.animationType === 'diffusion' || 
+            this.animationType === 'gas-laws' ||
+            this.animationType === 'pendulum' ||
+            this.animationType === 'orbital-motion' ||
+            this.animationType === 'wave-particle-duality' ||
+            this.animationType === 'wave-propagation') {
             textColor = '#1a1a2e'; // Dark text for transparent/light backgrounds
             shadowColor = 'rgba(255, 255, 255, 0.8)'; // White shadow
         }

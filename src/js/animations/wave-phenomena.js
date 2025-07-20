@@ -5,6 +5,7 @@ import { BaseAnimation } from './base-animation.js';
 export class WavePropagation extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'wave-propagation';
         this.waveType = 'transverse';
         this.speed = 1;
         this.frequency = 1;
@@ -559,6 +560,7 @@ export class WavePropagation extends BaseAnimation {
 export class SoundWaves extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'wave-propagation';
         this.particles = [];
         this.frequency = 5; // Hz (low frequency for visualization)
         this.amplitude = 50; // Percentage

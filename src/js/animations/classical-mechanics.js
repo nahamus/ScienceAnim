@@ -5,6 +5,7 @@ import { BaseAnimation } from './base-animation.js';
 export class Pendulum extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'pendulum';
         this.length = 120;
         this.angle = Math.PI / 4; // 45 degrees
         this.angularVelocity = 0;
@@ -561,11 +562,12 @@ export class Pendulum extends BaseAnimation {
 export class OrbitalMotion extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'orbital-motion';
         this.centerX = 400;
         this.centerY = 300;
         this.semiMajorAxis = 200;
         this.eccentricity = 0.2;
-        this.centralMass = 1.0;
+        this.centralMass = 1000;
         this.speed = 1.0;
         this.angle = 0;
         this.showOrbitPath = true;
@@ -1453,7 +1455,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     
     setInclineAngle(angle) {
         this.inclineAngle = angle;
-        this.resetObject();
+        // Don't reset object position when changing angle
     }
     
     setFrictionCoefficient(coefficient) {
@@ -1466,7 +1468,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     
     setInitialVelocity(velocity) {
         this.initialVelocity = velocity;
-        this.resetObject();
+        // Don't reset object position when changing initial velocity
     }
     
     setGravity(gravity) {
@@ -1648,20 +1650,32 @@ export class FrictionInclinedPlanes extends BaseAnimation {
             this.ctx.stroke();
         }
         this.ctx.restore();
-            
-        // Draw angle indicator (arc/protractor)
+
+        // Draw angle label at the base of the incline
         this.ctx.save();
-        this.ctx.strokeStyle = '#4ECDC4';
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-        this.ctx.arc(startX, adjustedStartY, 38, 0, angleRad, false);
-            this.ctx.stroke();
-        // Angle label
+        
+        // Draw horizontal reference line at the base
+        this.ctx.strokeStyle = 'rgba(78, 205, 196, 0.6)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(endX - 80, adjustedEndY);
+        this.ctx.lineTo(endX + 20, adjustedEndY);
+        this.ctx.stroke();
+        
         this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.font = 'bold 18px Inter';
+        this.ctx.font = 'bold 20px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText(`${this.inclineAngle}°`, startX + 44 * Math.cos(angleRad / 2), adjustedStartY + 44 * Math.sin(angleRad / 2));
+        this.ctx.textAlign = 'center';
+        // Position label at the bottom of the incline where it meets the ground
+        const labelX = endX - 35; // Position near the bottom end
+        const labelY = adjustedEndY + 25; // Position below the incline at the base
+        this.ctx.fillText(`${this.inclineAngle}°`, labelX, labelY);
+        
+        // Add a subtle background for better readability
+        this.ctx.fillStyle = 'rgba(26, 26, 46, 0.8)';
+        this.ctx.fillRect(labelX - 25, labelY - 15, 50, 20);
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.fillText(`${this.inclineAngle}°`, labelX, labelY);
         this.ctx.restore();
 
         // Draw enhanced object with modern styling
@@ -1669,28 +1683,93 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.ctx.translate(this.object.x, this.object.y);
         this.ctx.rotate(angleRad);
         
-        // Enhanced 3D shadow effect
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-        this.ctx.fillRect(-objectSize + 4, -objectSize + 4, objectSize * 2, objectSize * 2);
+        // Add subtle bounce effect based on velocity
+        const bounceOffset = Math.sin(this.time * 0.01) * Math.min(Math.abs(this.object.vx) * 0.1, 2);
+        this.ctx.translate(0, bounceOffset);
         
-        // Modern gradient for the object
+        // Add rolling rotation effect when moving
+        if (Math.abs(this.object.vx) > 0.1) {
+            const rotationSpeed = this.object.vx * 0.02; // Rotation based on velocity
+            this.ctx.rotate(this.time * rotationSpeed);
+        }
+        
+        // Enhanced 3D shadow effect with blur and dynamic positioning
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 4;
+        this.ctx.shadowOffsetY = 4 + Math.abs(this.object.vx) * 0.5; // Dynamic shadow based on speed
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.fillRect(-objectSize + 6, -objectSize + 6, objectSize * 2, objectSize * 2);
+        
+        // Reset shadow for main object
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Create rounded rectangle path for modern look
+        const radius = objectSize * 0.2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(-objectSize + radius, -objectSize);
+        this.ctx.lineTo(objectSize - radius, -objectSize);
+        this.ctx.quadraticCurveTo(objectSize, -objectSize, objectSize, -objectSize + radius);
+        this.ctx.lineTo(objectSize, objectSize - radius);
+        this.ctx.quadraticCurveTo(objectSize, objectSize, objectSize - radius, objectSize);
+        this.ctx.lineTo(-objectSize + radius, objectSize);
+        this.ctx.quadraticCurveTo(-objectSize, objectSize, -objectSize, objectSize - radius);
+        this.ctx.lineTo(-objectSize, -objectSize + radius);
+        this.ctx.quadraticCurveTo(-objectSize, -objectSize, -objectSize + radius, -objectSize);
+        this.ctx.closePath();
+        
+        // Modern gradient for the object with more sophisticated colors
         const objectGradient = this.ctx.createLinearGradient(-objectSize, -objectSize, objectSize, objectSize);
         objectGradient.addColorStop(0, '#ff6b6b');
-        objectGradient.addColorStop(0.7, '#ee5a52');
-        objectGradient.addColorStop(1, '#c62828');
+        objectGradient.addColorStop(0.3, '#ee5a52');
+        objectGradient.addColorStop(0.7, '#d32f2f');
+        objectGradient.addColorStop(1, '#b71c1c');
         
         // Main object body
         this.ctx.fillStyle = objectGradient;
-        this.ctx.fillRect(-objectSize, -objectSize, objectSize * 2, objectSize * 2);
+        this.ctx.fill();
         
-        // Enhanced highlight effect
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        this.ctx.fillRect(-objectSize, -objectSize, objectSize * 2, objectSize * 0.6);
+        // Enhanced highlight effect with multiple layers
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        this.ctx.fillRect(-objectSize, -objectSize, objectSize * 2, objectSize * 0.4);
         
-        // Modern border
+        // Secondary highlight for more depth
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.fillRect(-objectSize, -objectSize, objectSize * 2, objectSize * 0.2);
+        
+        // Add subtle texture pattern
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.lineWidth = 1;
+        for (let i = -objectSize + 4; i < objectSize - 4; i += 6) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(i, -objectSize + 4);
+            this.ctx.lineTo(i, objectSize - 4);
+            this.ctx.stroke();
+        }
+        
+        // Modern border with gradient
         this.ctx.strokeStyle = '#2c3e50';
         this.ctx.lineWidth = 2.5;
-        this.ctx.strokeRect(-objectSize, -objectSize, objectSize * 2, objectSize * 2);
+        this.ctx.stroke();
+        
+        // Add a subtle inner glow effect
+        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        
+        // Add motion blur effect when object is moving
+        if (Math.abs(this.object.vx) > 0.1) {
+            const blurIntensity = Math.min(Math.abs(this.object.vx) * 0.5, 0.8);
+            this.ctx.fillStyle = `rgba(255, 107, 107, ${blurIntensity * 0.3})`;
+            this.ctx.fillRect(-objectSize - 8, -objectSize, 8, objectSize * 2);
+        }
         
         this.ctx.restore();
 

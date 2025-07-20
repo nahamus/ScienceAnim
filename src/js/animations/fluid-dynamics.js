@@ -1,10 +1,10 @@
-
 // Fluid Flow Simulation
 import { BaseAnimation } from './base-animation.js';
 
 export class FluidFlow extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'fluid-flow';
         this.particles = [];
         this.obstacles = [];
         this.flowRate = 1;
@@ -1070,6 +1070,7 @@ export class FluidFlow extends BaseAnimation {
 export class Bernoulli extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'bernoulli';
         this.particles = [];
         this.pipeWidth = 50;
         this.fluidDensity = 1;
