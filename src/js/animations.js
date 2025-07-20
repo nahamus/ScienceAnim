@@ -1400,253 +1400,257 @@ export class ScientificAnimations {
         requestAnimationFrame((time) => this.animate(time));
     }
     
+    // Unified stats update system
+    updateStats(animationName, elementMappings) {
+        const animation = this[animationName];
+        if (!animation) return;
+        
+        const stats = animation.getStats();
+        
+        Object.entries(elementMappings).forEach(([elementId, config]) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                const value = this.getNestedValue(stats, config.path);
+                element.textContent = this.formatValue(value, config);
+            }
+        });
+    }
+    
+    getNestedValue(obj, path) {
+        return path.split('.').reduce((current, key) => {
+            return current && current[key] !== undefined ? current[key] : null;
+        }, obj);
+    }
+    
+    formatValue(value, config) {
+        if (value === null || value === undefined) {
+            return config.fallback !== undefined ? config.fallback.toString() : '';
+        }
+        
+        const { format, suffix, prefix, decimalPlaces, transform } = config;
+        
+        // Apply transform function if provided
+        if (transform && typeof transform === 'function') {
+            value = transform(value);
+        }
+        
+        if (format === 'time') {
+            return (value / 1000).toFixed(1) + 's';
+        }
+        
+        if (format === 'angle') {
+            return value.toFixed(decimalPlaces || 1) + '°';
+        }
+        
+        if (format === 'percentage') {
+            return value.toFixed(decimalPlaces || 1) + '%';
+        }
+        
+        if (format === 'unit') {
+            return value + (suffix || '');
+        }
+        
+        if (format === 'decimal') {
+            return value.toFixed(decimalPlaces || 2);
+        }
+        
+        if (format === 'boolean') {
+            return value ? 'Active' : 'Hidden';
+        }
+        
+        if (format === 'capitalize') {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+        
+        if (format === 'uppercase') {
+            return value.toString().toUpperCase();
+        }
+        
+        return value.toString();
+    }
+    
     updateBrownianStats() {
-        const stats = this.brownianMotion.getStats();
-        document.getElementById('activeParticles').textContent = stats.particleCount;
-        document.getElementById('avgSpeed').textContent = stats.avgSpeed.toFixed(2);
-        document.getElementById('simTime').textContent = (stats.time / 1000).toFixed(1) + 's';
-        
-        // Update new statistics if elements exist
-        const collisionElement = document.getElementById('brownianCollisionCount');
-        const meanFreePathElement = document.getElementById('brownianMeanFreePath');
-        const temperatureElement = document.getElementById('brownianTemperature');
-        
-        if (collisionElement) collisionElement.textContent = stats.collisionCount;
-        if (meanFreePathElement) meanFreePathElement.textContent = stats.meanFreePath.toFixed(1);
-        if (temperatureElement) temperatureElement.textContent = stats.temperature.toFixed(1);
+        this.updateStats('brownianMotion', {
+            'activeParticles': { path: 'particleCount' },
+            'avgSpeed': { path: 'avgSpeed', format: 'decimal', decimalPlaces: 2 },
+            'simTime': { path: 'time', format: 'time' },
+            'brownianCollisionCount': { path: 'collisionCount' },
+            'brownianMeanFreePath': { path: 'meanFreePath', format: 'decimal', decimalPlaces: 1 },
+            'brownianTemperature': { path: 'temperature', format: 'decimal', decimalPlaces: 1 }
+        });
     }
     
     updatePendulumStats() {
-        const stats = this.pendulum.getStats();
-        document.getElementById('currentAngle').textContent = stats.angle.toFixed(1) + '°';
-        document.getElementById('angularVelocity').textContent = stats.angularVelocity.toFixed(2);
-        document.getElementById('period').textContent = stats.theoreticalPeriod.toFixed(2) + 's';
-        document.getElementById('pendulumTime').textContent = (stats.time / 1000).toFixed(1) + 's';
-        
-        // Update air resistance information
-        const airResistanceElement = document.getElementById('pendulumAirResistance');
-        const dampingElement = document.getElementById('pendulumDamping');
-        if (airResistanceElement) {
-            airResistanceElement.textContent = stats.airResistanceForce.toFixed(3);
-        }
-        if (dampingElement) {
-            dampingElement.textContent = stats.dampingCoefficient.toFixed(3);
-        }
+        this.updateStats('pendulum', {
+            'currentAngle': { path: 'angle', format: 'angle', decimalPlaces: 1 },
+            'angularVelocity': { path: 'angularVelocity', format: 'decimal', decimalPlaces: 2 },
+            'period': { path: 'theoreticalPeriod', format: 'unit', suffix: 's', decimalPlaces: 2 },
+            'pendulumTime': { path: 'time', format: 'time' },
+            'pendulumAirResistance': { path: 'airResistanceForce', format: 'decimal', decimalPlaces: 3 },
+            'pendulumDamping': { path: 'dampingCoefficient', format: 'decimal', decimalPlaces: 3 }
+        });
     }
     
     updateDiffusionStats() {
-        const stats = this.diffusion.getStats();
-        document.getElementById('diffusionParticleCount').textContent = stats.particleCount;
-        document.getElementById('diffusionAvgSpeed').textContent = stats.avgSpeed.toFixed(2);
-        document.getElementById('concentrationSpread').textContent = stats.concentrationSpread.toFixed(2);
-        document.getElementById('diffusionTime').textContent = (stats.time / 1000).toFixed(1) + 's';
+        this.updateStats('diffusion', {
+            'diffusionParticleCount': { path: 'particleCount' },
+            'diffusionAvgSpeed': { path: 'avgSpeed', format: 'decimal', decimalPlaces: 2 },
+            'concentrationSpread': { path: 'concentrationSpread', format: 'decimal', decimalPlaces: 2 },
+            'diffusionTime': { path: 'time', format: 'time' }
+        });
     }
     
 
     
     updateWaveStats() {
-        const stats = this.waves.getStats();
-        document.getElementById('currentWaveType').textContent = stats.waveType;
-        document.getElementById('currentFrequency').textContent = stats.frequency + ' Hz';
-        document.getElementById('currentWavelength').textContent = stats.wavelength + ' px';
-        document.getElementById('currentAmplitude').textContent = stats.amplitude + ' px';
-        document.getElementById('currentWaveSpeed').textContent = stats.waveSpeed + ' px/s';
-        document.getElementById('currentWaveEnergy').textContent = stats.energy;
-        document.getElementById('wavesTime').textContent = stats.time + 's';
+        this.updateStats('waves', {
+            'currentWaveType': { path: 'waveType' },
+            'currentFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
+            'currentWavelength': { path: 'wavelength', format: 'unit', suffix: ' px' },
+            'currentAmplitude': { path: 'amplitude', format: 'unit', suffix: ' px' },
+            'currentWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' px/s' },
+            'currentWaveEnergy': { path: 'energy' },
+            'wavesTime': { path: 'time', format: 'unit', suffix: 's' }
+        });
     }
     
     updateOrbitalStats() {
-        const stats = this.orbital.getStats();
-        document.getElementById('orbitalPeriod').textContent = stats.period.toFixed(2) + 's';
-        document.getElementById('orbitalSpeed').textContent = stats.speed.toFixed(2);
-        document.getElementById('orbitalDistance').textContent = stats.distance.toFixed(1);
-        document.getElementById('orbitalTime').textContent = (stats.time / 1000).toFixed(1) + 's';
-        
-        // Display eccentricity value
-        if (stats.eccentricity !== undefined) {
-            document.getElementById('orbitalEccentricity').textContent = stats.eccentricity.toFixed(2);
-        }
+        this.updateStats('orbital', {
+            'orbitalPeriod': { path: 'period', format: 'unit', suffix: 's', decimalPlaces: 2 },
+            'orbitalSpeed': { path: 'speed', format: 'decimal', decimalPlaces: 2 },
+            'orbitalDistance': { path: 'distance', format: 'decimal', decimalPlaces: 1 },
+            'orbitalTime': { path: 'time', format: 'time' },
+            'orbitalEccentricity': { path: 'eccentricity', format: 'decimal', decimalPlaces: 2 }
+        });
     }
     
     updateElectricFieldsStats() {
-        const stats = this.electricFields.getStats();
-        document.getElementById('activeCharges').textContent = stats.chargeCount;
-        document.getElementById('efParticleCount').textContent = stats.particleCount;
-        document.getElementById('efFieldStrength').textContent = stats.fieldStrength;
-        document.getElementById('efTime').textContent = stats.time + 's';
+        this.updateStats('electricFields', {
+            'activeCharges': { path: 'chargeCount' },
+            'efParticleCount': { path: 'particleCount' },
+            'efFieldStrength': { path: 'fieldStrength' },
+            'efTime': { path: 'time', format: 'unit', suffix: 's' }
+        });
     }
     
     updateGasLawsStats() {
-        const stats = this.gasLaws.getStats();
-        document.getElementById('gasParticleCount').textContent = stats.particleCount;
-        document.getElementById('gasTemperature').textContent = stats.temperature + 'K';
-        document.getElementById('gasPressure').textContent = stats.pressure.toFixed(2);
-        document.getElementById('gasVolume').textContent = stats.volume;
+        this.updateStats('gasLaws', {
+            'gasParticleCount': { path: 'particleCount' },
+            'gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K' },
+            'gasPressure': { path: 'pressure', format: 'decimal', decimalPlaces: 2 },
+            'gasVolume': { path: 'volume' }
+        });
     }
     
 
     
     updateCollisionStats() {
-        const stats = this.collisions.getStats();
-        document.getElementById('collisionBallCount').textContent = stats.ballCount;
-        document.getElementById('collisionMomentum').textContent = stats.totalMomentum.toFixed(1);
-        document.getElementById('collisionEnergy').textContent = stats.totalEnergy.toFixed(1);
-        document.getElementById('collisionCount').textContent = stats.collisionCount;
+        this.updateStats('collisions', {
+            'collisionBallCount': { path: 'ballCount' },
+            'collisionMomentum': { path: 'totalMomentum', format: 'decimal', decimalPlaces: 1 },
+            'collisionEnergy': { path: 'totalEnergy', format: 'decimal', decimalPlaces: 1 },
+            'collisionCount': { path: 'collisionCount' }
+        });
     }
     
     updateFrictionStats() {
-        const stats = this.friction.getStats();
-        document.getElementById('frictionSurface').textContent = stats.surfaceType;
-        document.getElementById('frictionAngle').textContent = stats.inclineAngle + '°';
-        document.getElementById('frictionNetForce').textContent = stats.netForce.toFixed(1);
-        document.getElementById('frictionAcceleration').textContent = stats.acceleration.toFixed(2);
+        this.updateStats('friction', {
+            'frictionSurface': { path: 'surfaceType' },
+            'frictionAngle': { path: 'inclineAngle', format: 'angle' },
+            'frictionNetForce': { path: 'netForce', format: 'decimal', decimalPlaces: 1 },
+            'frictionAcceleration': { path: 'acceleration', format: 'decimal', decimalPlaces: 2 }
+        });
     }
     
 
     
     updateMagneticFieldsStats() {
-        const stats = this.magneticFields.getStats();
-        document.getElementById('magneticFieldStrength').textContent = stats.fieldStrength;
-        document.getElementById('magneticParticleCount').textContent = stats.particleCount;
-        document.getElementById('magneticTime').textContent = stats.time + 's';
+        this.updateStats('magneticFields', {
+            'magneticFieldStrength': { path: 'fieldStrength' },
+            'magneticParticleCount': { path: 'particleCount' },
+            'magneticTime': { path: 'time', format: 'unit', suffix: 's' }
+        });
     }
     
 
     
     updateWaveParticleDualityStats() {
-        const stats = this.waveParticleDuality.getStats();
-        // Update stats display elements if they exist
-        const modeElement = document.getElementById('currentDualityMode');
-        const energyElement = document.getElementById('currentPhotonEnergy');
-        const wavelengthElement = document.getElementById('currentDualityWavelength');
-        const waveFunctionElement = document.getElementById('waveFunctionStatus');
-        const interferenceElement = document.getElementById('interferenceStatus');
-        const measurementElement = document.getElementById('measurementCount');
-        const timeElement = document.getElementById('dualityTime');
-        
-        if (modeElement) modeElement.textContent = stats.mode;
-        if (energyElement) energyElement.textContent = stats.photonEnergy + ' eV';
-        if (wavelengthElement) wavelengthElement.textContent = stats.wavelength + ' nm';
-        if (waveFunctionElement) waveFunctionElement.textContent = this.waveParticleDuality.showWaveFunction ? 'Active' : 'Hidden';
-        if (interferenceElement) interferenceElement.textContent = this.waveParticleDuality.showInterference ? 'Visible' : 'Hidden';
-        if (measurementElement) measurementElement.textContent = stats.measurementCount;
-        if (timeElement) timeElement.textContent = stats.time + 's';
+        this.updateStats('waveParticleDuality', {
+            'currentDualityMode': { path: 'mode' },
+            'currentPhotonEnergy': { path: 'photonEnergy', format: 'unit', suffix: ' eV' },
+            'currentDualityWavelength': { path: 'wavelength', format: 'unit', suffix: ' nm' },
+            'waveFunctionStatus': { path: 'showWaveFunction', format: 'boolean' },
+            'interferenceStatus': { path: 'showInterference', format: 'boolean' },
+            'measurementCount': { path: 'measurementCount' },
+            'dualityTime': { path: 'time', format: 'unit', suffix: 's' }
+        });
     }
     
     updateFluidFlowStats() {
-        if (!this.fluidFlow) return;
-        
-        const stats = this.fluidFlow.getStats();
-        // Update stats display elements if they exist
-        const flowRateElement = document.getElementById('fluidFlowRate');
-        const viscosityElement = document.getElementById('fluidViscosity');
-        const reynoldsElement = document.getElementById('reynoldsNumberValue');
-        const flowTypeElement = document.getElementById('flowType');
-        const avgVelocityElement = document.getElementById('averageVelocity');
-        const timeElement = document.getElementById('fluidTime');
-        
-        if (flowRateElement) flowRateElement.textContent = stats.flowRate.toFixed(1);
-        if (viscosityElement) viscosityElement.textContent = stats.viscosity.toFixed(1);
-        if (reynoldsElement) reynoldsElement.textContent = stats.reynoldsNumber;
-        if (flowTypeElement) flowTypeElement.textContent = stats.flowType;
-        if (avgVelocityElement) avgVelocityElement.textContent = stats.averageVelocity.toFixed(2);
-        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+        this.updateStats('fluidFlow', {
+            'fluidFlowRate': { path: 'flowRate', format: 'decimal', decimalPlaces: 1 },
+            'fluidViscosity': { path: 'viscosity', format: 'decimal', decimalPlaces: 1 },
+            'reynoldsNumberValue': { path: 'reynoldsNumber' },
+            'flowType': { path: 'flowType' },
+            'averageVelocity': { path: 'averageVelocity', format: 'decimal', decimalPlaces: 2 },
+            'fluidTime': { path: 'time', format: 'time' }
+        });
     }
     
     updateBernoulliStats() {
-        if (!this.bernoulli) return;
-        
-        const stats = this.bernoulli.getStats();
-        // Update stats display elements if they exist
-        const pipeWidthElement = document.getElementById('bernoulliPipeWidth');
-        const densityElement = document.getElementById('bernoulliDensity');
-        const pressureElement = document.getElementById('bernoulliPressureDiff');
-        const velocityRatioElement = document.getElementById('velocityRatio');
-        const energyElement = document.getElementById('energyConservation');
-        const timeElement = document.getElementById('bernoulliTime');
-        
-        if (pipeWidthElement) pipeWidthElement.textContent = stats.pipeWidth;
-        if (densityElement) densityElement.textContent = stats.fluidDensity.toFixed(1);
-        if (pressureElement) pressureElement.textContent = stats.pressureDifference.toFixed(1);
-        if (velocityRatioElement) velocityRatioElement.textContent = stats.velocityRatio.toFixed(1);
-        if (energyElement) energyElement.textContent = stats.energyConservation;
-        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+        this.updateStats('bernoulli', {
+            'bernoulliPipeWidth': { path: 'pipeWidth' },
+            'bernoulliDensity': { path: 'fluidDensity', format: 'decimal', decimalPlaces: 1 },
+            'bernoulliPressureDiff': { path: 'pressureDifference', format: 'decimal', decimalPlaces: 1 },
+            'velocityRatio': { path: 'velocityRatio', format: 'decimal', decimalPlaces: 1 },
+            'energyConservation': { path: 'energyConservation' },
+            'bernoulliTime': { path: 'time', format: 'time' }
+        });
     }
     
     updateSoundWavesStats() {
-        if (!this.soundWaves) return;
-        
-        const stats = this.soundWaves.getStats();
-        // Update stats display elements if they exist
-        const waveTypeElement = document.getElementById('soundWaveTypeDisplay');
-        const frequencyElement = document.getElementById('soundFrequency');
-        const wavelengthElement = document.getElementById('soundWavelength');
-        const waveSpeedElement = document.getElementById('soundWaveSpeed');
-        const amplitudeElement = document.getElementById('soundAmplitude');
-        const particleCountElement = document.getElementById('soundParticleCount');
-        const timeElement = document.getElementById('soundTime');
-        
-        if (waveTypeElement) waveTypeElement.textContent = stats.waveType.charAt(0).toUpperCase() + stats.waveType.slice(1);
-        if (frequencyElement) frequencyElement.textContent = stats.frequency + ' Hz';
-        if (wavelengthElement) wavelengthElement.textContent = stats.wavelength.toFixed(2) + ' m';
-        if (waveSpeedElement) waveSpeedElement.textContent = stats.waveSpeed + ' m/s';
-        if (amplitudeElement) amplitudeElement.textContent = stats.amplitude + '%';
-        if (particleCountElement) particleCountElement.textContent = stats.particleCount;
-        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+        this.updateStats('soundWaves', {
+            'soundWaveTypeDisplay': { path: 'waveType', format: 'capitalize' },
+            'soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
+            'soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
+            'soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s' },
+            'soundAmplitude': { path: 'amplitude', format: 'percentage' },
+            'soundParticleCount': { path: 'particleCount' },
+            'soundTime': { path: 'time', format: 'time' }
+        });
     }
     
     updateDiodeTransistorStats() {
-        if (!this.diodeTransistor) return;
-        
-        const stats = this.diodeTransistor.getStats();
-        // Update stats display elements if they exist
-        const componentTypeElement = document.getElementById('diodeComponentTypeDisplay');
-        const biasTypeElement = document.getElementById('diodeBiasTypeDisplay');
-        const inputVoltageElement = document.getElementById('diodeInputVoltageDisplay');
-        const baseVoltageElement = document.getElementById('diodeBaseVoltageDisplay');
-        const currentElement = document.getElementById('diodeCurrent');
-        const powerElement = document.getElementById('diodePower');
-        const statusElement = document.getElementById('diodeStatus');
-        const temperatureElement = document.getElementById('diodeTemperature');
-        const timeElement = document.getElementById('diodeTime');
-        
-        if (componentTypeElement) componentTypeElement.textContent = stats.componentType.toUpperCase();
-        if (biasTypeElement) biasTypeElement.textContent = stats.biasType.toUpperCase();
-        if (inputVoltageElement) inputVoltageElement.textContent = stats.inputVoltage + 'V';
-        if (baseVoltageElement) baseVoltageElement.textContent = stats.baseVoltage + 'V';
-        if (currentElement) currentElement.textContent = stats.current.toFixed(1) + 'mA';
-        if (powerElement) powerElement.textContent = stats.power.toFixed(1) + 'mW';
-        if (statusElement) statusElement.textContent = stats.isActive ? 'ACTIVE' : 'INACTIVE';
-        if (temperatureElement) temperatureElement.textContent = stats.temperature + '°C';
-        if (timeElement) timeElement.textContent = (stats.time / 1000).toFixed(1) + 's';
+        this.updateStats('diodeTransistor', {
+            'diodeComponentTypeDisplay': { path: 'componentType', format: 'uppercase' },
+            'diodeBiasTypeDisplay': { path: 'biasType', format: 'uppercase' },
+            'diodeInputVoltageDisplay': { path: 'inputVoltage', format: 'unit', suffix: 'V' },
+            'diodeBaseVoltageDisplay': { path: 'baseVoltage', format: 'unit', suffix: 'V' },
+            'diodeCurrent': { path: 'current', format: 'unit', suffix: 'mA', decimalPlaces: 1 },
+            'diodePower': { path: 'power', format: 'unit', suffix: 'mW', decimalPlaces: 1 },
+            'diodeStatus': { path: 'isActive', format: 'boolean' },
+            'diodeTemperature': { path: 'temperature', format: 'unit', suffix: '°C' },
+            'diodeTime': { path: 'time', format: 'time' }
+        });
         
         // Show/hide base voltage stat based on component type
         const baseVoltageStat = document.getElementById('baseVoltageStat');
         if (baseVoltageStat) {
+            const stats = this.diodeTransistor.getStats();
             baseVoltageStat.style.display = (stats.componentType === 'npn' || stats.componentType === 'pnp') ? 'block' : 'none';
         }
     }
     
     updateNeuralNetworkStats() {
-        if (!this.neuralNetwork) return;
-        
-        const stats = this.neuralNetwork.getStats();
-        // Update stats display elements if they exist
-        const epochElement = document.getElementById('neuralEpoch');
-        const lossElement = document.getElementById('neuralLoss');
-        const accuracyElement = document.getElementById('neuralAccuracy');
-        const learningRateElement = document.getElementById('neuralLearningRate');
-        const speedElement = document.getElementById('neuralSpeed');
-        const phaseElement = document.getElementById('neuralPhase');
-        const dataIndexElement = document.getElementById('neuralDataIndex');
-        
-        if (epochElement) epochElement.textContent = stats.epoch;
-        if (lossElement) lossElement.textContent = stats.currentLoss.toFixed(4);
-        if (accuracyElement) accuracyElement.textContent = (stats.currentAccuracy * 100).toFixed(1) + '%';
-        if (learningRateElement) learningRateElement.textContent = stats.learningRate;
-        if (speedElement) speedElement.textContent = stats.speed.toFixed(1) + 'x';
-        if (phaseElement) phaseElement.textContent = stats.animationPhase;
-        if (dataIndexElement) dataIndexElement.textContent = stats.trainingDataIndex;
+        this.updateStats('neuralNetwork', {
+            'neuralEpoch': { path: 'epoch' },
+            'neuralLoss': { path: 'currentLoss', format: 'decimal', decimalPlaces: 4 },
+            'neuralAccuracy': { path: 'currentAccuracy', format: 'percentage', decimalPlaces: 1 },
+            'neuralLearningRate': { path: 'learningRate' },
+            'neuralSpeed': { path: 'speed', format: 'unit', suffix: 'x', decimalPlaces: 1 },
+            'neuralPhase': { path: 'animationPhase' },
+            'neuralDataIndex': { path: 'trainingDataIndex' }
+        });
     }
     
     showScienceExplanation() {
@@ -3052,45 +3056,35 @@ export class ScientificAnimations {
     }
     
     updateMemoryManagementStats() {
-        if (!this.memoryManagement) return;
-        const stats = this.memoryManagement.getStats();
-        const buildingsElement = document.getElementById('memoryBuildings');
-        const allocatedElement = document.getElementById('memoryAllocated');
-        const gcCyclesElement = document.getElementById('memoryGCCycles');
-        const efficiencyElement = document.getElementById('memoryEfficiency');
-        
-        if (buildingsElement) buildingsElement.textContent = stats.totalHeapUsed || 0;
-        if (allocatedElement) allocatedElement.textContent = stats.totalHeapUsed || 0;
-        if (gcCyclesElement) gcCyclesElement.textContent = stats.gcCycles || 0;
-        if (efficiencyElement) {
-            const efficiency = stats.fragmentation ? (100 - stats.fragmentation) : 100;
-            efficiencyElement.textContent = efficiency.toFixed(1) + '%';
-        }
+        this.updateStats('memoryManagement', {
+            'memoryBuildings': { path: 'totalHeapUsed', fallback: 0 },
+            'memoryAllocated': { path: 'totalHeapUsed', fallback: 0 },
+            'memoryGCCycles': { path: 'gcCycles', fallback: 0 },
+            'memoryEfficiency': { 
+                path: 'fragmentation', 
+                format: 'percentage', 
+                decimalPlaces: 1,
+                transform: (value) => value ? (100 - value) : 100
+            }
+        });
     }
     
     updateBlockchainStats() {
-        if (!this.blockchain) return;
-        const stats = this.blockchain.getStats();
-        const blocksElement = document.getElementById('blockchainBlocks');
-        const transactionsElement = document.getElementById('blockchainTransactions');
-        const pendingElement = document.getElementById('blockchainPending');
-        const difficultyElement = document.getElementById('blockchainDifficulty');
-        const hashrateElement = document.getElementById('blockchainHashrate');
-        const minersElement = document.getElementById('blockchainMiners');
-        const nodesElement = document.getElementById('blockchainNodes');
-        const phaseElement = document.getElementById('blockchainPhase');
-        const miningElement = document.getElementById('blockchainMining');
-        
-        if (blocksElement) blocksElement.textContent = stats.blocks || 0;
-        if (transactionsElement) transactionsElement.textContent = stats.transactions || 0;
-        if (pendingElement) pendingElement.textContent = stats.pending || 0;
-        if (difficultyElement) difficultyElement.textContent = stats.difficulty || 0;
-        if (hashrateElement) hashrateElement.textContent = (stats.hashrate || 0) + ' H/s';
-        if (minersElement) minersElement.textContent = stats.miners || 0;
-        if (nodesElement) nodesElement.textContent = stats.nodes || 0;
+        this.updateStats('blockchain', {
+            'blockchainBlocks': { path: 'blocks', fallback: 0 },
+            'blockchainTransactions': { path: 'transactions', fallback: 0 },
+            'blockchainPending': { path: 'pending', fallback: 0 },
+            'blockchainDifficulty': { path: 'difficulty', fallback: 0 },
+            'blockchainHashrate': { path: 'hashrate', format: 'unit', suffix: ' H/s', fallback: 0 },
+            'blockchainMiners': { path: 'miners', fallback: 0 },
+            'blockchainNodes': { path: 'nodes', fallback: 0 },
+            'blockchainMining': { path: 'isMining', format: 'boolean' }
+        });
         
         // Update phase with consensus information
+        const phaseElement = document.getElementById('blockchainPhase');
         if (phaseElement) {
+            const stats = this.blockchain.getStats();
             let phaseText = stats.phase || 'idle';
             if (stats.phase === 'finalization' && stats.consensusPercentage !== undefined) {
                 if (stats.consensusReached) {
@@ -3101,7 +3095,5 @@ export class ScientificAnimations {
             }
             phaseElement.textContent = phaseText;
         }
-        
-        if (miningElement) miningElement.textContent = stats.isMining ? 'Yes' : 'No';
     }
 }
