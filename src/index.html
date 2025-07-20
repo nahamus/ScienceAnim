@@ -657,9 +657,9 @@
                         <label for="fluidVisualizationMode">Visualization Mode:</label>
                         <select id="fluidVisualizationMode" class="select-control">
                             <option value="particles">Particle Flow</option>
-                            <option value="streamlines">Streamlines</option>
-                            <option value="velocity">Velocity Field</option>
-                            <option value="pressure">Pressure Field</option>
+                            <option value="pressure">Pressure Analysis</option>
+                            <option value="velocity">Velocity Analysis</option>
+                            <option value="porosity">Porosity Effects</option>
                         </select>
                     </div>
                 </div>
@@ -667,37 +667,9 @@
                 <!-- Bernoulli's Principle Controls -->
                 <div id="bernoulli-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
-                        <label for="bernoulliSpeed">Animation Speed:</label>
-                        <input type="range" id="bernoulliSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="bernoulliSpeedValue">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="pipeWidth">Pipe Width:</label>
-                        <input type="range" id="pipeWidth" min="20" max="100" value="50" step="5" class="slider">
-                        <span id="pipeWidthValue">50</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="fluidDensity">Fluid Density:</label>
-                        <input type="range" id="fluidDensity" min="0.5" max="2" value="1" step="0.1" class="slider">
-                        <span id="fluidDensityValue">1.0</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="pressureDifference">Pressure Difference:</label>
                         <input type="range" id="pressureDifference" min="0.1" max="3" value="1" step="0.1" class="slider">
                         <span id="pressureDifferenceValue">1.0</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="bernoulliVisualizationMode">Visualization Mode:</label>
-                        <select id="bernoulliVisualizationMode" class="select-control">
-                            <option value="basic">Basic Flow</option>
-                            <option value="pressure">Pressure Analysis</option>
-                            <option value="velocity">Velocity Analysis</option>
-                            <option value="energy">Energy Conservation</option>
-                        </select>
                     </div>
                 </div>
 

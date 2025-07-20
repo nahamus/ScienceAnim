@@ -627,24 +627,8 @@ export class ScientificAnimations {
         });
         
         // Bernoulli's Principle Controls
-        this.setupSliderControl('bernoulliSpeed', 'bernoulliSpeedValue', (value) => {
-            this.bernoulli.setPressureDifference(parseFloat(value));
-        });
-        
-        this.setupSliderControl('pipeWidth', 'pipeWidthValue', (value) => {
-            this.bernoulli.setPipeWidth(parseInt(value));
-        });
-        
-        this.setupSliderControl('fluidDensity', 'fluidDensityValue', (value) => {
-            this.bernoulli.setFluidDensity(parseFloat(value));
-        });
-        
         this.setupSliderControl('pressureDifference', 'pressureDifferenceValue', (value) => {
             this.bernoulli.setPressureDifference(parseFloat(value));
-        });
-        
-        document.getElementById('bernoulliVisualizationMode').addEventListener('change', (e) => {
-            this.bernoulli.setVisualizationMode(e.target.value);
         });
         
         // Sound Waves Controls
@@ -1587,17 +1571,22 @@ export class ScientificAnimations {
             'reynoldsNumberValue': { path: 'reynoldsNumber' },
             'flowType': { path: 'flowType' },
             'averageVelocity': { path: 'averageVelocity', format: 'decimal', decimalPlaces: 2 },
+            'viscosityEffect': { path: 'viscosityEffect', format: 'percentage', decimalPlaces: 0 },
+            'velocityRatio': { path: 'velocityRatio', format: 'decimal', decimalPlaces: 1 },
+            'topPorosity': { path: 'topPorosity', format: 'percentage', decimalPlaces: 0 },
+            'bottomPorosity': { path: 'bottomPorosity', format: 'percentage', decimalPlaces: 0 },
             'fluidTime': { path: 'time', format: 'time' }
         });
     }
     
     updateBernoulliStats() {
         this.updateStats('bernoulli', {
-            'bernoulliPipeWidth': { path: 'pipeWidth' },
-            'bernoulliDensity': { path: 'fluidDensity', format: 'decimal', decimalPlaces: 1 },
             'bernoulliPressureDiff': { path: 'pressureDifference', format: 'decimal', decimalPlaces: 1 },
             'velocityRatio': { path: 'velocityRatio', format: 'decimal', decimalPlaces: 1 },
             'energyConservation': { path: 'energyConservation' },
+            'particleCount': { path: 'particleCount' },
+            'maxParticles': { path: 'maxParticles' },
+            'flowEfficiency': { path: 'flowEfficiency', format: 'percentage' },
             'bernoulliTime': { path: 'time', format: 'time' }
         });
     }
@@ -2439,46 +2428,92 @@ export class ScientificAnimations {
                 };
             case 'fluid-flow':
                 return {
-                    title: 'Fluid Flow - Laminar and Turbulent Dynamics',
+                    title: 'Fluid Flow - Enhanced Viscosity & Porosity Effects',
                     html: `
                         <div class="science-content">
                             <h3>What is Fluid Flow?</h3>
-                            <p>Fluid flow describes how liquids and gases move through space. Understanding flow patterns is crucial for engineering applications, from blood flow in arteries to air flow over airplane wings.</p>
+                            <p>Fluid flow describes how liquids and gases move through space and porous materials. This enhanced simulation demonstrates realistic fluid dynamics with visible viscosity effects, Reynolds number transitions, and porous media flow patterns.</p>
                             
                             <h3>Key Scientific Concepts</h3>
                             <ul>
-                                <li><strong>Laminar Flow:</strong> Smooth, parallel streamlines with no mixing between layers</li>
-                                <li><strong>Turbulent Flow:</strong> Chaotic, swirling motion with rapid mixing</li>
-                                <li><strong>Reynolds Number:</strong> Re = ρvL/μ (determines flow type)</li>
-                                <li><strong>Viscosity:</strong> Internal friction that resists flow</li>
-                                <li><strong>Boundary Layer:</strong> Region near surfaces where flow is affected by friction</li>
+                                <li><strong>Laminar Flow:</strong> Smooth, parallel streamlines with no mixing between layers (Re < 2300)</li>
+                                <li><strong>Turbulent Flow:</strong> Chaotic, swirling motion with rapid mixing (Re > 4000)</li>
+                                <li><strong>Reynolds Number:</strong> Re = ρvL/μ - determines flow regime and transition points</li>
+                                <li><strong>Enhanced Viscosity Effects:</strong> Internal friction that visibly slows particle movement</li>
+                                <li><strong>Porous Media Flow:</strong> Fluid movement through materials with different porosity levels</li>
+                                <li><strong>Darcy's Law:</strong> Flow rate through porous media depends on permeability and pressure gradient</li>
                             </ul>
                             
                             <h3>What You Should Observe</h3>
                             <ul>
-                                <li>Smooth, parallel streamlines in laminar flow</li>
-                                <li>Chaotic, swirling patterns in turbulent flow</li>
-                                <li>Flow separation around obstacles</li>
-                                <li>Velocity changes with viscosity</li>
-                                <li>Reynolds number transitions</li>
+                                <li><strong>Viscosity Effects:</strong> Particles move much slower with high viscosity (5x enhanced visibility)</li>
+                                <li><strong>Flow Regimes:</strong> Smooth laminar flow vs chaotic turbulent flow based on Reynolds number</li>
+                                <li><strong>Porosity Effects:</strong> Particles slow down significantly in porous materials</li>
+                                <li><strong>Visualization Modes:</strong> Different analysis panels show pressure, velocity, and porosity effects</li>
+                                <li><strong>Real-time Statistics:</strong> Live updates of Reynolds number, flow type, and viscosity effects</li>
                             </ul>
                             
-                            <h3>Flow Regimes</h3>
+                            <h3>Enhanced Features</h3>
                             <ul>
-                                <li><strong>Re < 2300:</strong> Laminar flow (smooth, predictable)</li>
-                                <li><strong>2300 < Re < 4000:</strong> Transitional flow (unstable)</li>
-                                <li><strong>Re > 4000:</strong> Turbulent flow (chaotic, mixing)</li>
-                                <li><strong>High Re:</strong> Inertia dominates over viscosity</li>
-                                <li><strong>Low Re:</strong> Viscosity dominates over inertia</li>
+                                <li><strong>Visible Viscosity:</strong> 5x stronger effect makes viscosity changes clearly observable</li>
+                                <li><strong>Reynolds Number Display:</strong> Real-time calculation and color-coded flow type indicators</li>
+                                <li><strong>Porosity Analysis:</strong> Comparison between high and low porosity materials</li>
+                                <li><strong>Velocity Analysis:</strong> Shows how porosity affects flow velocity</li>
+                                <li><strong>Pressure Analysis:</strong> Demonstrates pressure build-up in porous materials</li>
+                                <li><strong>Clean UI:</strong> Removed redundant information for better focus</li>
+                            </ul>
+                            
+                            <h3>Flow Regimes & Transitions</h3>
+                            <ul>
+                                <li><strong>Laminar (Re < 2300):</strong> Green indicator - smooth, predictable flow</li>
+                                <li><strong>Transitional (2300 < Re < 4000):</strong> Orange indicator - unstable, mixed flow</li>
+                                <li><strong>Turbulent (Re > 4000):</strong> Red indicator - chaotic, highly mixed flow</li>
+                                <li><strong>Viscosity Impact:</strong> High viscosity = lower Reynolds number = more laminar flow</li>
+                                <li><strong>Flow Rate Impact:</strong> High flow rate = higher Reynolds number = more turbulent flow</li>
+                            </ul>
+                            
+                            <h3>Porous Media Physics</h3>
+                            <ul>
+                                <li><strong>High Porosity Material:</strong> More open spaces, particles flow through more easily</li>
+                                <li><strong>Low Porosity Material:</strong> Fewer open spaces, particles slow down significantly</li>
+                                <li><strong>Velocity Ratio:</strong> Shows the speed difference between materials</li>
+                                <li><strong>Pressure Build-up:</strong> Porous materials create resistance and pressure gradients</li>
+                                <li><strong>Flow Patterns:</strong> Particles follow tortuous paths through porous structures</li>
+                            </ul>
+                            
+                            <h3>Interactive Controls</h3>
+                            <ul>
+                                <li><strong>Flow Rate Slider:</strong> Adjusts particle speed and Reynolds number</li>
+                                <li><strong>Viscosity Slider:</strong> Controls internal friction (now 5x more visible)</li>
+                                <li><strong>Visualization Modes:</strong> Switch between particle flow, pressure, velocity, and porosity analysis</li>
+                                <li><strong>Real-time Feedback:</strong> Watch statistics update as you adjust parameters</li>
                             </ul>
                             
                             <h3>Real-World Applications</h3>
                             <ul>
-                                <li>Blood flow in cardiovascular system</li>
-                                <li>Air flow over aircraft wings</li>
-                                <li>Water flow in pipes and channels</li>
-                                <li>Weather patterns and atmospheric flow</li>
-                                <li>Industrial mixing and processing</li>
+                                <li><strong>Groundwater Flow:</strong> Water movement through soil and rock formations</li>
+                                <li><strong>Oil Reservoir Engineering:</strong> Petroleum flow through porous rock</li>
+                                <li><strong>Blood Flow:</strong> Circulation through capillaries and tissue</li>
+                                <li><strong>Air Filtration:</strong> Gas flow through filter materials</li>
+                                <li><strong>Chemical Processing:</strong> Fluid flow through catalyst beds</li>
+                                <li><strong>Geothermal Systems:</strong> Heat transfer in porous media</li>
+                            </ul>
+                            
+                            <h3>Mathematical Foundation</h3>
+                            <ul>
+                                <li><strong>Reynolds Number:</strong> Re = (ρ × V × D) / μ where ρ=density, V=velocity, D=characteristic length, μ=viscosity</li>
+                                <li><strong>Viscosity Effect:</strong> velocity_factor = 1 - (viscosity × 0.1) - 5x enhanced for visibility</li>
+                                <li><strong>Porosity Factor:</strong> porosity_factor = 1 - (1 - porosity) × 0.6</li>
+                                <li><strong>Darcy's Law:</strong> Q = -kA(ΔP/ΔL)/μ where k=permeability, A=cross-sectional area</li>
+                            </ul>
+                            
+                            <h3>Educational Value</h3>
+                            <ul>
+                                <li><strong>Visual Learning:</strong> See abstract concepts like viscosity and Reynolds number in action</li>
+                                <li><strong>Parameter Relationships:</strong> Understand how flow rate, viscosity, and porosity interact</li>
+                                <li><strong>Real-time Analysis:</strong> Watch statistics update as you experiment with controls</li>
+                                <li><strong>Multiple Perspectives:</strong> Different visualization modes show various aspects of fluid dynamics</li>
+                                <li><strong>Scientific Accuracy:</strong> Based on real fluid dynamics equations and principles</li>
                             </ul>
                         </div>
                     `
@@ -2489,7 +2524,7 @@ export class ScientificAnimations {
                     html: `
                         <div class="science-content">
                             <h3>What is Bernoulli's Principle?</h3>
-                            <p>Bernoulli's principle states that in a flowing fluid, an increase in velocity is accompanied by a decrease in pressure. This is a consequence of energy conservation in fluid flow.</p>
+                            <p>Bernoulli's principle states that in a flowing fluid, an increase in velocity is accompanied by a decrease in pressure. This is a consequence of energy conservation in fluid flow. Our enhanced simulation demonstrates this with continuous particle flow and realistic velocity transitions.</p>
                             
                             <h3>Key Scientific Concepts</h3>
                             <ul>
@@ -2498,15 +2533,26 @@ export class ScientificAnimations {
                                 <li><strong>Pressure-Velocity Trade-off:</strong> Higher velocity = lower pressure</li>
                                 <li><strong>Continuity Equation:</strong> A₁v₁ = A₂v₂ (mass conservation)</li>
                                 <li><strong>Venturi Effect:</strong> Pressure drop in constricted flow</li>
+                                <li><strong>Enhanced Particle System:</strong> Continuous flow with 80 particles maintained</li>
                             </ul>
                             
                             <h3>What You Should Observe</h3>
                             <ul>
-                                <li>Fluid speeding up in narrow sections</li>
-                                <li>Pressure decreasing in constricted areas</li>
-                                <li>Energy conservation maintained</li>
-                                <li>Velocity and pressure inversely related</li>
-                                <li>Flow rate remains constant</li>
+                                <li><strong>Continuous Particle Flow:</strong> Steady stream without gaps or stops</li>
+                                <li><strong>Velocity Transitions:</strong> Smooth speed changes through pipe constriction</li>
+                                <li><strong>Bernoulli Effect:</strong> Particles speed up 1.8x in narrow section</li>
+                                <li><strong>Energy Conservation:</strong> Total energy maintained throughout flow</li>
+                                <li><strong>Pressure Changes:</strong> Lower pressure in high-velocity regions</li>
+                                <li><strong>Flow Efficiency:</strong> Optimized particle management system</li>
+                            </ul>
+                            
+                            <h3>Enhanced Simulation Features</h3>
+                            <ul>
+                                <li><strong>Continuous Flow:</strong> Particles added continuously to maintain steady stream</li>
+                                <li><strong>Smart Particle Management:</strong> 80 particles with optimized addition/removal</li>
+                                <li><strong>Realistic Transitions:</strong> Gradual velocity changes in pipe constrictions</li>
+                                <li><strong>Energy Visualization:</strong> Color-coded particles show energy distribution</li>
+                                <li><strong>Flow Efficiency:</strong> Real-time calculation of flow performance</li>
                             </ul>
                             
                             <h3>Energy Components</h3>
@@ -2515,15 +2561,25 @@ export class ScientificAnimations {
                                 <li><strong>Kinetic Energy:</strong> ½ρv² (energy of motion)</li>
                                 <li><strong>Potential Energy:</strong> ρgh (gravitational energy)</li>
                                 <li><strong>Total Energy:</strong> Sum remains constant</li>
+                                <li><strong>Flow Efficiency:</strong> Percentage of optimal flow achieved</li>
                             </ul>
                             
                             <h3>Real-World Applications</h3>
                             <ul>
-                                <li>Airplane wing lift generation</li>
-                                <li>Carburetor fuel mixing</li>
-                                <li>Venturi meters for flow measurement</li>
-                                <li>Spray bottles and atomizers</li>
-                                <li>Blood flow in arteries</li>
+                                <li><strong>Airplane Wings:</strong> Curved upper surface creates lift</li>
+                                <li><strong>Carburetors:</strong> Fuel mixing through pressure differences</li>
+                                <li><strong>Venturi Meters:</strong> Flow measurement using pressure drop</li>
+                                <li><strong>Spray Bottles:</strong> Atomization through constricted flow</li>
+                                <li><strong>Blood Flow:</strong> Arterial constriction effects</li>
+                                <li><strong>Wind Tunnels:</strong> Aerodynamic testing</li>
+                            </ul>
+                            
+                            <h3>Technical Implementation</h3>
+                            <ul>
+                                <li><strong>Particle System:</strong> 80 particles with continuous addition</li>
+                                <li><strong>Velocity Calculation:</strong> Based on cross-sectional area changes</li>
+                                <li><strong>Energy Conservation:</strong> Maintained through velocity-pressure relationship</li>
+                                <li><strong>Flow Monitoring:</strong> Real-time particle count and efficiency tracking</li>
                             </ul>
                         </div>
                     `
