@@ -480,7 +480,9 @@ export class WavePropagation extends BaseAnimation {
     }
     
     drawWaveInfo() {
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
         this.ctx.font = '14px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
@@ -503,6 +505,9 @@ export class WavePropagation extends BaseAnimation {
         this.ctx.fillText(`Wave Equation: y = A sin(kx - ωt)`, 10, y);
         y += 20;
         this.ctx.fillText(`where: k = 2π/λ, ω = 2πf`, 10, y);
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
     }
     
     drawEnergyVisualization() {
@@ -1145,11 +1150,13 @@ export class SoundWaves extends BaseAnimation {
     }
     
     drawSoundInfo() {
-        // Simple info panel
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        // Simple info panel with better contrast
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         this.ctx.fillRect(10, 10, 320, 180);
         
-        this.ctx.fillStyle = 'white';
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
         this.ctx.font = 'bold 16px Arial';
         this.ctx.textAlign = 'left';
         this.ctx.fillText('🎵 Sound Wave Properties', 20, 30);
@@ -1166,14 +1173,19 @@ export class SoundWaves extends BaseAnimation {
         this.ctx.fillText(`Amplitude: ${this.amplitude}%`, 20, 130);
         this.ctx.fillText(`Wave Type: ${this.waveType}`, 20, 150);
         this.ctx.fillText(`Particles: ${this.particleCount}`, 20, 170);
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
     }
     
     drawRealWorldAnalogy() {
-        // Simple analogy panel
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        // Simple analogy panel with better contrast
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         this.ctx.fillRect(this.ctx.canvas.width - 280, 10, 270, 140);
         
-        this.ctx.fillStyle = 'white';
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
         this.ctx.font = 'bold 14px Arial';
         this.ctx.textAlign = 'left';
         this.ctx.fillText('💡 Real-World Examples:', this.ctx.canvas.width - 270, 30);
@@ -1195,6 +1207,9 @@ export class SoundWaves extends BaseAnimation {
             this.ctx.fillText('📡 Combined phenomena', this.ctx.canvas.width - 270, 90);
             this.ctx.fillText('🎼 Musical instruments', this.ctx.canvas.width - 270, 110);
         }
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
     }
     
     getStats() {

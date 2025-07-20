@@ -481,7 +481,9 @@ export class Pendulum extends BaseAnimation {
         const infoX = 20;
         const infoY = 60;
         
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
         this.ctx.font = '14px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
@@ -520,6 +522,9 @@ export class Pendulum extends BaseAnimation {
         this.ctx.fillText(`Air Resistance: ${airResistanceForce.toFixed(3)} N`, infoX, y);
         y += 20;
         this.ctx.fillText(`Damping Coefficient: ${this.damping.toFixed(3)}`, infoX, y);
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
     }
     
     getStats() {
@@ -1434,7 +1439,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.inclineAngle = 20;
         this.frictionCoefficient = 0.3;
         this.objectMass = 5;
-        this.initialVelocity = 50;
+        this.initialVelocity = 0; // Start from rest by default
         this.gravity = 1.0;
         this.speed = 1.0;
         this.showAnalytics = false;
@@ -1478,7 +1483,10 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         const canvasWidth = this.ctx.canvas.width;
         const canvasHeight = this.ctx.canvas.height;
         const startX = canvasWidth * 0.125;
-        this.object.x = startX;
+        
+        // Position object a bit down the incline (about 5% of the incline length)
+        const offsetDistance = canvasWidth * 0.75 * 0.05; // 5% of incline length
+        this.object.x = startX + offsetDistance;
         
         // Calculate adjusted start position based on current angle
         const angleRad = this.inclineAngle * Math.PI / 180;
@@ -1489,7 +1497,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         const verticalOffset = Math.max(0, endY - maxEndY);
         const adjustedStartY = startY - verticalOffset;
         
-        this.object.y = adjustedStartY - 15 - 18 * Math.cos(angleRad);
+        // Scale object size with mass for positioning
+        const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
+        this.object.y = adjustedStartY + offsetDistance * Math.tan(angleRad) - objectSize - 18 * Math.cos(angleRad);
         this.object.vx = this.initialVelocity * Math.cos(angleRad);
         this.object.vy = 0;
     }
@@ -1499,7 +1509,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     }
     
     update(deltaTime) {
-        const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
+        const dt = (deltaTime / 1000) * this.speed * 3; // Increased speed multiplier for more engaging motion
         const angleRad = this.inclineAngle * Math.PI / 180;
         
         // Calculate forces
@@ -1525,8 +1535,12 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         }
         const acceleration = netForce / this.objectMass;
         
+        // Enhanced acceleration scaling for more dramatic effect with higher angles
+        const angleEffect = Math.sin(angleRad) * 1.5; // Amplify the angle effect
+        const enhancedAcceleration = acceleration * (1 + angleEffect);
+        
         // Update velocity
-        this.object.vx += acceleration * dt;
+        this.object.vx += enhancedAcceleration * dt;
         
         // Update position
         this.object.x += this.object.vx * dt;
@@ -1552,7 +1566,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         }
         
         // Position object ON TOP of the incline surface (not embedded)
-        this.object.y = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad) - 15 - 18 * Math.cos(angleRad);
+        // Scale object size with mass for positioning
+        const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
+        this.object.y = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad) - objectSize - 18 * Math.cos(angleRad);
     }
     
     render() {
@@ -1578,7 +1594,8 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         const verticalOffset = Math.max(0, endY - maxEndY);
         const adjustedStartY = startY - verticalOffset;
         const adjustedEndY = endY - verticalOffset;
-        const objectSize = 15;
+        // Scale object size with mass (minimum 12, maximum 25)
+        const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
 
         // Draw subtle grid/ruler along the incline
         this.ctx.save();
@@ -1696,7 +1713,8 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         const netForce = (Math.abs(this.object.vx) < 1e-4 && Math.abs(parallelForce) <= frictionForce)
             ? 0
             : parallelForce - Math.sign(this.object.vx || parallelForce) * frictionForce;
-        const objectSize = 15;
+        // Scale object size with mass for force vectors
+        const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
         const x = this.object.x;
         const y = this.object.y;
 

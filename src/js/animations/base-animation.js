@@ -21,16 +21,36 @@ export class BaseAnimation {
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         
+        // Determine background type and set appropriate colors
+        // Most animations use dark backgrounds, so default to white text
+        let textColor = '#ffffff';
+        let shadowColor = 'rgba(0, 0, 0, 0.8)';
+        
+        // Check for animations with transparent/light backgrounds that need dark text
+        if (this.constructor.name === 'FluidFlow' || 
+            this.constructor.name === 'Bernoulli' ||
+            this.constructor.name === 'BrownianMotion' || 
+            this.constructor.name === 'Diffusion' || 
+            this.constructor.name === 'GasLaws' ||
+            this.constructor.name === 'Pendulum' ||
+            this.constructor.name === 'OrbitalMotion' ||
+            this.constructor.name === 'WaveParticleDuality' ||
+            this.constructor.name === 'WavePropagation') {
+            textColor = '#1a1a2e'; // Dark text for transparent/light backgrounds
+            shadowColor = 'rgba(255, 255, 255, 0.8)'; // White shadow
+        }
+        
         // Draw animation type label
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        this.ctx.fillStyle = textColor;
+        this.ctx.shadowColor = shadowColor;
         this.ctx.shadowBlur = 2;
         this.ctx.fillText(title, this.ctx.canvas.width / 2, titleY);
         
         // Draw mathematical formulas in a more compact format
         this.ctx.font = '12px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillStyle = textColor;
+        this.ctx.shadowColor = shadowColor;
         this.ctx.fillText(formulas, this.ctx.canvas.width / 2, formulasY);
         
         // Reset shadow

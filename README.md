@@ -2,6 +2,56 @@
 
 An interactive web application featuring real-time scientific simulations for educational purposes. Built with modern web technologies and optimized for development with hot reloading.
 
+## 🎨 **Label Visibility Guidelines**
+
+### **Font Color Standards:**
+```javascript
+// Dark backgrounds
+this.ctx.fillStyle = '#ffffff';
+this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+
+// Light backgrounds  
+this.ctx.fillStyle = '#1a1a2e';
+this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+```
+
+### **Smart Base Animation Class**
+The base animation class automatically detects animation type and applies appropriate colors:
+```javascript
+// Check for animations with transparent/light backgrounds that need dark text
+if (this.constructor.name === 'FluidFlow' || 
+    this.constructor.name === 'Bernoulli' ||
+    this.constructor.name === 'BrownianMotion' || 
+    this.constructor.name === 'Diffusion' || 
+    this.constructor.name === 'GasLaws' ||
+    this.constructor.name === 'Pendulum' ||
+    this.constructor.name === 'OrbitalMotion' ||
+    this.constructor.name === 'CollisionPhysics' ||
+    this.constructor.name === 'FrictionInclinedPlanes' ||
+    this.constructor.name === 'WaveParticleDuality' ||
+    this.constructor.name === 'WavePropagation') {
+    textColor = '#1a1a2e'; // Dark text for transparent/light backgrounds
+    shadowColor = 'rgba(255, 255, 255, 0.8)'; // White shadow
+}
+```
+
+### **⚠️ IMPORTANT: Always Check Label Visibility**
+When adding new animations or modifying existing ones:
+1. **Test label visibility** against the animation background
+2. **Use appropriate font colors** with shadows for contrast
+3. **Test on different screen sizes and brightness levels**
+
+### **Common Issues to Avoid:**
+- ❌ White text on white/light backgrounds
+- ❌ Dark text on dark backgrounds  
+- ❌ Low contrast text without shadows
+
+### **Best Practices:**
+- ✅ Always use text shadows for better readability
+- ✅ Test visibility across different monitor brightness levels
+- ✅ Use the base animation class's smart color detection
+- ✅ Consider accessibility standards for color contrast
+
 ## Features
 
 ### 🧪 Brownian Motion Simulation

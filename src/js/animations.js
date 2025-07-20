@@ -385,9 +385,7 @@ export class ScientificAnimations {
         
 
         
-        document.getElementById('magneticShowForceArrows').addEventListener('change', (e) => {
-            this.magneticFields.setShowForceArrows(e.target.checked);
-        });
+
         
         // Removed addMagnetBtn and clearMagnetsBtn event listeners
         

@@ -466,12 +466,11 @@ export class ElectricFields extends BaseAnimation {
 export class MagneticFields extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
-        this.speed = 1.0;
-        this.fieldStrength = 1.0;
+        this.speed = 0.5; // Slower default speed
+        this.fieldStrength = 3.0; // Increased field strength for more visible effect
         this.particleCount = 15;
         this.showFieldLines = true;
         this.showParticles = true;
-        this.showForceArrows = false;
         this.animationOffset = 0;
         this.magnets = [];
         this.particles = [];
@@ -547,9 +546,7 @@ export class MagneticFields extends BaseAnimation {
         this.showParticles = show;
     }
     
-    setShowForceArrows(show) {
-        this.showForceArrows = show;
-    }
+
     
     addMagnetAtPosition(x, y) {
         // Add a complete magnet with both poles
@@ -600,13 +597,19 @@ export class MagneticFields extends BaseAnimation {
                 // Field strength decreases with distance
                 const fieldStrength = magnet.strength / (1 + distance / 100);
                 
+                // Calculate unit vector from magnet to point
+                const unitX = dx / distance;
+                const unitY = dy / distance;
+                
                 // Field direction depends on pole
                 if (magnet.pole === 'north') {
-                    // North pole: field points away from magnet (upward in this case)
-                    By += fieldStrength;
+                    // North pole: field points AWAY from magnet (outward)
+                    Bx += fieldStrength * unitX;
+                    By += fieldStrength * unitY;
                 } else {
-                    // South pole: field points toward magnet (downward in this case)
-                    By -= fieldStrength;
+                    // South pole: field points TOWARD magnet (inward)
+                    Bx -= fieldStrength * unitX;
+                    By -= fieldStrength * unitY;
                 }
             }
         });
@@ -624,38 +627,62 @@ export class MagneticFields extends BaseAnimation {
         this.particles.forEach(particle => {
             // Calculate magnetic field at particle position
             const field = this.calculateMagneticField(particle.x, particle.y);
+            const fieldMagnitude = Math.sqrt(field.Bx * field.Bx + field.By * field.By);
             
-            // Simple Lorentz force: F = q(v × B)
-            // Since B points upward, force is perpendicular to velocity
-            const forceX = particle.charge * particle.vy * field.By;
-            const forceY = -particle.charge * particle.vx * field.By;
+            // Enhanced Lorentz force with field strength scaling
+            // F = q(v × B) - force is perpendicular to both velocity and magnetic field
+            const forceX = particle.charge * (particle.vy * field.Bx - particle.vx * field.By) * 8.0;
+            const forceY = particle.charge * (particle.vx * field.By - particle.vy * field.Bx) * 8.0;
+            
+            // Scale force based on field strength for more realistic behavior
+            const forceScale = Math.min(1.0, fieldMagnitude / 2.0);
+            const scaledForceX = forceX * forceScale;
+            const scaledForceY = forceY * forceScale;
         
-        // Update velocity
-            particle.vx += forceX * dt;
-            particle.vy += forceY * dt;
+        // Update velocity with enhanced physics
+            particle.vx += scaledForceX * dt;
+            particle.vy += scaledForceY * dt;
             
-            // Add some damping to prevent particles from going too fast
+            // Enhanced damping based on field strength
             const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
-            if (speed > 150) {
-                particle.vx *= 0.95;
-                particle.vy *= 0.95;
+            const dampingFactor = fieldMagnitude > 0.5 ? 0.98 : 0.95; // Less damping in strong fields
+            
+            if (speed > 120) {
+                particle.vx *= dampingFactor;
+                particle.vy *= dampingFactor;
             }
         
         // Update position
             particle.x += particle.vx * dt;
             particle.y += particle.vy * dt;
             
-            // Add to trail
-            particle.trail.push({ x: particle.x, y: particle.y });
+            // Enhanced trail with charge-based properties
+            particle.trail.push({ 
+                x: particle.x, 
+                y: particle.y,
+                fieldStrength: fieldMagnitude // Store field strength for trail coloring
+            });
             if (particle.trail.length > particle.maxTrailLength) {
                 particle.trail.shift();
             }
             
-            // Wrap around edges
-            if (particle.x < 0) particle.x = this.ctx.canvas.width;
-            if (particle.x > this.ctx.canvas.width) particle.x = 0;
-            if (particle.y < 0) particle.y = this.ctx.canvas.height;
-            if (particle.y > this.ctx.canvas.height) particle.y = 0;
+            // Wrap around edges with momentum preservation
+            if (particle.x < 0) {
+                particle.x = this.ctx.canvas.width;
+                particle.vx *= 0.8; // Slight energy loss at boundaries
+            }
+            if (particle.x > this.ctx.canvas.width) {
+                particle.x = 0;
+                particle.vx *= 0.8;
+            }
+            if (particle.y < 0) {
+                particle.y = this.ctx.canvas.height;
+                particle.vy *= 0.8;
+            }
+            if (particle.y > this.ctx.canvas.height) {
+                particle.y = 0;
+                particle.vy *= 0.8;
+            }
         });
     }
     
@@ -678,10 +705,7 @@ export class MagneticFields extends BaseAnimation {
         // Draw enhanced particles
         this.drawParticles();
         
-        // Draw enhanced force arrows
-        if (this.showForceArrows) {
-            this.drawForceArrows();
-        }
+
         
         // Draw canvas labels
         this.drawMagneticLabels();
@@ -690,29 +714,87 @@ export class MagneticFields extends BaseAnimation {
     drawFieldLines() {
         if (this.magnets.length === 0) return;
         
-        // Group magnets by magnetId to handle complete magnets
-        const magnetGroups = {};
-        this.magnets.forEach(magnet => {
-            if (!magnetGroups[magnet.magnetId]) {
-                magnetGroups[magnet.magnetId] = [];
-            }
-            magnetGroups[magnet.magnetId].push(magnet);
-        });
-        
-        // Draw field lines for each complete magnet
-        Object.values(magnetGroups).forEach(magnetGroup => {
-            if (magnetGroup.length === 2) {
-                const northPole = magnetGroup.find(m => m.pole === 'north');
-                const southPole = magnetGroup.find(m => m.pole === 'south');
-                
-                if (northPole && southPole) {
-                    this.drawMagnetFieldLines(northPole, southPole);
-                }
-            }
-        });
+        // Draw combined field lines that show the actual magnetic field
+        this.drawCombinedFieldLines();
         
         // Draw interaction field lines between magnets
         this.drawInteractionFieldLines();
+    }
+    
+    drawCombinedFieldLines() {
+        // Draw field lines that represent the combined field from all magnets
+        const numLines = 24; // More field lines for better coverage
+        const lineLength = 150;
+        
+        // Create a grid of starting points
+        const gridSize = 8;
+        const stepX = this.ctx.canvas.width / gridSize;
+        const stepY = this.ctx.canvas.height / gridSize;
+        
+        for (let i = 0; i < gridSize; i++) {
+            for (let j = 0; j < gridSize; j++) {
+                const startX = i * stepX + stepX / 2;
+                const startY = j * stepY + stepY / 2;
+                
+                // Draw field line from this point
+                this.drawCombinedFieldLine(startX, startY, lineLength);
+            }
+        }
+    }
+    
+    drawCombinedFieldLine(startX, startY, lineLength) {
+        const numSteps = 20;
+        const stepSize = lineLength / numSteps;
+        
+        let currentX = startX;
+        let currentY = startY;
+        
+        // Progressive drawing
+        const drawProgress = Math.min(1, this.animationOffset / 1.0);
+        const maxSteps = Math.floor(numSteps * drawProgress);
+        
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        this.ctx.lineWidth = 1;
+        this.ctx.lineCap = 'round';
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(currentX, currentY);
+        
+        for (let step = 0; step < maxSteps; step++) {
+            // Calculate magnetic field at current position
+            const field = this.calculateMagneticField(currentX, currentY);
+            const fieldMagnitude = Math.sqrt(field.Bx * field.Bx + field.By * field.By);
+            
+            if (fieldMagnitude > 0.1) {
+                // Normalize field direction
+                const fieldDirX = field.Bx / fieldMagnitude;
+                const fieldDirY = field.By / fieldMagnitude;
+                
+                // Move in field direction
+                currentX += fieldDirX * stepSize;
+                currentY += fieldDirY * stepSize;
+                
+                this.ctx.lineTo(currentX, currentY);
+            } else {
+                break; // Stop if field is too weak
+            }
+        }
+        
+        this.ctx.stroke();
+        
+        // Draw arrowhead at the end
+        if (maxSteps > 5) {
+            const field = this.calculateMagneticField(currentX, currentY);
+            const fieldMagnitude = Math.sqrt(field.Bx * field.Bx + field.By * field.By);
+            
+            if (fieldMagnitude > 0.1) {
+                const fieldDirX = field.Bx / fieldMagnitude;
+                const fieldDirY = field.By / fieldMagnitude;
+                const angle = Math.atan2(fieldDirY, fieldDirX);
+                
+                this.drawSimpleArrowhead(currentX, currentY, angle, 'combined');
+            }
+        }
     }
     
     drawMagnetFieldLines(northPole, southPole) {
@@ -745,11 +827,24 @@ export class MagneticFields extends BaseAnimation {
     }
     
     drawRadiatingFieldLine(pole, angle, poleType) {
-        const lineLength = 120;
-        const startX = pole.x;
-        const startY = pole.y;
-        const endX = startX + Math.cos(angle) * lineLength;
-        const endY = startY + Math.sin(angle) * lineLength;
+        let lineLength = 120;
+        
+        let startX, startY, endX, endY;
+        
+        if (poleType === 'north') {
+            // North pole: lines radiate outward from pole (slightly longer for better visibility)
+            lineLength = 140;
+            startX = pole.x;
+            startY = pole.y;
+            endX = startX + Math.cos(angle) * lineLength;
+            endY = startY + Math.sin(angle) * lineLength;
+        } else {
+            // South pole: lines converge inward to pole
+            endX = pole.x;
+            endY = pole.y;
+            startX = endX + Math.cos(angle) * lineLength;
+            startY = endY + Math.sin(angle) * lineLength;
+        }
         
         // Progressive drawing
         const drawProgress = Math.min(1, this.animationOffset / 1.0);
@@ -757,8 +852,8 @@ export class MagneticFields extends BaseAnimation {
         const currentEndY = startY + (endY - startY) * drawProgress;
         
         // Line styling based on pole type
-        const lineColor = poleType === 'north' ? 'rgba(255, 107, 107, 0.7)' : 'rgba(102, 126, 234, 0.7)';
-        const lineWidth = 2;
+        const lineColor = poleType === 'north' ? 'rgba(255, 107, 107, 0.8)' : 'rgba(102, 126, 234, 0.7)';
+        const lineWidth = poleType === 'north' ? 2.5 : 2;
         
         // Draw the field line
         this.ctx.strokeStyle = lineColor;
@@ -776,25 +871,37 @@ export class MagneticFields extends BaseAnimation {
     }
     
     drawSimpleArrowhead(x, y, angle, poleType) {
-        const arrowLength = 10;
+        const arrowLength = 20; // Increased from 10 to 20
         const arrowAngle = Math.PI / 6;
         
-        // For North pole: arrows point outward
-        // For South pole: arrows point inward
-        const direction = poleType === 'north' ? angle : angle + Math.PI;
+        // For North pole: arrows point outward (away from pole)
+        // For South pole: arrows point inward (towards pole)
+        const direction = poleType === 'north' ? angle : angle;
         
-        // Calculate arrow points
-        const tipX = x + Math.cos(direction) * arrowLength;
-        const tipY = y + Math.sin(direction) * arrowLength;
+        // Calculate arrow points - attach to the line end
+        const tipX = x;
+        const tipY = y;
         
-        const leftX = x + Math.cos(direction + arrowAngle) * arrowLength * 0.6;
-        const leftY = y + Math.sin(direction + arrowAngle) * arrowLength * 0.6;
+        const leftX = x - Math.cos(direction + arrowAngle) * arrowLength * 0.6;
+        const leftY = y - Math.sin(direction + arrowAngle) * arrowLength * 0.6;
         
-        const rightX = x + Math.cos(direction - arrowAngle) * arrowLength * 0.6;
-        const rightY = y + Math.sin(direction - arrowAngle) * arrowLength * 0.6;
+        const rightX = x - Math.cos(direction - arrowAngle) * arrowLength * 0.6;
+        const rightY = y - Math.sin(direction - arrowAngle) * arrowLength * 0.6;
         
-        // Arrow color
-        const arrowColor = poleType === 'north' ? 'rgba(255, 107, 107, 0.9)' : 'rgba(102, 126, 234, 0.9)';
+        // Arrow color with enhanced visibility
+        let arrowColor;
+        if (poleType === 'north') {
+            arrowColor = 'rgba(255, 107, 107, 1.0)';
+        } else if (poleType === 'south') {
+            arrowColor = 'rgba(102, 126, 234, 1.0)';
+        } else {
+            // Combined field - use white color
+            arrowColor = 'rgba(255, 255, 255, 0.8)';
+        }
+        
+        // Add shadow for better visibility
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.shadowBlur = 2;
         
         this.ctx.fillStyle = arrowColor;
         this.ctx.beginPath();
@@ -803,6 +910,9 @@ export class MagneticFields extends BaseAnimation {
         this.ctx.lineTo(rightX, rightY);
         this.ctx.closePath();
         this.ctx.fill();
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
     }
     
 
@@ -869,14 +979,15 @@ export class MagneticFields extends BaseAnimation {
         // Draw arrowhead at the end if animation is far enough
         if (animatedLength > 0.1) {
             const arrowAngle = Math.atan2(actualEndY - startY, actualEndX - startX);
+            const arrowLength = 20; // Increased from 10 to 20
             
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 1.0)'; // Increased opacity
             this.ctx.moveTo(actualEndX, actualEndY);
-            this.ctx.lineTo(actualEndX - 10 * Math.cos(arrowAngle - Math.PI / 6), 
-                           actualEndY - 10 * Math.sin(arrowAngle - Math.PI / 6));
-            this.ctx.lineTo(actualEndX - 10 * Math.cos(arrowAngle + Math.PI / 6), 
-                           actualEndY - 10 * Math.sin(arrowAngle + Math.PI / 6));
+            this.ctx.lineTo(actualEndX - arrowLength * Math.cos(arrowAngle - Math.PI / 6), 
+                           actualEndY - arrowLength * Math.sin(arrowAngle - Math.PI / 6));
+            this.ctx.lineTo(actualEndX - arrowLength * Math.cos(arrowAngle + Math.PI / 6), 
+                           actualEndY - arrowLength * Math.sin(arrowAngle + Math.PI / 6));
             this.ctx.closePath();
             this.ctx.fill();
         }
@@ -905,46 +1016,114 @@ export class MagneticFields extends BaseAnimation {
             }
         });
         
-        // Draw individual poles
-        this.magnets.forEach((magnet, index) => {
-            this.drawMagnetPole(magnet);
-        });
+        // Individual poles are now drawn as part of the bar magnet
     }
     
     drawMagnetBody(northPole, southPole) {
-        // Enhanced magnet body with gradient
-        const bodyGradient = this.ctx.createLinearGradient(
+        // Calculate magnet properties
+        const magnetLength = Math.sqrt(
+            Math.pow(southPole.x - northPole.x, 2) + 
+            Math.pow(southPole.y - northPole.y, 2)
+        );
+        const magnetAngle = Math.atan2(southPole.y - northPole.y, southPole.x - northPole.x);
+        const magnetWidth = 20;
+        
+        // Create bar magnet shape
+        const halfWidth = magnetWidth / 2;
+        const corners = [
+            // Top-left
+            { x: northPole.x - halfWidth * Math.cos(magnetAngle + Math.PI/2), 
+              y: northPole.y - halfWidth * Math.sin(magnetAngle + Math.PI/2) },
+            // Top-right
+            { x: northPole.x + halfWidth * Math.cos(magnetAngle + Math.PI/2), 
+              y: northPole.y + halfWidth * Math.sin(magnetAngle + Math.PI/2) },
+            // Bottom-right
+            { x: southPole.x + halfWidth * Math.cos(magnetAngle + Math.PI/2), 
+              y: southPole.y + halfWidth * Math.sin(magnetAngle + Math.PI/2) },
+            // Bottom-left
+            { x: southPole.x - halfWidth * Math.cos(magnetAngle + Math.PI/2), 
+              y: southPole.y - halfWidth * Math.sin(magnetAngle + Math.PI/2) }
+        ];
+        
+        // Draw magnet shadow
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(corners[0].x + 3, corners[0].y + 3);
+        this.ctx.lineTo(corners[1].x + 3, corners[1].y + 3);
+        this.ctx.lineTo(corners[2].x + 3, corners[2].y + 3);
+        this.ctx.lineTo(corners[3].x + 3, corners[3].y + 3);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Create gradient for bar magnet
+        const magnetGradient = this.ctx.createLinearGradient(
             northPole.x, northPole.y, southPole.x, southPole.y
         );
-        bodyGradient.addColorStop(0, '#ff6b6b');
-        bodyGradient.addColorStop(0.5, '#8b5cf6');
-        bodyGradient.addColorStop(1, '#667eea');
+        magnetGradient.addColorStop(0, '#ff6b6b');      // North pole (red)
+        magnetGradient.addColorStop(0.3, '#ff8a65');    // Red-orange
+        magnetGradient.addColorStop(0.5, '#8b5cf6');    // Purple (middle)
+        magnetGradient.addColorStop(0.7, '#667eea');    // Blue
+        magnetGradient.addColorStop(1, '#5352ed');      // South pole (blue)
         
-        // Main body with gradient
-        this.ctx.strokeStyle = bodyGradient;
-        this.ctx.lineWidth = 16;
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
+        // Draw main magnet body
+        this.ctx.fillStyle = magnetGradient;
         this.ctx.beginPath();
-        this.ctx.moveTo(northPole.x, northPole.y);
-        this.ctx.lineTo(southPole.x, southPole.y);
+        this.ctx.moveTo(corners[0].x, corners[0].y);
+        this.ctx.lineTo(corners[1].x, corners[1].y);
+        this.ctx.lineTo(corners[2].x, corners[2].y);
+        this.ctx.lineTo(corners[3].x, corners[3].y);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Draw magnet border
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(corners[0].x, corners[0].y);
+        this.ctx.lineTo(corners[1].x, corners[1].y);
+        this.ctx.lineTo(corners[2].x, corners[2].y);
+        this.ctx.lineTo(corners[3].x, corners[3].y);
+        this.ctx.closePath();
         this.ctx.stroke();
         
-        // Body shadow
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.lineWidth = 16;
+        // Draw highlight
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
         this.ctx.beginPath();
-        this.ctx.moveTo(northPole.x + 3, northPole.y + 3);
-        this.ctx.lineTo(southPole.x + 3, southPole.y + 3);
+        this.ctx.moveTo(corners[0].x, corners[0].y);
+        this.ctx.lineTo(corners[1].x, corners[1].y);
         this.ctx.stroke();
         
-        // Body highlight
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        this.ctx.lineWidth = 4;
+        // Draw pole indicators
+        this.drawPoleIndicator(northPole, 'N', '#ff3838');
+        this.drawPoleIndicator(southPole, 'S', '#5352ed');
+    }
+    
+    drawPoleIndicator(pole, label, color) {
+        const indicatorRadius = 8;
+        
+        // Pole indicator background
+        this.ctx.fillStyle = color;
         this.ctx.beginPath();
-        this.ctx.moveTo(northPole.x, northPole.y);
-        this.ctx.lineTo(southPole.x, southPole.y);
+        this.ctx.arc(pole.x, pole.y, indicatorRadius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Pole indicator border
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(pole.x, pole.y, indicatorRadius, 0, Math.PI * 2);
         this.ctx.stroke();
+        
+        // Pole label
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 12px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.shadowBlur = 1;
+        this.ctx.fillText(label, pole.x, pole.y);
+        this.ctx.shadowBlur = 0;
     }
     
     drawMagnetPole(magnet) {
@@ -1011,18 +1190,30 @@ export class MagneticFields extends BaseAnimation {
     
     drawParticles() {
         this.particles.forEach(particle => {
-            // Enhanced particle trail with gradient
+            // Calculate current field strength for enhanced visualization
+            const field = this.calculateMagneticField(particle.x, particle.y);
+            const fieldMagnitude = Math.sqrt(field.Bx * field.Bx + field.By * field.By);
+            
+            // Enhanced particle trail with field strength-based coloring
             if (particle.trail.length > 1) {
                 this.ctx.beginPath();
                 const trailGradient = this.ctx.createLinearGradient(
                     particle.trail[0].x, particle.trail[0].y,
                     particle.x, particle.y
                 );
-                trailGradient.addColorStop(0, particle.charge > 0 ? 'rgba(255, 100, 100, 0.2)' : 'rgba(100, 100, 255, 0.2)');
-                trailGradient.addColorStop(1, particle.charge > 0 ? 'rgba(255, 100, 100, 0.6)' : 'rgba(100, 100, 255, 0.6)');
+                
+                // Trail color based on charge and field strength
+                const trailOpacity = Math.min(0.8, 0.3 + fieldMagnitude * 0.5);
+                if (particle.charge > 0) {
+                    trailGradient.addColorStop(0, `rgba(255, 100, 100, ${trailOpacity * 0.3})`);
+                    trailGradient.addColorStop(1, `rgba(255, 100, 100, ${trailOpacity})`);
+                } else {
+                    trailGradient.addColorStop(0, `rgba(100, 100, 255, ${trailOpacity * 0.3})`);
+                    trailGradient.addColorStop(1, `rgba(100, 100, 255, ${trailOpacity})`);
+                }
                 
                 this.ctx.strokeStyle = trailGradient;
-                this.ctx.lineWidth = 3;
+                this.ctx.lineWidth = 2 + fieldMagnitude * 2; // Thicker trail in strong fields
                 this.ctx.lineCap = 'round';
                 this.ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
                 particle.trail.forEach(point => {
@@ -1031,10 +1222,11 @@ export class MagneticFields extends BaseAnimation {
                 this.ctx.stroke();
             }
             
-            // Enhanced particle with gradient and glow
+            // Enhanced particle with field strength-based effects
+            const particleSize = 5 + fieldMagnitude * 3; // Larger particles in strong fields
             const particleGradient = this.ctx.createRadialGradient(
-                particle.x - 3, particle.y - 3, 0,
-                particle.x, particle.y, 8
+                particle.x - particleSize/2, particle.y - particleSize/2, 0,
+                particle.x, particle.y, particleSize
             );
             
             if (particle.charge > 0) {
@@ -1047,78 +1239,52 @@ export class MagneticFields extends BaseAnimation {
                 particleGradient.addColorStop(1, '#5f6fd8');
             }
             
-            // Glow effect
-            this.ctx.shadowColor = particle.charge > 0 ? 'rgba(255, 107, 107, 0.6)' : 'rgba(102, 126, 234, 0.6)';
-            this.ctx.shadowBlur = 6;
+            // Enhanced glow effect based on field strength
+            const glowIntensity = Math.min(12, 6 + fieldMagnitude * 10);
+            this.ctx.shadowColor = particle.charge > 0 ? 'rgba(255, 107, 107, 0.8)' : 'rgba(102, 126, 234, 0.8)';
+            this.ctx.shadowBlur = glowIntensity;
             this.ctx.beginPath();
             this.ctx.fillStyle = particleGradient;
-            this.ctx.arc(particle.x, particle.y, 6, 0, Math.PI * 2);
+            this.ctx.arc(particle.x, particle.y, particleSize, 0, Math.PI * 2);
             this.ctx.fill();
             
             // Reset shadow
             this.ctx.shadowBlur = 0;
             
-            // Modern shadow
+            // Enhanced shadow
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            this.ctx.arc(particle.x + 1, particle.y + 1, 6, 0, Math.PI * 2);
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.arc(particle.x + 1, particle.y + 1, particleSize, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Enhanced charge symbol with modern styling
+            // Enhanced charge symbol with field strength-based styling
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
+            this.ctx.font = `bold ${12 + fieldMagnitude * 4}px Inter, Arial, sans-serif`;
             this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText(particle.charge > 0 ? '+' : '−', particle.x, particle.y);
-        });
-    }
-    
-    drawForceArrows() {
-        this.particles.forEach(particle => {
-            const field = this.calculateMagneticField(particle.x, particle.y);
-            const forceX = particle.charge * particle.vy * field.By;
-            const forceY = -particle.charge * particle.vx * field.By;
-            const forceMagnitude = Math.sqrt(forceX * forceX + forceY * forceY);
             
-            if (forceMagnitude > 5) {
-                const scale = 0.3;
-                const endX = particle.x + forceX * scale;
-                const endY = particle.y + forceY * scale;
+            // Add velocity indicator in strong fields
+            if (fieldMagnitude > 1.0) {
+                const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+                const velocityAngle = Math.atan2(particle.vy, particle.vx);
                 
-                // Enhanced force arrow with gradient and glow
-                const arrowGradient = this.ctx.createLinearGradient(
-                    particle.x, particle.y, endX, endY
-                );
-                arrowGradient.addColorStop(0, '#ff9800');
-                arrowGradient.addColorStop(1, '#ff8c42');
-                
-                // Glow effect
-                this.ctx.shadowColor = 'rgba(255, 152, 0, 0.6)';
-                this.ctx.shadowBlur = 6;
-                this.ctx.strokeStyle = arrowGradient;
-                this.ctx.lineWidth = 4;
-                this.ctx.lineCap = 'round';
+                // Draw velocity arrow
+                this.ctx.strokeStyle = particle.charge > 0 ? '#ff6b6b' : '#667eea';
+                this.ctx.lineWidth = 1;
                 this.ctx.beginPath();
                 this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(endX, endY);
+                this.ctx.lineTo(
+                    particle.x + Math.cos(velocityAngle) * speed * 0.1,
+                    particle.y + Math.sin(velocityAngle) * speed * 0.1
+                );
                 this.ctx.stroke();
-                
-                // Reset shadow
-                this.ctx.shadowBlur = 0;
-                
-                // Enhanced arrowhead
-                const angle = Math.atan2(forceY, forceX);
-                this.ctx.beginPath();
-                this.ctx.fillStyle = arrowGradient;
-                this.ctx.moveTo(endX, endY);
-                this.ctx.lineTo(endX - 10 * Math.cos(angle - Math.PI / 6), endY - 10 * Math.sin(angle - Math.PI / 6));
-                this.ctx.lineTo(endX - 10 * Math.cos(angle + Math.PI / 6), endY - 10 * Math.sin(angle + Math.PI / 6));
-                this.ctx.closePath();
-                this.ctx.fill();
             }
         });
     }
+    
+
     
     drawInfo() {
         // Enhanced modern info panel with gradient background
@@ -1194,56 +1360,84 @@ export class MagneticFields extends BaseAnimation {
     }
     
     drawMagneticLabels() {
-        this.drawLabels(
-            'Magnetic Fields',
-            'F = q(v × B)  |  F = qvB sin θ  |  B = μ₀I/2πr'
-        );
+        // Draw custom labels with better visibility
+        this.ctx.save();
+        
+        // Set up text styling
+        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
+        this.ctx.textRenderingOptimization = 'optimizeLegibility';
+        this.ctx.textAlign = 'center';
+        
+        // Draw animation title with better contrast
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 3;
+        this.ctx.fillText('Magnetic Fields', this.ctx.canvas.width / 2, 30);
+        
+        // Draw mathematical formulas
+        this.ctx.font = '14px Inter, Arial, sans-serif';
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+        this.ctx.shadowBlur = 2;
+        this.ctx.fillText('F = q(v × B)  |  F = qvB sin θ  |  B = μ₀I/2πr', this.ctx.canvas.width / 2, 50);
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.restore();
         
         // Draw interaction and magnet explanation banner
         this.drawMagneticBanner();
     }
     
     drawMagneticBanner() {
-        // Create banner background with gradient
-        const bannerWidth = 400;
-        const bannerHeight = 50;
-        const bannerX = 10;
-        const bannerY = this.ctx.canvas.height - 65;
+        // Create banner background with modern dark theme
+        const bannerWidth = 450;
+        const bannerHeight = 60;
+        const bannerX = 15;
+        const bannerY = this.ctx.canvas.height - 75;
         
-        // Banner background with gradient
+        // Banner background with dark gradient
         const bannerGradient = this.ctx.createLinearGradient(bannerX, bannerY, bannerX, bannerY + bannerHeight);
-        bannerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-        bannerGradient.addColorStop(1, 'rgba(240, 240, 240, 0.95)');
+        bannerGradient.addColorStop(0, 'rgba(26, 26, 46, 0.95)');
+        bannerGradient.addColorStop(1, 'rgba(22, 33, 62, 0.95)');
         
         this.ctx.fillStyle = bannerGradient;
         this.ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
         
-        // Banner border with glow
-        this.ctx.shadowColor = 'rgba(255, 107, 107, 0.6)';
-        this.ctx.shadowBlur = 4;
-        this.ctx.strokeStyle = 'rgba(255, 107, 107, 0.8)';
-        this.ctx.lineWidth = 2;
+        // Banner border with subtle glow
+        this.ctx.shadowColor = 'rgba(255, 107, 107, 0.3)';
+        this.ctx.shadowBlur = 2;
+        this.ctx.strokeStyle = 'rgba(255, 107, 107, 0.6)';
+        this.ctx.lineWidth = 1;
         this.ctx.strokeRect(bannerX, bannerY, bannerWidth, bannerHeight);
         this.ctx.shadowBlur = 0;
         
-        // Banner text
-        this.ctx.fillStyle = '#1a1a2e';
-        this.ctx.font = 'bold 13px Inter, Arial, sans-serif';
+        // Banner text with better contrast
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('Click to add complete magnets (N-S pairs)', bannerX + 12, bannerY + bannerHeight/2 - 8);
-        this.ctx.fillText('Red particles = Positive charge, Blue particles = Negative charge', bannerX + 12, bannerY + bannerHeight/2 + 8);
+        this.ctx.fillText('Click to add complete magnets (N-S pairs)', bannerX + 15, bannerY + bannerHeight/2 - 10);
         
-        // Add small magnet icon
+        this.ctx.font = '12px Inter, Arial, sans-serif';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.fillText('Red particles = Positive charge, Blue particles = Negative charge', bannerX + 15, bannerY + bannerHeight/2 + 10);
+        
+        // Add magnet icon with better styling
+        const iconX = bannerX + 400;
+        const iconY = bannerY + bannerHeight/2;
+        
+        // Magnet icon background
         this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(255, 107, 107, 0.4)';
-        this.ctx.arc(bannerX + 370, bannerY + bannerHeight/2, 6, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(255, 107, 107, 0.2)';
+        this.ctx.arc(iconX, iconY, 8, 0, Math.PI * 2);
         this.ctx.fill();
         
+        // Magnet icon
         this.ctx.beginPath();
         this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.arc(bannerX + 370, bannerY + bannerHeight/2, 3, 0, Math.PI * 2);
+        this.ctx.arc(iconX, iconY, 4, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Add N label to magnet icon
@@ -1251,7 +1445,7 @@ export class MagneticFields extends BaseAnimation {
         this.ctx.font = 'bold 10px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('N', bannerX + 370, bannerY + bannerHeight/2);
+        this.ctx.fillText('N', iconX, iconY);
     }
 }
 
@@ -2368,8 +2562,8 @@ export class DiodeTransistor extends BaseAnimation {
         this.ctx.fillStyle = color;
         this.ctx.beginPath();
         this.ctx.moveTo(x, y);
-        this.ctx.lineTo(x - 8, y - 4);
-        this.ctx.lineTo(x - 8, y + 4);
+        this.ctx.lineTo(x - 16, y - 8); // Increased from 8,4 to 16,8
+        this.ctx.lineTo(x - 16, y + 8); // Increased from 8,4 to 16,8
         this.ctx.closePath();
         this.ctx.fill();
     }

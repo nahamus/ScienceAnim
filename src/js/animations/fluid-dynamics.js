@@ -1082,15 +1082,18 @@ export class Bernoulli extends BaseAnimation {
     
     initializeParticles() {
         this.particles = [];
-        for (let i = 0; i < this.maxParticles; i++) {
+        // Create more particles for continuous flow
+        for (let i = 0; i < this.maxParticles * 2; i++) {
             this.particles.push({
-                x: -50 + Math.random() * 50,
+                x: -100 - Math.random() * 200, // Start further back for continuous flow
                 y: 250 + Math.random() * 100,
-                vx: this.pressureDifference * (1 + Math.random() * 0.3),
-                vy: (Math.random() - 0.5) * 0.3,
-                size: 4 + Math.random() * 3,
+                vx: this.pressureDifference * (1 + Math.random() * 0.2),
+                vy: (Math.random() - 0.5) * 0.2,
+                size: 2 + Math.random() * 2, // Smaller particles
                 color: `hsl(${220 + Math.random() * 40}, 80%, 60%)`,
-                life: 0
+                life: 0,
+                currentSection: 'left',
+                opacity: 0.7 + Math.random() * 0.3 // Varying opacity for depth
             });
         }
     }
@@ -1119,35 +1122,154 @@ export class Bernoulli extends BaseAnimation {
     update(deltaTime) {
         this.time += deltaTime;
         
-        this.particles.forEach(particle => {
-            // Apply Bernoulli effect in constricted section
-            if (particle.x > 300 && particle.x < 500) {
-                // Constricted section - higher velocity
-                particle.vx *= 1.5;
+        // Maintain continuous flow by adding new particles
+        this.maintainContinuousFlow(deltaTime);
+        
+        this.particles.forEach((particle, index) => {
+            // Calculate velocity based on position with smooth transitions
+            let baseVelocity = this.pressureDifference * (1 + Math.random() * 0.2);
+            let velocityMultiplier = 1.0;
+            
+            // Smooth velocity transitions based on position
+            if (particle.x < 300) {
+                // Left wide section - slow
+                velocityMultiplier = 0.6;
+            } else if (particle.x >= 300 && particle.x < 350) {
+                // Transition to narrow - gradually speed up
+                const transitionProgress = (particle.x - 300) / 50;
+                velocityMultiplier = 0.6 + (1.8 - 0.6) * transitionProgress;
+            } else if (particle.x >= 350 && particle.x < 450) {
+                // Narrow section - fast
+                velocityMultiplier = 1.8;
+            } else if (particle.x >= 450 && particle.x < 500) {
+                // Transition to wide - gradually slow down
+                const transitionProgress = (particle.x - 450) / 50;
+                velocityMultiplier = 1.8 - (1.8 - 0.6) * transitionProgress;
+            } else {
+                // Right wide section - slow
+                velocityMultiplier = 0.6;
+            }
+            
+            // Apply velocity with gradual transition
+            particle.vx = baseVelocity * velocityMultiplier;
+            
+            // Add slight turbulence in transitions
+            if ((particle.x >= 300 && particle.x < 350) || (particle.x >= 450 && particle.x < 500)) {
+                particle.vx += (Math.random() - 0.5) * 0.5;
             }
             
             // Update position
             particle.x += particle.vx * deltaTime * 0.1;
             particle.y += particle.vy * deltaTime * 0.1;
+            
+            // Constrain particles to pipe boundaries
+            this.constrainParticleToPipe(particle);
+            
             particle.life += deltaTime;
             
-            // Reset particles that go off screen
-            if (particle.x > this.ctx.canvas.width + 50 || 
-                particle.x < -50 || 
-                particle.y < 150 || 
-                particle.y > 450 ||
-                particle.life > 8000) {
-                this.resetParticle(particle);
+            // Remove particles that go off screen
+            if (particle.x > this.ctx.canvas.width + 100 || 
+                particle.x < -300 || 
+                particle.y < 100 || 
+                particle.y > 500 ||
+                particle.life > 12000) {
+                // Remove particle instead of resetting
+                this.particles.splice(index, 1);
             }
         });
     }
     
+    maintainContinuousFlow(deltaTime) {
+        // Calculate target number of particles based on flow rate
+        const targetParticles = this.maxParticles * 2;
+        const currentParticles = this.particles.length;
+        
+        // Add new particles if we're below target
+        if (currentParticles < targetParticles) {
+            const particlesToAdd = Math.min(targetParticles - currentParticles, 2);
+            
+            for (let i = 0; i < particlesToAdd; i++) {
+                this.addNewParticle();
+            }
+        }
+    }
+    
+    addNewParticle() {
+        // Add particle at the left edge with staggered timing
+        const staggerOffset = Math.random() * 150; // Stagger entry points
+        
+        this.particles.push({
+            x: -200 - staggerOffset,
+            y: 250 + Math.random() * 100,
+            vx: this.pressureDifference * (1 + Math.random() * 0.2),
+            vy: (Math.random() - 0.5) * 0.2,
+            size: 2 + Math.random() * 2,
+            color: `hsl(${220 + Math.random() * 40}, 80%, 60%)`,
+            life: 0,
+            currentSection: 'left',
+            opacity: 0.7 + Math.random() * 0.3
+        });
+    }
+    
+    constrainParticleToPipe(particle) {
+        // Calculate pipe boundaries based on x position
+        let topBoundary, bottomBoundary;
+        
+        if (particle.x < 300) {
+            // Left wide section
+            topBoundary = 200;
+            bottomBoundary = 400;
+        } else if (particle.x >= 300 && particle.x < 350) {
+            // Transition to narrow
+            const transitionProgress = (particle.x - 300) / 50;
+            topBoundary = 200 + transitionProgress * 50;
+            bottomBoundary = 400 - transitionProgress * 50;
+        } else if (particle.x >= 350 && particle.x < 450) {
+            // Narrow section
+            topBoundary = 250;
+            bottomBoundary = 350;
+        } else if (particle.x >= 450 && particle.x < 500) {
+            // Transition to wide
+            const transitionProgress = (particle.x - 450) / 50;
+            topBoundary = 250 - transitionProgress * 50;
+            bottomBoundary = 350 + transitionProgress * 50;
+        } else {
+            // Right wide section
+            topBoundary = 200;
+            bottomBoundary = 400;
+        }
+        
+        // Add some margin to keep particles away from walls
+        const margin = 10;
+        topBoundary += margin;
+        bottomBoundary -= margin;
+        
+        // Constrain particle to pipe boundaries
+        if (particle.y < topBoundary) {
+            particle.y = topBoundary;
+            particle.vy = Math.abs(particle.vy) * 0.5; // Bounce off top wall
+        } else if (particle.y > bottomBoundary) {
+            particle.y = bottomBoundary;
+            particle.vy = -Math.abs(particle.vy) * 0.5; // Bounce off bottom wall
+        }
+        
+        // Add slight random vertical movement to simulate fluid flow
+        if (Math.random() < 0.1) {
+            particle.vy += (Math.random() - 0.5) * 0.3;
+        }
+        
+        // Dampen vertical velocity to keep particles flowing horizontally
+        particle.vy *= 0.95;
+    }
+    
     resetParticle(particle) {
-        particle.x = -50 + Math.random() * 50;
+        particle.x = -100 - Math.random() * 200; // Reset further back for continuous flow
         particle.y = 250 + Math.random() * 100;
-        particle.vx = this.pressureDifference * (1 + Math.random() * 0.3);
-        particle.vy = (Math.random() - 0.5) * 0.3;
+        particle.vx = this.pressureDifference * (1 + Math.random() * 0.2);
+        particle.vy = (Math.random() - 0.5) * 0.2;
         particle.life = 0;
+        particle.currentSection = 'left';
+        particle.opacity = 0.7 + Math.random() * 0.3;
     }
     
     render() {
@@ -1180,8 +1302,10 @@ export class Bernoulli extends BaseAnimation {
     }
     
     drawPipeSystem() {
-        // Modern pipe system with enhanced visual design and rounded corners
-        const pipeRadius = 15;
+        // Single continuous pipe with smooth transitions
+        const pipeWidth = 200; // Wide sections
+        const narrowWidth = 100; // Narrow section
+        const transitionLength = 50; // Smooth transition length
         
         // Add shadow for depth
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
@@ -1189,63 +1313,48 @@ export class Bernoulli extends BaseAnimation {
         this.ctx.shadowOffsetX = 2;
         this.ctx.shadowOffsetY = 2;
         
-        // Wide section (left) with modern gradient and rounded corners
+        // Create single continuous pipe path
         this.ctx.beginPath();
+        
+        // Left wide section (0 to 300)
         this.ctx.moveTo(0, 200);
         this.ctx.lineTo(300, 200);
+        
+        // Transition to narrow section (300 to 350)
+        this.ctx.lineTo(350, 250);
+        
+        // Narrow section (350 to 450)
+        this.ctx.lineTo(450, 250);
+        
+        // Transition to wide section (450 to 500)
+        this.ctx.lineTo(500, 200);
+        
+        // Right wide section (500 to end)
+        this.ctx.lineTo(this.ctx.canvas.width, 200);
+        
+        // Bottom of pipe (mirror of top)
+        this.ctx.lineTo(this.ctx.canvas.width, 400);
+        this.ctx.lineTo(500, 400);
+        this.ctx.lineTo(450, 350);
+        this.ctx.lineTo(350, 350);
         this.ctx.lineTo(300, 400);
         this.ctx.lineTo(0, 400);
         this.ctx.closePath();
         
-        // Enhanced gradient for left section
-        const leftGradient = this.ctx.createLinearGradient(0, 200, 300, 400);
-        leftGradient.addColorStop(0, 'rgba(135, 206, 250, 0.6)');
-        leftGradient.addColorStop(0.5, 'rgba(70, 130, 180, 0.5)');
-        leftGradient.addColorStop(1, 'rgba(135, 206, 250, 0.6)');
-        this.ctx.fillStyle = leftGradient;
+        // Create gradient for the entire pipe
+        const pipeGradient = this.ctx.createLinearGradient(0, 200, this.ctx.canvas.width, 400);
+        pipeGradient.addColorStop(0, 'rgba(135, 206, 250, 0.6)');
+        pipeGradient.addColorStop(0.3, 'rgba(70, 130, 180, 0.5)');
+        pipeGradient.addColorStop(0.4, 'rgba(255, 140, 0, 0.6)');
+        pipeGradient.addColorStop(0.6, 'rgba(255, 69, 0, 0.7)');
+        pipeGradient.addColorStop(0.7, 'rgba(255, 140, 0, 0.6)');
+        pipeGradient.addColorStop(0.8, 'rgba(70, 130, 180, 0.5)');
+        pipeGradient.addColorStop(1, 'rgba(135, 206, 250, 0.6)');
+        
+        this.ctx.fillStyle = pipeGradient;
         this.ctx.fill();
         
-        // Modern border for left section
-        this.ctx.strokeStyle = 'rgba(70, 130, 180, 0.9)';
-        this.ctx.lineWidth = 3;
-        this.ctx.stroke();
-        
-        // Constricted section (middle) with enhanced gradient
-        this.ctx.beginPath();
-        this.ctx.moveTo(300, 250);
-        this.ctx.lineTo(500, 250);
-        this.ctx.lineTo(500, 350);
-        this.ctx.lineTo(300, 350);
-        this.ctx.closePath();
-        
-        const middleGradient = this.ctx.createLinearGradient(300, 250, 500, 350);
-        middleGradient.addColorStop(0, 'rgba(255, 140, 0, 0.6)');
-        middleGradient.addColorStop(0.5, 'rgba(255, 69, 0, 0.5)');
-        middleGradient.addColorStop(1, 'rgba(255, 140, 0, 0.6)');
-        this.ctx.fillStyle = middleGradient;
-        this.ctx.fill();
-        
-        // Modern border for middle section
-        this.ctx.strokeStyle = 'rgba(255, 69, 0, 0.9)';
-        this.ctx.lineWidth = 3;
-        this.ctx.stroke();
-        
-        // Wide section (right) with enhanced gradient
-        this.ctx.beginPath();
-        this.ctx.moveTo(500, 200);
-        this.ctx.lineTo(this.ctx.canvas.width, 200);
-        this.ctx.lineTo(this.ctx.canvas.width, 400);
-        this.ctx.lineTo(500, 400);
-        this.ctx.closePath();
-        
-        const rightGradient = this.ctx.createLinearGradient(500, 200, this.ctx.canvas.width, 400);
-        rightGradient.addColorStop(0, 'rgba(70, 130, 180, 0.6)');
-        rightGradient.addColorStop(0.5, 'rgba(135, 206, 250, 0.5)');
-        rightGradient.addColorStop(1, 'rgba(70, 130, 180, 0.6)');
-        this.ctx.fillStyle = rightGradient;
-        this.ctx.fill();
-        
-        // Modern border for right section
+        // Single border for the entire pipe
         this.ctx.strokeStyle = 'rgba(70, 130, 180, 0.9)';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
@@ -1255,41 +1364,43 @@ export class Bernoulli extends BaseAnimation {
         this.ctx.shadowOffsetX = 0;
         this.ctx.shadowOffsetY = 0;
         
-        // Modern section labels with enhanced styling
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
+        // Section labels with better positioning
+        this.ctx.fillStyle = '#1a1a2e';
+        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        this.ctx.shadowBlur = 2;
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Wide Section (Slow)', 150, 180);
         this.ctx.fillText('Narrow Section (Fast)', 400, 180);
         this.ctx.fillText('Wide Section (Slow)', 650, 180);
         
-        // Enhanced speed indicators with modern styling
+        // Speed indicators
         this.ctx.fillStyle = '#0066CC';
-        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
         this.ctx.fillText('SLOW', 150, 160);
         this.ctx.fillText('SLOW', 650, 160);
         
         this.ctx.fillStyle = '#FF6600';
         this.ctx.fillText('FAST', 400, 160);
         
-        // Modern flow direction arrows with enhanced styling
+        // Flow direction arrows
         this.ctx.strokeStyle = '#0066CC';
-        this.ctx.lineWidth = 4;
+        this.ctx.lineWidth = 3;
         this.ctx.fillStyle = '#0066CC';
         
-        // Left section arrows with enhanced styling
+        // Left section arrows
         for (let y = 220; y < 380; y += 30) {
             this.drawEnhancedArrow(50, y, 100, y, '#0066CC');
         }
         
-        // Middle section arrows (longer and orange) with enhanced styling
+        // Middle section arrows (faster flow)
         this.ctx.strokeStyle = '#FF6600';
         this.ctx.fillStyle = '#FF6600';
-        for (let y = 270; y < 330; y += 20) {
-            this.drawEnhancedArrow(320, y, 480, y, '#FF6600');
+        for (let y = 270; y < 330; y += 15) {
+            this.drawEnhancedArrow(360, y, 440, y, '#FF6600');
         }
         
-        // Right section arrows with enhanced styling
+        // Right section arrows
         this.ctx.strokeStyle = '#0066CC';
         this.ctx.fillStyle = '#0066CC';
         for (let y = 220; y < 380; y += 30) {
@@ -1376,80 +1487,72 @@ export class Bernoulli extends BaseAnimation {
                 // Constricted section - orange/red for fast
                 const hue = 20 + intensity * 40; // Orange to red
                 color = `hsl(${hue}, 85%, 60%)`;
-                trailColor = `rgba(255, 140, 0, ${intensity * 0.8})`;
-                glowColor = `rgba(255, 69, 0, ${intensity * 0.6})`;
+                trailColor = `rgba(255, 140, 0, ${intensity * 0.6})`;
+                glowColor = `rgba(255, 69, 0, ${intensity * 0.4})`;
             } else {
                 // Wide sections - blue for slow
                 const hue = 220 - intensity * 30;
                 color = `hsl(${hue}, 80%, 60%)`;
-                trailColor = `rgba(70, 130, 180, ${intensity * 0.6})`;
-                glowColor = `rgba(135, 206, 250, ${intensity * 0.4})`;
+                trailColor = `rgba(70, 130, 180, ${intensity * 0.5})`;
+                glowColor = `rgba(135, 206, 250, ${intensity * 0.3})`;
             }
             
-            // Enhanced glow effect for fast particles
-            if (particle.x > 300 && particle.x < 500 && velocity > this.pressureDifference * 0.8) {
-                // Multi-layer glow effect
-                this.ctx.shadowColor = glowColor;
-                this.ctx.shadowBlur = 12;
-                this.ctx.fillStyle = color;
-                this.ctx.beginPath();
-                this.ctx.arc(particle.x, particle.y, particle.size + 4, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                this.ctx.shadowBlur = 6;
-                this.ctx.fillStyle = color;
-                this.ctx.beginPath();
-                this.ctx.arc(particle.x, particle.y, particle.size + 2, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                this.ctx.shadowBlur = 0;
-            }
+            // Apply particle opacity
+            const alpha = particle.opacity || 0.8;
+            color = color.replace('hsl(', 'hsla(').replace(')', `, ${alpha})`);
             
-            // Draw main particle with gradient
+            // Subtle glow effect for all particles
+            this.ctx.shadowColor = glowColor;
+            this.ctx.shadowBlur = 4;
+            
+            // Draw main particle with enhanced gradient
             const gradient = this.ctx.createRadialGradient(
                 particle.x - particle.size * 0.3, particle.y - particle.size * 0.3, 0,
-                particle.x, particle.y, particle.size
+                particle.x, particle.y, particle.size * 1.5
             );
-            gradient.addColorStop(0, this.adjustColor(color, 30));
-            gradient.addColorStop(0.7, color);
-            gradient.addColorStop(1, this.adjustColor(color, -20));
+            gradient.addColorStop(0, this.adjustColor(color, 40));
+            gradient.addColorStop(0.6, color);
+            gradient.addColorStop(1, this.adjustColor(color, -30));
             
             this.ctx.fillStyle = gradient;
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Enhanced speed trails with gradient
-            if (velocity > this.pressureDifference * 0.5) {
-                const trailLength = Math.max(3, velocity * 3);
+            // Enhanced speed trails for faster particles
+            if (velocity > this.pressureDifference * 0.3) {
+                const trailLength = Math.max(2, velocity * 2);
                 const trailGradient = this.ctx.createLinearGradient(
                     particle.x, particle.y,
-                    particle.x - particle.vx * 0.6, particle.y - particle.vy * 0.6
+                    particle.x - particle.vx * 0.4, particle.y - particle.vy * 0.4
                 );
                 trailGradient.addColorStop(0, trailColor);
                 trailGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
                 
                 this.ctx.strokeStyle = trailGradient;
-                this.ctx.lineWidth = Math.max(3, velocity * 2);
+                this.ctx.lineWidth = Math.max(1, velocity * 1.5);
                 this.ctx.lineCap = 'round';
                 this.ctx.beginPath();
                 this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(particle.x - particle.vx * 0.6, particle.y - particle.vy * 0.6);
+                this.ctx.lineTo(particle.x - particle.vx * 0.4, particle.y - particle.vy * 0.4);
                 this.ctx.stroke();
             }
             
-            // Enhanced velocity indicators for very fast particles
-            if (particle.x > 300 && particle.x < 500 && velocity > this.pressureDifference * 1.2) {
+            // Velocity indicators for very fast particles in narrow section
+            if (particle.x > 350 && particle.x < 450 && velocity > this.pressureDifference * 1.0) {
                 this.ctx.strokeStyle = '#FF6600';
-                this.ctx.lineWidth = 3;
-                this.ctx.setLineDash([8, 4]);
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([6, 3]);
                 this.ctx.lineCap = 'round';
                 this.ctx.beginPath();
                 this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(particle.x + particle.vx * 0.4, particle.y + particle.vy * 0.4);
+                this.ctx.lineTo(particle.x + particle.vx * 0.3, particle.y + particle.vy * 0.3);
                 this.ctx.stroke();
                 this.ctx.setLineDash([]);
             }
+            
+            // Reset shadow
+            this.ctx.shadowBlur = 0;
         });
     }
     

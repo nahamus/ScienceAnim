@@ -902,13 +902,13 @@ export class WaveParticleDuality extends BaseAnimation {
         // Draw descriptive labels in the bottom-right corner
         this.ctx.save();
         
-        // Set up text styling
+        // Set up text styling with better contrast for dark background
         this.ctx.font = 'bold 13px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-        this.ctx.shadowBlur = 1;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
         
         const startX = this.ctx.canvas.width - 200;
         const startY = this.ctx.canvas.height - 120;
