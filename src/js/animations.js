@@ -471,9 +471,7 @@ export class ScientificAnimations {
             this.collisions.setGravity(parseFloat(value));
         });
         
-        document.getElementById('showAnalytics').addEventListener('change', (e) => {
-            this.collisions.setShowAnalytics(e.target.checked);
-        });
+        // Analytics are always enabled for collision physics
         
         document.getElementById('collisionType').addEventListener('change', (e) => {
             this.collisions.setCollisionType(e.target.value);
@@ -496,9 +494,7 @@ export class ScientificAnimations {
             this.friction.setGravity(parseFloat(value));
         });
         
-        document.getElementById('showFrictionAnalytics').addEventListener('change', (e) => {
-            this.friction.setShowAnalytics(e.target.checked);
-        });
+        // Analytics are always enabled for friction physics
         
         this.setupSliderControl('frictionCoefficient', 'frictionCoefficientValue', (value) => {
             this.friction.setFrictionCoefficient(parseFloat(value));

@@ -870,7 +870,7 @@ export class CollisionPhysics extends BaseAnimation {
         this.restitution = 0.8;
         this.gravity = 0.5;
         this.speed = 1.0;
-        this.showAnalytics = false;
+        this.showAnalytics = true; // Always enable analytics
         this.collisionType = 'elastic';
         this.collisionCount = 0;
         this.collisionEffects = []; // Track collision effects for visual feedback
@@ -1167,46 +1167,41 @@ export class CollisionPhysics extends BaseAnimation {
         // Draw enhanced collision effects with modern styling
         this.collisionEffects.forEach(effect => {
             const alpha = 1 - (effect.time / effect.maxTime);
-            const radius = 40 * (1 - effect.time / effect.maxTime);
+            const radius = 30 * (1 - effect.time / effect.maxTime); // Reduced from 40 to 30
             
             if (effect.type === 'ball') {
-                // Modern ball collision effect with multiple rings
-                for (let i = 0; i < 3; i++) {
-                    const ringRadius = radius * (0.3 + i * 0.3);
-                    const ringAlpha = alpha * (1 - i * 0.3);
+                // Simplified ball collision effect with fewer rings
+                for (let i = 0; i < 2; i++) { // Reduced from 3 to 2 rings
+                    const ringRadius = radius * (0.4 + i * 0.4);
+                    const ringAlpha = alpha * (1 - i * 0.4) * 0.6; // Reduced opacity by 40%
                     
                     this.ctx.beginPath();
                     this.ctx.strokeStyle = `rgba(255, 107, 107, ${ringAlpha})`;
-                    this.ctx.lineWidth = 3 - i;
+                    this.ctx.lineWidth = 2 - i; // Reduced line width
                     this.ctx.arc(effect.x, effect.y, ringRadius, 0, Math.PI * 2);
                     this.ctx.stroke();
                 }
                 
-                // Add sparkle effect
-                for (let i = 0; i < 8; i++) {
-                    const angle = (i * Math.PI * 2) / 8;
-                    const sparkleX = effect.x + Math.cos(angle) * radius * 0.8;
-                    const sparkleY = effect.y + Math.sin(angle) * radius * 0.8;
+                // Reduced sparkle effect
+                for (let i = 0; i < 4; i++) { // Reduced from 8 to 4 sparkles
+                    const angle = (i * Math.PI * 2) / 4;
+                    const sparkleX = effect.x + Math.cos(angle) * radius * 0.6;
+                    const sparkleY = effect.y + Math.sin(angle) * radius * 0.6;
                     
                     this.ctx.beginPath();
-                    this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
-                    this.ctx.arc(sparkleX, sparkleY, 2, 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.4})`; // Reduced opacity
+                    this.ctx.arc(sparkleX, sparkleY, 1, 0, Math.PI * 2); // Reduced size from 2 to 1
                     this.ctx.fill();
                 }
             } else if (effect.type === 'wall') {
-                // Modern wall collision effect
+                // Simplified wall collision effect
                 this.ctx.beginPath();
-                this.ctx.strokeStyle = `rgba(100, 150, 255, ${alpha})`;
-                this.ctx.lineWidth = 4;
-                this.ctx.arc(effect.x, effect.y, radius * 0.7, 0, Math.PI * 2);
+                this.ctx.strokeStyle = `rgba(100, 150, 255, ${alpha * 0.5})`; // Reduced opacity
+                this.ctx.lineWidth = 2; // Reduced from 4 to 2
+                this.ctx.arc(effect.x, effect.y, radius * 0.6, 0, Math.PI * 2);
                 this.ctx.stroke();
                 
-                // Add ripple effect
-                this.ctx.beginPath();
-                this.ctx.strokeStyle = `rgba(100, 150, 255, ${alpha * 0.5})`;
-                this.ctx.lineWidth = 2;
-                this.ctx.arc(effect.x, effect.y, radius * 0.4, 0, Math.PI * 2);
-                this.ctx.stroke();
+                // Remove ripple effect to reduce distraction
             }
         });
         
@@ -1256,14 +1251,14 @@ export class CollisionPhysics extends BaseAnimation {
             if (this.showAnalytics) {
                 const velocity = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
                 if (velocity > 1) { // Only show vectors for moving balls
-                    const vectorLength = 50;
+                    const vectorLength = 50; // Restore original length
                     const normalizedVX = ball.vx / velocity;
                     const normalizedVY = ball.vy / velocity;
                     
                     // Vector glow effect
                 this.ctx.beginPath();
                     this.ctx.strokeStyle = `rgba(78, 205, 196, 0.3)`;
-                    this.ctx.lineWidth = 6;
+                    this.ctx.lineWidth = 6; // Restore original width
                 this.ctx.moveTo(ball.x, ball.y);
                     this.ctx.lineTo(ball.x + normalizedVX * vectorLength, ball.y + normalizedVY * vectorLength);
                 this.ctx.stroke();
@@ -1271,14 +1266,14 @@ export class CollisionPhysics extends BaseAnimation {
                     // Main momentum vector
                 this.ctx.beginPath();
                     this.ctx.strokeStyle = '#4ECDC4';
-                    this.ctx.lineWidth = 3;
+                    this.ctx.lineWidth = 3; // Restore original width
                     this.ctx.moveTo(ball.x, ball.y);
                     this.ctx.lineTo(ball.x + normalizedVX * vectorLength, ball.y + normalizedVY * vectorLength);
                     this.ctx.stroke();
                     
                     // Arrowhead with gradient
                     const angle = Math.atan2(ball.vy, ball.vx);
-                    const arrowLength = 12;
+                    const arrowLength = 12; // Restore original arrow size
                     this.ctx.beginPath();
                     this.ctx.fillStyle = '#4ECDC4';
                     this.ctx.moveTo(ball.x + normalizedVX * vectorLength, ball.y + normalizedVY * vectorLength);
@@ -1289,7 +1284,7 @@ export class CollisionPhysics extends BaseAnimation {
                 this.ctx.closePath();
                 this.ctx.fill();
                     
-                    // Velocity magnitude label with background
+                    // Restore velocity magnitude labels for force analysis
                     const labelX = ball.x + normalizedVX * (vectorLength + 20);
                     const labelY = ball.y + normalizedVY * (vectorLength + 20);
                     
@@ -1312,93 +1307,104 @@ export class CollisionPhysics extends BaseAnimation {
             this.drawCollisionInfo();
         }
         
-        // Draw canvas labels
+        // Draw gravity force arrows on balls
+        if (this.showAnalytics) {
+            this.drawGravityForceArrows();
+        }
+        
+        // Draw canvas labels for physics context
         this.drawCollisionLabels();
     }
     
+    drawGravityForceArrows() {
+        this.balls.forEach(ball => {
+            // Calculate gravity force magnitude
+            const gravityForce = ball.mass * this.gravity * 9.8;
+            
+            // Draw gravity arrow pointing downward
+            const arrowLength = Math.max(40, Math.min(gravityForce * 0.8, 80)); // Ensure minimum length of 40px
+            const startX = ball.x;
+            const startY = ball.y + ball.radius + 5; // Start below the ball
+            const endX = startX;
+            const endY = startY + arrowLength;
+            
+            // Draw arrow with modern styling
+            this.ctx.save();
+            
+            // Arrow glow effect
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = 'rgba(255, 107, 107, 0.4)';
+            this.ctx.lineWidth = 6;
+            this.ctx.moveTo(startX, startY);
+            this.ctx.lineTo(endX, endY);
+            this.ctx.stroke();
+            
+            // Main arrow
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = '#FF6B6B';
+            this.ctx.lineWidth = 3;
+            this.ctx.moveTo(startX, startY);
+            this.ctx.lineTo(endX, endY);
+            this.ctx.stroke();
+            
+            // Arrowhead
+            this.ctx.beginPath();
+            this.ctx.fillStyle = '#FF6B6B';
+            this.ctx.moveTo(endX, endY);
+            this.ctx.lineTo(endX - 8, endY - 12);
+            this.ctx.lineTo(endX + 8, endY - 12);
+            this.ctx.closePath();
+            this.ctx.fill();
+            
+            // Force label
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillRect(endX - 20, endY + 5, 40, 16);
+            this.ctx.fillStyle = '#FF6B6B';
+            this.ctx.font = 'bold 12px Inter';
+            this.ctx.textRenderingOptimization = 'optimizeLegibility';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(`mg`, endX, endY + 15);
+            
+            this.ctx.restore();
+        });
+    }
+    
     drawCollisionInfo() {
-        // Modern info panel background with responsive sizing
+        // Compact info panel background
         const canvasWidth = this.ctx.canvas.width;
         const canvasHeight = this.ctx.canvas.height;
         
-        // Calculate responsive panel size (20% of canvas width, max 300px)
-        const panelWidth = Math.min(canvasWidth * 0.2, 300);
-        const panelHeight = Math.min(canvasHeight * 0.25, 250);
+        // Smaller, more compact panel
+        const panelWidth = Math.min(canvasWidth * 0.15, 200);
+        const panelHeight = Math.min(canvasHeight * 0.15, 120);
         const panelX = 10;
         const panelY = 10;
         
-        this.ctx.fillStyle = 'rgba(26, 26, 46, 0.9)';
+        this.ctx.fillStyle = 'rgba(26, 26, 46, 0.8)';
         this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
         this.ctx.strokeStyle = '#4ECDC4';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 1;
         this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
         
-        this.ctx.font = 'bold 18px Inter';
+        this.ctx.font = 'bold 14px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
-        let y = panelY + 25;
+        let y = panelY + 20;
         this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.fillText(`Collision Physics`, panelX + 10, y);
-        y += 25;
+        this.ctx.fillText(`Collisions: ${this.collisionCount}`, panelX + 8, y);
+        y += 18;
         
-        this.ctx.font = '14px Inter';
+        this.ctx.font = '12px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.fillText(`Scenario: ${this.collisionType}`, panelX + 10, y);
-        y += 20;
-        this.ctx.fillText(`Bounciness: ${this.restitution}`, panelX + 10, y);
-        y += 20;
-        this.ctx.fillText(`Collisions: ${this.collisionCount}`, panelX + 10, y);
-        y += 20;
-        this.ctx.fillText(`Objects: ${this.balls.length}`, panelX + 10, y);
-        y += 25;
+        this.ctx.fillText(`Balls: ${this.balls.length}`, panelX + 8, y);
+        y += 16;
+        this.ctx.fillText(`Bounce: ${this.restitution}`, panelX + 8, y);
+        y += 16;
+        this.ctx.fillText(`Type: ${this.collisionType}`, panelX + 8, y);
         
-        // Show last collision analysis with modern styling
-        if (this.lastCollision) {
-            this.ctx.fillStyle = '#FFD700';
-            this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-            this.ctx.fillText(`Last Collision Analysis:`, panelX + 10, y);
-            y += 20;
-            
-            this.ctx.font = '13px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-            this.ctx.fillStyle = '#FF6B6B';
-            this.ctx.fillText(`  Ball 1: m=${this.lastCollision.ball1.mass}, v=${this.lastCollision.ball1.velocity.toFixed(1)}`, panelX + 10, y);
-            y += 15;
-            this.ctx.fillStyle = '#4ECDC4';
-            this.ctx.fillText(`  Ball 2: m=${this.lastCollision.ball2.mass}, v=${this.lastCollision.ball2.velocity.toFixed(1)}`, panelX + 10, y);
-            y += 15;
-            this.ctx.fillStyle = '#FFEAA7';
-            this.ctx.fillText(`  Energy: ${this.lastCollision.energy.toFixed(1)}`, panelX + 10, y);
-            y += 15;
-            this.ctx.fillStyle = '#DDA0DD';
-            this.ctx.fillText(`  Effective e: ${this.lastCollision.restitution.toFixed(2)}`, panelX + 10, y);
-            y += 25;
-        }
-        
-        // Physics principles with modern styling
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillText(`Physics Principles:`, panelX + 10, y);
-        y += 20;
-        
-        this.ctx.font = '13px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.fillText(`  • Momentum conservation`, panelX + 10, y);
-        y += 15;
-        this.ctx.fillText(`  • Energy transfer in collisions`, panelX + 10, y);
-        y += 15;
-        this.ctx.fillText(`  • Impulse = Force × Time`, panelX + 10, y);
-        y += 15;
-        this.ctx.fillStyle = '#96CEB4';
-        this.ctx.fillText(`  • Elastic: e = 1 (energy conserved)`, panelX + 10, y);
-        y += 15;
-        this.ctx.fillStyle = '#FF6B6B';
-        this.ctx.fillText(`  • Inelastic: e < 1 (energy lost)`, panelX + 10, y);
+        // Remove detailed collision analysis to reduce clutter
     }
     
     getStats() {
@@ -1444,7 +1450,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.initialVelocity = 0; // Start from rest by default
         this.gravity = 1.0;
         this.speed = 1.0;
-        this.showAnalytics = false;
+        this.showAnalytics = true; // Always enable analytics
         
         this.resetObject();
     }
@@ -1779,7 +1785,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
             this.drawFrictionInfo();
         }
         
-        // Draw canvas labels
+        // Draw canvas labels for physics context
         this.drawFrictionLabels();
     }
     
