@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Science Animations - Interactive Physics Simulations</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/ScienceAnim/assets/index-BhH-nA0I.js"></script>
-  <link rel="stylesheet" crossorigin href="/ScienceAnim/assets/index-CKAdEsK7.css">
+  <script type="module" crossorigin src="/ScienceAnim/assets/index-BFupBme1.js"></script>
+  <link rel="stylesheet" crossorigin href="/ScienceAnim/assets/index-QZAx1l8Y.css">
 </head>
 <body>
     <div class="container">
@@ -919,10 +919,12 @@
             </div>
 
             <div class="animation-container">
-                <div class="controls-toggle" aria-label="Animation Settings">
-                    <span class="toggle-icon">⚙️</span>
+                <div style="position: relative; display: inline-block;">
+                    <canvas id="animationCanvas" width="800" height="600"></canvas>
+                    <div class="controls-toggle" aria-label="Animation Settings">
+                        <span class="toggle-icon">⚙️</span>
+                    </div>
                 </div>
-                <canvas id="animationCanvas" width="800" height="600"></canvas>
                 <div class="info-panel">
                     <!-- Brownian Motion Info -->
                     <div id="brownian-info" class="animation-info">
