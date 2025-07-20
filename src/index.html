@@ -918,10 +918,12 @@
             </div>
 
             <div class="animation-container">
-                <div class="controls-toggle" aria-label="Animation Settings">
-                    <span class="toggle-icon">⚙️</span>
+                <div style="position: relative; display: inline-block;">
+                    <canvas id="animationCanvas" width="800" height="600"></canvas>
+                    <div class="controls-toggle" aria-label="Animation Settings">
+                        <span class="toggle-icon">⚙️</span>
+                    </div>
                 </div>
-                <canvas id="animationCanvas" width="800" height="600"></canvas>
                 <div class="info-panel">
                     <!-- Brownian Motion Info -->
                     <div id="brownian-info" class="animation-info">
