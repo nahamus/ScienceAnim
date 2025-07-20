@@ -1,9 +1,11 @@
 
 
 // Electric Fields Simulation - Simplified
-export class ElectricFields {
+import { BaseAnimation } from './base-animation.js';
+
+export class ElectricFields extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.charges = [];
         this.testParticles = [];
         this.fieldStrength = 1.0;
@@ -13,7 +15,6 @@ export class ElectricFields {
         this.showParticles = true;
         this.showForceArrows = false;
         this.showAnalytics = true; // Enable analytics by default for electric fields
-        this.time = 0;
         
         this.initializeTestParticles();
         this.initializeDefaultCharges();
@@ -408,42 +409,13 @@ export class ElectricFields {
     }
     
     drawElectricLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Electric Fields', this.ctx.canvas.width / 2, 30);
-        
-        // Draw mathematical formulas
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillText(`E = kQ/r²`, 
-                          this.ctx.canvas.width / 2, 50);
-        
-        // Draw Coulomb's law
-        this.ctx.fillText(`F = kq₁q₂/r²`, 
-                          this.ctx.canvas.width / 2, 70);
-        
-        // Draw field superposition
-        this.ctx.fillText(`E = ΣEᵢ`, 
-                          this.ctx.canvas.width / 2, 90);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
+        this.drawLabels(
+            'Electric Fields',
+            'E = kQ/r²  |  F = kq₁q₂/r²  |  E = ΣEᵢ'
+        );
         
         // Draw test particle explanation banner
         this.drawTestParticleBanner();
-        
-        this.ctx.restore();
     }
     
     drawTestParticleBanner() {
@@ -491,16 +463,15 @@ export class ElectricFields {
 }
 
 // Magnetic Fields Simulation - Simplified
-export class MagneticFields {
+export class MagneticFields extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.speed = 1.0;
         this.fieldStrength = 1.0;
         this.particleCount = 15;
         this.showFieldLines = true;
         this.showParticles = true;
         this.showForceArrows = false;
-        this.time = 0;
         this.animationOffset = 0;
         this.magnets = [];
         this.particles = [];
@@ -1223,42 +1194,13 @@ export class MagneticFields {
     }
     
     drawMagneticLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label with enhanced styling
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Magnetic Fields', this.ctx.canvas.width / 2, 30);
-        
-        // Draw mathematical formulas with enhanced styling
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillText(`F = q(v × B)`, 
-                          this.ctx.canvas.width / 2, 50);
-        
-        // Draw Lorentz force
-        this.ctx.fillText(`F = qvB sin θ`, 
-                          this.ctx.canvas.width / 2, 70);
-        
-        // Draw magnetic field
-        this.ctx.fillText(`B = μ₀I/2πr`, 
-                          this.ctx.canvas.width / 2, 90);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
+        this.drawLabels(
+            'Magnetic Fields',
+            'F = q(v × B)  |  F = qvB sin θ  |  B = μ₀I/2πr'
+        );
         
         // Draw interaction and magnet explanation banner
         this.drawMagneticBanner();
-        
-        this.ctx.restore();
     }
     
     drawMagneticBanner() {
@@ -1313,9 +1255,9 @@ export class MagneticFields {
     }
 }
 
-export class DiodeTransistor {
+export class DiodeTransistor extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.componentType = 'diode'; // 'diode', 'npn', 'pnp'
         this.biasType = 'forward'; // 'forward', 'reverse', 'off'
         this.inputVoltage = 5; // Volts
@@ -1327,7 +1269,6 @@ export class DiodeTransistor {
         this.showCurrent = true;
         this.showVoltage = true;
         this.animationSpeed = 1.0;
-        this.time = 0;
         this.isActive = false;
         
         // Scientific accuracy notes:

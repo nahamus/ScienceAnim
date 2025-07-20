@@ -1,8 +1,10 @@
 // Particle Physics Animations
+import { BaseAnimation } from './base-animation.js';
+
 // Brownian Motion Simulation
-export class BrownianMotion {
+export class BrownianMotion extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.particles = [];
         this.particleCount = 15;
         this.speed = 1;
@@ -13,7 +15,6 @@ export class BrownianMotion {
         this.showVelocityDistribution = false;
         this.showMeanFreePath = false;
         this.particleSize = 4;
-        this.time = 0;
         this.collisionCount = 0;
         this.meanFreePath = 0;
         this.velocityData = [];
@@ -358,39 +359,17 @@ export class BrownianMotion {
     }
     
     drawBrownianLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Brownian Motion', this.ctx.canvas.width / 2, 25);
-        
-        // Draw mathematical formulas in a more compact format
-        this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillText(`⟨v²⟩ = 3kBT/m  |  λ = 1/(√2πd²n)  |  D = kBT/(6πηr)`, 
-                          this.ctx.canvas.width / 2, 45);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Brownian Motion',
+            '⟨v²⟩ = 3kBT/m  |  λ = 1/(√2πd²n)  |  D = kBT/(6πηr)'
+        );
     }
 }
 
 // Diffusion Simulation
-export class Diffusion {
+export class Diffusion extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.particles = [];
         this.particleCount = 200;
         this.speed = 1;
@@ -398,7 +377,6 @@ export class Diffusion {
         this.concentrationGradient = 1;
         this.showConcentration = true; // Default to showing concentration
         this.particleSize = 4;
-        this.time = 0;
         this.concentrationMap = [];
         this.diffusionStarted = false; // New: control when diffusion starts
         this.showConcentrationProfile = true; // New: show concentration profile
@@ -843,37 +821,17 @@ export class Diffusion {
     }
     
     drawDiffusionLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Particle Diffusion', this.ctx.canvas.width / 2, 25);
-        
-        // Draw mathematical formulas in a more compact format
-        this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillText(`∂c/∂t = D∇²c  |  J = -D∇c  |  D = kBT/(6πηr)`, 
-                          this.ctx.canvas.width / 2, 45);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Particle Diffusion',
+            '∂c/∂t = D∇²c  |  J = -D∇c  |  D = kBT/(6πηr)'
+        );
     }
 }
 
 // Gas Laws Simulation
-export class GasLaws {
+export class GasLaws extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.particles = [];
         this.particleCount = 50;
         this.temperature = 300; // Kelvin
@@ -888,7 +846,6 @@ export class GasLaws {
         this.showGasLawGraph = false;
         this.showParticleCollisions = false;
         this.lawType = 'boyle';
-        this.time = 0;
         this.containerWidth = 200;
         this.containerX = 300;
         this.pistonY = 400 - this.volume;
@@ -1612,22 +1569,6 @@ export class GasLaws {
     }
     
     drawGasLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label only (no formulas to avoid overlap with law info container)
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Gas Laws', this.ctx.canvas.width / 2, 25);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels('Gas Laws', '');
     }
 }

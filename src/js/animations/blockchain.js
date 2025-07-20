@@ -1,7 +1,9 @@
 // Blockchain Animation - Enhanced with Realistic Concepts
-export class Blockchain {
+import { BaseAnimation } from './base-animation.js';
+
+export class Blockchain extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.canvas = ctx.canvas;
         
         // Blockchain properties

@@ -1,15 +1,16 @@
 
 // Wave Propagation Simulation
-export class WavePropagation {
+import { BaseAnimation } from './base-animation.js';
+
+export class WavePropagation extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.waveType = 'transverse';
         this.speed = 1;
         this.frequency = 1;
         this.amplitude = 50;
         this.wavelength = 150;
         this.showAnalytics = false;
-        this.time = 0;
         this.particles = [];
         this.waveSpeed = 0; // Calculated from frequency and wavelength
         this.energy = 0; // Wave energy
@@ -387,31 +388,11 @@ export class WavePropagation {
     }
     
     drawCanvasLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw wave type label
         const waveTypeLabel = this.waveType.charAt(0).toUpperCase() + this.waveType.slice(1) + ' Wave';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText(waveTypeLabel, this.ctx.canvas.width / 2, 25);
-        
-        // Draw mathematical formulas in a more compact format
-        this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillText(`v = f×λ = ${this.waveSpeed.toFixed(1)} px/s  |  y = A sin(2π(ft-x/λ))  |  E ∝ A²f²`, 
-                          this.ctx.canvas.width / 2, 45);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            waveTypeLabel,
+            `v = f×λ = ${this.waveSpeed.toFixed(1)} px/s  |  y = A sin(2π(ft-x/λ))  |  E ∝ A²f²`
+        );
     }
     
     drawParticles() {
@@ -570,9 +551,9 @@ export class WavePropagation {
 }
 
 // Sound Waves Simulation
-export class SoundWaves {
+export class SoundWaves extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.particles = [];
         this.frequency = 5; // Hz (low frequency for visualization)
         this.amplitude = 50; // Percentage
@@ -581,7 +562,6 @@ export class SoundWaves {
         this.waveType = 'transverse'; // 'transverse', 'longitudinal', 'combined'
         this.showPressure = true;
         this.animationSpeed = 1.0;
-        this.time = 0;
         
         // Source and receiver properties
         this.sourceX = 100;

@@ -1,9 +1,10 @@
 
-export class NuclearReactions {
+import { BaseAnimation } from './base-animation.js';
+
+export class NuclearReactions extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.canvas = ctx.canvas;
-        this.time = 0;
         this.speed = 1;
         this.mode = 'fission'; // fission, fusion
         this.neutronEnergy = 1.0;
@@ -959,67 +960,23 @@ export class NuclearReactions {
     }
     
     drawNuclearLabels() {
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw chemical formulas at the top with white text and glow effect
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
+        let title, formulas;
         
         if (this.mode === 'fission') {
-            this.ctx.fillText(`²³⁵U + ¹n → ⁹²Kr + ¹⁴¹Ba + 3¹n + 200 MeV`, 
-                              this.ctx.canvas.width / 2, 30);
-            this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-            this.ctx.fillText(`Nuclear Fission`, 
-                              this.ctx.canvas.width / 2, 50);
+            title = 'Nuclear Fission';
+            formulas = '²³⁵U + ¹n → ⁹²Kr + ¹⁴¹Ba + 3¹n + 200 MeV';
         } else if (this.mode === 'fusion') {
-            this.ctx.fillText(`²H + ³H → ⁴He + ¹n + 17.6 MeV`, 
-                              this.ctx.canvas.width / 2, 30);
-            this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-            this.ctx.fillText(`Nuclear Fusion`, 
-                              this.ctx.canvas.width / 2, 50);
+            title = 'Nuclear Fusion';
+            formulas = '²H + ³H → ⁴He + ¹n + 17.6 MeV';
         } else if (this.mode === 'chain') {
-            this.ctx.fillText(`²³⁵U + ¹n → ⁹²Kr + ¹⁴¹Ba + 3¹n + 200 MeV`, 
-                              this.ctx.canvas.width / 2, 30);
-            this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-            this.ctx.fillText(`Chain Reaction`, 
-                              this.ctx.canvas.width / 2, 50);
+            title = 'Chain Reaction';
+            formulas = '²³⁵U + ¹n → ⁹²Kr + ¹⁴¹Ba + 3¹n + 200 MeV';
         } else {
-            this.ctx.fillText(`E = mc²`, 
-                              this.ctx.canvas.width / 2, 30);
-            this.ctx.fillText(`Nuclear Binding Energy`, 
-                              this.ctx.canvas.width / 2, 50);
+            title = 'Nuclear Binding Energy';
+            formulas = 'E = mc²';
         }
         
-        // Draw click instructions at the bottom
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = '#FFD700';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        
-        if (this.mode === 'fission') {
-            this.ctx.fillText(`Click anywhere to trigger fission`, 
-                              this.ctx.canvas.width / 2, this.ctx.canvas.height - 20);
-        } else if (this.mode === 'fusion') {
-            this.ctx.fillText(`Click anywhere to trigger fusion`, 
-                              this.ctx.canvas.width / 2, this.ctx.canvas.height - 20);
-        } else if (this.mode === 'chain') {
-            this.ctx.fillText(`Click anywhere to trigger chain reaction`, 
-                              this.ctx.canvas.width / 2, this.ctx.canvas.height - 20);
-        }
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(title, formulas);
     }
     
 

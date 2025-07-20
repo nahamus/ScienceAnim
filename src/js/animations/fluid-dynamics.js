@@ -1,15 +1,16 @@
 
 // Fluid Flow Simulation
-export class FluidFlow {
+import { BaseAnimation } from './base-animation.js';
+
+export class FluidFlow extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.particles = [];
         this.obstacles = [];
         this.flowRate = 1;
         this.viscosity = 1;
         this.reynoldsNumber = 100;
         this.visualizationMode = 'particles';
-        this.time = 0;
         this.maxParticles = 100;
         this.flowType = 'Laminar';
         this.mouseX = 0;
@@ -1066,15 +1067,14 @@ export class FluidFlow {
 }
 
 // Bernoulli's Principle Simulation
-export class Bernoulli {
+export class Bernoulli extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.particles = [];
         this.pipeWidth = 50;
         this.fluidDensity = 1;
         this.pressureDifference = 1;
         this.visualizationMode = 'basic';
-        this.time = 0;
         this.maxParticles = 80;
         
         this.initializeParticles();

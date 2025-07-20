@@ -1,10 +1,10 @@
 // Classical Mechanics Animations
+import { BaseAnimation } from './base-animation.js';
 
 // Pendulum Simulation
-// Pendulum Simulation
-export class Pendulum {
+export class Pendulum extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.length = 120;
         this.angle = Math.PI / 4; // 45 degrees
         this.angularVelocity = 0;
@@ -17,7 +17,6 @@ export class Pendulum {
         this.showForceVectors = false; // New: show force vectors
         this.showEnergyInfo = false; // New: show energy information
         this.showPhaseSpace = false; // New: show phase space plot
-        this.time = 0;
         this.path = [];
         this.phaseSpaceData = []; // New: store phase space data
         this.energyHistory = []; // New: store energy data
@@ -546,46 +545,23 @@ export class Pendulum {
     }
     
     drawPendulumLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Simple Pendulum', this.ctx.canvas.width / 2, 25);
-        
-        // Draw mathematical formulas in a more compact format
-        this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillText(`T = 2π√(L/g)  |  θ̈ + (g/L)sin(θ) = 0  |  E = ½mL²θ̇² + mgL(1-cos(θ))`, 
-                          this.ctx.canvas.width / 2, 45);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Simple Pendulum',
+            'T = 2π√(L/g)  |  θ̈ + (g/L)sin(θ) = 0  |  E = ½mL²θ̇² + mgL(1-cos(θ))'
+        );
     }
 }
 
 // Orbital Motion Simulation
-export class OrbitalMotion {
+export class OrbitalMotion extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.centerX = 400;
         this.centerY = 300;
         this.semiMajorAxis = 200;
         this.eccentricity = 0.2;
         this.centralMass = 1.0;
         this.speed = 1.0;
-        this.time = 0;
         this.angle = 0;
         this.showOrbitPath = true;
         this.showVelocityVector = false;
@@ -870,46 +846,18 @@ export class OrbitalMotion {
     }
     
     drawOrbitalLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Orbital Motion', this.ctx.canvas.width / 2, 30);
-        
-        // Draw mathematical formulas
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillText(`r = a(1-e²)/(1+ecos(θ))`, 
-                          this.ctx.canvas.width / 2, 50);
-        
-        // Draw Kepler's laws
-        this.ctx.fillText(`T² ∝ a³`, 
-                          this.ctx.canvas.width / 2, 70);
-        
-        // Draw energy conservation
-        this.ctx.fillText(`E = ½mv² - GMm/r`, 
-                          this.ctx.canvas.width / 2, 90);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Orbital Motion',
+            'r = a(1-e²)/(1+ecos(θ))  |  T² ∝ a³  |  E = ½mv² - GMm/r'
+        );
     }
 }
 
 
 // Collision Physics Simulation
-export class CollisionPhysics {
+export class CollisionPhysics extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.balls = [];
         this.ballCount = 5;
         this.restitution = 0.8;
@@ -1466,45 +1414,17 @@ export class CollisionPhysics {
     }
     
     drawCollisionLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Collision Physics', this.ctx.canvas.width / 2, 30);
-        
-        // Draw mathematical formulas
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillText(`p = mv`, 
-                          this.ctx.canvas.width / 2, 50);
-        
-        // Draw momentum conservation
-        this.ctx.fillText(`Σp = constant`, 
-                          this.ctx.canvas.width / 2, 70);
-        
-        // Draw energy relation
-        this.ctx.fillText(`KE = ½mv²`, 
-                          this.ctx.canvas.width / 2, 90);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Collision Physics',
+            'p = mv  |  Σp = constant  |  KE = ½mv²'
+        );
     }
 }
 
 // Friction & Inclined Planes Simulation
-export class FrictionInclinedPlanes {
+export class FrictionInclinedPlanes extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.object = {
             x: 100,
             y: 200,
@@ -1888,37 +1808,9 @@ export class FrictionInclinedPlanes {
     }
     
     drawFrictionLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Friction & Inclined Planes', this.ctx.canvas.width / 2, 30);
-        
-        // Draw mathematical formulas
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillText(`F = μN`, 
-                          this.ctx.canvas.width / 2, 50);
-        
-        // Draw force components
-        this.ctx.fillText(`F∥ = mg sin θ`, 
-                          this.ctx.canvas.width / 2, 70);
-        
-        // Draw normal force
-        this.ctx.fillText(`N = mg cos θ`, 
-                          this.ctx.canvas.width / 2, 90);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Friction & Inclined Planes',
+            'F = μN  |  F∥ = mg sin θ  |  N = mg cos θ'
+        );
     }
 }

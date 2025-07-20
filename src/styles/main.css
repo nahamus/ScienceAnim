@@ -1,3 +1,11 @@
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    --primary-gradient-full: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --white-transparent-20: rgba(255, 255, 255, 0.2);
+    --border-radius-large: 25px;
+    --box-shadow-panel: 0 12px 32px rgba(0,0,0,0.12);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +14,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-gradient-full);
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
@@ -46,7 +54,7 @@ body::before {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     margin: 10px 20px 20px 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--white-transparent-20);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
@@ -525,8 +533,8 @@ body::before {
 }
 
 .modal-body {
-    padding: 30px;
-    max-height: 60vh;
+    padding: 25px;
+    max-height: 70vh;
     overflow-y: auto;
     background: white;
 }
@@ -618,10 +626,10 @@ body::before {
 .controls-panel {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(25px);
-    border-radius: 25px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    border: 1px solid var(--white-transparent-20);
+    box-shadow: var(--box-shadow-panel);
     height: fit-content;
     position: sticky;
     top: 20px;
@@ -753,6 +761,7 @@ body::before {
 
 
 .control-group {
+    position: relative;
     margin-bottom: 20px;
     transition: all 0.3s ease-in-out;
     opacity: 1;
@@ -780,11 +789,6 @@ body::before {
     text-shadow: 0 1px 1px rgba(0,0,0,0.15);
 }
 
-.control-group {
-    position: relative;
-    margin-bottom: 8px;
-}
-
 
 
 .slider {
@@ -805,7 +809,7 @@ body::before {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--primary-gradient);
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     transition: all 0.3s ease;
@@ -820,7 +824,7 @@ body::before {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--primary-gradient);
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
@@ -846,7 +850,7 @@ body::before {
 }
 
 .checkbox:checked {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--primary-gradient);
     border-color: rgba(255, 255, 255, 0.4);
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
 }
@@ -920,7 +924,7 @@ body::before {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--primary-gradient);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
@@ -956,10 +960,10 @@ body::before {
 .animation-container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(25px);
-    border-radius: 25px;
+    border-radius: var(--border-radius-large);
     padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    border: 1px solid var(--white-transparent-20);
+    box-shadow: var(--box-shadow-panel);
     position: relative;
     overflow: visible;
     flex: 1;
@@ -1500,30 +1504,15 @@ body::before {
     /* No margin adjustment needed for overlay approach */
 }
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-    .mobile-nav-toggle {
-        display: none;
-    }
-    .side-navigation {
-        width: 220px;
-    }
-    
+/* Responsive adjustments - Common properties */
+@media (max-width: 1024px), (max-width: 768px) {
     .main-content {
         flex-direction: column;
         align-items: center;
-        gap: 20px;
     }
     
     .main-content.nav-collapsed {
         /* No margin adjustment needed for overlay approach */
-    }
-    
-    .controls-panel {
-        order: 2;
-        min-width: 180px;
-        max-width: 400px;
-        width: 100%;
     }
     
     .animation-container {
@@ -1539,11 +1528,25 @@ body::before {
     }
 }
 
-@media (max-width: 768px) {
-    .mobile-nav-toggle {
-        display: flex;
+/* Large screens (1024px and below) */
+@media (max-width: 1024px) {
+    .side-navigation {
+        width: 220px;
     }
     
+    .main-content {
+        gap: 20px;
+    }
+    
+    .controls-panel {
+        order: 2;
+        min-width: 180px;
+        max-width: 400px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
     .side-navigation {
         transform: translateX(-100%);
         width: 240px;
@@ -1555,13 +1558,7 @@ body::before {
     
     .main-content {
         padding: 10px;
-        flex-direction: column;
-        align-items: center;
         gap: 15px;
-    }
-    
-    .main-content.nav-collapsed {
-        /* No margin adjustment needed for overlay approach */
     }
     
     .controls-panel {
@@ -1572,16 +1569,10 @@ body::before {
     }
     
     .animation-container {
-        order: 1;
-        max-width: 100%;
         padding: 10px;
-        width: 100%;
     }
     
     #animationCanvas {
-        max-width: 100%;
-        width: 100%;
-        aspect-ratio: 1.333;
         min-height: 400px;
     }
 
@@ -1761,11 +1752,6 @@ body::before {
 }
 
 /* Modal Content Enhancement */
-.modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding: 25px;
-}
 
 .modal-body::-webkit-scrollbar {
     width: 8px;
@@ -1777,7 +1763,7 @@ body::before {
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--primary-gradient);
     border-radius: 4px;
 }
 

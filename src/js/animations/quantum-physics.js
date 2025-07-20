@@ -1,7 +1,9 @@
 
-export class WaveParticleDuality {
+import { BaseAnimation } from './base-animation.js';
+
+export class WaveParticleDuality extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.canvas = ctx.canvas;
         
         // Quantum properties
@@ -9,7 +11,6 @@ export class WaveParticleDuality {
         this.photonEnergy = 5.0; // eV
         this.wavelength = 150; // nm
         this.speed = 1.0;
-        this.time = 0;
         
         // Wave function properties
         this.waveFunction = [];
@@ -894,23 +895,7 @@ export class WaveParticleDuality {
     }
     
     drawQuantumLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label only (formulas moved to info panel)
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Wave-Particle Duality', this.ctx.canvas.width / 2, 25);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels('Wave-Particle Duality', '');
     }
     
     drawDescriptiveLabels() {

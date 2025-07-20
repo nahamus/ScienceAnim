@@ -1,9 +1,10 @@
 // Computer Science Animations
+import { BaseAnimation } from './base-animation.js';
 
 // Neural Network Training Visualization
-export class NeuralNetwork {
+export class NeuralNetwork extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.canvas = ctx.canvas;
         
         // Network architecture
@@ -1484,38 +1485,10 @@ export class NeuralNetwork {
     }
     
     drawNetworkLabels() {
-        // Draw elegant labels on the canvas
-        this.ctx.save();
-        
-        // Set up text styling
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'center';
-        
-        // Draw animation type label
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText('Neural Network Training', this.ctx.canvas.width / 2, 30);
-        
-        // Draw mathematical formulas
-        this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillText(`σ(x) = 1/(1 + e^(-x))`, 
-                          this.ctx.canvas.width / 2, 50);
-        
-        // Draw backpropagation
-        this.ctx.fillText(`δ = (target - output) × σ'(output)`, 
-                          this.ctx.canvas.width / 2, 70);
-        
-        // Draw weight update
-        this.ctx.fillText(`w = w + α × δ × input`, 
-                          this.ctx.canvas.width / 2, 90);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.restore();
+        this.drawLabels(
+            'Neural Network Training',
+            'σ(x) = 1/(1 + e^(-x))  |  δ = (target - output) × σ\'(output)  |  w = w + α × δ × input'
+        );
     }
     
     handleCanvasClick(x, y) {
@@ -2067,9 +2040,9 @@ export class NeuralNetwork {
 }
 
 // Memory Management with Detailed Memory Visualization
-export class MemoryManagement {
+export class MemoryManagement extends BaseAnimation {
     constructor(ctx) {
-        this.ctx = ctx;
+        super(ctx);
         this.canvas = ctx.canvas;
         
         // Code execution layout
