@@ -1,7 +1,7 @@
 import { BrownianMotion, Diffusion, GasLaws } from './animations/particle-physics.js';
 import { Pendulum, OrbitalMotion, CollisionPhysics, FrictionInclinedPlanes } from './animations/classical-mechanics.js';
 import { SoundWaves, WavePropagation } from './animations/wave-phenomena.js';
-import { ElectricFields, MagneticFields, DiodeTransistor } from './animations/elelectro-magnetism.js';
+import { ElectricFields, MagneticFields, DiodeTransistor } from './animations/electro-magnetism.js';
 import { WaveParticleDuality } from './animations/quantum-physics.js';
 import { NuclearReactions } from './animations/nuclear-physics.js';
 import { FluidFlow, Bernoulli } from './animations/fluid-dynamics.js';
@@ -122,8 +122,18 @@ export class ScientificAnimations {
         
         if (navToggleBtn) {
             navToggleBtn.addEventListener('click', () => {
+                const willCollapse = !sideNav.classList.contains('collapsed');
                 sideNav.classList.toggle('collapsed');
                 mainContent.classList.toggle('nav-collapsed');
+                // Persist state
+                try { localStorage.setItem('sideNavCollapsed', String(willCollapse)); } catch {}
+                try { localStorage.setItem('sideNavUserToggled', 'true'); } catch {}
+                // Clear mobile-open state when collapsing on desktop
+                if (willCollapse) {
+                    sideNav.classList.remove('open');
+                    const mobileNavToggle = document.getElementById('mobileNavToggle');
+                    if (mobileNavToggle) mobileNavToggle.classList.remove('open');
+                }
             });
         }
 
@@ -134,6 +144,13 @@ export class ScientificAnimations {
             mobileNavToggle.addEventListener('click', () => {
                 mobileNavToggle.classList.toggle('open');
                 sideNav.classList.toggle('open');
+                // When opening mobile nav, ensure desktop collapsed is cleared for consistency
+                if (sideNav.classList.contains('open')) {
+                    sideNav.classList.remove('collapsed');
+                    mainContent.classList.remove('nav-collapsed');
+                    try { localStorage.setItem('sideNavCollapsed', 'false'); } catch {}
+                }
+                try { localStorage.setItem('sideNavUserToggled', 'true'); } catch {}
             });
         }
 
@@ -184,6 +201,47 @@ export class ScientificAnimations {
             }
         });
         
+        // Responsive side nav layout helper
+        const applySideNavLayout = () => {
+            const width = window.innerWidth || document.documentElement.clientWidth;
+            const userToggled = (() => { try { return localStorage.getItem('sideNavUserToggled') === 'true'; } catch { return false; } })();
+            if (width <= 768) {
+                // Mobile overlay mode - no layout offset
+                sideNav.classList.remove('collapsed');
+                mainContent.classList.remove('nav-collapsed');
+                sideNav.classList.remove('open');
+                return;
+            }
+            if (!userToggled) {
+                if (width < 1200) {
+                    sideNav.classList.add('collapsed');
+                    mainContent.classList.add('nav-collapsed');
+                    try { localStorage.setItem('sideNavCollapsed', 'true'); } catch {}
+                } else {
+                    sideNav.classList.remove('collapsed');
+                    mainContent.classList.remove('nav-collapsed');
+                    try { localStorage.setItem('sideNavCollapsed', 'false'); } catch {}
+                }
+            }
+        };
+
+        // Restore persisted side nav collapsed state and last animation
+        try {
+            const collapsed = localStorage.getItem('sideNavCollapsed');
+            if (collapsed === 'true') {
+                sideNav.classList.add('collapsed');
+                mainContent.classList.add('nav-collapsed');
+            }
+            const lastAnimation = localStorage.getItem('lastAnimation');
+            if (lastAnimation) {
+                // Defer to ensure DOM is ready
+                setTimeout(() => this.switchAnimation(lastAnimation), 0);
+            }
+        } catch {}
+
+        // Apply responsive layout once on load
+        applySideNavLayout();
+
         // Brownian Motion Controls
         this.setupSliderControl('particleCount', 'particleCountValue', (value) => {
             this.brownianMotion.setParticleCount(parseInt(value));
@@ -504,7 +562,27 @@ export class ScientificAnimations {
         
         // Window resize
         window.addEventListener('resize', () => {
+            // Auto-resize canvas
             this.resizeCanvas();
+            // Auto-adjust nav layout if user hasn't explicitly toggled
+            const sideNav = document.querySelector('.side-navigation');
+            const mainContent = document.querySelector('.main-content');
+            if (sideNav && mainContent) {
+                const userToggled = (() => { try { return localStorage.getItem('sideNavUserToggled') === 'true'; } catch { return false; } })();
+                if (!userToggled) {
+                    const width = window.innerWidth || document.documentElement.clientWidth;
+                    if (width <= 768) {
+                        sideNav.classList.remove('collapsed');
+                        mainContent.classList.remove('nav-collapsed');
+                    } else if (width < 1200) {
+                        sideNav.classList.add('collapsed');
+                        mainContent.classList.add('nav-collapsed');
+                    } else {
+                        sideNav.classList.remove('collapsed');
+                        mainContent.classList.remove('nav-collapsed');
+                    }
+                }
+            }
         });
         
         // Comprehensive touch event handling for mobile support
@@ -1031,6 +1109,7 @@ export class ScientificAnimations {
         }
         
         this.currentAnimation = animationType;
+        try { localStorage.setItem('lastAnimation', animationType); } catch {}
         this.resetAnimation();
         
         // Initialize wave controls if switching to waves animation
@@ -1218,7 +1297,7 @@ export class ScientificAnimations {
     resizeCanvas() {
         const container = this.canvas.parentElement;
         // Account for padding: container has 20px padding, animation-container has 20px padding
-        const availableWidth = container.clientWidth - 40; // 20px padding on each side
+        const availableWidth = container ? container.clientWidth - 40 : 800; // 20px padding on each side
         const maxWidth = Math.max(availableWidth, 800); // Minimum width of 800px
         
         // Maintain 4:3 aspect ratio with minimum height
@@ -1505,18 +1584,18 @@ export class ScientificAnimations {
     updateElectricFieldsStats() {
         this.updateStats('electricFields', {
             'activeCharges': { path: 'chargeCount' },
-            'efParticleCount': { path: 'particleCount' },
-            'efFieldStrength': { path: 'fieldStrength' },
+            'stat-efParticleCount': { path: 'particleCount' },
+            'stat-efFieldStrength': { path: 'fieldStrength' },
             'efTime': { path: 'time', format: 'unit', suffix: 's' }
         });
     }
     
     updateGasLawsStats() {
         this.updateStats('gasLaws', {
-            'gasParticleCount': { path: 'particleCount' },
-            'gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K' },
-            'gasPressure': { path: 'pressure', format: 'decimal', decimalPlaces: 2 },
-            'gasVolume': { path: 'volume' }
+            'stat-gasParticleCount': { path: 'particleCount' },
+            'stat-gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K' },
+            'stat-gasPressure': { path: 'pressure', format: 'decimal', decimalPlaces: 2 },
+            'stat-gasVolume': { path: 'volume' }
         });
     }
     
@@ -1544,8 +1623,8 @@ export class ScientificAnimations {
     
     updateMagneticFieldsStats() {
         this.updateStats('magneticFields', {
-            'magneticFieldStrength': { path: 'fieldStrength' },
-            'magneticParticleCount': { path: 'particleCount' },
+            'stat-magneticFieldStrength': { path: 'fieldStrength' },
+            'stat-magneticParticleCount': { path: 'particleCount' },
             'magneticTime': { path: 'time', format: 'unit', suffix: 's' }
         });
     }
@@ -1568,7 +1647,7 @@ export class ScientificAnimations {
         this.updateStats('fluidFlow', {
             'fluidFlowRate': { path: 'flowRate', format: 'decimal', decimalPlaces: 1 },
             'fluidViscosity': { path: 'viscosity', format: 'decimal', decimalPlaces: 1 },
-            'reynoldsNumberValue': { path: 'reynoldsNumber' },
+            'stat-reynoldsNumber': { path: 'reynoldsNumber' },
             'flowType': { path: 'flowType' },
             'averageVelocity': { path: 'averageVelocity', format: 'decimal', decimalPlaces: 2 },
             'viscosityEffect': { path: 'viscosityEffect', format: 'percentage', decimalPlaces: 0 },
@@ -1594,10 +1673,10 @@ export class ScientificAnimations {
     updateSoundWavesStats() {
         this.updateStats('soundWaves', {
             'soundWaveTypeDisplay': { path: 'waveType', format: 'capitalize' },
-            'soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
+            'stat-soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
             'soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
             'soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s' },
-            'soundAmplitude': { path: 'amplitude', format: 'percentage' },
+            'stat-soundAmplitude': { path: 'amplitude', format: 'percentage' },
             'soundParticleCount': { path: 'particleCount' },
             'soundTime': { path: 'time', format: 'time' }
         });

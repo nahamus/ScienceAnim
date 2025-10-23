@@ -1500,9 +1500,8 @@ body::before {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.main-content.nav-collapsed {
-    /* No margin adjustment needed for overlay approach */
-}
+/* Intentionally left blank for future layout adjustments when nav is collapsed */
+/* .main-content.nav-collapsed { margin-left: 0; } */
 
 /* Responsive adjustments - Common properties */
 @media (max-width: 1024px), (max-width: 768px) {
@@ -1511,9 +1510,8 @@ body::before {
         align-items: center;
     }
     
-    .main-content.nav-collapsed {
-        /* No margin adjustment needed for overlay approach */
-    }
+    /* Intentionally left blank for future layout adjustments on smaller screens */
+    /* .main-content.nav-collapsed { margin-left: 0; } */
     
     .animation-container {
         order: 1;
