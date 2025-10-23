@@ -4,6 +4,10 @@
     --white-transparent-20: rgba(255, 255, 255, 0.2);
     --border-radius-large: 25px;
     --box-shadow-panel: 0 12px 32px rgba(0,0,0,0.12);
+    --bg-color-start: #0f1426;
+    --bg-color-end: #1a2140;
+    --bg-accent-1: rgba(102, 126, 234, 0.18);
+    --bg-accent-2: rgba(118, 75, 162, 0.18);
 }
 
 * {
@@ -14,7 +18,10 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--primary-gradient-full);
+    background:
+        radial-gradient(1000px 800px at 20% -10%, var(--bg-accent-1), transparent 60%),
+        radial-gradient(1200px 900px at 110% 110%, var(--bg-accent-2), transparent 60%),
+        linear-gradient(180deg, var(--bg-color-start), var(--bg-color-end));
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
@@ -29,7 +36,19 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.01)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Soft vignette to focus the center content */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(120% 100% at 50% 0%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.15) 100%),
+        radial-gradient(120% 100% at 50% 100%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.18) 100%);
     pointer-events: none;
     z-index: 1;
 }
