@@ -29,7 +29,7 @@
             </p>
         </header>
 
-        <nav class="side-navigation">
+        <nav id="sideNav" class="side-navigation" role="navigation" aria-label="Primary">
             <div class="side-nav-header">
                 <h3>Categories</h3>
                 <button class="nav-toggle-btn" id="navToggleBtn" title="Toggle Navigation"></button>
@@ -38,7 +38,7 @@
             <div class="category-menu">
                 <!-- Particle Physics -->
                 <div class="category-item active" data-category="particle-physics">
-                    <div class="category-header" data-category="Particle Physics">
+                    <div class="category-header" data-category="Particle Physics" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">⚛️</span>
                         <span class="category-name">Particle Physics</span>
                         <span class="category-count">3</span>
@@ -61,7 +61,7 @@
 
                 <!-- Classical Mechanics -->
                 <div class="category-item" data-category="classical-mechanics">
-                    <div class="category-header" data-category="Classical Mechanics">
+                    <div class="category-header" data-category="Classical Mechanics" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">⚖️</span>
                         <span class="category-name">Classical Mechanics</span>
                         <span class="category-count">4</span>
@@ -88,7 +88,7 @@
 
                 <!-- Wave Phenomena -->
                 <div class="category-item" data-category="wave-phenomena">
-                    <div class="category-header" data-category="Wave Phenomena">
+                    <div class="category-header" data-category="Wave Phenomena" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">📡</span>
                         <span class="category-name">Wave Phenomena</span>
                         <span class="category-count">2</span>
@@ -107,7 +107,7 @@
 
                 <!-- Electromagnetism -->
                 <div class="category-item" data-category="electromagnetism">
-                    <div class="category-header" data-category="Electromagnetism">
+                    <div class="category-header" data-category="Electromagnetism" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">🧲</span>
                         <span class="category-name">Electromagnetism</span>
                         <span class="category-count">3</span>
@@ -130,7 +130,7 @@
 
                 <!-- Quantum Physics -->
                 <div class="category-item" data-category="quantum-physics">
-                    <div class="category-header" data-category="Quantum Physics">
+                    <div class="category-header" data-category="Quantum Physics" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">🔮</span>
                         <span class="category-name">Quantum Physics</span>
                         <span class="category-count">1</span>
@@ -145,7 +145,7 @@
 
                 <!-- Nuclear Physics -->
                 <div class="category-item" data-category="nuclear-physics">
-                    <div class="category-header" data-category="Nuclear Physics">
+                    <div class="category-header" data-category="Nuclear Physics" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">⚛️</span>
                         <span class="category-name">Nuclear Physics</span>
                         <span class="category-count">1</span>
@@ -160,7 +160,7 @@
 
                 <!-- Fluid Dynamics -->
                 <div class="category-item" data-category="fluid-dynamics">
-                    <div class="category-header" data-category="Fluid Dynamics">
+                    <div class="category-header" data-category="Fluid Dynamics" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">💧</span>
                         <span class="category-name">Fluid Dynamics</span>
                         <span class="category-count">2</span>
@@ -179,7 +179,7 @@
 
                 <!-- Computer Science -->
                 <div class="category-item" data-category="computer-science">
-                    <div class="category-header" data-category="Computer Science">
+                    <div class="category-header" data-category="Computer Science" role="button" tabindex="0" aria-expanded="false">
                         <span class="category-icon">💻</span>
                         <span class="category-name">Computer Science</span>
                         <span class="category-count">3</span>
@@ -201,6 +201,7 @@
                 </div>
             </div>
         </nav>
+        <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
 
         <main class="main-content">
             <div class="controls-panel">

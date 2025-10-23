@@ -64,6 +64,10 @@ export class ScientificAnimations {
     setupEventListeners() {
         // Category header clicks
         document.querySelectorAll('.category-header').forEach(header => {
+            const setExpanded = (el, expanded) => {
+                try { el.setAttribute('aria-expanded', String(expanded)); } catch {}
+            };
+
             header.addEventListener('click', (e) => {
                 const categoryItem = e.currentTarget.closest('.category-item');
                 const category = categoryItem.dataset.category;
@@ -74,6 +78,7 @@ export class ScientificAnimations {
                 if (sideNav.classList.contains('collapsed')) {
                     sideNav.classList.remove('collapsed');
                     mainContent.classList.remove('nav-collapsed');
+                    setExpanded(header, true);
                     return;
                 }
                 
@@ -81,11 +86,14 @@ export class ScientificAnimations {
                 document.querySelectorAll('.category-item').forEach(item => {
                     if (item !== categoryItem) {
                         item.classList.remove('active');
+                        const h = item.querySelector('.category-header');
+                        if (h) setExpanded(h, false);
                     }
                 });
                 
                 // Toggle current category
                 categoryItem.classList.toggle('active');
+                setExpanded(header, categoryItem.classList.contains('active'));
                 
                 // If this category is now active, switch to its first animation
                 if (categoryItem.classList.contains('active')) {
@@ -93,6 +101,13 @@ export class ScientificAnimations {
                     if (firstAnimation && !firstAnimation.classList.contains('active')) {
                         this.switchAnimation(firstAnimation.dataset.animation);
                     }
+                }
+            });
+            // Keyboard support
+            header.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    header.click();
                 }
             });
         });
@@ -134,13 +149,26 @@ export class ScientificAnimations {
                     const mobileNavToggle = document.getElementById('mobileNavToggle');
                     if (mobileNavToggle) mobileNavToggle.classList.remove('open');
                 }
+                // Toggle aria-expanded on the button for a11y
+                try {
+                    const expanded = !willCollapse;
+                    navToggleBtn.setAttribute('aria-expanded', String(expanded));
+                } catch {}
             });
+            // Initialize aria-expanded
+            navToggleBtn.setAttribute('aria-expanded', String(!sideNav.classList.contains('collapsed')));
         }
 
         // Mobile navigation toggle
         const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const navBackdrop = document.getElementById('navBackdrop');
         
         if (mobileNavToggle && sideNav) {
+            const closeMobileNav = () => {
+                mobileNavToggle.classList.remove('open');
+                sideNav.classList.remove('open');
+            };
+
             mobileNavToggle.addEventListener('click', () => {
                 mobileNavToggle.classList.toggle('open');
                 sideNav.classList.toggle('open');
@@ -151,6 +179,16 @@ export class ScientificAnimations {
                     try { localStorage.setItem('sideNavCollapsed', 'false'); } catch {}
                 }
                 try { localStorage.setItem('sideNavUserToggled', 'true'); } catch {}
+            });
+            
+            // Close on backdrop click and Esc key
+            if (navBackdrop) {
+                navBackdrop.addEventListener('click', () => closeMobileNav());
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sideNav.classList.contains('open')) {
+                    closeMobileNav();
+                }
             });
         }
 

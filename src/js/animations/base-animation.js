@@ -17,9 +17,14 @@ export class BaseAnimation {
     drawLabels(title, formulas, titleY = 25, formulasY = 45) {
         this.ctx.save();
         
+        // Scale text for device pixel ratio for crisper rendering
+        const dpr = (window && window.devicePixelRatio) ? window.devicePixelRatio : 1;
+        this.ctx.scale(1, 1); // keep geometry as-is; font sizes adjusted below
+        const titleFontSize = Math.round(16 * (dpr > 1 ? 1.0 : 1));
+        const formulaFontSize = Math.round(12 * (dpr > 1 ? 1.0 : 1));
+
         // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
+        this.ctx.font = `bold ${titleFontSize}px Inter`;
         this.ctx.textAlign = 'center';
         
         // Determine background type and set appropriate colors
@@ -49,8 +54,7 @@ export class BaseAnimation {
         this.ctx.fillText(title, this.ctx.canvas.width / 2, titleY);
         
         // Draw mathematical formulas in a more compact format
-        this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
+        this.ctx.font = `${formulaFontSize}px Inter`;
         this.ctx.fillStyle = textColor;
         this.ctx.shadowColor = shadowColor;
         this.ctx.fillText(formulas, this.ctx.canvas.width / 2, formulasY);
