@@ -203,32 +203,34 @@
         </nav>
         <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
 
+        
+
         <main class="main-content">
-            <div class="controls-panel">
+            <div class="controls-panel collapsed">
                 <!-- Brownian Motion Controls -->
                 <div id="brownian-controls" class="animation-controls">
                     <div class="control-group">
                         <label for="particleCount">Number of Particles:</label>
-                        <input type="range" id="particleCount" min="5" max="50" value="15" class="slider">
-                        <span id="particleCountValue">15</span>
+                        <input type="range" id="particleCount" min="5" max="50" value="15" class="slider" data-decimals="0">
+                        <span id="particleCountValue" data-decimals="0">15</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="speed">Animation Speed:</label>
-                        <input type="range" id="speed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="speedValue">1.0x</span>
+                        <input type="range" id="speed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="speedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="temperature">Temperature (Motion Intensity):</label>
-                        <input type="range" id="temperature" min="0.5" max="3" value="1" step="0.1" class="slider">
-                        <span id="temperatureValue">1.0</span>
+                        <input type="range" id="temperature" min="0.5" max="3" value="1" step="0.1" class="slider" data-decimals="1">
+                        <span id="temperatureValue" data-decimals="1">1.0</span>
                     </div>
 
                     <div class="control-group">
                         <label for="brownianParticleSize">Particle Size:</label>
-                        <input type="range" id="brownianParticleSize" min="2" max="8" value="4" class="slider">
-                        <span id="brownianParticleSizeValue">4</span>
+                        <input type="range" id="brownianParticleSize" min="2" max="8" value="4" class="slider" data-unit=" px" data-decimals="0">
+                        <span id="brownianParticleSizeValue" data-unit=" px" data-decimals="0">4</span>
                     </div>
 
                     <div class="control-group">
@@ -251,26 +253,26 @@
                     
                     <div class="control-group">
                         <label for="pendulumSpeed">Animation Speed:</label>
-                        <input type="range" id="pendulumSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="pendulumSpeedValue">1.0x</span>
+                        <input type="range" id="pendulumSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="pendulumSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="initialAngle">Initial Angle (degrees):</label>
-                        <input type="range" id="initialAngle" min="5" max="90" value="45" class="slider">
-                        <span id="initialAngleValue">45°</span>
+                        <input type="range" id="initialAngle" min="5" max="90" value="45" class="slider" data-unit="°" data-decimals="0">
+                        <span id="initialAngleValue" data-unit="°" data-decimals="0">45°</span>
                     </div>
 
                     <div class="control-group">
                         <label for="gravity">Gravity Strength:</label>
-                        <input type="range" id="gravity" min="0.5" max="2" value="1" step="0.1" class="slider">
-                        <span id="gravityValue">1.0</span>
+                        <input type="range" id="gravity" min="0.5" max="2" value="1" step="0.1" class="slider" data-decimals="1">
+                        <span id="gravityValue" data-decimals="1">1.0</span>
                     </div>
 
                     <div class="control-group">
                         <label for="damping">Air Resistance:</label>
-                        <input type="range" id="damping" min="0" max="0.1" value="0.01" step="0.001" class="slider">
-                        <span id="dampingValue">0.01</span>
+                        <input type="range" id="damping" min="0" max="0.1" value="0.01" step="0.001" class="slider" data-decimals="3">
+                        <span id="dampingValue" data-decimals="3">0.01</span>
                     </div>
 
                     <div class="control-group">
@@ -287,14 +289,14 @@
                 <div id="diffusion-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="diffusionParticles">Number of Particles:</label>
-                        <input type="range" id="diffusionParticles" min="50" max="500" value="200" class="slider">
-                        <span id="diffusionParticlesValue">200</span>
+                        <input type="range" id="diffusionParticles" min="50" max="500" value="200" class="slider" data-decimals="0">
+                        <span id="diffusionParticlesValue" data-decimals="0">200</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="diffusionSpeed">Animation Speed:</label>
-                        <input type="range" id="diffusionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="diffusionSpeedValue">1.0x</span>
+                        <input type="range" id="diffusionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="diffusionSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -332,26 +334,26 @@
                 <div id="orbital-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="orbitalSpeed">Animation Speed:</label>
-                        <input type="range" id="orbitalSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="orbitalSpeedValue">1.0x</span>
+                        <input type="range" id="orbitalSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="orbitalSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="eccentricity">Orbit Eccentricity:</label>
-                        <input type="range" id="eccentricity" min="0" max="0.8" value="0.2" step="0.05" class="slider">
-                        <span id="eccentricityValue">0.20</span>
+                        <input type="range" id="eccentricity" min="0" max="0.8" value="0.2" step="0.05" class="slider" data-decimals="2">
+                        <span id="eccentricityValue" data-decimals="2">0.20</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="semiMajorAxis">Orbit Size:</label>
-                        <input type="range" id="semiMajorAxis" min="100" max="300" value="200" class="slider">
-                        <span id="semiMajorAxisValue">200</span>
+                        <input type="range" id="semiMajorAxis" min="100" max="300" value="200" class="slider" data-unit=" px" data-decimals="0">
+                        <span id="semiMajorAxisValue" data-unit=" px" data-decimals="0">200</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="centralMass">Gravitational Strength:</label>
-                        <input type="range" id="centralMass" min="0.5" max="3" value="1" step="0.1" class="slider">
-                        <span id="centralMassValue">1.0</span>
+                        <input type="range" id="centralMass" min="0.5" max="3" value="1" step="0.1" class="slider" data-decimals="1">
+                        <span id="centralMassValue" data-decimals="1">1.0</span>
                     </div>
                     
                     <div class="control-group">
@@ -377,32 +379,32 @@
                     
                     <div class="control-group">
                         <label for="gasSpeed">Animation Speed:</label>
-                        <input type="range" id="gasSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="gasSpeedValue">1.0x</span>
+                        <input type="range" id="gasSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="gasSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="gasParticleCount">Number of Particles:</label>
-                        <input type="range" id="gasParticleCount" min="10" max="100" value="50" class="slider">
-                        <span id="gasParticleCountValue">50</span>
+                        <input type="range" id="gasParticleCount" min="10" max="100" value="50" class="slider" data-decimals="0">
+                        <span id="gasParticleCountValue" data-decimals="0">50</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="gasTemperature">Temperature (K):</label>
-                        <input type="range" id="gasTemperature" min="200" max="600" value="300" class="slider">
-                        <span id="gasTemperatureValue">300K</span>
+                        <input type="range" id="gasTemperature" min="200" max="600" value="300" class="slider" data-unit="K" data-decimals="0">
+                        <span id="gasTemperatureValue" data-unit="K" data-decimals="0">300K</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="gasVolume">Volume (Container Height):</label>
-                        <input type="range" id="gasVolume" min="100" max="400" value="300" class="slider">
-                        <span id="gasVolumeValue">300</span>
+                        <input type="range" id="gasVolume" min="100" max="400" value="300" class="slider" data-decimals="0">
+                        <span id="gasVolumeValue" data-decimals="0">300</span>
                     </div>
                     
                     <div class="control-group">
                         <label for="gasPressure">Pressure (External):</label>
-                        <input type="range" id="gasPressure" min="0.5" max="2" value="1" step="0.1" class="slider">
-                        <span id="gasPressureValue">1.0</span>
+                        <input type="range" id="gasPressure" min="0.5" max="2" value="1" step="0.1" class="slider" data-decimals="2">
+                        <span id="gasPressureValue" data-decimals="2">1.0</span>
                     </div>
 
                     <div class="control-group">
@@ -421,8 +423,8 @@
                 <div id="collisions-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="collisionSpeed">Animation Speed:</label>
-                        <input type="range" id="collisionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="collisionSpeedValue">1.0x</span>
+                        <input type="range" id="collisionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="collisionSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -438,8 +440,8 @@
                     
                     <div class="control-group">
                         <label for="ballCount">Number of Objects:</label>
-                        <input type="range" id="ballCount" min="2" max="8" value="4" class="slider">
-                        <span id="ballCountValue">4</span>
+                        <input type="range" id="ballCount" min="2" max="8" value="4" class="slider" data-decimals="0">
+                        <span id="ballCountValue" data-decimals="0">4</span>
                     </div>
                     
                     <div class="control-group">
@@ -459,8 +461,8 @@
                 <div id="friction-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="frictionSpeed">Animation Speed:</label>
-                        <input type="range" id="frictionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="frictionSpeedValue">1.0x</span>
+                        <input type="range" id="frictionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="frictionSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -494,8 +496,8 @@
                 <div id="electric-fields-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="efSpeed">Animation Speed:</label>
-                        <input type="range" id="efSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="efSpeedValue">1.0x</span>
+                        <input type="range" id="efSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="efSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -506,8 +508,8 @@
                     
                     <div class="control-group">
                         <label for="efParticleCount">Particles:</label>
-                        <input type="range" id="efParticleCount" min="5" max="40" value="20" class="slider">
-                        <span id="efParticleCountValue">20</span>
+                        <input type="range" id="efParticleCount" min="5" max="40" value="20" class="slider" data-decimals="0">
+                        <span id="efParticleCountValue" data-decimals="0">20</span>
                     </div>
                     
                     <div class="control-group">
@@ -528,8 +530,8 @@
                 <div id="magnetic-fields-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="magneticSpeed">Animation Speed:</label>
-                        <input type="range" id="magneticSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="magneticSpeedValue">1.0x</span>
+                        <input type="range" id="magneticSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="magneticSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -540,8 +542,8 @@
                     
                     <div class="control-group">
                         <label for="magneticParticleCount">Number of Particles:</label>
-                        <input type="range" id="magneticParticleCount" min="5" max="30" value="15" class="slider">
-                        <span id="magneticParticleCountValue">15</span>
+                        <input type="range" id="magneticParticleCount" min="5" max="30" value="15" class="slider" data-decimals="0">
+                        <span id="magneticParticleCountValue" data-decimals="0">15</span>
                     </div>
                     
                     <div class="control-group">
@@ -611,8 +613,8 @@
                     
                     <div class="control-group">
                         <label for="nuclearSpeed">Animation Speed:</label>
-                        <input type="range" id="nuclearSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="nuclearSpeedValue">1.0x</span>
+                        <input type="range" id="nuclearSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="nuclearSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -632,8 +634,8 @@
                 <div id="fluid-flow-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="fluidSpeed">Animation Speed:</label>
-                        <input type="range" id="fluidSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="fluidSpeedValue">1.0x</span>
+                        <input type="range" id="fluidSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="fluidSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -688,8 +690,8 @@
                     
                     <div class="control-group">
                         <label for="waveSpeed">Animation Speed:</label>
-                        <input type="range" id="waveSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="waveSpeedValue">1.0x</span>
+                        <input type="range" id="waveSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="waveSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -700,8 +702,8 @@
 
                     <div class="control-group">
                         <label for="waveAmplitude">Amplitude:</label>
-                        <input type="range" id="waveAmplitude" min="10" max="100" value="50" class="slider">
-                        <span id="waveAmplitudeValue">50</span>
+                        <input type="range" id="waveAmplitude" min="10" max="100" value="50" class="slider" data-unit=" px" data-decimals="0">
+                        <span id="waveAmplitudeValue" data-unit=" px" data-decimals="0">50 px</span>
                     </div>
 
                     <div class="control-group">
@@ -723,8 +725,8 @@
                     
                     <div class="control-group">
                         <label for="soundAnimationSpeed">Animation Speed:</label>
-                        <input type="range" id="soundAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="soundAnimationSpeedValue">1.0x</span>
+                        <input type="range" id="soundAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="soundAnimationSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -747,8 +749,8 @@
 
                     <div class="control-group">
                         <label for="soundParticles">Particle Count:</label>
-                        <input type="range" id="soundParticles" min="10" max="50" value="20" class="slider">
-                        <span id="soundParticlesValue">20</span>
+                        <input type="range" id="soundParticles" min="10" max="50" value="20" class="slider" data-decimals="0">
+                        <span id="soundParticlesValue" data-decimals="0">20</span>
                     </div>
 
                     <div class="control-group">
@@ -792,8 +794,8 @@
 
                     <div class="control-group">
                         <label for="diodeAnimationSpeed">Animation Speed:</label>
-                        <input type="range" id="diodeAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="diodeAnimationSpeedValue">1.0x</span>
+                        <input type="range" id="diodeAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="diodeAnimationSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                 </div>
 
@@ -807,8 +809,8 @@
                     
                     <div class="control-group">
                         <label for="neuralSpeed">Animation Speed:</label>
-                        <input type="range" id="neuralSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="neuralSpeedValue">1.0x</span>
+                        <input type="range" id="neuralSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="neuralSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -824,8 +826,8 @@
                 <div id="memory-management-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
                         <label for="memorySpeed">Animation Speed:</label>
-                        <input type="range" id="memorySpeed" min="0.1" max="3.0" value="1.0" step="0.1" class="slider">
-                        <span id="memorySpeedValue">1.0x</span>
+                        <input type="range" id="memorySpeed" min="0.1" max="3.0" value="1.0" step="0.1" class="slider" data-unit="x" data-decimals="1">
+                        <span id="memorySpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -872,10 +874,9 @@
 
                 </div>
 
-                <div class="button-group">
-                    <button id="playPauseBtn" class="btn btn-primary">Pause</button>
-                    <button id="resetBtn" class="btn btn-secondary">Reset</button>
-                    <button id="learnMoreBtn" class="btn btn-info">📚 Learn More</button>
+                <div class="button-group overlay-actions">
+                    <button id="controlsApplyBtn" class="btn btn-primary">Apply</button>
+                    <button id="controlsCancelBtn" class="btn btn-secondary">Cancel</button>
                 </div>
             </div>
 
@@ -886,6 +887,7 @@
                         <span class="toggle-icon">⚙️</span>
                     </div>
                 </div>
+                <div id="controlsBackdrop" class="controls-backdrop" aria-hidden="true"></div>
                 <div class="info-panel">
                     <!-- Brownian Motion Info -->
                     <div id="brownian-info" class="animation-info">
@@ -1506,6 +1508,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="info-actions">
+                    <button id="learnMoreBtn" class="btn btn-info">📚 Learn More</button>
                 </div>
             </div>
         </main>

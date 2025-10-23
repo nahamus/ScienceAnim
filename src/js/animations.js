@@ -134,6 +134,9 @@ export class ScientificAnimations {
         const navToggleBtn = document.querySelector('.nav-toggle-btn');
         const sideNav = document.querySelector('.side-navigation');
         const mainContent = document.querySelector('.main-content');
+        const controlsPanel = document.querySelector('.controls-panel');
+        const controlsToggle = document.querySelector('.controls-toggle');
+        const controlsBackdrop = document.getElementById('controlsBackdrop');
         
         if (navToggleBtn) {
             navToggleBtn.addEventListener('click', () => {
@@ -158,6 +161,32 @@ export class ScientificAnimations {
             // Initialize aria-expanded
             navToggleBtn.setAttribute('aria-expanded', String(!sideNav.classList.contains('collapsed')));
         }
+        // Controls overlay open/close
+        const openControls = () => {
+            if (!controlsPanel || !controlsBackdrop) return;
+            controlsPanel.classList.remove('collapsed');
+            controlsBackdrop.classList.add('active');
+        };
+        const closeControls = () => {
+            if (!controlsPanel || !controlsBackdrop) return;
+            controlsPanel.classList.add('collapsed');
+            controlsBackdrop.classList.remove('active');
+        };
+        if (controlsToggle) {
+            controlsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+                else e.stopPropagation();
+                openControls();
+            });
+        }
+        if (controlsBackdrop) {
+            controlsBackdrop.addEventListener('click', closeControls);
+        }
+        const applyBtn = document.getElementById('controlsApplyBtn');
+        const cancelBtn = document.getElementById('controlsCancelBtn');
+        if (applyBtn) applyBtn.addEventListener('click', closeControls);
+        if (cancelBtn) cancelBtn.addEventListener('click', closeControls);
 
         // Mobile navigation toggle
         const mobileNavToggle = document.getElementById('mobileNavToggle');
@@ -206,19 +235,26 @@ export class ScientificAnimations {
         });
 
         
-        // Control buttons
-        document.getElementById('playPauseBtn').addEventListener('click', () => {
-            this.togglePlayPause();
-        });
-        
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            this.resetAnimation();
-        });
-        
-        // Learn More button
-        document.getElementById('learnMoreBtn').addEventListener('click', () => {
-            this.showScienceExplanation();
-        });
+        // Control buttons (optional presence)
+        const playPauseBtnEl = document.getElementById('playPauseBtn');
+        if (playPauseBtnEl) {
+            playPauseBtnEl.addEventListener('click', () => {
+                this.togglePlayPause();
+            });
+        }
+        const resetBtnEl = document.getElementById('resetBtn');
+        if (resetBtnEl) {
+            resetBtnEl.addEventListener('click', () => {
+                this.resetAnimation();
+            });
+        }
+        // Learn More button (now in stats area)
+        const learnMoreBtnEl = document.getElementById('learnMoreBtn');
+        if (learnMoreBtnEl) {
+            learnMoreBtnEl.addEventListener('click', () => {
+                this.showScienceExplanation();
+            });
+        }
         
         // Modal close button
         document.getElementById('closeModal').addEventListener('click', () => {
@@ -913,9 +949,13 @@ export class ScientificAnimations {
             return;
         }
         
-        slider.addEventListener('input', (e) => {
-            const value = e.target.value;
-            const unit = sliderId.includes('Speed') ? 'x' : 
+        const formatAndApply = (val) => {
+            const raw = typeof val === 'string' ? val : String(val);
+            const parsedNum = Number(raw);
+            const customUnit = valueDisplay.dataset.unit || slider.dataset.unit || '';
+            const decimalsAttr = valueDisplay.dataset.decimals || slider.dataset.decimals;
+            const decimals = decimalsAttr !== undefined ? Number(decimalsAttr) : undefined;
+            const fallbackUnit = sliderId.includes('Speed') ? 'x' : 
                         sliderId.includes('Angle') ? '°' : 
                         sliderId.includes('Length') ? '' : 
                         sliderId.includes('Wavelength') ? ' px' :
@@ -923,10 +963,20 @@ export class ScientificAnimations {
                         sliderId.includes('gasTemperature') ? 'K' : 
                         sliderId.includes('frictionCoefficient') ? '' : 
                         sliderId.includes('Voltage') ? 'V' : '';
-            
-            valueDisplay.textContent = value + unit;
-            callback(value);
+            const unit = customUnit || fallbackUnit;
+            const displayVal = !Number.isNaN(parsedNum) && decimals !== undefined
+                ? parsedNum.toFixed(decimals)
+                : raw;
+            valueDisplay.textContent = displayVal + unit;
+            callback(raw);
+        };
+
+        slider.addEventListener('input', (e) => {
+            formatAndApply(e.target.value);
         });
+
+        // Initialize display and underlying value on load
+        formatAndApply(slider.value);
     }
     
     updateDualityControls(mode) {
