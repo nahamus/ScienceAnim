@@ -71,10 +71,23 @@ body::after {
     padding: 14px 0;
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
-    margin: 0 20px 10px 20px;
+    border-radius: 0;
+    margin: 0 0 10px 0;
+    width: 100vw; /* truly edge-to-edge */
+    left: 50%;
+    transform: translateX(-50%);
     border: 1px solid var(--white-transparent-20);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 0 12px 0; }
+    .header { margin: 0 0 8px 0; }
+}
+
+@media (max-width: 480px) {
+    .container { padding: 0 0 8px 0; }
+    .header { margin: 0 0 6px 0; }
 }
 
 .header::after {
@@ -688,7 +701,7 @@ body::after {
     z-index: 1001;
 }
 
-.controls-panel:hover { }
+/* Hover intentionally has no visual change to avoid position shift */
 
 .controls-panel.collapsed {
     display: none;

@@ -185,7 +185,14 @@ export class ScientificAnimations {
         }
         const applyBtn = document.getElementById('controlsApplyBtn');
         const cancelBtn = document.getElementById('controlsCancelBtn');
-        if (applyBtn) applyBtn.addEventListener('click', closeControls);
+        if (applyBtn) applyBtn.addEventListener('click', () => {
+            // Restart current animation so new settings take effect uniformly
+            this.resetAnimation();
+            this.isRunning = true;
+            const playBtn = document.getElementById('playPauseBtn');
+            if (playBtn) playBtn.textContent = 'Pause';
+            closeControls();
+        });
         if (cancelBtn) cancelBtn.addEventListener('click', closeControls);
 
         // Mobile navigation toggle
