@@ -186,8 +186,8 @@ export class ScientificAnimations {
         const applyBtn = document.getElementById('controlsApplyBtn');
         const cancelBtn = document.getElementById('controlsCancelBtn');
         if (applyBtn) applyBtn.addEventListener('click', () => {
-            // Restart current animation so new settings take effect uniformly
-            this.resetAnimation();
+        // Restart current animation so new settings take effect uniformly
+        this.resetAnimation();
             this.isRunning = true;
             const playBtn = document.getElementById('playPauseBtn');
             if (playBtn) playBtn.textContent = 'Pause';
@@ -1390,14 +1390,14 @@ export class ScientificAnimations {
     }
     
     resizeCanvas() {
-        const container = this.canvas.parentElement;
+        const container = this.canvas.parentElement; // .canvas-wrapper
         // Account for padding: container has 20px padding, animation-container has 20px padding
-        const availableWidth = container ? container.clientWidth - 40 : 800; // 20px padding on each side
+        const availableWidth = container ? container.clientWidth : 800;
         const maxWidth = Math.max(availableWidth, 800); // Minimum width of 800px
         
         // Maintain 4:3 aspect ratio with minimum height
         this.canvas.width = maxWidth;
-        this.canvas.height = Math.max(maxWidth / 1.333, 400); // 4:3 aspect ratio (1.333) with min height of 400px
+        this.canvas.height = Math.max(maxWidth / 1.333, 400);
         
         // Update source and receiver positions for sound waves
         if (this.soundWaves) {

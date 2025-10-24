@@ -26,6 +26,7 @@ export class Pendulum extends BaseAnimation {
         this.periods = []; // Track periods
         this.lastZeroCrossing = 0; // For period calculation
         this.crossingCount = 0; // Count zero crossings
+        this.lastAngle = this.angle;
     }
     
     setLength(length) {
@@ -86,35 +87,34 @@ export class Pendulum extends BaseAnimation {
         this.periods = [];
         this.lastZeroCrossing = 0;
         this.crossingCount = 0;
+        this.lastAngle = this.angle;
     }
     
     update(deltaTime) {
         this.time += deltaTime;
-        const dt = (deltaTime / 1000) * this.speed * 3; // Reduced scaling for moderate speed
-        
-        // Pendulum physics with enhanced air resistance modeling
-        const acceleration = -(this.gravity * 9.8) / (this.length / 100) * Math.sin(this.angle);
-        
-        // Enhanced air resistance: velocity-dependent damping
-        const velocityMagnitude = Math.abs(this.angularVelocity);
-        const airResistanceForce = this.damping * velocityMagnitude * velocityMagnitude;
-        const dampingAcceleration = -Math.sign(this.angularVelocity) * airResistanceForce;
-        
-        this.angularVelocity += (acceleration + dampingAcceleration) * dt;
-        this.angle += this.angularVelocity * dt;
+        const dt = (deltaTime / 1000) * this.speed;
+        const simulationRate = 2.5; // Speed up pendulum evolution while keeping correct dynamics
+        const stepDt = dt * simulationRate;
+
+        // Nonlinear simple pendulum with linear damping: θ¨ + c θ˙ + (g/L) sin θ = 0
+        const g = this.gravity * 9.8; // m/s^2 effective
+        const L = this.length; // treat length as pixels; constant factor cancels visually
+        const angularAcceleration = -(g / L) * Math.sin(this.angle) - this.damping * this.angularVelocity;
+
+        // Semi-implicit Euler for better energy behavior
+        this.angularVelocity += angularAcceleration * stepDt;
+        this.angle += this.angularVelocity * stepDt;
         
         // Track maximum amplitude
         this.maxAmplitude = Math.max(this.maxAmplitude, Math.abs(this.angle));
         
         // Period calculation (zero crossing detection)
-        if (this.angle * this.angularVelocity < 0 && this.angularVelocity > 0) {
-            // Positive zero crossing
+        // Positive-going zero crossing detection for period measurement
+        if (this.lastAngle <= 0 && this.angle > 0 && this.angularVelocity > 0) {
             if (this.crossingCount > 0) {
                 const period = this.time - this.lastZeroCrossing;
                 this.periods.push(period);
-                if (this.periods.length > 10) {
-                    this.periods.shift();
-                }
+                if (this.periods.length > 10) this.periods.shift();
             }
             this.lastZeroCrossing = this.time;
             this.crossingCount++;
@@ -147,6 +147,9 @@ export class Pendulum extends BaseAnimation {
                 this.energyHistory.shift();
             }
         }
+
+        // Update last angle for zero-crossing detection
+        this.lastAngle = this.angle;
     }
     
     render() {
@@ -282,7 +285,6 @@ export class Pendulum extends BaseAnimation {
         // Gravity force label
         this.ctx.fillStyle = '#e74c3c';
         this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Fg', bobX + 15, bobY + gravityLength / 2);
         
@@ -315,7 +317,6 @@ export class Pendulum extends BaseAnimation {
             // Tension force label
             this.ctx.fillStyle = '#3498db';
             this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('T', bobX - unitX * tensionLength / 2 + 15, bobY - unitY * tensionLength / 2 - 10);
         }
@@ -352,7 +353,6 @@ export class Pendulum extends BaseAnimation {
                 // Air resistance force label
                 this.ctx.fillStyle = '#e67e22';
                 this.ctx.font = 'bold 12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
                 this.ctx.textAlign = 'center';
                 this.ctx.fillText('Fd', bobX - unitVX * airResistanceLength / 2 - 10, bobY - unitVY * airResistanceLength / 2 - 5);
             }
@@ -421,7 +421,6 @@ export class Pendulum extends BaseAnimation {
         // Labels
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Energy', barX + barWidth / 2, barY - 5);
         this.ctx.fillText('K', barX + 10, barY + 15);
@@ -471,7 +470,6 @@ export class Pendulum extends BaseAnimation {
         // Labels
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Phase Space', plotX + plotWidth / 2, plotY - 5);
         this.ctx.fillText('θ', plotX + plotWidth / 2, plotY + plotHeight + 15);
@@ -486,7 +484,6 @@ export class Pendulum extends BaseAnimation {
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         this.ctx.shadowBlur = 2;
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
         let y = infoY;
@@ -752,7 +749,6 @@ export class OrbitalMotion extends BaseAnimation {
             // Draw velocity label
             this.ctx.fillStyle = '#FF6B6B';
             this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.fillText(`v = ${velocity.toFixed(1)}`, 
                 this.currentX + normalizedVX * (vectorLength + 15),
                 this.currentY + normalizedVY * (vectorLength + 15));
@@ -772,7 +768,6 @@ export class OrbitalMotion extends BaseAnimation {
             this.ctx.stroke();
             this.ctx.fillStyle = '#2ECC71';
             this.ctx.font = 'bold 12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.fillText('P', perigeeX - 3, perigeeY + 3);
             
             // Apogee marker (farthest point)
@@ -787,7 +782,6 @@ export class OrbitalMotion extends BaseAnimation {
             this.ctx.stroke();
             this.ctx.fillStyle = '#E74C3C';
             this.ctx.font = 'bold 12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.fillText('A', apogeeX - 3, apogeeY + 3);
         }
         
@@ -795,7 +789,6 @@ export class OrbitalMotion extends BaseAnimation {
         if (this.showKeplerInfo) {
             this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.textAlign = 'left';
             
             // Position text on the right side to avoid cutoff
@@ -1157,12 +1150,7 @@ export class CollisionPhysics extends BaseAnimation {
     }
     
     render() {
-        // Draw modern gradient background using full canvas
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
-        gradient.addColorStop(0, '#1a1a2e');
-        gradient.addColorStop(1, '#16213e');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Use the same neutral canvas background approach as other animations
         
         // Draw enhanced collision effects with modern styling
         this.collisionEffects.forEach(effect => {
@@ -1295,7 +1283,6 @@ export class CollisionPhysics extends BaseAnimation {
                     // Label text
                     this.ctx.fillStyle = '#4ECDC4';
                     this.ctx.font = 'bold 13px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
                     this.ctx.textAlign = 'center';
                     this.ctx.fillText(`v = ${velocity.toFixed(1)}`, labelX, labelY + 3);
                 }
@@ -1361,7 +1348,6 @@ export class CollisionPhysics extends BaseAnimation {
             this.ctx.fillRect(endX - 20, endY + 5, 40, 16);
             this.ctx.fillStyle = '#FF6B6B';
             this.ctx.font = 'bold 12px Inter';
-            this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(`mg`, endX, endY + 15);
             
@@ -1387,7 +1373,6 @@ export class CollisionPhysics extends BaseAnimation {
         this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
         
         this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
         let y = panelY + 20;
@@ -1396,7 +1381,6 @@ export class CollisionPhysics extends BaseAnimation {
         y += 18;
         
         this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fillText(`Balls: ${this.balls.length}`, panelX + 8, y);
         y += 16;
@@ -1580,12 +1564,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     }
     
     render() {
-        // Draw modern gradient background using full canvas
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
-        gradient.addColorStop(0, '#1a1a2e');
-        gradient.addColorStop(1, '#16213e');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Use standardized neutral canvas background handled globally
         
         const angleRad = this.inclineAngle * Math.PI / 180;
         // Use canvas dimensions for incline positioning
@@ -1670,7 +1649,6 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         
         this.ctx.fillStyle = '#4ECDC4';
         this.ctx.font = 'bold 20px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         // Position label at the bottom of the incline where it meets the ground
         const labelX = endX - 35; // Position near the bottom end
@@ -1782,7 +1760,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         // Draw analytics if enabled
         if (this.showAnalytics) {
             this.drawForceVectors();
-            this.drawFrictionInfo();
+            // Removed on-canvas stats panel for a cleaner view
         }
         
         // Draw canvas labels for physics context
@@ -1829,7 +1807,6 @@ export class FrictionInclinedPlanes extends BaseAnimation {
             this.ctx.fill();
             // Label
             this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.fillStyle = color;
             this.ctx.textAlign = 'left';
             this.ctx.fillText(label, endX + 15, endY + 4);
@@ -1880,7 +1857,6 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         // Modern text styling
         this.ctx.fillStyle = '#ffffff';
         this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
         let y = 35;
