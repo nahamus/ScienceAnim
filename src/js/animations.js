@@ -1587,18 +1587,22 @@ export class ScientificAnimations {
         }
         
         if (format === 'time') {
-            return (value / 1000).toFixed(1) + 's';
+            return (value / 1000).toFixed(2) + 's';
         }
         
         if (format === 'angle') {
-            return value.toFixed(decimalPlaces || 1) + '°';
+            return value.toFixed(decimalPlaces || 2) + '°';
         }
         
         if (format === 'percentage') {
-            return value.toFixed(decimalPlaces || 1) + '%';
+            return value.toFixed(decimalPlaces || 2) + '%';
         }
         
         if (format === 'unit') {
+            if (typeof value === 'number') {
+                const dp = (decimalPlaces !== undefined) ? decimalPlaces : 2;
+                return value.toFixed(dp) + (suffix || '');
+            }
             return value + (suffix || '');
         }
         
@@ -1625,21 +1629,19 @@ export class ScientificAnimations {
         this.updateStats('brownianMotion', {
             'activeParticles': { path: 'particleCount' },
             'avgSpeed': { path: 'avgSpeed', format: 'decimal', decimalPlaces: 2 },
-            'simTime': { path: 'time', format: 'time' },
             'brownianCollisionCount': { path: 'collisionCount' },
-            'brownianMeanFreePath': { path: 'meanFreePath', format: 'decimal', decimalPlaces: 1 },
-            'brownianTemperature': { path: 'temperature', format: 'decimal', decimalPlaces: 1 }
+            'brownianMeanFreePath': { path: 'meanFreePath', format: 'decimal', decimalPlaces: 2 },
+            'brownianTemperature': { path: 'temperature', format: 'decimal', decimalPlaces: 2 }
         });
     }
     
     updatePendulumStats() {
         this.updateStats('pendulum', {
-            'currentAngle': { path: 'angle', format: 'angle', decimalPlaces: 1 },
+            'currentAngle': { path: 'angle', format: 'angle', decimalPlaces: 2 },
             'angularVelocity': { path: 'angularVelocity', format: 'decimal', decimalPlaces: 2 },
             'period': { path: 'theoreticalPeriod', format: 'unit', suffix: 's', decimalPlaces: 2 },
-            'pendulumTime': { path: 'time', format: 'time' },
-            'pendulumAirResistance': { path: 'airResistanceForce', format: 'decimal', decimalPlaces: 3 },
-            'pendulumDamping': { path: 'dampingCoefficient', format: 'decimal', decimalPlaces: 3 }
+            'pendulumAirResistance': { path: 'airResistanceForce', format: 'decimal', decimalPlaces: 2 },
+            'pendulumDamping': { path: 'dampingCoefficient', format: 'decimal', decimalPlaces: 2 }
         });
     }
     
@@ -1648,7 +1650,7 @@ export class ScientificAnimations {
             'diffusionParticleCount': { path: 'particleCount' },
             'diffusionAvgSpeed': { path: 'avgSpeed', format: 'decimal', decimalPlaces: 2 },
             'concentrationSpread': { path: 'concentrationSpread', format: 'decimal', decimalPlaces: 2 },
-            'diffusionTime': { path: 'time', format: 'time' }
+            
         });
     }
     
@@ -1657,12 +1659,12 @@ export class ScientificAnimations {
     updateWaveStats() {
         this.updateStats('waves', {
             'currentWaveType': { path: 'waveType' },
-            'currentFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
-            'currentWavelength': { path: 'wavelength', format: 'unit', suffix: ' px' },
-            'currentAmplitude': { path: 'amplitude', format: 'unit', suffix: ' px' },
-            'currentWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' px/s' },
-            'currentWaveEnergy': { path: 'energy' },
-            'wavesTime': { path: 'time', format: 'unit', suffix: 's' }
+            'currentFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz', decimalPlaces: 2 },
+            'currentWavelength': { path: 'wavelength', format: 'unit', suffix: ' px', decimalPlaces: 2 },
+            'currentAmplitude': { path: 'amplitude', format: 'unit', suffix: ' px', decimalPlaces: 2 },
+            'currentWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' px/s', decimalPlaces: 2 },
+            'currentWaveEnergy': { path: 'energy', format: 'decimal', decimalPlaces: 2 },
+            
         });
     }
     
@@ -1671,7 +1673,6 @@ export class ScientificAnimations {
             'orbitalPeriod': { path: 'period', format: 'unit', suffix: 's', decimalPlaces: 2 },
             'orbitalSpeed': { path: 'speed', format: 'decimal', decimalPlaces: 2 },
             'orbitalDistance': { path: 'distance', format: 'decimal', decimalPlaces: 1 },
-            'orbitalTime': { path: 'time', format: 'time' },
             'orbitalEccentricity': { path: 'eccentricity', format: 'decimal', decimalPlaces: 2 }
         });
     }
@@ -1681,14 +1682,14 @@ export class ScientificAnimations {
             'activeCharges': { path: 'chargeCount' },
             'stat-efParticleCount': { path: 'particleCount' },
             'stat-efFieldStrength': { path: 'fieldStrength' },
-            'efTime': { path: 'time', format: 'unit', suffix: 's' }
+            
         });
     }
     
     updateGasLawsStats() {
         this.updateStats('gasLaws', {
             'stat-gasParticleCount': { path: 'particleCount' },
-            'stat-gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K' },
+            'stat-gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K', decimalPlaces: 2 },
             'stat-gasPressure': { path: 'pressure', format: 'decimal', decimalPlaces: 2 },
             'stat-gasVolume': { path: 'volume' }
         });
@@ -1708,8 +1709,8 @@ export class ScientificAnimations {
     updateFrictionStats() {
         this.updateStats('friction', {
             'frictionSurface': { path: 'surfaceType' },
-            'frictionAngle': { path: 'inclineAngle', format: 'angle' },
-            'frictionNetForce': { path: 'netForce', format: 'decimal', decimalPlaces: 1 },
+            'frictionAngle': { path: 'inclineAngle', format: 'angle', decimalPlaces: 2 },
+            'frictionNetForce': { path: 'netForce', format: 'decimal', decimalPlaces: 2 },
             'frictionAcceleration': { path: 'acceleration', format: 'decimal', decimalPlaces: 2 }
         });
     }
@@ -1720,7 +1721,7 @@ export class ScientificAnimations {
         this.updateStats('magneticFields', {
             'stat-magneticFieldStrength': { path: 'fieldStrength' },
             'stat-magneticParticleCount': { path: 'particleCount' },
-            'magneticTime': { path: 'time', format: 'unit', suffix: 's' }
+            
         });
     }
     
@@ -1734,7 +1735,7 @@ export class ScientificAnimations {
             'waveFunctionStatus': { path: 'showWaveFunction', format: 'boolean' },
             'interferenceStatus': { path: 'showInterference', format: 'boolean' },
             'measurementCount': { path: 'measurementCount' },
-            'dualityTime': { path: 'time', format: 'unit', suffix: 's' }
+            
         });
     }
     
@@ -1749,7 +1750,7 @@ export class ScientificAnimations {
             'velocityRatio': { path: 'velocityRatio', format: 'decimal', decimalPlaces: 1 },
             'topPorosity': { path: 'topPorosity', format: 'percentage', decimalPlaces: 0 },
             'bottomPorosity': { path: 'bottomPorosity', format: 'percentage', decimalPlaces: 0 },
-            'fluidTime': { path: 'time', format: 'time' }
+            
         });
     }
     
@@ -1761,19 +1762,18 @@ export class ScientificAnimations {
             'particleCount': { path: 'particleCount' },
             'maxParticles': { path: 'maxParticles' },
             'flowEfficiency': { path: 'flowEfficiency', format: 'percentage' },
-            'bernoulliTime': { path: 'time', format: 'time' }
+            
         });
     }
     
     updateSoundWavesStats() {
         this.updateStats('soundWaves', {
             'soundWaveTypeDisplay': { path: 'waveType', format: 'capitalize' },
-            'stat-soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
+            'stat-soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz', decimalPlaces: 2 },
             'soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
-            'soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s' },
-            'stat-soundAmplitude': { path: 'amplitude', format: 'percentage' },
-            'soundParticleCount': { path: 'particleCount' },
-            'soundTime': { path: 'time', format: 'time' }
+            'soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s', decimalPlaces: 2 },
+            'stat-soundAmplitude': { path: 'amplitude', format: 'percentage', decimalPlaces: 2 },
+            'soundParticleCount': { path: 'particleCount' }
         });
     }
     
