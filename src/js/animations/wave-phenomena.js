@@ -245,27 +245,28 @@ export class WavePropagation extends BaseAnimation {
     }
     
     drawGrid() {
-        // Draw wavelength markers
+        // Draw wavelength markers with half-pixel alignment for crisp lines
         this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.3)';
         this.ctx.lineWidth = 1;
+        this.ctx.lineCap = 'butt';
         this.ctx.setLineDash([5, 5]);
-        
         for (let x = 0; x < this.ctx.canvas.width; x += this.wavelength) {
+            const px = Math.round(x) + 0.5;
             this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.ctx.canvas.height);
+            this.ctx.moveTo(px, 0.5);
+            this.ctx.lineTo(px, this.ctx.canvas.height - 0.5);
             this.ctx.stroke();
         }
         this.ctx.setLineDash([]);
-        
         // Draw amplitude markers
         const centerY = this.ctx.canvas.height / 2;
         this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.2)';
         this.ctx.lineWidth = 1;
         for (let y = centerY - this.amplitude; y <= centerY + this.amplitude; y += this.amplitude / 2) {
+            const py = Math.round(y) + 0.5;
             this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(this.ctx.canvas.width, y);
+            this.ctx.moveTo(0.5, py);
+            this.ctx.lineTo(this.ctx.canvas.width - 0.5, py);
             this.ctx.stroke();
         }
     }
@@ -280,7 +281,9 @@ export class WavePropagation extends BaseAnimation {
         gradient.addColorStop(1, '#667eea');
         
         this.ctx.strokeStyle = gradient;
-        this.ctx.lineWidth = 4;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         
         // Create smooth waveform with dense interpolation
         if (this.particles.length > 1) {
@@ -309,12 +312,6 @@ export class WavePropagation extends BaseAnimation {
             }
         }
         this.ctx.stroke();
-        
-        // Add glow effect
-        this.ctx.shadowColor = '#667eea';
-        this.ctx.shadowBlur = 10;
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
     }
     
     drawLongitudinalWaveform() {
@@ -325,7 +322,9 @@ export class WavePropagation extends BaseAnimation {
         
         // Draw a slinky-like spring with multiple coils
         this.ctx.strokeStyle = '#667eea';
-        this.ctx.lineWidth = 4;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         
         // Create a continuous spring path
         this.ctx.beginPath();
@@ -355,12 +354,6 @@ export class WavePropagation extends BaseAnimation {
         
         this.ctx.stroke();
         
-        // Add glow effect
-        this.ctx.shadowColor = '#667eea';
-        this.ctx.shadowBlur = 10;
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
-        
         // Draw wave direction arrows
         this.drawLongitudinalWaveDirection();
     }
@@ -369,21 +362,25 @@ export class WavePropagation extends BaseAnimation {
         const centerY = this.ctx.canvas.height / 2;
         const waveSpeed = this.frequency * this.wavelength;
         const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
-        
-        // Draw horizontal arrow
+
+        const y = Math.round(centerY) + 0.5;
+        const ax = Math.round(arrowX) + 0.5;
+
+        // Draw horizontal arrow (crisp)
         this.ctx.beginPath();
         this.ctx.strokeStyle = '#ff6b6b';
-        this.ctx.lineWidth = 3;
-        this.ctx.moveTo(arrowX, centerY);
-        this.ctx.lineTo(arrowX + 30, centerY);
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
+        this.ctx.moveTo(ax, y);
+        this.ctx.lineTo(ax + 30, y);
         this.ctx.stroke();
-        
+
         // Arrowhead
         this.ctx.beginPath();
         this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.moveTo(arrowX + 30, centerY);
-        this.ctx.lineTo(arrowX + 25, centerY - 5);
-        this.ctx.lineTo(arrowX + 25, centerY + 5);
+        this.ctx.moveTo(ax + 30.5, y);
+        this.ctx.lineTo(ax + 25.5, y - 5);
+        this.ctx.lineTo(ax + 25.5, y + 5);
         this.ctx.closePath();
         this.ctx.fill();
     }
@@ -411,19 +408,16 @@ export class WavePropagation extends BaseAnimation {
             // Make particles larger for longitudinal waves
             const particleSize = this.waveType === 'longitudinal' ? 8 : 5;
             
-            this.ctx.beginPath();
+            // Draw crisp particle using rect aligned to pixel grid for sharper look
+            const px = Math.round(particle.x) + 0.5;
+            const py = Math.round(particle.y) + 0.5;
             this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-            this.ctx.arc(particle.x, particle.y, particleSize, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Add highlight
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            this.ctx.arc(particle.x - 1, particle.y - 1, particleSize * 0.4, 0, Math.PI * 2);
+            this.ctx.arc(px, py, particleSize, 0, Math.PI * 2);
             this.ctx.fill();
-            
-            this.ctx.strokeStyle = '#fff';
-            this.ctx.lineWidth = 1;
+            // Thin stroke for definition
+            this.ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+            this.ctx.lineWidth = 0.75;
             this.ctx.stroke();
         });
     }
@@ -435,21 +429,27 @@ export class WavePropagation extends BaseAnimation {
                 const scale = 0.1;
                 const endX = particle.x + particle.vx * scale;
                 const endY = particle.y + particle.vy * scale;
-                
+
+                const sx = Math.round(particle.x) + 0.5;
+                const sy = Math.round(particle.y) + 0.5;
+                const ex = Math.round(endX) + 0.5;
+                const ey = Math.round(endY) + 0.5;
+
                 this.ctx.beginPath();
                 this.ctx.strokeStyle = '#ff6b6b';
-                this.ctx.lineWidth = 2;
-                this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(endX, endY);
+                this.ctx.lineWidth = 1.5;
+                this.ctx.lineCap = 'round';
+                this.ctx.moveTo(sx, sy);
+                this.ctx.lineTo(ex, ey);
                 this.ctx.stroke();
-                
+
                 // Arrowhead
                 const angle = Math.atan2(particle.vy, particle.vx);
                 this.ctx.beginPath();
                 this.ctx.fillStyle = '#ff6b6b';
-                this.ctx.moveTo(endX, endY);
-                this.ctx.lineTo(endX - 6 * Math.cos(angle - Math.PI / 6), endY - 6 * Math.sin(angle - Math.PI / 6));
-                this.ctx.lineTo(endX - 6 * Math.cos(angle + Math.PI / 6), endY - 6 * Math.sin(angle + Math.PI / 6));
+                this.ctx.moveTo(ex, ey);
+                this.ctx.lineTo(ex - 6 * Math.cos(angle - Math.PI / 6), ey - 6 * Math.sin(angle - Math.PI / 6));
+                this.ctx.lineTo(ex - 6 * Math.cos(angle + Math.PI / 6), ey - 6 * Math.sin(angle + Math.PI / 6));
                 this.ctx.closePath();
                 this.ctx.fill();
             }
@@ -461,20 +461,24 @@ export class WavePropagation extends BaseAnimation {
             // Animated wave direction indicator - move at wave speed
             const waveSpeed = this.frequency * this.wavelength;
             const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
-            
+
+            const y = 50.5;
+            const ax = Math.round(arrowX) + 0.5;
+
             this.ctx.beginPath();
             this.ctx.strokeStyle = '#ff6b6b';
-            this.ctx.lineWidth = 3;
-            this.ctx.moveTo(arrowX, 50);
-            this.ctx.lineTo(arrowX + 20, 50);
+            this.ctx.lineWidth = 2;
+            this.ctx.lineCap = 'round';
+            this.ctx.moveTo(ax, y);
+            this.ctx.lineTo(ax + 20, y);
             this.ctx.stroke();
-            
+
             // Arrowhead
             this.ctx.beginPath();
             this.ctx.fillStyle = '#ff6b6b';
-            this.ctx.moveTo(arrowX + 20, 50);
-            this.ctx.lineTo(arrowX + 15, 45);
-            this.ctx.lineTo(arrowX + 15, 55);
+            this.ctx.moveTo(ax + 20.5, y);
+            this.ctx.lineTo(ax + 15.5, y - 5);
+            this.ctx.lineTo(ax + 15.5, y + 5);
             this.ctx.closePath();
             this.ctx.fill();
         }
@@ -485,7 +489,6 @@ export class WavePropagation extends BaseAnimation {
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         this.ctx.shadowBlur = 2;
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
         let y = 120; // Moved down to avoid overlap with main labels
@@ -538,7 +541,6 @@ export class WavePropagation extends BaseAnimation {
         // Label
         this.ctx.fillStyle = '#fff';
         this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`Energy: ${this.energy.toFixed(1)}`, barX + barWidth / 2, barY + 15);
     }
