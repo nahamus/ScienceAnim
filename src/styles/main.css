@@ -1,3 +1,6 @@
+.viewer-layout {
+    display: block; /* stack: canvas then stats on all sizes */
+}
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
     --primary-gradient-full: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1039,8 +1042,8 @@ body::after {
     overflow: visible;
     flex: 0 1 auto; /* Hug content, don't stretch */
     min-width: 0;
-    max-width: 800px; /* Fit the canvas like before */
-    width: auto;
+    max-width: 100%;
+    width: 100%;
     display: block;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1075,7 +1078,7 @@ body::after {
 
 .canvas-wrapper {
     position: relative;
-    display: inline-block;
+    display: block;
 }
 
 #animationCanvas {
@@ -1091,7 +1094,7 @@ body::after {
     position: relative;
     z-index: 1;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 800px;
+    width: 100%;
     max-width: 100%;
     aspect-ratio: 1.333;
     object-fit: contain;
@@ -1109,6 +1112,8 @@ body::after {
 .stats-panel {
     margin-top: 10px;
     display: block;
+    max-width: none;
+    width: 100%;
 }
 
 .info-panel {
@@ -1136,8 +1141,8 @@ body::after {
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* horizontal cards */
+    gap: 10px;
     margin-top: 12px;
 }
 
@@ -1650,6 +1655,7 @@ body::after {
 
 /* Responsive adjustments - Common properties */
 @media (max-width: 1024px), (max-width: 768px) {
+    .viewer-layout { display: block; }
     .main-content {
         flex-direction: column;
         align-items: center;
@@ -1664,6 +1670,7 @@ body::after {
         order: 1;
         max-width: 100%;
         width: 100%;
+        display: block; /* canvas only; stats below via layout */
     }
     
     #animationCanvas {
@@ -1671,6 +1678,8 @@ body::after {
         width: 100%;
         aspect-ratio: 1.333;
     }
+    /* On smaller screens, arrange stats horizontally (wraps as needed) */
+    .stats { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
 }
 
 /* Large screens (1024px and below) */
@@ -1680,6 +1689,8 @@ body::after {
     }
     
     .main-content {
+        margin-left: 220px; /* ensure content clears reduced-width nav */
+        width: calc(100% - 220px);
         gap: 20px;
     }
     
@@ -1718,6 +1729,8 @@ body::after {
     }
     
     .main-content {
+        margin-left: 0; /* overlay nav; content uses full width */
+        width: 100%;
         padding: 10px;
         gap: 15px;
     }

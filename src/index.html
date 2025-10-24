@@ -880,14 +880,16 @@
                 </div>
             </div>
 
-            <div class="animation-container">
-                <div class="canvas-wrapper">
+            <div class="viewer-layout">
+                <div class="animation-container">
+                    <div class="canvas-wrapper">
                     <canvas id="animationCanvas" width="800" height="600"></canvas>
                     <div class="controls-toggle" aria-label="Animation Settings">
                         <span class="toggle-icon">⚙️</span>
                     </div>
+                    </div>
+                    <div id="controlsBackdrop" class="controls-backdrop" aria-hidden="true"></div>
                 </div>
-                <div id="controlsBackdrop" class="controls-backdrop" aria-hidden="true"></div>
                 <div class="stats-panel">
                     <div class="info-panel">
                     <!-- Brownian Motion Info -->
