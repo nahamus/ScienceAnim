@@ -531,8 +531,10 @@ export class ScientificAnimations {
         // Canvas click for adding charges, magnets, toggling switch, starting diffusion, and neural network testing
         this.canvas.addEventListener('click', (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
             
             if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
@@ -671,8 +673,10 @@ export class ScientificAnimations {
             e.preventDefault();
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
             
             // Handle different animations based on current animation
             if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
@@ -818,8 +822,10 @@ export class ScientificAnimations {
         this.canvas.addEventListener('click', (e) => {
             if (this.currentAnimation === 'sound-waves') {
                 const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
                 const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
@@ -879,6 +885,9 @@ export class ScientificAnimations {
                 this.neuralNetwork.setSpeed(parseFloat(value));
             }
         });
+
+        // New NN controls
+        // Simplified: no optimizer/dataset/batch/dropout/decay controls for now
         
         // Memory Management Controls
         this.setupSliderControl('memorySpeed', 'memorySpeedValue', (value) => {
@@ -1801,9 +1810,9 @@ export class ScientificAnimations {
     updateNeuralNetworkStats() {
         this.updateStats('neuralNetwork', {
             'neuralEpoch': { path: 'epoch' },
-            'neuralLoss': { path: 'currentLoss', format: 'decimal', decimalPlaces: 4 },
-            'neuralAccuracy': { path: 'currentAccuracy', format: 'percentage', decimalPlaces: 1 },
-            'neuralLearningRate': { path: 'learningRate' },
+            'neuralLoss': { path: 'currentLoss', format: 'decimal', decimalPlaces: 2 },
+            'neuralAccuracy': { path: 'currentAccuracy', format: 'percentage', decimalPlaces: 2 },
+            'neuralLearningRate': { path: 'learningRate', format: 'decimal', decimalPlaces: 2 },
             'neuralSpeed': { path: 'speed', format: 'unit', suffix: 'x', decimalPlaces: 1 },
             'neuralPhase': { path: 'animationPhase' },
             'neuralDataIndex': { path: 'trainingDataIndex' }
@@ -1936,7 +1945,12 @@ export class ScientificAnimations {
                 state.controls = {
                     learningRate: document.getElementById('neuralLearningRate')?.value || '0.1',
                     speed: document.getElementById('neuralSpeed')?.value || '1.0',
-                    mode: document.getElementById('neuralMode')?.value || 'training'
+                    mode: document.getElementById('neuralMode')?.value || 'training',
+                    optimizer: document.getElementById('neuralOptimizer')?.value || 'sgd',
+                    dataset: document.getElementById('neuralDataset')?.value || 'shapes',
+                    batchSize: document.getElementById('neuralBatchSize')?.value || '4',
+                    dropout: document.getElementById('neuralDropout')?.value || '0',
+                    weightDecay: document.getElementById('neuralWeightDecay')?.value || '0'
                 };
                 state.stats = this.neuralNetwork?.getStats() || {};
                 break;
@@ -2763,103 +2777,48 @@ export class ScientificAnimations {
                     title: 'Neural Network Training - Object Recognition',
                     html: `
                         <div class="science-content">
-                            <h3>What are Neural Networks?</h3>
-                            <p>Neural networks are computational models inspired by biological neurons in the brain. They consist of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This animation demonstrates how neural networks learn to recognize and classify different geometric objects.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
+                            <h3>Overview</h3>
+                            <p>This animation shows a small neural network learning to classify geometric shapes as <em>simple</em> or <em>complex</em> using two features: symmetry and edge complexity. You can watch data flow forward, errors flow backward, and weights update in real-time.</p>
+
+                            <h3>Architecture</h3>
                             <ul>
-                                <li><strong>Artificial Neurons:</strong> Mathematical functions that receive inputs, apply weights, and produce outputs. Each neuron computes: output = σ(Σ(inputs × weights) + bias)</li>
-                                <li><strong>Network Architecture:</strong> Input layer (2 neurons) → Hidden layer 1 (4 neurons) → Hidden layer 2 (3 neurons) → Output layer (1 neuron)</li>
+                                <li><strong>Layers:</strong> 2 inputs → hidden layers (4, 3) → 1 output (binary)</li>
+                                <li><strong>Activation:</strong> Sigmoid σ(x) = 1/(1 + e<sup>−x</sup>)</li>
+                                <li><strong>Output:</strong> y ∈ (0,1) interpreted as probability of “complex”</li>
                             </ul>
-                            
-                            <h3>Why This Architecture?</h3>
-                            <ul>
-                                <li><strong>2 Input Neurons:</strong> Perfect for our 2-feature problem (symmetry, edges)</li>
-                                <li><strong>4 Hidden Neurons:</strong> Provides enough capacity to learn non-linear patterns without overfitting</li>
-                                <li><strong>3 Hidden Neurons:</strong> Allows further feature refinement and abstraction</li>
-                                <li><strong>1 Output Neuron:</strong> Binary classification (simple vs complex objects)</li>
-                            </ul>
-                            
-                            <h3>Layer Size Effects</h3>
-                            <ul>
-                                <li><strong>Too Few Neurons:</strong> Network can't learn complex patterns (underfitting)</li>
-                                <li><strong>Too Many Neurons:</strong> Network memorizes training data (overfitting)</li>
-                                <li><strong>Optimal Size:</strong> Balances learning capacity with generalization</li>
-                                <li><strong>Our Choice:</strong> 4→3 hidden layers provide sufficient complexity for this task</li>
-                            </ul>
-                                <li><strong>Weights & Biases:</strong> Numerical values that determine connection strength and neuron activation thresholds</li>
-                                <li><strong>Sigmoid Activation:</strong> σ(x) = 1/(1 + e^(-x)) - transforms any input to a value between 0 and 1</li>
-                                <li><strong>Backpropagation:</strong> Algorithm that calculates how much each weight should change to reduce prediction errors</li>
-                                <li><strong>Learning Rate:</strong> Controls how big weight updates are during training</li>
-                            </ul>
-                            
-                            <h3>Training Process Explained</h3>
+
+                            <h3>Training process (science)</h3>
                             <ol>
-                                <li><strong>Forward Propagation:</strong> Input features flow through the network, each neuron computes its output using weights and activation function</li>
-                                <li><strong>Loss Calculation:</strong> Compare network output with target value using Mean Squared Error: Loss = (target - output)²</li>
-                                <li><strong>Backward Propagation:</strong> Calculate error gradients for each weight using chain rule of calculus</li>
-                                <li><strong>Weight Updates:</strong> Adjust weights using gradient descent: Δw = learning_rate × gradient</li>
+                                <li><strong>Forward pass:</strong> y = σ(Wx + b)</li>
+                                <li><strong>Loss (MSE):</strong> L = (t − y)², where t ∈ {0,1}</li>
+                                <li><strong>Backpropagation:</strong> Compute ∂L/∂W via chain rule</li>
+                                <li><strong>Gradient descent:</strong> W ← W − α·∂L/∂W, b ← b − α·∂L/∂b</li>
                             </ol>
-                            
-                            <h3>Object Recognition Task</h3>
-                            <p>This network learns to classify geometric objects based on their complexity using 2 features:</p>
+
+                            <h3>Visual guide</h3>
                             <ul>
-                                <li><strong>Feature 1 - Symmetry Score (0-1):</strong> How symmetrical the object is (high = simple)</li>
-                                <li><strong>Feature 2 - Edge Complexity (0-1):</strong> How many edges/corners the object has (high = complex)</li>
-                                <li><strong>Simple Objects:</strong> Circle [0.9,0.1], Square [0.8,0.3] → Output: 0 (classified as simple)</li>
-                                <li><strong>Complex Objects:</strong> Triangle [0.6,0.5], Star [0.3,0.9] → Output: 1 (classified as complex)</li>
+                                <li><strong>Decision Boundary (bottom-left):</strong> Background color shows the model’s output over the 2D feature space. Amber rings mark <em>misclassified</em> training points.</li>
+                                <li><strong>Current Phase (top-right):</strong> Forward, Backward, Update, or Pause with progress.</li>
+                                <li><strong>Particles:</strong> Blue = forward flow, Red = error flow. Updated connections flash subtly.</li>
                             </ul>
-                            
-                            <h3>What You Should Observe</h3>
+
+                            <h3>How to use</h3>
                             <ul>
-                                <li><strong>Training Mode:</strong> Watch data flow forward (blue particles), errors flow backward (red particles), and weights update (flashing connections)</li>
-                                <li><strong>Testing Mode:</strong> See how the trained network processes new inputs and makes predictions with confidence scores</li>
-                                <li><strong>Visual Indicators:</strong> Active neurons pulse, weight changes are highlighted, and prediction accuracy improves over time</li>
-                                <li><strong>Object Context:</strong> Each training example shows the actual geometric object being learned</li>
+                                <li><strong>Mode:</strong> Switch Training/Testing in the controls.</li>
+                                <li><strong>Testing:</strong> Click a shape on the right to see prediction and confidence.</li>
+                                <li><strong>Learning Rate & Speed:</strong> Adjust to explore dynamics without changing the concept.</li>
                             </ul>
-                            
-                            <h3>Mathematical Foundation</h3>
+
+                            <h3>Scientific context</h3>
                             <ul>
-                                <li><strong>Neuron Output:</strong> y = σ(w₁x₁ + w₂x₂ + ... + wₙxₙ + b)</li>
-                                <li><strong>Loss Function:</strong> L = (y_target - y_predicted)²</li>
-                                <li><strong>Weight Update:</strong> w_new = w_old - α × ∂L/∂w</li>
-                                <li><strong>Gradient Calculation:</strong> ∂L/∂w = ∂L/∂y × ∂y/∂w (chain rule)</li>
+                                <li><strong>Feature learning:</strong> Hidden layers learn intermediate patterns from symmetry/edges.</li>
+                                <li><strong>Bias/variance:</strong> Too few neurons underfit; too many can overfit. This network is sized to learn the task cleanly.</li>
+                                <li><strong>Generalization:</strong> The decision boundary illustrates how the model separates classes beyond the training points.</li>
                             </ul>
-                            
-                            <h3>Real-World Applications</h3>
+
+                            <h3>Applications</h3>
                             <ul>
-                                <li><strong>Computer Vision:</strong> Image classification, object detection, facial recognition</li>
-                                <li><strong>Natural Language Processing:</strong> Text classification, language translation, chatbots</li>
-                                <li><strong>Speech Recognition:</strong> Voice assistants, transcription services</li>
-                                <li><strong>Autonomous Systems:</strong> Self-driving cars, robotics, drones</li>
-                                <li><strong>Medical Diagnosis:</strong> Disease detection, medical image analysis</li>
-                                <li><strong>Financial Analysis:</strong> Fraud detection, stock prediction, risk assessment</li>
-                            </ul>
-                            
-                            <h3>Educational Insights</h3>
-                            <ul>
-                                <li><strong>Learning Process:</strong> Neural networks learn by adjusting weights to minimize prediction errors</li>
-                                <li><strong>Feature Learning:</strong> Hidden layers automatically learn useful features from raw input data</li>
-                                <li><strong>Generalization:</strong> Well-trained networks can make accurate predictions on unseen data</li>
-                                <li><strong>Overfitting:</strong> Networks can memorize training data instead of learning general patterns</li>
-                                <li><strong>Hyperparameters:</strong> Learning rate, network architecture, and activation functions affect training success</li>
-                            </ul>
-                            
-                            <h3>Interactive Features</h3>
-                            <ul>
-                                <li><strong>Training Mode:</strong> Watch the network learn through forward/backward propagation cycles</li>
-                                <li><strong>Testing Mode:</strong> Test the trained network on different objects and see predictions</li>
-                                <li><strong>Parameter Control:</strong> Adjust learning rate and animation speed to observe different training behaviors</li>
-                                <li><strong>Visual Feedback:</strong> See real-time loss, accuracy, and confidence metrics</li>
-                            </ul>
-                            
-                            <h3>Advanced Concepts</h3>
-                            <ul>
-                                <li><strong>Gradient Descent:</strong> Optimization algorithm that finds the best weights by following the steepest descent</li>
-                                <li><strong>Vanishing Gradients:</strong> Problem where gradients become very small in deep networks</li>
-                                <li><strong>Regularization:</strong> Techniques to prevent overfitting (dropout, weight decay)</li>
-                                <li><strong>Batch Processing:</strong> Training on multiple examples simultaneously for better gradient estimates</li>
-                                <li><strong>Transfer Learning:</strong> Using pre-trained networks for new tasks</li>
+                                <li>Vision (image classification), NLP (text classification), speech, robotics, medicine, finance.</li>
                             </ul>
                         </div>
                     `

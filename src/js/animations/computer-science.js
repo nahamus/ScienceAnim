@@ -64,6 +64,16 @@ export class NeuralNetwork extends BaseAnimation {
         this.accuracyHistory = [];
         this.currentLoss = 0;
         this.currentAccuracy = 0;
+        // Optimizer and regularization controls
+        this.optimizer = 'sgd';
+        this.momentum = 0.9;
+        this.adamBeta1 = 0.9;
+        this.adamBeta2 = 0.999;
+        this.adamEps = 1e-8;
+        this.weightDecay = 0.0;
+        this.dropoutRate = 0.0;
+        this.batchSize = 4;
+        this.optState = { m: [], v: [], velocity: [] };
         
         // Animation timing
         this.phaseDuration = 3.5; // seconds per phase (slightly faster for better engagement)
@@ -99,6 +109,7 @@ export class NeuralNetwork extends BaseAnimation {
         this.isTrainingComplete = false; // Track if training has finished
         
         this.reset();
+        this.initializeOptimizerState();
         
         // Always run training on load
         this.runShortTrainingPhase();
@@ -112,6 +123,73 @@ export class NeuralNetwork extends BaseAnimation {
                 this.isTrainingComplete = true;
             }
         }, 5000); // Mark training as complete after 5 seconds
+    }
+    initializeOptimizerState() {
+        this.optState.m = [];
+        this.optState.v = [];
+        this.optState.velocity = [];
+        for (let l = 0; l < this.weights.length; l++) {
+            const layer = this.weights[l];
+            const mL = [], vL = [], velL = [];
+            for (let i = 0; i < layer.length; i++) {
+                const row = layer[i];
+                mL.push(new Array(row.length).fill(0));
+                vL.push(new Array(row.length).fill(0));
+                velL.push(new Array(row.length).fill(0));
+            }
+            this.optState.m.push(mL);
+            this.optState.v.push(vL);
+            this.optState.velocity.push(velL);
+        }
+    }
+    setOptimizer(o) { this.optimizer = o; }
+    setBatchSize(b) { this.batchSize = Math.max(1, Math.floor(b)); }
+    setDropout(r) { this.dropoutRate = Math.max(0, Math.min(0.9, r)); }
+    setWeightDecay(l2) { this.weightDecay = Math.max(0, l2); }
+    setDataset(name) {
+        if (name === 'moons') {
+            this.trainingData = this.generateMoons(120, 0.12);
+        } else if (name === 'circles') {
+            this.trainingData = this.generateCircles(120, 0.08);
+        } else {
+            this.trainingData = [
+                { input: [0.9, 0.1], output: [0], object: 'circle', description: 'Simple: High symmetry, smooth edges' },
+                { input: [0.8, 0.3], output: [0], object: 'square', description: 'Simple: Regular symmetry, straight edges' },
+                { input: [0.6, 0.5], output: [1], object: 'triangle', description: 'Complex: Lower symmetry, angular edges' },
+                { input: [0.3, 0.9], output: [1], object: 'star', description: 'Complex: Low symmetry, many edges' }
+            ];
+        }
+        this.reset();
+    }
+    generateMoons(n, noise) {
+        const data = [];
+        for (let i = 0; i < n; i++) {
+            const t = Math.random() * Math.PI;
+            const x = Math.cos(t) * 0.4 + 0.5 + (Math.random()*2-1)*noise;
+            const y = Math.sin(t) * 0.4 + 0.5 + (Math.random()*2-1)*noise;
+            data.push({ input: [x, y], output: [0], object: 'moonA' });
+        }
+        for (let i = 0; i < n; i++) {
+            const t = Math.random() * Math.PI;
+            const x = 1 - (Math.cos(t) * 0.4 + 0.5) + (Math.random()*2-1)*noise;
+            const y = 1 - (Math.sin(t) * 0.4 + 0.5) + (Math.random()*2-1)*noise;
+            data.push({ input: [x, y], output: [1], object: 'moonB' });
+        }
+        return data;
+    }
+    generateCircles(n, noise) {
+        const data = [];
+        for (let i = 0; i < n; i++) {
+            const r = 0.25 + (Math.random()*2-1)*noise;
+            const a = Math.random()*Math.PI*2;
+            data.push({ input: [0.5 + Math.cos(a)*r, 0.5 + Math.sin(a)*r], output: [0], object: 'inner' });
+        }
+        for (let i = 0; i < n; i++) {
+            const r = 0.45 + (Math.random()*2-1)*noise;
+            const a = Math.random()*Math.PI*2;
+            data.push({ input: [0.5 + Math.cos(a)*r, 0.5 + Math.sin(a)*r], output: [1], object: 'outer' });
+        }
+        return data;
     }
     
     initializeNetwork() {
@@ -409,7 +487,14 @@ export class NeuralNetwork extends BaseAnimation {
                 for (let i = 0; i < currentLayer.length; i++) {
                     sum += currentLayer[i].value * layerWeights[i][j].value;
                 }
-                nextLayer[j].value = this.sigmoid(sum);
+                const activated = this.sigmoid(sum);
+                if (!this.isTestingMode && this.dropoutRate > 0 && layerIndex < this.neurons.length - 1) {
+                    const keep = Math.random() > this.dropoutRate;
+                    nextLayer[j].value = keep ? activated : 0;
+                    nextLayer[j].isActive = keep;
+                } else {
+                    nextLayer[j].value = activated;
+                }
                 // Don't activate neurons here - let the animation handle it sequentially
             }
         }
@@ -551,6 +636,8 @@ export class NeuralNetwork extends BaseAnimation {
             this.selectedTestObject = null;
             this.testingStep = 0;
             this.testingParticles = [];
+            // Ensure initialization overlay is not shown in testing mode
+            this.showTrainingIndicator = false;
         } else {
             // Switching to training mode - run training to prepare the network
             this.runShortTrainingPhase();
@@ -561,12 +648,7 @@ export class NeuralNetwork extends BaseAnimation {
         if (!this.isTestingMode) {
             return;
         }
-        
-        // Check if training is complete
-        if (!this.isTrainingComplete) {
-            // Don't allow testing until training is complete
-            return;
-        }
+        // Allow testing regardless of training completion to keep UX simple
         
         // Clear previous result and start new test
         this.selectedTestObject = this.trainingData.find(data => data.object === objectType);
@@ -1432,9 +1514,9 @@ export class NeuralNetwork extends BaseAnimation {
             case 'pause':
                 this.ctx.fillText(`Epoch: ${this.epoch}`, detailsX + 10, y);
                 y += 12;
-                this.ctx.fillText(`Loss: ${this.currentLoss.toFixed(4)}`, detailsX + 10, y);
+        this.ctx.fillText(`Loss: ${this.currentLoss.toFixed(2)}`, detailsX + 10, y);
                 y += 12;
-                this.ctx.fillText(`Accuracy: ${(this.currentAccuracy * 100).toFixed(1)}%`, detailsX + 10, y);
+        this.ctx.fillText(`Accuracy: ${(this.currentAccuracy * 100).toFixed(2)}%`, detailsX + 10, y);
                 y += 15;
                 
                 this.ctx.fillStyle = '#95A5A6';
@@ -1465,9 +1547,9 @@ export class NeuralNetwork extends BaseAnimation {
         this.ctx.fillStyle = '#FFFFFF';
         let y = infoY + 45;
         
-        this.ctx.fillText(`Epoch: ${this.epoch} | Loss: ${this.currentLoss.toFixed(4)}`, infoX + 15, y);
+        this.ctx.fillText(`Epoch: ${this.epoch} | Loss: ${this.currentLoss.toFixed(2)}`, infoX + 15, y);
         y += 18;
-        this.ctx.fillText(`Accuracy: ${(this.currentAccuracy * 100).toFixed(1)}% | LR: ${this.learningRate}`, infoX + 15, y);
+        this.ctx.fillText(`Accuracy: ${(this.currentAccuracy * 100).toFixed(2)}% | LR: ${this.learningRate.toFixed(2)}`, infoX + 15, y);
         y += 25;
         
         // Current example - simplified
@@ -1492,28 +1574,25 @@ export class NeuralNetwork extends BaseAnimation {
     }
     
     handleCanvasClick(x, y) {
-        if (!this.isTestingMode) return;
-        
-        // Check if click is in the object selection area
+        // Check if click is in the object selection area (right side)
         const startX = this.ctx.canvas.width - 80;
         const startY = this.ctx.canvas.height / 2 - 120;
-        
-        // Calculate which object was clicked (vertical layout)
         const objects = ['circle', 'square', 'triangle', 'star'];
-        
         for (let i = 0; i < objects.length; i++) {
             const objX = startX;
             const objY = startY + i * 90;
-            
-            // Use a larger click area to make it easier to click
             const clickRadius = 30;
-            
-            if (x >= objX - clickRadius && x <= objX + clickRadius && 
+            if (x >= objX - clickRadius && x <= objX + clickRadius &&
                 y >= objY - clickRadius && y <= objY + clickRadius) {
+                // Auto-enter testing mode if not already
+                if (!this.isTestingMode) {
+                    this.setTestingMode(true);
+                }
                 this.selectTestObject(objects[i]);
-                break;
+                return;
             }
         }
+        if (!this.isTestingMode) return;
     }
     
     getStats() {
@@ -1553,6 +1632,9 @@ export class NeuralNetwork extends BaseAnimation {
         if (this.showLoss && !this.isTestingMode) {
             this.drawTrainingInfo();
         }
+        if (!this.isTestingMode) {
+            this.drawDecisionBoundary();
+        }
         
         // Draw testing information
         if (this.isTestingMode) {
@@ -1573,11 +1655,79 @@ export class NeuralNetwork extends BaseAnimation {
             this.drawObjectSelectionInterface();
         }
         
-        // Draw training indicator
-        if (this.showTrainingIndicator) {
+        // Draw training indicator (only in training mode)
+        if (!this.isTestingMode && this.showTrainingIndicator) {
             this.drawTrainingIndicator();
         }
     }
+
+    drawDecisionBoundary() {
+        const plotW = 220, plotH = 160;
+        const x0 = 20, y0 = this.ctx.canvas.height - plotH - 20;
+        const stepsX = 44, stepsY = 32;
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(26,26,46,0.6)';
+        this.ctx.fillRect(x0-2, y0-2, plotW+4, plotH+4);
+        // Title and legend
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.font = 'bold 12px Inter';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText('Decision Boundary', x0, y0 - 6);
+        // Legend for misclassified points
+        this.ctx.beginPath();
+        this.ctx.arc(x0 + 130, y0 - 9, 3.5, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(255, 184, 77, 0.95)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.stroke();
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = '11px Inter';
+        this.ctx.fillText('Misclassified', x0 + 140, y0 - 6);
+        // Ensure stable evaluation (no dropout) while rendering inset
+        const savedDropout = this.dropoutRate;
+        this.dropoutRate = 0;
+        for (let iy = 0; iy < stepsY; iy++) {
+            for (let ix = 0; ix < stepsX; ix++) {
+                const nx = ix / (stepsX - 1);
+                const ny = iy / (stepsY - 1);
+                this.forwardPropagate([nx, ny]);
+                const out = this.neurons[this.neurons.length - 1][0].value;
+                const c0 = 255 * (1 - out);
+                const c1 = 120 + 120 * out;
+                this.ctx.fillStyle = `rgba(${c0|0}, ${c1|0}, 255, 0.35)`;
+                const px = x0 + Math.floor((ix/stepsX) * plotW);
+                const py = y0 + Math.floor((iy/stepsY) * plotH);
+                this.ctx.fillRect(px, py, Math.ceil(plotW/stepsX), Math.ceil(plotH/stepsY));
+            }
+        }
+        // Overlay misclassified training points as subtle outlines
+        for (const data of this.trainingData) {
+            const inx = Math.max(0, Math.min(1, data.input[0]));
+            const iny = Math.max(0, Math.min(1, data.input[1]));
+            this.forwardPropagate([inx, iny]);
+            const out = this.neurons[this.neurons.length - 1][0].value;
+            const predicted = out > 0.5 ? 1 : 0;
+            const target = Array.isArray(data.output) ? data.output[0] : data.output;
+            if (predicted !== target) {
+                const px = x0 + inx * plotW;
+                const py = y0 + iny * plotH;
+                this.ctx.beginPath();
+                this.ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+                this.ctx.strokeStyle = 'rgba(255, 184, 77, 0.95)'; // amber
+                this.ctx.lineWidth = 1.5;
+                this.ctx.stroke();
+                this.ctx.beginPath();
+                this.ctx.arc(px, py, 2, 0, Math.PI * 2);
+                this.ctx.fillStyle = 'rgba(255, 184, 77, 0.18)';
+                this.ctx.fill();
+            }
+        }
+        this.dropoutRate = savedDropout;
+        this.ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        this.ctx.strokeRect(x0-2, y0-2, plotW+4, plotH+4);
+        this.ctx.restore();
+    }
+
+    // Removed mini-plots for simplicity
     
     drawObjectContext() {
         const objectX = 20;
