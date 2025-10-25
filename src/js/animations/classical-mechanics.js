@@ -93,7 +93,7 @@ export class Pendulum extends BaseAnimation {
     update(deltaTime) {
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed;
-        const simulationRate = 2.5; // Speed up pendulum evolution while keeping correct dynamics
+        const simulationRate = 10.0; // Speed up pendulum evolution while keeping correct dynamics
         const stepDt = dt * simulationRate;
 
         // Nonlinear simple pendulum with linear damping: θ¨ + c θ˙ + (g/L) sin θ = 0

@@ -467,7 +467,7 @@ export class Diffusion extends BaseAnimation {
     
     update(deltaTime) {
         this.time += deltaTime;
-        const dt = (deltaTime / 1000) * this.speed * 20; // Much faster animation
+        const dt = (deltaTime / 1000) * this.speed * 10; // Reduced speed for better observation
         
         // Only update particles if diffusion has started
         if (!this.diffusionStarted) return;
@@ -954,7 +954,7 @@ export class GasLaws extends BaseAnimation {
     
     update(deltaTime) {
         this.time += deltaTime;
-        const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
+        const dt = (deltaTime / 1000) * this.speed * 1; // Reduced speed for better observation
         
         // Update particles with collision detection
         this.particles.forEach((particle, index) => {

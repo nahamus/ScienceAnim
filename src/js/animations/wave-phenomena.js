@@ -46,49 +46,13 @@ export class WavePropagation extends BaseAnimation {
     setWaveType(type) {
         this.waveType = type;
         
-        // Reset all parameters to default values when changing wave type
-        this.speed = 1;
-        this.frequency = 1;
-        this.amplitude = 50;
-        this.wavelength = 150;
-        this.showAnalytics = false;
+        // Don't reset parameters - keep current values
+        // Just reinitialize particles with new wave type and restart time
         this.time = 0;
-        
-        // Reinitialize particles
         this.initializeParticles();
         
         // Recalculate wave parameters
         this.calculateWaveParameters();
-        
-        // Reset all controls to default values
-        const speedSlider = document.getElementById('waveSpeed');
-        const frequencySlider = document.getElementById('waveFrequency');
-        const amplitudeSlider = document.getElementById('waveAmplitude');
-        const waveTypeSelect = document.getElementById('waveType');
-        const analyticsCheckbox = document.getElementById('waveShowAnalytics');
-        
-        if (speedSlider) {
-            speedSlider.value = this.speed;
-            document.getElementById('waveSpeedValue').textContent = this.speed + 'x';
-        }
-        
-        if (frequencySlider) {
-            frequencySlider.value = this.frequency;
-            document.getElementById('waveFrequencyValue').textContent = this.frequency;
-        }
-        
-        if (amplitudeSlider) {
-            amplitudeSlider.value = this.amplitude;
-            document.getElementById('waveAmplitudeValue').textContent = this.amplitude;
-        }
-        
-        if (waveTypeSelect) {
-            waveTypeSelect.value = this.waveType;
-        }
-        
-        if (analyticsCheckbox) {
-            analyticsCheckbox.checked = this.showAnalytics;
-        }
     }
     
     setSpeed(speed) {
@@ -164,8 +128,8 @@ export class WavePropagation extends BaseAnimation {
     }
     
     update(deltaTime) {
-        // Slow down longitudinal waves for better visibility
-        const speedMultiplier = this.waveType === 'longitudinal' ? 1 : 5;
+        // Reduced speed for better observation
+        const speedMultiplier = this.waveType === 'longitudinal' ? 0.5 : 2;
         const dt = (deltaTime / 1000) * this.speed * speedMultiplier;
         this.time += dt;
         
