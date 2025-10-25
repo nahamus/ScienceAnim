@@ -294,7 +294,8 @@ export class ScientificAnimations {
                 return;
             }
             if (!userToggled) {
-                if (width < 1200) {
+                if (width < 1520) {
+                    // Collapse nav when there's not enough space for 280px nav + 1200px content + padding
                     sideNav.classList.add('collapsed');
                     mainContent.classList.add('nav-collapsed');
                     try { localStorage.setItem('sideNavCollapsed', 'true'); } catch {}
@@ -657,7 +658,8 @@ export class ScientificAnimations {
                     if (width <= 768) {
                         sideNav.classList.remove('collapsed');
                         mainContent.classList.remove('nav-collapsed');
-                    } else if (width < 1200) {
+                    } else if (width < 1520) {
+                        // Collapse nav when there's not enough space for 280px nav + 1200px content + padding
                         sideNav.classList.add('collapsed');
                         mainContent.classList.add('nav-collapsed');
                     } else {
@@ -1400,13 +1402,12 @@ export class ScientificAnimations {
     
     resizeCanvas() {
         const container = this.canvas.parentElement; // .canvas-wrapper
-        // Account for padding: container has 20px padding, animation-container has 20px padding
-        const availableWidth = container ? container.clientWidth : 800;
-        const maxWidth = Math.max(availableWidth, 800); // Minimum width of 800px
+        // Standardize canvas size: fixed width with 4:3 aspect ratio
+        const standardWidth = 800;
+        const standardHeight = 600;
         
-        // Maintain 4:3 aspect ratio with minimum height
-        this.canvas.width = maxWidth;
-        this.canvas.height = Math.max(maxWidth / 1.333, 400);
+        this.canvas.width = standardWidth;
+        this.canvas.height = standardHeight;
         
         // Update source and receiver positions for sound waves
         if (this.soundWaves) {
@@ -1422,6 +1423,11 @@ export class ScientificAnimations {
         // Initialize neural network if it hasn't been initialized yet
         if (this.neuralNetwork && this.neuralNetwork.neurons.length === 0) {
             this.neuralNetwork.initializeNetwork();
+        }
+        
+        // Resize memory management panels if needed
+        if (this.memoryManagement) {
+            this.memoryManagement.resize();
         }
     }
     
