@@ -919,6 +919,8 @@ export class ScientificAnimations {
         this.setupSliderControl('blockchainDifficulty', 'blockchainDifficultyValue', (value) => {
             if (this.blockchain) {
                 this.blockchain.setDifficulty(parseInt(value));
+                // Update stats immediately to reflect new difficulty
+                this.updateBlockchainStats();
             }
         });
         
