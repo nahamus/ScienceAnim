@@ -1,5 +1,7 @@
 .viewer-layout {
     display: block; /* stack: canvas then stats on all sizes */
+    width: 100%;
+    max-width: 100%;
 }
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
@@ -664,8 +666,9 @@ body::after {
 
 .main-content {
     display: flex;
+    flex-direction: column;
     gap: 30px;
-    align-items: flex-start;
+    align-items: stretch; /* Allow children to fill width */
     position: relative;
     z-index: 2;
     max-width: 100%;
@@ -1036,7 +1039,7 @@ body::after {
     box-shadow: var(--box-shadow-panel);
     position: relative;
     overflow: visible;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     margin: 0 auto;
     display: block;
@@ -1075,7 +1078,6 @@ body::after {
     position: relative;
     display: block;
     width: 100%;
-    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -1108,7 +1110,6 @@ body::after {
 .stats-panel {
     margin-top: 10px;
     display: block;
-    max-width: 800px; /* Match canvas wrapper max-width */
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -1640,7 +1641,7 @@ body::after {
     min-height: calc(100vh - 100px);
     display: flex;
     gap: 20px;
-    max-width: 1200px; /* Cap content width for consistent canvas sizing */
+    max-width: 1000px; /* Cap content width for consistent canvas sizing */
     margin-left: 280px;
     margin-right: auto;
     /* Center within the space to the right of nav */

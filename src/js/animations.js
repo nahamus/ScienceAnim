@@ -294,8 +294,8 @@ export class ScientificAnimations {
                 return;
             }
             if (!userToggled) {
-                if (width < 1520) {
-                    // Collapse nav when there's not enough space for 280px nav + 1200px content + padding
+                if (width < 1320) {
+                    // Collapse nav when there's not enough space for 280px nav + 1000px content + padding
                     sideNav.classList.add('collapsed');
                     mainContent.classList.add('nav-collapsed');
                     try { localStorage.setItem('sideNavCollapsed', 'true'); } catch {}
@@ -658,8 +658,8 @@ export class ScientificAnimations {
                     if (width <= 768) {
                         sideNav.classList.remove('collapsed');
                         mainContent.classList.remove('nav-collapsed');
-                    } else if (width < 1520) {
-                        // Collapse nav when there's not enough space for 280px nav + 1200px content + padding
+                    } else if (width < 1320) {
+                        // Collapse nav when there's not enough space for 280px nav + 1000px content + padding
                         sideNav.classList.add('collapsed');
                         mainContent.classList.add('nav-collapsed');
                     } else {
