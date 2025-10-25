@@ -893,12 +893,7 @@ export class ScientificAnimations {
         // New NN controls
         // Simplified: no optimizer/dataset/batch/dropout/decay controls for now
         
-        // Memory Management Controls
-        this.setupSliderControl('memorySpeed', 'memorySpeedValue', (value) => {
-            if (this.memoryManagement) {
-                this.memoryManagement.setAnimationSpeed(parseFloat(value));
-            }
-        });
+        // Memory Management Controls - removed memorySpeed as it's handled by on-canvas controls
         
         // Show Program Output toggle
         const showOutputCheckbox = document.getElementById('showOutput');
