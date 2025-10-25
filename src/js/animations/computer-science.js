@@ -2196,22 +2196,38 @@ export class MemoryManagement extends BaseAnimation {
         this.canvas = ctx.canvas;
         
         // Code execution layout
-        this.codePanel = { x: 50, y: 50, width: 400, height: 300 };
-        this.stackPanel = { x: 500, y: 50, width: 300, height: 300 };
-        this.heapPanel = { x: 50, y: 400, width: 750, height: 200 };
+        this.codePanel = { x: 50, y: 50, width: 500, height: 300 };
+        this.stackPanel = { x: 580, y: 50, width: 220, height: 300 };
+        this.heapPanel = { x: 25, y: 380, width: 750, height: 200 };
         this.outputPanel = { x: 500, y: 400, width: 300, height: 200 };
         
-        // Sample program with real code
+        // Control buttons
+        this.controlButtons = [
+            { id: 'play', label: '▶', x: 560, y: 15, width: 35, height: 30, tooltip: 'Play/Pause' },
+            { id: 'step', label: '⏭', x: 600, y: 15, width: 35, height: 30, tooltip: 'Step Forward' },
+            { id: 'reset', label: '⟲', x: 640, y: 15, width: 35, height: 30, tooltip: 'Reset' },
+            { id: 'speed', label: '⚡', x: 680, y: 15, width: 35, height: 30, tooltip: 'Speed' }
+        ];
+        this.hoveredButton = null;
+        this.speedOptions = [0.5, 1.0, 2.0, 4.0];
+        this.currentSpeedIndex = 2; // Start at 2.0x
+        this.animationSpeed = this.speedOptions[this.currentSpeedIndex];
+        
+        // Set up canvas event listeners
+        this.setupCanvasEventListeners();
+        
+        // Sample program - Image Processing Application
         this.program = {
-            name: "Image Processing Pipeline",
+            name: "Image Processing App",
             functions: [
                 {
                     name: "main()",
                     lines: [
                         "function main() {",
-                        "  let imageData = loadImage('photo.jpg');",
-                        "  let processedData = processImage(imageData);",
-                        "  saveResult(processedData);",
+                        "  let image = loadImage();",
+                        "  let result = processImage(image);",
+                        "  saveImage(result);",
+                        "  cleanup(image, result);",
                         "  return 0;",
                         "}"
                     ],
@@ -2220,13 +2236,11 @@ export class MemoryManagement extends BaseAnimation {
                 {
                     name: "loadImage()",
                     lines: [
-                        "function loadImage(filename) {",
-                        "  let fileBuffer = malloc(1024);",
-                        "  readFile(filename, fileBuffer);",
-                        "  let imageData = malloc(2048);",
-                        "  decodeImage(fileBuffer, imageData);",
-                        "  free(fileBuffer);",
-                        "  return imageData;",
+                        "function loadImage() {",
+                        "  let pixels = malloc(2048);",
+                        "  let metadata = malloc(256);",
+                        "  // Load image data",
+                        "  return pixels;",
                         "}"
                     ],
                     variables: []
@@ -2234,56 +2248,12 @@ export class MemoryManagement extends BaseAnimation {
                 {
                     name: "processImage()",
                     lines: [
-                        "function processImage(data) {",
-                        "  let tempBuffer = malloc(2048);",
-                        "  applyFilter(data, tempBuffer);",
-                        "  let result = malloc(2048);",
-                        "  compressImage(tempBuffer, result);",
-                        "  free(tempBuffer);",
-                        "  return result;",
-                        "}"
-                    ],
-                    variables: []
-                },
-                {
-                    name: "saveResult()",
-                    lines: [
-                        "function saveResult(data) {",
-                        "  let outputFile = malloc(512);",
-                        "  writeFile('output.jpg', data);",
-                        "  free(outputFile);",
-                        "  free(data);",
-                        "  return;",
-                        "}"
-                    ],
-                    variables: []
-                },
-                {
-                    name: "readFile()",
-                    lines: [
-                        "function readFile(filename, buffer) {",
-                        "  // Simulate file reading",
-                        "  return buffer;",
-                        "}"
-                    ],
-                    variables: []
-                },
-                {
-                    name: "decodeImage()",
-                    lines: [
-                        "function decodeImage(buffer, imageData) {",
-                        "  // Simulate image decoding",
-                        "  return imageData;",
-                        "}"
-                    ],
-                    variables: []
-                },
-                {
-                    name: "writeFile()",
-                    lines: [
-                        "function writeFile(filename, data) {",
-                        "  // Simulate file writing",
-                        "  return true;",
+                        "function processImage(img) {",
+                        "  let output = malloc(2048);",
+                        "  let temp = malloc(512);",
+                        "  applyFilter(img, output, temp);",
+                        "  free(temp);",
+                        "  return output;",
                         "}"
                     ],
                     variables: []
@@ -2291,19 +2261,52 @@ export class MemoryManagement extends BaseAnimation {
                 {
                     name: "applyFilter()",
                     lines: [
-                        "function applyFilter(data, tempBuffer) {",
-                        "  // Simulate filter application",
-                        "  return tempBuffer;",
+                        "function applyFilter(src, dst, tmp) {",
+                        "  // Apply blur filter",
+                        "  return;",
                         "}"
                     ],
                     variables: []
                 },
                 {
-                    name: "compressImage()",
+                    name: "saveImage()",
                     lines: [
-                        "function compressImage(tempBuffer, result) {",
-                        "  // Simulate image compression",
-                        "  return result;",
+                        "function saveImage(img) {",
+                        "  let buffer = malloc(1024);",
+                        "  // Write to file",
+                        "  free(buffer);",
+                        "  return;",
+                        "}"
+                    ],
+                    variables: []
+                },
+                {
+                    name: "cleanup()",
+                    lines: [
+                        "function cleanup(img, result) {",
+                        "  free(img);",
+                        "  free(result);",
+                        "  return;",
+                        "}"
+                    ],
+                    variables: []
+                },
+                {
+                    name: "malloc()",
+                    lines: [
+                        "function malloc(size) {",
+                        "  // Allocate from heap",
+                        "  return heapPointer;",
+                        "}"
+                    ],
+                    variables: []
+                },
+                {
+                    name: "free()",
+                    lines: [
+                        "function free(ptr) {",
+                        "  // Return to heap",
+                        "  markAsFree(ptr);",
                         "}"
                     ],
                     variables: []
@@ -2331,10 +2334,10 @@ export class MemoryManagement extends BaseAnimation {
         this.animationState = 'idle'; // idle, executing, allocating, accessing, deallocating, calling, returning
         this.animationTime = 0;
         this.executionSpeed = 1.0;
-        this.isAutoRunning = true;
+        this.isAutoRunning = false; // Start paused so users can control execution
         
         // Speed control
-        this.animationSpeed = 1.0; // 0.1 to 3.0
+        this.animationSpeed = 2.0; // 0.1 to 3.0 - Increased default speed for better engagement
         
         // Visual effects
         this.highlightedLine = -1;
@@ -2381,14 +2384,112 @@ export class MemoryManagement extends BaseAnimation {
         };
         
         this.initializeExecution();
-        this.startExecution();
-        
-        // Force start execution after a short delay to ensure everything is initialized
-        setTimeout(() => {
-            if (this.isAutoRunning && this.animationState === 'idle') {
-                this.executeNextStep();
+        // Don't auto-start - let users control execution with the play button
+    }
+    
+    setupCanvasEventListeners() {
+        // Store bound handlers so we can remove them later if needed
+        this.boundMouseMoveHandler = (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+            
+            this.hoveredButton = null;
+            for (const button of this.controlButtons) {
+                if (x >= button.x && x <= button.x + button.width &&
+                    y >= button.y && y <= button.y + button.height) {
+                    this.hoveredButton = button.id;
+                    this.canvas.style.cursor = 'pointer';
+                    break;
+                }
             }
-        }, 500);
+            if (!this.hoveredButton) {
+                this.canvas.style.cursor = 'default';
+            }
+        };
+        
+        this.boundClickHandler = (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+            
+            for (const button of this.controlButtons) {
+                if (x >= button.x && x <= button.x + button.width &&
+                    y >= button.y && y <= button.y + button.height) {
+                    this.handleButtonClick(button.id);
+                    break;
+                }
+            }
+        };
+        
+        // Mouse move for hover effects
+        this.canvas.addEventListener('mousemove', this.boundMouseMoveHandler);
+        
+        // Mouse click for button actions
+        this.canvas.addEventListener('click', this.boundClickHandler);
+    }
+    
+    handleButtonClick(buttonId) {
+        switch (buttonId) {
+            case 'play':
+                this.isAutoRunning = !this.isAutoRunning;
+                // If resuming and we're at the end, restart
+                if (this.isAutoRunning && this.currentFunction === 0 && 
+                    this.currentLine >= this.program.functions[0].lines.length) {
+                    this.resetExecution();
+                    this.isAutoRunning = true;
+                }
+                break;
+            case 'step':
+                // Pause auto-running when stepping manually
+                this.isAutoRunning = false;
+                // Execute next step regardless of animation state
+                if (this.animationState === 'idle' || this.animationState === 'executing') {
+                    this.animationState = 'idle'; // Force idle state
+                    this.executeNextStep();
+                }
+                break;
+            case 'reset':
+                this.resetExecution();
+                break;
+            case 'speed':
+                this.currentSpeedIndex = (this.currentSpeedIndex + 1) % this.speedOptions.length;
+                this.animationSpeed = this.speedOptions[this.currentSpeedIndex];
+                break;
+        }
+    }
+    
+    resetExecution() {
+        // Reset all execution state
+        this.currentFunction = 0;
+        this.currentLine = 0;
+        this.executionStep = 0;
+        this.programCounter = 0;
+        this.callStack = [];
+        this.highlightedLine = 0;
+        this.animationState = 'idle';
+        this.isAutoRunning = false;
+        
+        // Reset memory
+        this.heapBlocks = [];
+        this.variableAddresses = new Map();
+        this.memoryData = new Map();
+        this.output = [];
+        this.particles = [];
+        this.memoryAccesses = [];
+        this.addressHighlights = [];
+        this.allocationEffects = [];
+        this.dataFlowParticles = [];
+        
+        // Reset statistics
+        this.totalAllocations = 0;
+        this.totalDeallocations = 0;
+        this.memoryLeaks = 0;
+        this.currentMemoryUsage = 0;
+        this.memoryAccessCount = 0;
+        
+        // Reinitialize
+        this.initializeExecution();
     }
     
     initializeExecution() {
@@ -2403,35 +2504,30 @@ export class MemoryManagement extends BaseAnimation {
             height: 40
         }];
         
-        // Initialize call stack (empty)
+        // Initialize call stack with main() already on it
         this.callStack = [];
         
         // Initialize output
         this.output = [];
+        this.output.push('🎬 Ready to execute. Click ▶ to start or ⏭ to step through.');
         
         // Clear memory data
         this.memoryData.clear();
         this.variableAddresses.clear();
         
-        // Reset execution state
-        this.currentFunction = 0;
-        this.currentLine = 0;
+        // Reset execution state - start at main() function, first line
+        this.currentFunction = 0; // main() is index 0
+        this.currentLine = 0; // First line of main()
         this.executionStep = 0;
         this.programCounter = 0;
-        this.highlightedLine = -1;
+        this.highlightedLine = 0; // Highlight the first line (function declaration)
     }
     
     startExecution() {
-        this.isAutoRunning = true;
+        // Don't auto-start - keep paused until user clicks play
+        this.isAutoRunning = false;
         this.animationState = 'idle';
         this.executionStep = 0;
-        
-        // Force start the execution immediately
-        setTimeout(() => {
-            if (this.isAutoRunning && this.animationState === 'idle') {
-                this.executeNextStep();
-            }
-        }, 1000);
     }
     
     setAnimationSpeed(speed) {
@@ -2652,26 +2748,35 @@ export class MemoryManagement extends BaseAnimation {
     returnFromFunction() {
         if (this.callStack.length > 0) {
             const caller = this.callStack.pop();
+            
+            // Save the current function's local variables before switching context
+            const currentFunctionVariables = new Map(this.variableAddresses);
+            
             this.currentFunction = caller.functionIndex;
             this.currentLine = caller.lineIndex;
             this.programCounter = caller.returnAddress;
             
-            // Restore variables from stack frame
+            // Restore caller's variables from stack frame
             this.variableAddresses = new Map(caller.variables);
             
             // Handle return value assignment if the calling line was a variable assignment
             const callingLine = this.program.functions[caller.functionIndex].lines[caller.lineIndex];
             if (callingLine && callingLine.includes('=') && callingLine.includes('(')) {
-                // Extract variable name from assignment like "let imageData = loadImage('photo.jpg');"
+                // Extract variable name from assignment like "let image = loadImage();"
                 const varMatch = callingLine.match(/(?:let\s+)?(\w+)\s*=\s*\w+\(/);
                 if (varMatch) {
-                    const varName = varMatch[1];
-                    // Create a return value address for the variable
-                    const returnAddress = this.nextHeapAddress;
-                    this.nextHeapAddress += 256; // Small allocation for return value
-                    this.variableAddresses.set(varName, returnAddress);
+                    const newVarName = varMatch[1];
                     
-                    this.output.push(`📝 Return value assigned to ${varName}`);
+                    // Find the return variable from the called function
+                    // Look for the variable that was returned in the function
+                    const returnedVarName = this.findReturnedVariable(currentFunctionVariables);
+                    
+                    if (returnedVarName && currentFunctionVariables.has(returnedVarName)) {
+                        // Transfer the address from the returned variable to the new variable
+                        const returnAddress = currentFunctionVariables.get(returnedVarName);
+                        this.variableAddresses.set(newVarName, returnAddress);
+                        this.output.push(`📝 Return value assigned to ${newVarName}`);
+                    }
                 }
             }
             
@@ -2716,6 +2821,19 @@ export class MemoryManagement extends BaseAnimation {
     
     executeRegularLine(line) {
         // Handle regular code execution - no output for simple assignments
+    }
+    
+    findReturnedVariable(functionVariables) {
+        // Find the most recently allocated variable in the function
+        // This is a simple heuristic - in a real implementation, we'd parse the return statement
+        let lastVar = null;
+        for (const [varName, address] of functionVariables.entries()) {
+            // Skip temporary variables and prefer named variables
+            if (!varName.startsWith('temp') && varName !== 'ptr') {
+                lastVar = varName;
+            }
+        }
+        return lastVar;
     }
     
     allocateMemoryBlock(size, varName, line) {
@@ -3428,7 +3546,7 @@ export class MemoryManagement extends BaseAnimation {
         // Automatic execution
         if (this.isAutoRunning && this.animationState === 'idle') {
             this.animationTime += dt;
-            if (this.animationTime >= 0.5 / this.animationSpeed) { // Use animationSpeed instead of executionSpeed
+            if (this.animationTime >= 0.5 / this.animationSpeed) {
                 this.executeNextStep();
                 this.animationTime = 0;
             }
@@ -3549,7 +3667,7 @@ export class MemoryManagement extends BaseAnimation {
         if (this.highlightedLine >= 0) {
             this.executionTrail.push({
                 x: this.codePanel.x + 15,
-                y: this.codePanel.y + 70 + this.highlightedLine * 22, // Match execution pointer spacing
+                y: this.codePanel.y + 50 + this.highlightedLine * 20, // Match execution pointer spacing
                 time: 0,
                 duration: 2.0
             });
@@ -3591,6 +3709,7 @@ export class MemoryManagement extends BaseAnimation {
     
     render() {
         this.drawBackground();
+        this.drawControlButtons();
         this.drawCodePanel();
         this.drawStackPanel();
         this.drawHeapPanel();
@@ -3609,12 +3728,11 @@ export class MemoryManagement extends BaseAnimation {
     }
     
     drawBackground() {
-        // Create a modern gradient background with deeper colors
+        // Create a subtle modern gradient background
         const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
-        gradient.addColorStop(0, '#0a0a0a');
-        gradient.addColorStop(0.3, '#1a1a2e');
-        gradient.addColorStop(0.7, '#16213e');
-        gradient.addColorStop(1, '#0f3460');
+        gradient.addColorStop(0, '#1a1f2e');
+        gradient.addColorStop(0.5, '#252b3a');
+        gradient.addColorStop(1, '#1a1f2e');
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
@@ -3626,7 +3744,7 @@ export class MemoryManagement extends BaseAnimation {
         
         for (let y = -offset; y < this.canvas.height + hexSize; y += hexSize * 1.5) {
             for (let x = -offset; x < this.canvas.width + hexSize; x += hexSize * 1.3) {
-            this.ctx.beginPath();
+                this.ctx.beginPath();
                 for (let i = 0; i < 6; i++) {
                     const angle = (i * Math.PI) / 3;
                     const px = x + hexSize * 0.5 * Math.cos(angle);
@@ -3638,11 +3756,70 @@ export class MemoryManagement extends BaseAnimation {
                     }
                 }
                 this.ctx.closePath();
+                this.ctx.stroke();
+            }
+        }
+    }
+    
+    drawControlButtons() {
+        for (const button of this.controlButtons) {
+            const isHovered = this.hoveredButton === button.id;
+            
+            // Button background
+            const bgGradient = this.ctx.createLinearGradient(button.x, button.y, button.x, button.y + button.height);
+            if (isHovered) {
+                bgGradient.addColorStop(0, '#5a9fd4');
+                bgGradient.addColorStop(1, '#4a8fc4');
+            } else {
+                bgGradient.addColorStop(0, '#3a5f84');
+                bgGradient.addColorStop(1, '#2a4f74');
+            }
+            this.ctx.fillStyle = bgGradient;
+            this.roundRect(button.x, button.y, button.width, button.height, 6);
+            this.ctx.fill();
+            
+            // Button border
+            this.ctx.strokeStyle = isHovered ? '#7eb3d9' : '#4a6f94';
+            this.ctx.lineWidth = 1.5;
+            this.roundRect(button.x, button.y, button.width, button.height, 6);
             this.ctx.stroke();
+            
+            // Button icon/label
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = 'bold 16px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            
+            // Special handling for play/pause button
+            if (button.id === 'play') {
+                this.ctx.fillText(this.isAutoRunning ? '⏸' : '▶', button.x + button.width / 2, button.y + button.height / 2);
+            } else if (button.id === 'speed') {
+                this.ctx.font = 'bold 11px Arial';
+                this.ctx.fillText(`${this.speedOptions[this.currentSpeedIndex]}x`, button.x + button.width / 2, button.y + button.height / 2);
+            } else {
+                this.ctx.fillText(button.label, button.x + button.width / 2, button.y + button.height / 2);
+            }
+            
+            // Tooltip on hover
+            if (isHovered) {
+                const tooltipX = button.x + button.width / 2;
+                const tooltipY = button.y + button.height + 8;
+                
+                // Tooltip background
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                const tooltipWidth = this.ctx.measureText(button.tooltip).width + 12;
+                this.ctx.fillRect(tooltipX - tooltipWidth / 2, tooltipY, tooltipWidth, 20);
+                
+                // Tooltip text
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.font = '10px Arial';
+                this.ctx.fillText(button.tooltip, tooltipX, tooltipY + 10);
+            }
         }
-        }
-        
-        // Add floating particles for ambient effect
+    }
+    
+    drawCodePanel() {
+        // Code panel background with shadow
         for (let i = 0; i < 20; i++) {
             const x = (i * 137.5) % this.canvas.width;
             const y = (i * 73.3 + this.animationTime * 10) % this.canvas.height;
@@ -3678,67 +3855,54 @@ export class MemoryManagement extends BaseAnimation {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(this.codePanel.x, this.codePanel.y, this.codePanel.width, this.codePanel.height);
         
-        // Enhanced border with rounded corners and gradient
-        this.ctx.shadowColor = '#4ECDC4';
-        this.ctx.shadowBlur = 12;
-        this.ctx.lineWidth = 3;
-        
-        // Create gradient border
-        const borderGradient = this.ctx.createLinearGradient(
-            this.codePanel.x, this.codePanel.y, 
-            this.codePanel.x + this.codePanel.width, this.codePanel.y + this.codePanel.height
-        );
-        borderGradient.addColorStop(0, '#4ECDC4');
-        borderGradient.addColorStop(0.5, '#2ECC71');
-        borderGradient.addColorStop(1, '#4ECDC4');
-        
-        this.ctx.strokeStyle = borderGradient;
+        // Subtle border with rounded corners
+        this.ctx.shadowColor = 'rgba(100, 200, 255, 0.3)';
+        this.ctx.shadowBlur = 6;
+        this.ctx.lineWidth = 1.5;
+        this.ctx.strokeStyle = '#5a9fd4';
         this.roundRect(this.codePanel.x, this.codePanel.y, this.codePanel.width, this.codePanel.height, 12);
         this.ctx.stroke();
         this.ctx.shadowBlur = 0;
         
         // Title with crisp font rendering
-        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.fillStyle = '#7eb3d9';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText('💻 Code Execution', this.codePanel.x + 15, this.codePanel.y + 25);
         
-        // Current function with crisp font rendering
+        // Get current function
         const currentFunc = this.program.functions[this.currentFunction];
-        this.ctx.fillStyle = '#FFD700';
-        this.ctx.font = 'bold 14px Inter';
-        this.ctx.fillText(`Current: ${currentFunc.name}`, this.codePanel.x + 15, this.codePanel.y + 45);
         
         // Draw code lines with crisp font rendering
-        this.ctx.font = '12px Inter';
+        this.ctx.font = '12px "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace';
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
         
         for (let i = 0; i < currentFunc.lines.length; i++) {
             const line = currentFunc.lines[i];
-            const y = this.codePanel.y + 70 + i * 22; // Increased line spacing
+            const y = this.codePanel.y + 50 + i * 20; // Reduced top padding and line spacing
             
-            // Highlight current line with better effect
+            // Highlight current line with subtle effect
             if (i === this.highlightedLine) {
-                // Highlight background
-                this.ctx.fillStyle = 'rgba(78, 205, 196, 0.2)';
-                this.ctx.fillRect(this.codePanel.x + 8, y - 16, this.codePanel.width - 16, 22);
+                // Lighter highlight background - properly centered
+                this.ctx.fillStyle = 'rgba(100, 150, 200, 0.08)';
+                this.ctx.fillRect(this.codePanel.x + 8, y - 10, this.codePanel.width - 16, 20);
                 
-                // Highlight border
-                this.ctx.strokeStyle = '#4ECDC4';
+                // Lighter border - properly centered
+                this.ctx.strokeStyle = 'rgba(100, 150, 200, 0.3)';
                 this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(this.codePanel.x + 8, y - 16, this.codePanel.width - 16, 22);
+                this.ctx.strokeRect(this.codePanel.x + 8, y - 10, this.codePanel.width - 16, 20);
             }
             
             // Line number with crisp font rendering
-            this.ctx.fillStyle = '#666666';
-            this.ctx.font = '10px Inter';
+            this.ctx.fillStyle = '#888888';
+            this.ctx.font = '10px "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace';
             this.ctx.fillText(`${i + 1}`, this.codePanel.x + 15, y);
             
             // Code line with crisp font rendering
-            this.ctx.fillStyle = i === this.highlightedLine ? '#4ECDC4' : '#FFFFFF';
-            this.ctx.font = '12px Inter';
+            this.ctx.fillStyle = i === this.highlightedLine ? '#ffffff' : '#e0e0e0';
+            this.ctx.font = '12px "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace';
             this.ctx.fillText(line, this.codePanel.x + 35, y);
         }
     }
@@ -3755,76 +3919,56 @@ export class MemoryManagement extends BaseAnimation {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(this.stackPanel.x, this.stackPanel.y, this.stackPanel.width, this.stackPanel.height);
         
-        // Enhanced border with rounded corners and gradient
-        this.ctx.shadowColor = '#3498db';
-        this.ctx.shadowBlur = 10;
-        this.ctx.lineWidth = 3;
-        
-        // Create gradient border
-        const stackBorderGradient = this.ctx.createLinearGradient(
-            this.stackPanel.x, this.stackPanel.y, 
-            this.stackPanel.x + this.stackPanel.width, this.stackPanel.y + this.stackPanel.height
-        );
-        stackBorderGradient.addColorStop(0, '#3498db');
-        stackBorderGradient.addColorStop(0.5, '#2980b9');
-        stackBorderGradient.addColorStop(1, '#3498db');
-        
-        this.ctx.strokeStyle = stackBorderGradient;
+        // Subtle border with rounded corners
+        this.ctx.shadowColor = 'rgba(100, 150, 255, 0.3)';
+        this.ctx.shadowBlur = 6;
+        this.ctx.lineWidth = 1.5;
+        this.ctx.strokeStyle = '#6a8fc4';
         this.roundRect(this.stackPanel.x, this.stackPanel.y, this.stackPanel.width, this.stackPanel.height, 12);
         this.ctx.stroke();
         this.ctx.shadowBlur = 0;
         
                 // Title with crisp font rendering
-        this.ctx.fillStyle = '#3498db';
+        this.ctx.fillStyle = '#8aa8d4';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText('📚 Call Stack', this.stackPanel.x + 15, this.stackPanel.y + 25);
             
         // Draw call stack with crisp font rendering
-            this.ctx.font = '12px Inter';
+            this.ctx.font = '12px "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace';
             this.ctx.textAlign = 'left';
             this.ctx.textBaseline = 'middle';
         
-        // Draw older stacks at the bottom with more subtle styling
+        // Draw older stacks at the bottom without highlighting
         for (let i = 0; i < this.callStack.length; i++) {
             const frame = this.callStack[i];
             const func = this.program.functions[frame.functionIndex];
             const y = this.stackPanel.y + 50 + (this.callStack.length - i) * 22; // Compact spacing
             
-            // Stack frame background - more subtle
-            this.ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
-            this.ctx.fillRect(this.stackPanel.x + 10, y - 12, this.stackPanel.width - 20, 20);
-            
-            // Stack frame border with rounded corners
-            this.ctx.strokeStyle = '#3498db';
-            this.ctx.lineWidth = 1;
-            this.roundRect(this.stackPanel.x + 10, y - 12, this.stackPanel.width - 20, 20, 6);
-            this.ctx.stroke();
-            
-            // Function name and return address on one line
-            this.ctx.fillStyle = '#FFFFFF';
-            this.ctx.font = '11px Inter';
-            this.ctx.fillText(`${func.name} (PC: 0x${frame.returnAddress.toString(16)})`, this.stackPanel.x + 15, y + 2);
+            // Function name - simple text, no background
+            this.ctx.fillStyle = '#999999';
+            this.ctx.font = '11px "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace';
+            this.ctx.fillText(`${func.name}`, this.stackPanel.x + 15, y);
         }
         
-        // Current function at top with subtle highlighting
+        // Current function at top with highlighting
         const currentFunc = this.program.functions[this.currentFunction];
         const currentY = this.stackPanel.y + 50;
         
-        // Current frame background - subtle highlight
-        this.ctx.fillStyle = 'rgba(78, 205, 196, 0.4)';
-        this.ctx.fillRect(this.stackPanel.x + 10, currentY - 12, this.stackPanel.width - 20, 20);
+        // Current frame background - subtle light blue highlight, properly centered
+        this.ctx.fillStyle = 'rgba(100, 150, 200, 0.08)';
+        this.ctx.fillRect(this.stackPanel.x + 10, currentY - 10, this.stackPanel.width - 20, 20);
         
-        // Current function border with rounded corners
-        this.ctx.strokeStyle = '#4ECDC4';
+        // Current function border - light blue, properly centered
+        this.ctx.strokeStyle = 'rgba(100, 150, 200, 0.3)';
         this.ctx.lineWidth = 1;
-        this.roundRect(this.stackPanel.x + 10, currentY - 12, this.stackPanel.width - 20, 20, 6);
+        this.roundRect(this.stackPanel.x + 10, currentY - 10, this.stackPanel.width - 20, 20, 6);
         this.ctx.stroke();
         
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 11px Inter';
-        this.ctx.fillText(`${currentFunc.name} (current)`, this.stackPanel.x + 15, currentY + 2);
+        this.ctx.font = 'bold 11px "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace';
+        this.ctx.fillText(`${currentFunc.name}`, this.stackPanel.x + 15, currentY);
     }
     
     drawHeapPanel() {
@@ -3839,27 +3983,17 @@ export class MemoryManagement extends BaseAnimation {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(this.heapPanel.x, this.heapPanel.y, this.heapPanel.width, this.heapPanel.height);
         
-        // Enhanced border with rounded corners and gradient
-        this.ctx.shadowColor = '#2ecc71';
-        this.ctx.shadowBlur = 10;
-        this.ctx.lineWidth = 3;
-        
-        // Create gradient border
-        const heapBorderGradient = this.ctx.createLinearGradient(
-            this.heapPanel.x, this.heapPanel.y, 
-            this.heapPanel.x + this.heapPanel.width, this.heapPanel.y + this.heapPanel.height
-        );
-        heapBorderGradient.addColorStop(0, '#2ecc71');
-        heapBorderGradient.addColorStop(0.5, '#27ae60');
-        heapBorderGradient.addColorStop(1, '#2ecc71');
-        
-        this.ctx.strokeStyle = heapBorderGradient;
+        // Subtle border with rounded corners
+        this.ctx.shadowColor = 'rgba(100, 200, 150, 0.3)';
+        this.ctx.shadowBlur = 6;
+        this.ctx.lineWidth = 1.5;
+        this.ctx.strokeStyle = '#6ab896';
         this.roundRect(this.heapPanel.x, this.heapPanel.y, this.heapPanel.width, this.heapPanel.height, 12);
         this.ctx.stroke();
         this.ctx.shadowBlur = 0;
         
         // Title with crisp font rendering - positioned outside the box
-        this.ctx.fillStyle = '#2ecc71';
+        this.ctx.fillStyle = '#7ec9a9';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
@@ -3877,56 +4011,48 @@ export class MemoryManagement extends BaseAnimation {
             this.ctx.fillRect(block.x + 4, block.y + 4, block.width, block.height);
             this.ctx.shadowBlur = 0;
             
-            // Block with modern gradient and glow
+            // Block with appealing gradient - vibrant purple/blue
             const blockGradient = this.ctx.createLinearGradient(block.x, block.y, block.x, block.y + block.height);
-            blockGradient.addColorStop(0, '#4ECDC4');
-            blockGradient.addColorStop(0.3, '#2ecc71');
-            blockGradient.addColorStop(0.7, '#27ae60');
-            blockGradient.addColorStop(1, '#229954');
+            blockGradient.addColorStop(0, '#7c3aed');  // Vibrant purple
+            blockGradient.addColorStop(1, '#5b21b6');  // Deep purple
             this.ctx.fillStyle = blockGradient;
             this.ctx.fillRect(block.x, block.y, block.width, block.height);
             
-            // Enhanced block border with rounded corners and glow
-            this.ctx.shadowColor = '#4ECDC4';
-            this.ctx.shadowBlur = 8;
-            this.ctx.lineWidth = 2;
-            
-            // Create gradient border for memory blocks
-            const blockBorderGradient = this.ctx.createLinearGradient(
-                block.x, block.y, 
-                block.x + block.width, block.y + block.height
-            );
-            blockBorderGradient.addColorStop(0, '#FFFFFF');
-            blockBorderGradient.addColorStop(0.5, '#4ECDC4');
-            blockBorderGradient.addColorStop(1, '#FFFFFF');
-            
-            this.ctx.strokeStyle = blockBorderGradient;
+            // Subtle block border with glow
+            this.ctx.shadowColor = 'rgba(124, 58, 237, 0.5)';
+            this.ctx.shadowBlur = 6;
+            this.ctx.lineWidth = 1.5;
+            this.ctx.strokeStyle = '#a78bfa';  // Light purple border
             this.roundRect(block.x, block.y, block.width, block.height, 6);
             this.ctx.stroke();
             this.ctx.shadowBlur = 0;
             
             // Add inner highlight for 3D effect
             const innerGradient = this.ctx.createLinearGradient(block.x, block.y, block.x, block.y + block.height * 0.3);
-            innerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+            innerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
             innerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             this.ctx.fillStyle = innerGradient;
             this.ctx.fillRect(block.x, block.y, block.width, block.height * 0.3);
             
             // Block label with crisp font rendering and better contrast
-            this.ctx.fillStyle = '#000000';
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.lineWidth = 2;
             const fontSize = Math.max(8, Math.min(12, block.width / 8));
             this.ctx.font = `bold ${fontSize}px Inter`;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
+            this.ctx.strokeText(block.name, block.x + block.width / 2, block.y + block.height / 2 - 8);
             this.ctx.fillText(block.name, block.x + block.width / 2, block.y + block.height / 2 - 8);
             
             // Size label with smaller font
             const sizeFontSize = Math.max(7, Math.min(10, block.width / 10));
             this.ctx.font = `bold ${sizeFontSize}px Inter`;
+            this.ctx.strokeText(`${block.size}B`, block.x + block.width / 2, block.y + block.height / 2 + 2);
             this.ctx.fillText(`${block.size}B`, block.x + block.width / 2, block.y + block.height / 2 + 2);
             
             // Address label with smallest font
-            this.ctx.fillStyle = '#1a1a1a';
+            this.ctx.fillStyle = '#e9d5ff';  // Light purple for address
             const addrFontSize = Math.max(6, Math.min(8, block.width / 12));
             this.ctx.font = `bold ${addrFontSize}px Inter`;
             this.ctx.fillText(`0x${block.address.toString(16)}`, block.x + block.width / 2, block.y + block.height / 2 + 12);
@@ -3938,28 +4064,33 @@ export class MemoryManagement extends BaseAnimation {
             this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             this.ctx.fillRect(block.x + 2, block.y + 2, block.width, block.height);
             
-            // Free block background with gradient
+            // Free block background with gradient - emerald green
             const freeGradient = this.ctx.createLinearGradient(block.x, block.y, block.x, block.y + block.height);
-            freeGradient.addColorStop(0, 'rgba(46, 204, 113, 0.3)');
-            freeGradient.addColorStop(1, 'rgba(46, 204, 113, 0.1)');
+            freeGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');  // Emerald
+            freeGradient.addColorStop(1, 'rgba(5, 150, 105, 0.2)');   // Dark emerald
             this.ctx.fillStyle = freeGradient;
             this.ctx.fillRect(block.x, block.y, block.width, block.height);
             
-            // Free block border
-            this.ctx.strokeStyle = '#2ecc71';
-            this.ctx.lineWidth = 1;
+            // Free block border - dashed with emerald
+            this.ctx.strokeStyle = '#34d399';  // Light emerald
+            this.ctx.lineWidth = 1.5;
             this.ctx.setLineDash([5, 5]);
-            this.ctx.strokeRect(block.x, block.y, block.width, block.height);
+            this.roundRect(block.x, block.y, block.width, block.height, 6);
+            this.ctx.stroke();
             this.ctx.setLineDash([]);
             
             // Free label with better styling
-            this.ctx.fillStyle = '#2ecc71';
+            this.ctx.fillStyle = '#d1fae5';  // Very light emerald
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.lineWidth = 2;
             this.ctx.font = 'bold 9px Inter';
             this.ctx.textAlign = 'center';
+            this.ctx.strokeText(`FREE (${block.size}B)`, block.x + block.width / 2, block.y + block.height / 2);
             this.ctx.fillText(`FREE (${block.size}B)`, block.x + block.width / 2, block.y + block.height / 2);
             
             // Show address for larger free blocks
             if (block.size >= 512) {
+                this.ctx.fillStyle = '#a7f3d0';  // Light emerald for address
                 this.ctx.font = '8px Inter';
                 this.ctx.fillText(`0x${block.address.toString(16)}`, block.x + block.width / 2, block.y + block.height / 2 + 12);
             }
@@ -4001,51 +4132,32 @@ export class MemoryManagement extends BaseAnimation {
     
     drawExecutionPointer() {
         if (this.highlightedLine >= 0) {
-            const currentFunc = this.program.functions[this.currentFunction];
-            const y = this.codePanel.y + 70 + this.highlightedLine * 22;
+            const y = this.codePanel.y + 50 + this.highlightedLine * 20;
             
-            // Simple flashing circle around the line
-            const pulse = Math.sin(this.animationTime * 8) * 0.6 + 0.4;
+            // Position dot at the far right edge of the code panel
+            const dotX = this.codePanel.x + this.codePanel.width - 15;
             
-            // Flashing circle
-            this.ctx.strokeStyle = `rgba(255, 215, 0, ${pulse})`;
-            this.ctx.lineWidth = 2;
+            // Simple pulsating green dot
+            const pulse = 0.6 + Math.sin(this.animationTime * 4) * 0.4; // Smooth pulse between 0.2 and 1.0
+            const radius = 4;
+            
+            // Outer glow
+            this.ctx.shadowColor = '#2ecc71';
+            this.ctx.shadowBlur = 8 * pulse;
+            
+            // Green dot
+            this.ctx.fillStyle = `rgba(46, 204, 113, ${pulse})`;
             this.ctx.beginPath();
-            this.ctx.arc(this.codePanel.x + 15, y - 5, 12, 0, Math.PI * 2);
-            this.ctx.stroke();
-            
-            // Yellow circle
-            this.ctx.fillStyle = '#FFD700';
-            this.ctx.beginPath();
-            this.ctx.arc(this.codePanel.x + 15, y - 5, 6, 0, Math.PI * 2);
+            this.ctx.arc(dotX, y, radius, 0, Math.PI * 2);
             this.ctx.fill();
+            
+            // Reset shadow
+            this.ctx.shadowBlur = 0;
         }
     }
     
     drawExecutionTrail() {
-        // Draw execution trail showing the path of execution
-        for (let i = 0; i < this.executionTrail.length - 1; i++) {
-            const current = this.executionTrail[i];
-            const next = this.executionTrail[i + 1];
-            const alpha = 1 - (current.time / current.duration);
-            
-            // Enhanced trail with glow effect
-            this.ctx.shadowColor = '#FFD700';
-            this.ctx.shadowBlur = 4;
-            this.ctx.strokeStyle = `rgba(255, 215, 0, ${alpha * 0.6})`;
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-            this.ctx.moveTo(current.x, current.y);
-            this.ctx.lineTo(next.x, next.y);
-            this.ctx.stroke();
-            
-            // Draw trail dots with glow
-            this.ctx.fillStyle = `rgba(255, 215, 0, ${alpha * 0.8})`;
-            this.ctx.beginPath();
-            this.ctx.arc(current.x, current.y, 3, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.shadowBlur = 0;
-        }
+        // Execution trail disabled - using simple green dot pointer instead
     }
     
     drawMemoryAccesses() {
@@ -4472,21 +4584,7 @@ export class MemoryManagement extends BaseAnimation {
         }
     }
     
-    handleButtonClick(action) {
-        switch (action) {
-            case 'auto':
-                this.isAutoRunning = !this.isAutoRunning;
-                break;
-            case 'reset':
-                this.resetExecution();
-                break;
-            case 'step':
-                if (this.animationState === 'idle') {
-                    this.executeNextStep();
-                }
-                break;
-        }
-    }
+    // handleButtonClick moved earlier in the class - removed duplicate
     
     resetExecution() {
         this.initializeExecution();
@@ -4533,10 +4631,14 @@ export class MemoryManagement extends BaseAnimation {
         const canvasHeight = this.canvas.height;
         
         // Adjust panel positions for better responsiveness
-        this.codePanel = { x: 50, y: 50, width: Math.min(400, canvasWidth * 0.3), height: 300 };
-        this.stackPanel = { x: canvasWidth - 350, y: 50, width: 300, height: 300 };
-        this.heapPanel = { x: 50, y: 400, width: Math.max(750, canvasWidth - 100), height: 200 };
-        this.outputPanel = { x: canvasWidth - 350, y: 400, width: 300, height: 200 };
+        this.codePanel = { x: 50, y: 50, width: Math.min(500, canvasWidth * 0.4), height: 300 };
+        this.stackPanel = { x: canvasWidth - 270, y: 50, width: 220, height: 300 };
+        
+        // Center the heap panel
+        const heapWidth = Math.min(750, canvasWidth - 50);
+        this.heapPanel = { x: (canvasWidth - heapWidth) / 2, y: 380, width: heapWidth, height: 200 };
+        
+        this.outputPanel = { x: canvasWidth - 270, y: 400, width: 220, height: 200 };
         
         // Update free blocks positions
         this.updateFreeBlocks();
