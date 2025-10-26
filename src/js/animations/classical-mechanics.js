@@ -1233,6 +1233,7 @@ export class CollisionPhysics extends BaseAnimation {
         this.gravity = 0.5;
         this.speed = 1.0;
         this.showAnalytics = true; // Always enable analytics
+        this.showForceArrows = false; // Default: no force arrows
         this.collisionType = 'elastic';
         this.collisionCount = 0;
         this.collisionEffects = []; // Track collision effects for visual feedback
@@ -1257,6 +1258,10 @@ export class CollisionPhysics extends BaseAnimation {
     
     setGravity(gravity) {
         this.gravity = gravity;
+    }
+    
+    setShowForceArrows(show) {
+        this.showForceArrows = show;
     }
     
     setShowAnalytics(show) {
@@ -1605,7 +1610,7 @@ export class CollisionPhysics extends BaseAnimation {
             this.ctx.stroke();
             
             // Draw enhanced momentum vectors with modern styling
-            if (this.showAnalytics) {
+            if (this.showForceArrows) {
                 const velocity = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
                 if (velocity > 1) { // Only show vectors for moving balls
                     const vectorLength = 50; // Restore original length
@@ -1664,7 +1669,7 @@ export class CollisionPhysics extends BaseAnimation {
         }
         
         // Draw gravity force arrows on balls
-        if (this.showAnalytics) {
+        if (this.showForceArrows) {
             this.drawGravityForceArrows();
         }
         

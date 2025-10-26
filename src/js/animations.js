@@ -605,6 +605,11 @@ export class ScientificAnimations {
             this.collisions.setGravity(parseFloat(value));
         });
         
+        // Force arrows toggle
+        document.getElementById('showForceArrows').addEventListener('change', (e) => {
+            this.collisions.setShowForceArrows(e.target.checked);
+        });
+        
         // Analytics are always enabled for collision physics
         
         document.getElementById('collisionType').addEventListener('change', (e) => {
