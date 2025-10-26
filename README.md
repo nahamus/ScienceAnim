@@ -181,6 +181,9 @@ git checkout gh-pages
 # Copy built files to root directory (Windows)
 xcopy dist\* . /E /Y
 
+# For Linux/Mac users, use:
+# cp -r dist/* .
+
 # Add and commit the built files
 git add .
 git commit -m "Deploy built version with latest changes"
@@ -192,16 +195,82 @@ git push origin gh-pages
 git checkout develop
 ```
 
-#### **4. Verify Deployment**
+#### **4. Handle Merge Conflicts (if needed)**
+If you encounter merge conflicts during deployment:
+```bash
+# Pull latest changes from remote
+git pull origin gh-pages --allow-unrelated-histories
+
+# Resolve conflicts manually or use:
+git checkout --ours <conflicted-file>
+git add <conflicted-file>
+
+# Commit the merge
+git commit -m "Merge develop into gh-pages for deployment"
+
+# Push the changes
+git push origin gh-pages
+```
+
+#### **5. Verify Deployment**
 - Visit: [https://nahamus.github.io/ScienceAnim/](https://nahamus.github.io/ScienceAnim/)
 - Check that all animations are working correctly
 - Test responsive design on different devices
+- Clear browser cache if changes don't appear immediately
 
 ### **Deployment Notes**
 - **Branch**: Uses `gh-pages` branch for deployment
 - **Build Required**: Must run `npm run build` before deployment
 - **Built Files**: Deploy the contents of the `dist/` folder
 - **Updates**: Changes are live immediately after push
+- **Cache**: GitHub Pages may take 1-2 minutes to update
+
+### **Troubleshooting**
+- **Changes not visible**: Clear browser cache or wait 1-2 minutes
+- **Build errors**: Check for syntax errors in source files
+- **Merge conflicts**: Use `git checkout --ours` for config files
+- **404 errors**: Ensure `index.html` is in the root of gh-pages branch
+
+### **Quick Deployment Script**
+For faster deployment, you can create a batch file (Windows) or shell script:
+
+**deploy.bat** (Windows):
+```batch
+@echo off
+echo Building project...
+npm run build
+echo Switching to gh-pages branch...
+git checkout gh-pages
+echo Copying built files...
+xcopy dist\* . /E /Y
+echo Committing changes...
+git add .
+git commit -m "Deploy built version with latest changes"
+echo Pushing to GitHub Pages...
+git push origin gh-pages
+echo Switching back to develop...
+git checkout develop
+echo Deployment complete!
+```
+
+**deploy.sh** (Linux/Mac):
+```bash
+#!/bin/bash
+echo "Building project..."
+npm run build
+echo "Switching to gh-pages branch..."
+git checkout gh-pages
+echo "Copying built files..."
+cp -r dist/* .
+echo "Committing changes..."
+git add .
+git commit -m "Deploy built version with latest changes"
+echo "Pushing to GitHub Pages..."
+git push origin gh-pages
+echo "Switching back to develop..."
+git checkout develop
+echo "Deployment complete!"
+```
 
 ## Development Best Practices
 
