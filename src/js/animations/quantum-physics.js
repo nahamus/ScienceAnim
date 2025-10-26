@@ -4,6 +4,7 @@ import { BaseAnimation } from './base-animation.js';
 export class WaveParticleDuality extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'wave-particle-duality';
         this.canvas = ctx.canvas;
         
         // Quantum properties

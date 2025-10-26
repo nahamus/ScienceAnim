@@ -1,7 +1,7 @@
 import { BrownianMotion, Diffusion, GasLaws } from './animations/particle-physics.js';
 import { Pendulum, OrbitalMotion, CollisionPhysics, FrictionInclinedPlanes } from './animations/classical-mechanics.js';
 import { SoundWaves, WavePropagation } from './animations/wave-phenomena.js';
-import { ElectricFields, MagneticFields, DiodeTransistor } from './animations/elelectro-magnetism.js';
+import { ElectricFields, MagneticFields, DiodeTransistor } from './animations/electro-magnetism.js';
 import { WaveParticleDuality } from './animations/quantum-physics.js';
 import { NuclearReactions } from './animations/nuclear-physics.js';
 import { FluidFlow, Bernoulli } from './animations/fluid-dynamics.js';
@@ -64,6 +64,10 @@ export class ScientificAnimations {
     setupEventListeners() {
         // Category header clicks
         document.querySelectorAll('.category-header').forEach(header => {
+            const setExpanded = (el, expanded) => {
+                try { el.setAttribute('aria-expanded', String(expanded)); } catch {}
+            };
+
             header.addEventListener('click', (e) => {
                 const categoryItem = e.currentTarget.closest('.category-item');
                 const category = categoryItem.dataset.category;
@@ -74,6 +78,7 @@ export class ScientificAnimations {
                 if (sideNav.classList.contains('collapsed')) {
                     sideNav.classList.remove('collapsed');
                     mainContent.classList.remove('nav-collapsed');
+                    setExpanded(header, true);
                     return;
                 }
                 
@@ -81,11 +86,14 @@ export class ScientificAnimations {
                 document.querySelectorAll('.category-item').forEach(item => {
                     if (item !== categoryItem) {
                         item.classList.remove('active');
+                        const h = item.querySelector('.category-header');
+                        if (h) setExpanded(h, false);
                     }
                 });
                 
                 // Toggle current category
                 categoryItem.classList.toggle('active');
+                setExpanded(header, categoryItem.classList.contains('active'));
                 
                 // If this category is now active, switch to its first animation
                 if (categoryItem.classList.contains('active')) {
@@ -93,6 +101,13 @@ export class ScientificAnimations {
                     if (firstAnimation && !firstAnimation.classList.contains('active')) {
                         this.switchAnimation(firstAnimation.dataset.animation);
                     }
+                }
+            });
+            // Keyboard support
+            header.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    header.click();
                 }
             });
         });
@@ -119,21 +134,99 @@ export class ScientificAnimations {
         const navToggleBtn = document.querySelector('.nav-toggle-btn');
         const sideNav = document.querySelector('.side-navigation');
         const mainContent = document.querySelector('.main-content');
+        const controlsPanel = document.querySelector('.controls-panel');
+        const controlsToggle = document.querySelector('.controls-toggle');
+        const controlsBackdrop = document.getElementById('controlsBackdrop');
         
         if (navToggleBtn) {
             navToggleBtn.addEventListener('click', () => {
+                const willCollapse = !sideNav.classList.contains('collapsed');
                 sideNav.classList.toggle('collapsed');
                 mainContent.classList.toggle('nav-collapsed');
+                // Persist state
+                try { localStorage.setItem('sideNavCollapsed', String(willCollapse)); } catch {}
+                try { localStorage.setItem('sideNavUserToggled', 'true'); } catch {}
+                // Clear mobile-open state when collapsing on desktop
+                if (willCollapse) {
+                    sideNav.classList.remove('open');
+                    const mobileNavToggle = document.getElementById('mobileNavToggle');
+                    if (mobileNavToggle) mobileNavToggle.classList.remove('open');
+                }
+                // Toggle aria-expanded on the button for a11y
+                try {
+                    const expanded = !willCollapse;
+                    navToggleBtn.setAttribute('aria-expanded', String(expanded));
+                } catch {}
+            });
+            // Initialize aria-expanded
+            navToggleBtn.setAttribute('aria-expanded', String(!sideNav.classList.contains('collapsed')));
+        }
+        // Controls overlay open/close
+        const openControls = () => {
+            if (!controlsPanel || !controlsBackdrop) return;
+            controlsPanel.classList.remove('collapsed');
+            controlsBackdrop.classList.add('active');
+        };
+        const closeControls = () => {
+            if (!controlsPanel || !controlsBackdrop) return;
+            controlsPanel.classList.add('collapsed');
+            controlsBackdrop.classList.remove('active');
+        };
+        if (controlsToggle) {
+            controlsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+                else e.stopPropagation();
+                openControls();
             });
         }
+        if (controlsBackdrop) {
+            controlsBackdrop.addEventListener('click', closeControls);
+        }
+        const applyBtn = document.getElementById('controlsApplyBtn');
+        const cancelBtn = document.getElementById('controlsCancelBtn');
+        if (applyBtn) applyBtn.addEventListener('click', () => {
+            // Apply all control values (this will reinitialize the animation with new values)
+            this.applyControlValues();
+            // Don't call resetAnimation() as it resets to defaults
+            // The applyControlValues already reinitializes with the new settings
+            this.isRunning = true;
+            const playBtn = document.getElementById('playPauseBtn');
+            if (playBtn) playBtn.textContent = 'Pause';
+            closeControls();
+        });
+        if (cancelBtn) cancelBtn.addEventListener('click', closeControls);
 
         // Mobile navigation toggle
         const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const navBackdrop = document.getElementById('navBackdrop');
         
         if (mobileNavToggle && sideNav) {
+            const closeMobileNav = () => {
+                mobileNavToggle.classList.remove('open');
+                sideNav.classList.remove('open');
+            };
+
             mobileNavToggle.addEventListener('click', () => {
                 mobileNavToggle.classList.toggle('open');
                 sideNav.classList.toggle('open');
+                // When opening mobile nav, ensure desktop collapsed is cleared for consistency
+                if (sideNav.classList.contains('open')) {
+                    sideNav.classList.remove('collapsed');
+                    mainContent.classList.remove('nav-collapsed');
+                    try { localStorage.setItem('sideNavCollapsed', 'false'); } catch {}
+                }
+                try { localStorage.setItem('sideNavUserToggled', 'true'); } catch {}
+            });
+            
+            // Close on backdrop click and Esc key
+            if (navBackdrop) {
+                navBackdrop.addEventListener('click', () => closeMobileNav());
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sideNav.classList.contains('open')) {
+                    closeMobileNav();
+                }
             });
         }
 
@@ -151,19 +244,26 @@ export class ScientificAnimations {
         });
 
         
-        // Control buttons
-        document.getElementById('playPauseBtn').addEventListener('click', () => {
-            this.togglePlayPause();
-        });
-        
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            this.resetAnimation();
-        });
-        
-        // Learn More button
-        document.getElementById('learnMoreBtn').addEventListener('click', () => {
-            this.showScienceExplanation();
-        });
+        // Control buttons (optional presence)
+        const playPauseBtnEl = document.getElementById('playPauseBtn');
+        if (playPauseBtnEl) {
+            playPauseBtnEl.addEventListener('click', () => {
+                this.togglePlayPause();
+            });
+        }
+        const resetBtnEl = document.getElementById('resetBtn');
+        if (resetBtnEl) {
+            resetBtnEl.addEventListener('click', () => {
+                this.resetAnimation();
+            });
+        }
+        // Learn More button (now in stats area)
+        const learnMoreBtnEl = document.getElementById('learnMoreBtn');
+        if (learnMoreBtnEl) {
+            learnMoreBtnEl.addEventListener('click', () => {
+                this.showScienceExplanation();
+            });
+        }
         
         // Modal close button
         document.getElementById('closeModal').addEventListener('click', () => {
@@ -184,6 +284,48 @@ export class ScientificAnimations {
             }
         });
         
+        // Responsive side nav layout helper
+        const applySideNavLayout = () => {
+            const width = window.innerWidth || document.documentElement.clientWidth;
+            const userToggled = (() => { try { return localStorage.getItem('sideNavUserToggled') === 'true'; } catch { return false; } })();
+            if (width <= 768) {
+                // Mobile overlay mode - no layout offset
+                sideNav.classList.remove('collapsed');
+                mainContent.classList.remove('nav-collapsed');
+                sideNav.classList.remove('open');
+                return;
+            }
+            if (!userToggled) {
+                if (width < 1320) {
+                    // Collapse nav when there's not enough space for 280px nav + 1000px content + padding
+                    sideNav.classList.add('collapsed');
+                    mainContent.classList.add('nav-collapsed');
+                    try { localStorage.setItem('sideNavCollapsed', 'true'); } catch {}
+                } else {
+                    sideNav.classList.remove('collapsed');
+                    mainContent.classList.remove('nav-collapsed');
+                    try { localStorage.setItem('sideNavCollapsed', 'false'); } catch {}
+                }
+            }
+        };
+
+        // Restore persisted side nav collapsed state and last animation
+        try {
+            const collapsed = localStorage.getItem('sideNavCollapsed');
+            if (collapsed === 'true') {
+                sideNav.classList.add('collapsed');
+                mainContent.classList.add('nav-collapsed');
+            }
+            const lastAnimation = localStorage.getItem('lastAnimation');
+            if (lastAnimation) {
+                // Defer to ensure DOM is ready
+                setTimeout(() => this.switchAnimation(lastAnimation), 0);
+            }
+        } catch {}
+
+        // Apply responsive layout once on load
+        applySideNavLayout();
+
         // Brownian Motion Controls
         this.setupSliderControl('particleCount', 'particleCountValue', (value) => {
             this.brownianMotion.setParticleCount(parseInt(value));
@@ -301,18 +443,6 @@ export class ScientificAnimations {
             this.soundWaves.setFrequency(parseInt(value));
         });
         
-        this.setupSliderControl('soundAmplitude', 'soundAmplitudeValue', (value) => {
-            this.soundWaves.setAmplitude(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundSpeed', 'soundSpeedValue', (value) => {
-            this.soundWaves.setWaveSpeed(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundParticles', 'soundParticlesValue', (value) => {
-            this.soundWaves.setParticleCount(parseInt(value));
-        });
-        
         this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
             this.soundWaves.setAnimationSpeed(parseFloat(value));
         });
@@ -392,8 +522,10 @@ export class ScientificAnimations {
         // Canvas click for adding charges, magnets, toggling switch, starting diffusion, and neural network testing
         this.canvas.addEventListener('click', (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
             
             if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
@@ -405,6 +537,10 @@ export class ScientificAnimations {
             } else if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
                 this.diffusion.startDiffusion();
             } else if (this.currentAnimation === 'sound-waves') {
+                // Check for control button clicks first
+                this.soundWaves.handleButtonClick(x, y);
+                
+                // Then check for source clicks
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
                 const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
@@ -471,9 +607,7 @@ export class ScientificAnimations {
             this.collisions.setGravity(parseFloat(value));
         });
         
-        document.getElementById('showAnalytics').addEventListener('change', (e) => {
-            this.collisions.setShowAnalytics(e.target.checked);
-        });
+        // Analytics are always enabled for collision physics
         
         document.getElementById('collisionType').addEventListener('change', (e) => {
             this.collisions.setCollisionType(e.target.value);
@@ -496,9 +630,7 @@ export class ScientificAnimations {
             this.friction.setGravity(parseFloat(value));
         });
         
-        document.getElementById('showFrictionAnalytics').addEventListener('change', (e) => {
-            this.friction.setShowAnalytics(e.target.checked);
-        });
+        // Analytics are always enabled for friction physics
         
         this.setupSliderControl('frictionCoefficient', 'frictionCoefficientValue', (value) => {
             this.friction.setFrictionCoefficient(parseFloat(value));
@@ -508,7 +640,28 @@ export class ScientificAnimations {
         
         // Window resize
         window.addEventListener('resize', () => {
+            // Auto-resize canvas
             this.resizeCanvas();
+            // Auto-adjust nav layout if user hasn't explicitly toggled
+            const sideNav = document.querySelector('.side-navigation');
+            const mainContent = document.querySelector('.main-content');
+            if (sideNav && mainContent) {
+                const userToggled = (() => { try { return localStorage.getItem('sideNavUserToggled') === 'true'; } catch { return false; } })();
+                if (!userToggled) {
+                    const width = window.innerWidth || document.documentElement.clientWidth;
+                    if (width <= 768) {
+                        sideNav.classList.remove('collapsed');
+                        mainContent.classList.remove('nav-collapsed');
+                    } else if (width < 1320) {
+                        // Collapse nav when there's not enough space for 280px nav + 1000px content + padding
+                        sideNav.classList.add('collapsed');
+                        mainContent.classList.add('nav-collapsed');
+                    } else {
+                        sideNav.classList.remove('collapsed');
+                        mainContent.classList.remove('nav-collapsed');
+                    }
+                }
+            }
         });
         
         // Comprehensive touch event handling for mobile support
@@ -516,8 +669,10 @@ export class ScientificAnimations {
             e.preventDefault();
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
             
             // Handle different animations based on current animation
             if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
@@ -529,6 +684,10 @@ export class ScientificAnimations {
                 // Add complete magnet with both poles
                 this.magneticFields.addMagnetAtPosition(x, y);
             } else if (this.currentAnimation === 'sound-waves') {
+                // Check for control button clicks first
+                this.soundWaves.handleButtonClick(x, y);
+                
+                // Then check for source clicks
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
                 const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
@@ -631,24 +790,8 @@ export class ScientificAnimations {
         });
         
         // Bernoulli's Principle Controls
-        this.setupSliderControl('bernoulliSpeed', 'bernoulliSpeedValue', (value) => {
-            this.bernoulli.setPressureDifference(parseFloat(value));
-        });
-        
-        this.setupSliderControl('pipeWidth', 'pipeWidthValue', (value) => {
-            this.bernoulli.setPipeWidth(parseInt(value));
-        });
-        
-        this.setupSliderControl('fluidDensity', 'fluidDensityValue', (value) => {
-            this.bernoulli.setFluidDensity(parseFloat(value));
-        });
-        
         this.setupSliderControl('pressureDifference', 'pressureDifferenceValue', (value) => {
             this.bernoulli.setPressureDifference(parseFloat(value));
-        });
-        
-        document.getElementById('bernoulliVisualizationMode').addEventListener('change', (e) => {
-            this.bernoulli.setVisualizationMode(e.target.value);
         });
         
         // Sound Waves Controls
@@ -660,18 +803,6 @@ export class ScientificAnimations {
             this.soundWaves.setFrequency(parseInt(value));
         });
         
-        this.setupSliderControl('soundAmplitude', 'soundAmplitudeValue', (value) => {
-            this.soundWaves.setAmplitude(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundSpeed', 'soundSpeedValue', (value) => {
-            this.soundWaves.setWaveSpeed(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundParticles', 'soundParticlesValue', (value) => {
-            this.soundWaves.setParticleCount(parseInt(value));
-        });
-        
         document.getElementById('soundWaveType').addEventListener('change', (e) => {
             this.soundWaves.setWaveType(e.target.value);
         });
@@ -679,8 +810,10 @@ export class ScientificAnimations {
         this.canvas.addEventListener('click', (e) => {
             if (this.currentAnimation === 'sound-waves') {
                 const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
                 const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
@@ -740,13 +873,11 @@ export class ScientificAnimations {
                 this.neuralNetwork.setSpeed(parseFloat(value));
             }
         });
+
+        // New NN controls
+        // Simplified: no optimizer/dataset/batch/dropout/decay controls for now
         
-        // Memory Management Controls
-        this.setupSliderControl('memorySpeed', 'memorySpeedValue', (value) => {
-            if (this.memoryManagement) {
-                this.memoryManagement.setAnimationSpeed(parseFloat(value));
-            }
-        });
+        // Memory Management Controls - removed memorySpeed as it's handled by on-canvas controls
         
         // Show Program Output toggle
         const showOutputCheckbox = document.getElementById('showOutput');
@@ -767,6 +898,8 @@ export class ScientificAnimations {
         this.setupSliderControl('blockchainDifficulty', 'blockchainDifficultyValue', (value) => {
             if (this.blockchain) {
                 this.blockchain.setDifficulty(parseInt(value));
+                // Update stats immediately to reflect new difficulty
+                this.updateBlockchainStats();
             }
         });
         
@@ -817,9 +950,13 @@ export class ScientificAnimations {
             return;
         }
         
-        slider.addEventListener('input', (e) => {
-            const value = e.target.value;
-            const unit = sliderId.includes('Speed') ? 'x' : 
+        const formatAndApply = (val) => {
+            const raw = typeof val === 'string' ? val : String(val);
+            const parsedNum = Number(raw);
+            const customUnit = valueDisplay.dataset.unit || slider.dataset.unit || '';
+            const decimalsAttr = valueDisplay.dataset.decimals || slider.dataset.decimals;
+            const decimals = decimalsAttr !== undefined ? Number(decimalsAttr) : undefined;
+            const fallbackUnit = sliderId.includes('Speed') ? 'x' : 
                         sliderId.includes('Angle') ? '°' : 
                         sliderId.includes('Length') ? '' : 
                         sliderId.includes('Wavelength') ? ' px' :
@@ -827,10 +964,20 @@ export class ScientificAnimations {
                         sliderId.includes('gasTemperature') ? 'K' : 
                         sliderId.includes('frictionCoefficient') ? '' : 
                         sliderId.includes('Voltage') ? 'V' : '';
-            
-            valueDisplay.textContent = value + unit;
-            callback(value);
+            const unit = customUnit || fallbackUnit;
+            const displayVal = !Number.isNaN(parsedNum) && decimals !== undefined
+                ? parsedNum.toFixed(decimals)
+                : raw;
+            valueDisplay.textContent = displayVal + unit;
+            callback(raw);
+        };
+
+        slider.addEventListener('input', (e) => {
+            formatAndApply(e.target.value);
         });
+
+        // Initialize display and underlying value on load
+        formatAndApply(slider.value);
     }
     
     updateDualityControls(mode) {
@@ -1051,6 +1198,7 @@ export class ScientificAnimations {
         }
         
         this.currentAnimation = animationType;
+        try { localStorage.setItem('lastAnimation', animationType); } catch {}
         this.resetAnimation();
         
         // Initialize wave controls if switching to waves animation
@@ -1115,30 +1263,12 @@ export class ScientificAnimations {
         
         // Synchronize control values with sound waves parameters
         const frequencySlider = document.getElementById('soundFrequency');
-        const amplitudeSlider = document.getElementById('soundAmplitude');
-        const speedSlider = document.getElementById('soundSpeed');
-        const particlesSlider = document.getElementById('soundParticles');
         const animationSpeedSlider = document.getElementById('soundAnimationSpeed');
         const waveTypeSelect = document.getElementById('soundWaveType');
         
         if (frequencySlider && this.soundWaves) {
             frequencySlider.value = this.soundWaves.frequency;
             document.getElementById('soundFrequencyValue').textContent = this.soundWaves.frequency + ' Hz';
-        }
-        
-        if (amplitudeSlider && this.soundWaves) {
-            amplitudeSlider.value = this.soundWaves.amplitude;
-            document.getElementById('soundAmplitudeValue').textContent = this.soundWaves.amplitude + '%';
-        }
-        
-        if (speedSlider && this.soundWaves) {
-            speedSlider.value = this.soundWaves.waveSpeed;
-            document.getElementById('soundSpeedValue').textContent = this.soundWaves.waveSpeed + ' m/s';
-        }
-        
-        if (particlesSlider && this.soundWaves) {
-            particlesSlider.value = this.soundWaves.particleCount;
-            document.getElementById('soundParticlesValue').textContent = this.soundWaves.particleCount;
         }
         
         if (animationSpeedSlider && this.soundWaves) {
@@ -1169,6 +1299,114 @@ export class ScientificAnimations {
         this.isRunning = !this.isRunning;
         const btn = document.getElementById('playPauseBtn');
         btn.textContent = this.isRunning ? 'Pause' : 'Play';
+    }
+    
+    applyControlValues() {
+        // Apply control values based on current animation
+        // Read values from controls and apply them to the animation instance
+        switch(this.currentAnimation) {
+            case 'brownian':
+                if (this.brownianMotion) {
+                    const particleCount = parseInt(document.getElementById('particleCount')?.value);
+                    const speed = parseFloat(document.getElementById('speed')?.value);
+                    const temperature = parseFloat(document.getElementById('temperature')?.value);
+                    if (!isNaN(particleCount)) this.brownianMotion.setParticleCount(particleCount);
+                    if (!isNaN(speed)) this.brownianMotion.setSpeed(speed);
+                    if (!isNaN(temperature)) this.brownianMotion.setTemperature(temperature);
+                }
+                break;
+            case 'pendulum':
+                if (this.pendulum) {
+                    const length = parseFloat(document.getElementById('pendulumLength')?.value);
+                    const speed = parseFloat(document.getElementById('pendulumSpeed')?.value);
+                    const angle = parseFloat(document.getElementById('initialAngle')?.value);
+                    const gravity = parseFloat(document.getElementById('gravity')?.value);
+                    const damping = parseFloat(document.getElementById('damping')?.value);
+                    if (!isNaN(length)) this.pendulum.setLength(length);
+                    if (!isNaN(speed)) this.pendulum.setSpeed(speed);
+                    if (!isNaN(angle)) this.pendulum.setInitialAngle(angle);
+                    if (!isNaN(gravity)) this.pendulum.setGravity(gravity);
+                    if (!isNaN(damping)) this.pendulum.setDamping(damping);
+                }
+                break;
+            case 'diffusion':
+                if (this.diffusion) {
+                    const particleCount = parseInt(document.getElementById('diffusionParticles')?.value);
+                    const speed = parseFloat(document.getElementById('diffusionSpeed')?.value);
+                    const rate = parseFloat(document.getElementById('diffusionRate')?.value);
+                    if (!isNaN(particleCount)) this.diffusion.setParticleCount(particleCount);
+                    if (!isNaN(speed)) this.diffusion.setSpeed(speed);
+                    if (!isNaN(rate)) this.diffusion.setDiffusionRate(rate);
+                }
+                break;
+            case 'waves':
+                if (this.waves) {
+                    const waveType = document.getElementById('waveType')?.value;
+                    const frequency = parseFloat(document.getElementById('waveFrequency')?.value);
+                    const amplitude = parseFloat(document.getElementById('waveAmplitude')?.value);
+                    if (waveType) this.waves.setWaveType(waveType);
+                    if (!isNaN(frequency)) this.waves.setFrequency(frequency);
+                    if (!isNaN(amplitude)) this.waves.setAmplitude(amplitude);
+                }
+                break;
+            case 'orbital':
+                if (this.orbital) {
+                    const speed = parseFloat(document.getElementById('orbitalSpeed')?.value);
+                    const eccentricity = parseFloat(document.getElementById('eccentricity')?.value);
+                    if (!isNaN(speed)) this.orbital.setSpeed(speed);
+                    if (!isNaN(eccentricity)) this.orbital.setEccentricity(eccentricity);
+                }
+                break;
+            case 'gas-laws':
+                if (this.gasLaws) {
+                    const speed = parseFloat(document.getElementById('gasSpeed')?.value);
+                    const particleCount = parseInt(document.getElementById('gasParticleCount')?.value);
+                    const temperature = parseFloat(document.getElementById('gasTemperature')?.value);
+                    const volume = parseFloat(document.getElementById('gasVolume')?.value);
+                    if (!isNaN(speed)) this.gasLaws.setSpeed(speed);
+                    if (!isNaN(particleCount)) this.gasLaws.setParticleCount(particleCount);
+                    if (!isNaN(temperature)) this.gasLaws.setTemperature(temperature);
+                    if (!isNaN(volume)) this.gasLaws.setVolume(volume);
+                }
+                break;
+            case 'collisions':
+                if (this.collisions) {
+                    const speed = parseFloat(document.getElementById('collisionSpeed')?.value);
+                    const ballCount = parseInt(document.getElementById('ballCount')?.value);
+                    if (!isNaN(speed)) this.collisions.setSpeed(speed);
+                    if (!isNaN(ballCount)) this.collisions.setBallCount(ballCount);
+                }
+                break;
+            case 'friction':
+                if (this.friction) {
+                    const speed = parseFloat(document.getElementById('frictionSpeed')?.value);
+                    const coefficient = parseFloat(document.getElementById('frictionCoefficient')?.value);
+                    const angle = parseFloat(document.getElementById('inclineAngle')?.value);
+                    if (!isNaN(speed)) this.friction.setSpeed(speed);
+                    if (!isNaN(coefficient)) this.friction.setFrictionCoefficient(coefficient);
+                    if (!isNaN(angle)) this.friction.setInclineAngle(angle);
+                }
+                break;
+            case 'electric-fields':
+                if (this.electricFields) {
+                    const speed = parseFloat(document.getElementById('efSpeed')?.value);
+                    const fieldStrength = parseFloat(document.getElementById('efFieldStrength')?.value);
+                    if (!isNaN(speed)) this.electricFields.setSpeed(speed);
+                    if (!isNaN(fieldStrength)) this.electricFields.setFieldStrength(fieldStrength);
+                }
+                break;
+            case 'sound-waves':
+                if (this.soundWaves) {
+                    const waveType = document.getElementById('soundWaveType')?.value;
+                    const frequency = parseFloat(document.getElementById('soundFrequency')?.value);
+                    const animationSpeed = parseFloat(document.getElementById('soundAnimationSpeed')?.value);
+                    if (waveType) this.soundWaves.setWaveType(waveType);
+                    if (!isNaN(frequency)) this.soundWaves.setFrequency(frequency);
+                    if (!isNaN(animationSpeed)) this.soundWaves.setAnimationSpeed(animationSpeed);
+                }
+                break;
+            // Add more cases as needed for other animations
+        }
     }
     
     resetAnimation() {
@@ -1236,14 +1474,13 @@ export class ScientificAnimations {
     }
     
     resizeCanvas() {
-        const container = this.canvas.parentElement;
-        // Account for padding: container has 20px padding, animation-container has 20px padding
-        const availableWidth = container.clientWidth - 40; // 20px padding on each side
-        const maxWidth = Math.max(availableWidth, 800); // Minimum width of 800px
+        const container = this.canvas.parentElement; // .canvas-wrapper
+        // Standardize canvas size: fixed width with 4:3 aspect ratio
+        const standardWidth = 800;
+        const standardHeight = 600;
         
-        // Maintain 4:3 aspect ratio with minimum height
-        this.canvas.width = maxWidth;
-        this.canvas.height = Math.max(maxWidth / 1.333, 400); // 4:3 aspect ratio (1.333) with min height of 400px
+        this.canvas.width = standardWidth;
+        this.canvas.height = standardHeight;
         
         // Update source and receiver positions for sound waves
         if (this.soundWaves) {
@@ -1259,6 +1496,11 @@ export class ScientificAnimations {
         // Initialize neural network if it hasn't been initialized yet
         if (this.neuralNetwork && this.neuralNetwork.neurons.length === 0) {
             this.neuralNetwork.initializeNetwork();
+        }
+        
+        // Resize memory management panels if needed
+        if (this.memoryManagement) {
+            this.memoryManagement.resize();
         }
     }
     
@@ -1433,23 +1675,30 @@ export class ScientificAnimations {
         }
         
         if (format === 'time') {
-            return (value / 1000).toFixed(1) + 's';
+            return (value / 1000).toFixed(2) + 's';
         }
         
         if (format === 'angle') {
-            return value.toFixed(decimalPlaces || 1) + '°';
+            return value.toFixed(decimalPlaces || 2) + '°';
         }
         
         if (format === 'percentage') {
-            return value.toFixed(decimalPlaces || 1) + '%';
+            return value.toFixed(decimalPlaces || 2) + '%';
         }
         
         if (format === 'unit') {
+            if (typeof value === 'number') {
+                const dp = (decimalPlaces !== undefined) ? decimalPlaces : 2;
+                return value.toFixed(dp) + (suffix || '');
+            }
             return value + (suffix || '');
         }
         
         if (format === 'decimal') {
-            return value.toFixed(decimalPlaces || 2);
+            if (typeof value === 'number') {
+                return value.toFixed(decimalPlaces || 2);
+            }
+            return value.toString();
         }
         
         if (format === 'boolean') {
@@ -1471,21 +1720,19 @@ export class ScientificAnimations {
         this.updateStats('brownianMotion', {
             'activeParticles': { path: 'particleCount' },
             'avgSpeed': { path: 'avgSpeed', format: 'decimal', decimalPlaces: 2 },
-            'simTime': { path: 'time', format: 'time' },
             'brownianCollisionCount': { path: 'collisionCount' },
-            'brownianMeanFreePath': { path: 'meanFreePath', format: 'decimal', decimalPlaces: 1 },
-            'brownianTemperature': { path: 'temperature', format: 'decimal', decimalPlaces: 1 }
+            'brownianMeanFreePath': { path: 'meanFreePath', format: 'decimal', decimalPlaces: 2 },
+            'brownianTemperature': { path: 'temperature', format: 'decimal', decimalPlaces: 2 }
         });
     }
     
     updatePendulumStats() {
         this.updateStats('pendulum', {
-            'currentAngle': { path: 'angle', format: 'angle', decimalPlaces: 1 },
+            'currentAngle': { path: 'angle', format: 'angle', decimalPlaces: 2 },
             'angularVelocity': { path: 'angularVelocity', format: 'decimal', decimalPlaces: 2 },
             'period': { path: 'theoreticalPeriod', format: 'unit', suffix: 's', decimalPlaces: 2 },
-            'pendulumTime': { path: 'time', format: 'time' },
-            'pendulumAirResistance': { path: 'airResistanceForce', format: 'decimal', decimalPlaces: 3 },
-            'pendulumDamping': { path: 'dampingCoefficient', format: 'decimal', decimalPlaces: 3 }
+            'pendulumAirResistance': { path: 'airResistanceForce', format: 'decimal', decimalPlaces: 2 },
+            'pendulumDamping': { path: 'dampingCoefficient', format: 'decimal', decimalPlaces: 2 }
         });
     }
     
@@ -1494,7 +1741,7 @@ export class ScientificAnimations {
             'diffusionParticleCount': { path: 'particleCount' },
             'diffusionAvgSpeed': { path: 'avgSpeed', format: 'decimal', decimalPlaces: 2 },
             'concentrationSpread': { path: 'concentrationSpread', format: 'decimal', decimalPlaces: 2 },
-            'diffusionTime': { path: 'time', format: 'time' }
+            
         });
     }
     
@@ -1502,13 +1749,13 @@ export class ScientificAnimations {
     
     updateWaveStats() {
         this.updateStats('waves', {
-            'currentWaveType': { path: 'waveType' },
-            'currentFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
-            'currentWavelength': { path: 'wavelength', format: 'unit', suffix: ' px' },
-            'currentAmplitude': { path: 'amplitude', format: 'unit', suffix: ' px' },
-            'currentWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' px/s' },
-            'currentWaveEnergy': { path: 'energy' },
-            'wavesTime': { path: 'time', format: 'unit', suffix: 's' }
+            'currentWaveType': { path: 'waveType', format: 'capitalize' },
+            'currentFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz', decimalPlaces: 2 },
+            'currentWavelength': { path: 'wavelength', format: 'unit', suffix: ' px', decimalPlaces: 2 },
+            'currentAmplitude': { path: 'amplitude', format: 'unit', suffix: ' px', decimalPlaces: 2 },
+            'currentWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' px/s', decimalPlaces: 2 },
+            'currentWaveEnergy': { path: 'energy', format: 'decimal', decimalPlaces: 2 },
+            
         });
     }
     
@@ -1517,7 +1764,6 @@ export class ScientificAnimations {
             'orbitalPeriod': { path: 'period', format: 'unit', suffix: 's', decimalPlaces: 2 },
             'orbitalSpeed': { path: 'speed', format: 'decimal', decimalPlaces: 2 },
             'orbitalDistance': { path: 'distance', format: 'decimal', decimalPlaces: 1 },
-            'orbitalTime': { path: 'time', format: 'time' },
             'orbitalEccentricity': { path: 'eccentricity', format: 'decimal', decimalPlaces: 2 }
         });
     }
@@ -1525,18 +1771,18 @@ export class ScientificAnimations {
     updateElectricFieldsStats() {
         this.updateStats('electricFields', {
             'activeCharges': { path: 'chargeCount' },
-            'efParticleCount': { path: 'particleCount' },
-            'efFieldStrength': { path: 'fieldStrength' },
-            'efTime': { path: 'time', format: 'unit', suffix: 's' }
+            'stat-efParticleCount': { path: 'particleCount' },
+            'stat-efFieldStrength': { path: 'fieldStrength' },
+            
         });
     }
     
     updateGasLawsStats() {
         this.updateStats('gasLaws', {
-            'gasParticleCount': { path: 'particleCount' },
-            'gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K' },
-            'gasPressure': { path: 'pressure', format: 'decimal', decimalPlaces: 2 },
-            'gasVolume': { path: 'volume' }
+            'stat-gasParticleCount': { path: 'particleCount' },
+            'stat-gasTemperature': { path: 'temperature', format: 'unit', suffix: 'K', decimalPlaces: 2 },
+            'stat-gasPressure': { path: 'pressure', format: 'decimal', decimalPlaces: 2 },
+            'stat-gasVolume': { path: 'volume' }
         });
     }
     
@@ -1554,8 +1800,8 @@ export class ScientificAnimations {
     updateFrictionStats() {
         this.updateStats('friction', {
             'frictionSurface': { path: 'surfaceType' },
-            'frictionAngle': { path: 'inclineAngle', format: 'angle' },
-            'frictionNetForce': { path: 'netForce', format: 'decimal', decimalPlaces: 1 },
+            'frictionAngle': { path: 'inclineAngle', format: 'angle', decimalPlaces: 2 },
+            'frictionNetForce': { path: 'netForce', format: 'decimal', decimalPlaces: 2 },
             'frictionAcceleration': { path: 'acceleration', format: 'decimal', decimalPlaces: 2 }
         });
     }
@@ -1564,9 +1810,9 @@ export class ScientificAnimations {
     
     updateMagneticFieldsStats() {
         this.updateStats('magneticFields', {
-            'magneticFieldStrength': { path: 'fieldStrength' },
-            'magneticParticleCount': { path: 'particleCount' },
-            'magneticTime': { path: 'time', format: 'unit', suffix: 's' }
+            'stat-magneticFieldStrength': { path: 'fieldStrength' },
+            'stat-magneticParticleCount': { path: 'particleCount' },
+            
         });
     }
     
@@ -1580,7 +1826,7 @@ export class ScientificAnimations {
             'waveFunctionStatus': { path: 'showWaveFunction', format: 'boolean' },
             'interferenceStatus': { path: 'showInterference', format: 'boolean' },
             'measurementCount': { path: 'measurementCount' },
-            'dualityTime': { path: 'time', format: 'unit', suffix: 's' }
+            
         });
     }
     
@@ -1588,33 +1834,35 @@ export class ScientificAnimations {
         this.updateStats('fluidFlow', {
             'fluidFlowRate': { path: 'flowRate', format: 'decimal', decimalPlaces: 1 },
             'fluidViscosity': { path: 'viscosity', format: 'decimal', decimalPlaces: 1 },
-            'reynoldsNumberValue': { path: 'reynoldsNumber' },
+            'stat-reynoldsNumber': { path: 'reynoldsNumber' },
             'flowType': { path: 'flowType' },
             'averageVelocity': { path: 'averageVelocity', format: 'decimal', decimalPlaces: 2 },
-            'fluidTime': { path: 'time', format: 'time' }
+            'viscosityEffect': { path: 'viscosityEffect', format: 'percentage', decimalPlaces: 0 },
+            'velocityRatio': { path: 'velocityRatio', format: 'decimal', decimalPlaces: 1 },
+            'topPorosity': { path: 'topPorosity', format: 'percentage', decimalPlaces: 0 },
+            'bottomPorosity': { path: 'bottomPorosity', format: 'percentage', decimalPlaces: 0 },
+            
         });
     }
     
     updateBernoulliStats() {
         this.updateStats('bernoulli', {
-            'bernoulliPipeWidth': { path: 'pipeWidth' },
-            'bernoulliDensity': { path: 'fluidDensity', format: 'decimal', decimalPlaces: 1 },
             'bernoulliPressureDiff': { path: 'pressureDifference', format: 'decimal', decimalPlaces: 1 },
             'velocityRatio': { path: 'velocityRatio', format: 'decimal', decimalPlaces: 1 },
             'energyConservation': { path: 'energyConservation' },
-            'bernoulliTime': { path: 'time', format: 'time' }
+            'particleCount': { path: 'particleCount' },
+            'maxParticles': { path: 'maxParticles' },
+            'flowEfficiency': { path: 'flowEfficiency', format: 'percentage' },
+            
         });
     }
     
     updateSoundWavesStats() {
         this.updateStats('soundWaves', {
-            'soundWaveTypeDisplay': { path: 'waveType', format: 'capitalize' },
-            'soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz' },
-            'soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
-            'soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s' },
-            'soundAmplitude': { path: 'amplitude', format: 'percentage' },
-            'soundParticleCount': { path: 'particleCount' },
-            'soundTime': { path: 'time', format: 'time' }
+            'stat-soundWaveType': { path: 'waveType', format: 'capitalize' },
+            'stat-soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz', decimalPlaces: 2 },
+            'stat-soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
+            'stat-soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s', decimalPlaces: 2 }
         });
     }
     
@@ -1642,9 +1890,9 @@ export class ScientificAnimations {
     updateNeuralNetworkStats() {
         this.updateStats('neuralNetwork', {
             'neuralEpoch': { path: 'epoch' },
-            'neuralLoss': { path: 'currentLoss', format: 'decimal', decimalPlaces: 4 },
-            'neuralAccuracy': { path: 'currentAccuracy', format: 'percentage', decimalPlaces: 1 },
-            'neuralLearningRate': { path: 'learningRate' },
+            'neuralLoss': { path: 'currentLoss', format: 'decimal', decimalPlaces: 2 },
+            'neuralAccuracy': { path: 'currentAccuracy', format: 'percentage', decimalPlaces: 2 },
+            'neuralLearningRate': { path: 'learningRate', format: 'decimal', decimalPlaces: 2 },
             'neuralSpeed': { path: 'speed', format: 'unit', suffix: 'x', decimalPlaces: 1 },
             'neuralPhase': { path: 'animationPhase' },
             'neuralDataIndex': { path: 'trainingDataIndex' }
@@ -1777,7 +2025,12 @@ export class ScientificAnimations {
                 state.controls = {
                     learningRate: document.getElementById('neuralLearningRate')?.value || '0.1',
                     speed: document.getElementById('neuralSpeed')?.value || '1.0',
-                    mode: document.getElementById('neuralMode')?.value || 'training'
+                    mode: document.getElementById('neuralMode')?.value || 'training',
+                    optimizer: document.getElementById('neuralOptimizer')?.value || 'sgd',
+                    dataset: document.getElementById('neuralDataset')?.value || 'shapes',
+                    batchSize: document.getElementById('neuralBatchSize')?.value || '4',
+                    dropout: document.getElementById('neuralDropout')?.value || '0',
+                    weightDecay: document.getElementById('neuralWeightDecay')?.value || '0'
                 };
                 state.stats = this.neuralNetwork?.getStats() || {};
                 break;
@@ -2443,46 +2696,92 @@ export class ScientificAnimations {
                 };
             case 'fluid-flow':
                 return {
-                    title: 'Fluid Flow - Laminar and Turbulent Dynamics',
+                    title: 'Fluid Flow - Enhanced Viscosity & Porosity Effects',
                     html: `
                         <div class="science-content">
                             <h3>What is Fluid Flow?</h3>
-                            <p>Fluid flow describes how liquids and gases move through space. Understanding flow patterns is crucial for engineering applications, from blood flow in arteries to air flow over airplane wings.</p>
+                            <p>Fluid flow describes how liquids and gases move through space and porous materials. This enhanced simulation demonstrates realistic fluid dynamics with visible viscosity effects, Reynolds number transitions, and porous media flow patterns.</p>
                             
                             <h3>Key Scientific Concepts</h3>
                             <ul>
-                                <li><strong>Laminar Flow:</strong> Smooth, parallel streamlines with no mixing between layers</li>
-                                <li><strong>Turbulent Flow:</strong> Chaotic, swirling motion with rapid mixing</li>
-                                <li><strong>Reynolds Number:</strong> Re = ρvL/μ (determines flow type)</li>
-                                <li><strong>Viscosity:</strong> Internal friction that resists flow</li>
-                                <li><strong>Boundary Layer:</strong> Region near surfaces where flow is affected by friction</li>
+                                <li><strong>Laminar Flow:</strong> Smooth, parallel streamlines with no mixing between layers (Re < 2300)</li>
+                                <li><strong>Turbulent Flow:</strong> Chaotic, swirling motion with rapid mixing (Re > 4000)</li>
+                                <li><strong>Reynolds Number:</strong> Re = ρvL/μ - determines flow regime and transition points</li>
+                                <li><strong>Enhanced Viscosity Effects:</strong> Internal friction that visibly slows particle movement</li>
+                                <li><strong>Porous Media Flow:</strong> Fluid movement through materials with different porosity levels</li>
+                                <li><strong>Darcy's Law:</strong> Flow rate through porous media depends on permeability and pressure gradient</li>
                             </ul>
                             
                             <h3>What You Should Observe</h3>
                             <ul>
-                                <li>Smooth, parallel streamlines in laminar flow</li>
-                                <li>Chaotic, swirling patterns in turbulent flow</li>
-                                <li>Flow separation around obstacles</li>
-                                <li>Velocity changes with viscosity</li>
-                                <li>Reynolds number transitions</li>
+                                <li><strong>Viscosity Effects:</strong> Particles move much slower with high viscosity (5x enhanced visibility)</li>
+                                <li><strong>Flow Regimes:</strong> Smooth laminar flow vs chaotic turbulent flow based on Reynolds number</li>
+                                <li><strong>Porosity Effects:</strong> Particles slow down significantly in porous materials</li>
+                                <li><strong>Visualization Modes:</strong> Different analysis panels show pressure, velocity, and porosity effects</li>
+                                <li><strong>Real-time Statistics:</strong> Live updates of Reynolds number, flow type, and viscosity effects</li>
                             </ul>
                             
-                            <h3>Flow Regimes</h3>
+                            <h3>Enhanced Features</h3>
                             <ul>
-                                <li><strong>Re < 2300:</strong> Laminar flow (smooth, predictable)</li>
-                                <li><strong>2300 < Re < 4000:</strong> Transitional flow (unstable)</li>
-                                <li><strong>Re > 4000:</strong> Turbulent flow (chaotic, mixing)</li>
-                                <li><strong>High Re:</strong> Inertia dominates over viscosity</li>
-                                <li><strong>Low Re:</strong> Viscosity dominates over inertia</li>
+                                <li><strong>Visible Viscosity:</strong> 5x stronger effect makes viscosity changes clearly observable</li>
+                                <li><strong>Reynolds Number Display:</strong> Real-time calculation and color-coded flow type indicators</li>
+                                <li><strong>Porosity Analysis:</strong> Comparison between high and low porosity materials</li>
+                                <li><strong>Velocity Analysis:</strong> Shows how porosity affects flow velocity</li>
+                                <li><strong>Pressure Analysis:</strong> Demonstrates pressure build-up in porous materials</li>
+                                <li><strong>Clean UI:</strong> Removed redundant information for better focus</li>
+                            </ul>
+                            
+                            <h3>Flow Regimes & Transitions</h3>
+                            <ul>
+                                <li><strong>Laminar (Re < 2300):</strong> Green indicator - smooth, predictable flow</li>
+                                <li><strong>Transitional (2300 < Re < 4000):</strong> Orange indicator - unstable, mixed flow</li>
+                                <li><strong>Turbulent (Re > 4000):</strong> Red indicator - chaotic, highly mixed flow</li>
+                                <li><strong>Viscosity Impact:</strong> High viscosity = lower Reynolds number = more laminar flow</li>
+                                <li><strong>Flow Rate Impact:</strong> High flow rate = higher Reynolds number = more turbulent flow</li>
+                            </ul>
+                            
+                            <h3>Porous Media Physics</h3>
+                            <ul>
+                                <li><strong>High Porosity Material:</strong> More open spaces, particles flow through more easily</li>
+                                <li><strong>Low Porosity Material:</strong> Fewer open spaces, particles slow down significantly</li>
+                                <li><strong>Velocity Ratio:</strong> Shows the speed difference between materials</li>
+                                <li><strong>Pressure Build-up:</strong> Porous materials create resistance and pressure gradients</li>
+                                <li><strong>Flow Patterns:</strong> Particles follow tortuous paths through porous structures</li>
+                            </ul>
+                            
+                            <h3>Interactive Controls</h3>
+                            <ul>
+                                <li><strong>Flow Rate Slider:</strong> Adjusts particle speed and Reynolds number</li>
+                                <li><strong>Viscosity Slider:</strong> Controls internal friction (now 5x more visible)</li>
+                                <li><strong>Visualization Modes:</strong> Switch between particle flow, pressure, velocity, and porosity analysis</li>
+                                <li><strong>Real-time Feedback:</strong> Watch statistics update as you adjust parameters</li>
                             </ul>
                             
                             <h3>Real-World Applications</h3>
                             <ul>
-                                <li>Blood flow in cardiovascular system</li>
-                                <li>Air flow over aircraft wings</li>
-                                <li>Water flow in pipes and channels</li>
-                                <li>Weather patterns and atmospheric flow</li>
-                                <li>Industrial mixing and processing</li>
+                                <li><strong>Groundwater Flow:</strong> Water movement through soil and rock formations</li>
+                                <li><strong>Oil Reservoir Engineering:</strong> Petroleum flow through porous rock</li>
+                                <li><strong>Blood Flow:</strong> Circulation through capillaries and tissue</li>
+                                <li><strong>Air Filtration:</strong> Gas flow through filter materials</li>
+                                <li><strong>Chemical Processing:</strong> Fluid flow through catalyst beds</li>
+                                <li><strong>Geothermal Systems:</strong> Heat transfer in porous media</li>
+                            </ul>
+                            
+                            <h3>Mathematical Foundation</h3>
+                            <ul>
+                                <li><strong>Reynolds Number:</strong> Re = (ρ × V × D) / μ where ρ=density, V=velocity, D=characteristic length, μ=viscosity</li>
+                                <li><strong>Viscosity Effect:</strong> velocity_factor = 1 - (viscosity × 0.1) - 5x enhanced for visibility</li>
+                                <li><strong>Porosity Factor:</strong> porosity_factor = 1 - (1 - porosity) × 0.6</li>
+                                <li><strong>Darcy's Law:</strong> Q = -kA(ΔP/ΔL)/μ where k=permeability, A=cross-sectional area</li>
+                            </ul>
+                            
+                            <h3>Educational Value</h3>
+                            <ul>
+                                <li><strong>Visual Learning:</strong> See abstract concepts like viscosity and Reynolds number in action</li>
+                                <li><strong>Parameter Relationships:</strong> Understand how flow rate, viscosity, and porosity interact</li>
+                                <li><strong>Real-time Analysis:</strong> Watch statistics update as you experiment with controls</li>
+                                <li><strong>Multiple Perspectives:</strong> Different visualization modes show various aspects of fluid dynamics</li>
+                                <li><strong>Scientific Accuracy:</strong> Based on real fluid dynamics equations and principles</li>
                             </ul>
                         </div>
                     `
@@ -2493,7 +2792,7 @@ export class ScientificAnimations {
                     html: `
                         <div class="science-content">
                             <h3>What is Bernoulli's Principle?</h3>
-                            <p>Bernoulli's principle states that in a flowing fluid, an increase in velocity is accompanied by a decrease in pressure. This is a consequence of energy conservation in fluid flow.</p>
+                            <p>Bernoulli's principle states that in a flowing fluid, an increase in velocity is accompanied by a decrease in pressure. This is a consequence of energy conservation in fluid flow. Our enhanced simulation demonstrates this with continuous particle flow and realistic velocity transitions.</p>
                             
                             <h3>Key Scientific Concepts</h3>
                             <ul>
@@ -2502,15 +2801,26 @@ export class ScientificAnimations {
                                 <li><strong>Pressure-Velocity Trade-off:</strong> Higher velocity = lower pressure</li>
                                 <li><strong>Continuity Equation:</strong> A₁v₁ = A₂v₂ (mass conservation)</li>
                                 <li><strong>Venturi Effect:</strong> Pressure drop in constricted flow</li>
+                                <li><strong>Enhanced Particle System:</strong> Continuous flow with 80 particles maintained</li>
                             </ul>
                             
                             <h3>What You Should Observe</h3>
                             <ul>
-                                <li>Fluid speeding up in narrow sections</li>
-                                <li>Pressure decreasing in constricted areas</li>
-                                <li>Energy conservation maintained</li>
-                                <li>Velocity and pressure inversely related</li>
-                                <li>Flow rate remains constant</li>
+                                <li><strong>Continuous Particle Flow:</strong> Steady stream without gaps or stops</li>
+                                <li><strong>Velocity Transitions:</strong> Smooth speed changes through pipe constriction</li>
+                                <li><strong>Bernoulli Effect:</strong> Particles speed up 1.8x in narrow section</li>
+                                <li><strong>Energy Conservation:</strong> Total energy maintained throughout flow</li>
+                                <li><strong>Pressure Changes:</strong> Lower pressure in high-velocity regions</li>
+                                <li><strong>Flow Efficiency:</strong> Optimized particle management system</li>
+                            </ul>
+                            
+                            <h3>Enhanced Simulation Features</h3>
+                            <ul>
+                                <li><strong>Continuous Flow:</strong> Particles added continuously to maintain steady stream</li>
+                                <li><strong>Smart Particle Management:</strong> 80 particles with optimized addition/removal</li>
+                                <li><strong>Realistic Transitions:</strong> Gradual velocity changes in pipe constrictions</li>
+                                <li><strong>Energy Visualization:</strong> Color-coded particles show energy distribution</li>
+                                <li><strong>Flow Efficiency:</strong> Real-time calculation of flow performance</li>
                             </ul>
                             
                             <h3>Energy Components</h3>
@@ -2519,15 +2829,25 @@ export class ScientificAnimations {
                                 <li><strong>Kinetic Energy:</strong> ½ρv² (energy of motion)</li>
                                 <li><strong>Potential Energy:</strong> ρgh (gravitational energy)</li>
                                 <li><strong>Total Energy:</strong> Sum remains constant</li>
+                                <li><strong>Flow Efficiency:</strong> Percentage of optimal flow achieved</li>
                             </ul>
                             
                             <h3>Real-World Applications</h3>
                             <ul>
-                                <li>Airplane wing lift generation</li>
-                                <li>Carburetor fuel mixing</li>
-                                <li>Venturi meters for flow measurement</li>
-                                <li>Spray bottles and atomizers</li>
-                                <li>Blood flow in arteries</li>
+                                <li><strong>Airplane Wings:</strong> Curved upper surface creates lift</li>
+                                <li><strong>Carburetors:</strong> Fuel mixing through pressure differences</li>
+                                <li><strong>Venturi Meters:</strong> Flow measurement using pressure drop</li>
+                                <li><strong>Spray Bottles:</strong> Atomization through constricted flow</li>
+                                <li><strong>Blood Flow:</strong> Arterial constriction effects</li>
+                                <li><strong>Wind Tunnels:</strong> Aerodynamic testing</li>
+                            </ul>
+                            
+                            <h3>Technical Implementation</h3>
+                            <ul>
+                                <li><strong>Particle System:</strong> 80 particles with continuous addition</li>
+                                <li><strong>Velocity Calculation:</strong> Based on cross-sectional area changes</li>
+                                <li><strong>Energy Conservation:</strong> Maintained through velocity-pressure relationship</li>
+                                <li><strong>Flow Monitoring:</strong> Real-time particle count and efficiency tracking</li>
                             </ul>
                         </div>
                     `
@@ -2537,103 +2857,48 @@ export class ScientificAnimations {
                     title: 'Neural Network Training - Object Recognition',
                     html: `
                         <div class="science-content">
-                            <h3>What are Neural Networks?</h3>
-                            <p>Neural networks are computational models inspired by biological neurons in the brain. They consist of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This animation demonstrates how neural networks learn to recognize and classify different geometric objects.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
+                            <h3>Overview</h3>
+                            <p>This animation shows a small neural network learning to classify geometric shapes as <em>simple</em> or <em>complex</em> using two features: symmetry and edge complexity. You can watch data flow forward, errors flow backward, and weights update in real-time.</p>
+
+                            <h3>Architecture</h3>
                             <ul>
-                                <li><strong>Artificial Neurons:</strong> Mathematical functions that receive inputs, apply weights, and produce outputs. Each neuron computes: output = σ(Σ(inputs × weights) + bias)</li>
-                                <li><strong>Network Architecture:</strong> Input layer (2 neurons) → Hidden layer 1 (4 neurons) → Hidden layer 2 (3 neurons) → Output layer (1 neuron)</li>
+                                <li><strong>Layers:</strong> 2 inputs → hidden layers (4, 3) → 1 output (binary)</li>
+                                <li><strong>Activation:</strong> Sigmoid σ(x) = 1/(1 + e<sup>−x</sup>)</li>
+                                <li><strong>Output:</strong> y ∈ (0,1) interpreted as probability of “complex”</li>
                             </ul>
-                            
-                            <h3>Why This Architecture?</h3>
-                            <ul>
-                                <li><strong>2 Input Neurons:</strong> Perfect for our 2-feature problem (symmetry, edges)</li>
-                                <li><strong>4 Hidden Neurons:</strong> Provides enough capacity to learn non-linear patterns without overfitting</li>
-                                <li><strong>3 Hidden Neurons:</strong> Allows further feature refinement and abstraction</li>
-                                <li><strong>1 Output Neuron:</strong> Binary classification (simple vs complex objects)</li>
-                            </ul>
-                            
-                            <h3>Layer Size Effects</h3>
-                            <ul>
-                                <li><strong>Too Few Neurons:</strong> Network can't learn complex patterns (underfitting)</li>
-                                <li><strong>Too Many Neurons:</strong> Network memorizes training data (overfitting)</li>
-                                <li><strong>Optimal Size:</strong> Balances learning capacity with generalization</li>
-                                <li><strong>Our Choice:</strong> 4→3 hidden layers provide sufficient complexity for this task</li>
-                            </ul>
-                                <li><strong>Weights & Biases:</strong> Numerical values that determine connection strength and neuron activation thresholds</li>
-                                <li><strong>Sigmoid Activation:</strong> σ(x) = 1/(1 + e^(-x)) - transforms any input to a value between 0 and 1</li>
-                                <li><strong>Backpropagation:</strong> Algorithm that calculates how much each weight should change to reduce prediction errors</li>
-                                <li><strong>Learning Rate:</strong> Controls how big weight updates are during training</li>
-                            </ul>
-                            
-                            <h3>Training Process Explained</h3>
+
+                            <h3>Training process (science)</h3>
                             <ol>
-                                <li><strong>Forward Propagation:</strong> Input features flow through the network, each neuron computes its output using weights and activation function</li>
-                                <li><strong>Loss Calculation:</strong> Compare network output with target value using Mean Squared Error: Loss = (target - output)²</li>
-                                <li><strong>Backward Propagation:</strong> Calculate error gradients for each weight using chain rule of calculus</li>
-                                <li><strong>Weight Updates:</strong> Adjust weights using gradient descent: Δw = learning_rate × gradient</li>
+                                <li><strong>Forward pass:</strong> y = σ(Wx + b)</li>
+                                <li><strong>Loss (MSE):</strong> L = (t − y)², where t ∈ {0,1}</li>
+                                <li><strong>Backpropagation:</strong> Compute ∂L/∂W via chain rule</li>
+                                <li><strong>Gradient descent:</strong> W ← W − α·∂L/∂W, b ← b − α·∂L/∂b</li>
                             </ol>
-                            
-                            <h3>Object Recognition Task</h3>
-                            <p>This network learns to classify geometric objects based on their complexity using 2 features:</p>
+
+                            <h3>Visual guide</h3>
                             <ul>
-                                <li><strong>Feature 1 - Symmetry Score (0-1):</strong> How symmetrical the object is (high = simple)</li>
-                                <li><strong>Feature 2 - Edge Complexity (0-1):</strong> How many edges/corners the object has (high = complex)</li>
-                                <li><strong>Simple Objects:</strong> Circle [0.9,0.1], Square [0.8,0.3] → Output: 0 (classified as simple)</li>
-                                <li><strong>Complex Objects:</strong> Triangle [0.6,0.5], Star [0.3,0.9] → Output: 1 (classified as complex)</li>
+                                <li><strong>Decision Boundary (bottom-left):</strong> Background color shows the model’s output over the 2D feature space. Amber rings mark <em>misclassified</em> training points.</li>
+                                <li><strong>Current Phase (top-right):</strong> Forward, Backward, Update, or Pause with progress.</li>
+                                <li><strong>Particles:</strong> Blue = forward flow, Red = error flow. Updated connections flash subtly.</li>
                             </ul>
-                            
-                            <h3>What You Should Observe</h3>
+
+                            <h3>How to use</h3>
                             <ul>
-                                <li><strong>Training Mode:</strong> Watch data flow forward (blue particles), errors flow backward (red particles), and weights update (flashing connections)</li>
-                                <li><strong>Testing Mode:</strong> See how the trained network processes new inputs and makes predictions with confidence scores</li>
-                                <li><strong>Visual Indicators:</strong> Active neurons pulse, weight changes are highlighted, and prediction accuracy improves over time</li>
-                                <li><strong>Object Context:</strong> Each training example shows the actual geometric object being learned</li>
+                                <li><strong>Mode:</strong> Switch Training/Testing in the controls.</li>
+                                <li><strong>Testing:</strong> Click a shape on the right to see prediction and confidence.</li>
+                                <li><strong>Learning Rate & Speed:</strong> Adjust to explore dynamics without changing the concept.</li>
                             </ul>
-                            
-                            <h3>Mathematical Foundation</h3>
+
+                            <h3>Scientific context</h3>
                             <ul>
-                                <li><strong>Neuron Output:</strong> y = σ(w₁x₁ + w₂x₂ + ... + wₙxₙ + b)</li>
-                                <li><strong>Loss Function:</strong> L = (y_target - y_predicted)²</li>
-                                <li><strong>Weight Update:</strong> w_new = w_old - α × ∂L/∂w</li>
-                                <li><strong>Gradient Calculation:</strong> ∂L/∂w = ∂L/∂y × ∂y/∂w (chain rule)</li>
+                                <li><strong>Feature learning:</strong> Hidden layers learn intermediate patterns from symmetry/edges.</li>
+                                <li><strong>Bias/variance:</strong> Too few neurons underfit; too many can overfit. This network is sized to learn the task cleanly.</li>
+                                <li><strong>Generalization:</strong> The decision boundary illustrates how the model separates classes beyond the training points.</li>
                             </ul>
-                            
-                            <h3>Real-World Applications</h3>
+
+                            <h3>Applications</h3>
                             <ul>
-                                <li><strong>Computer Vision:</strong> Image classification, object detection, facial recognition</li>
-                                <li><strong>Natural Language Processing:</strong> Text classification, language translation, chatbots</li>
-                                <li><strong>Speech Recognition:</strong> Voice assistants, transcription services</li>
-                                <li><strong>Autonomous Systems:</strong> Self-driving cars, robotics, drones</li>
-                                <li><strong>Medical Diagnosis:</strong> Disease detection, medical image analysis</li>
-                                <li><strong>Financial Analysis:</strong> Fraud detection, stock prediction, risk assessment</li>
-                            </ul>
-                            
-                            <h3>Educational Insights</h3>
-                            <ul>
-                                <li><strong>Learning Process:</strong> Neural networks learn by adjusting weights to minimize prediction errors</li>
-                                <li><strong>Feature Learning:</strong> Hidden layers automatically learn useful features from raw input data</li>
-                                <li><strong>Generalization:</strong> Well-trained networks can make accurate predictions on unseen data</li>
-                                <li><strong>Overfitting:</strong> Networks can memorize training data instead of learning general patterns</li>
-                                <li><strong>Hyperparameters:</strong> Learning rate, network architecture, and activation functions affect training success</li>
-                            </ul>
-                            
-                            <h3>Interactive Features</h3>
-                            <ul>
-                                <li><strong>Training Mode:</strong> Watch the network learn through forward/backward propagation cycles</li>
-                                <li><strong>Testing Mode:</strong> Test the trained network on different objects and see predictions</li>
-                                <li><strong>Parameter Control:</strong> Adjust learning rate and animation speed to observe different training behaviors</li>
-                                <li><strong>Visual Feedback:</strong> See real-time loss, accuracy, and confidence metrics</li>
-                            </ul>
-                            
-                            <h3>Advanced Concepts</h3>
-                            <ul>
-                                <li><strong>Gradient Descent:</strong> Optimization algorithm that finds the best weights by following the steepest descent</li>
-                                <li><strong>Vanishing Gradients:</strong> Problem where gradients become very small in deep networks</li>
-                                <li><strong>Regularization:</strong> Techniques to prevent overfitting (dropout, weight decay)</li>
-                                <li><strong>Batch Processing:</strong> Training on multiple examples simultaneously for better gradient estimates</li>
-                                <li><strong>Transfer Learning:</strong> Using pre-trained networks for new tasks</li>
+                                <li>Vision (image classification), NLP (text classification), speech, robotics, medicine, finance.</li>
                             </ul>
                         </div>
                     `

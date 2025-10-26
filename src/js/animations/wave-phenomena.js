@@ -5,6 +5,7 @@ import { BaseAnimation } from './base-animation.js';
 export class WavePropagation extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'wave-propagation';
         this.waveType = 'transverse';
         this.speed = 1;
         this.frequency = 1;
@@ -21,7 +22,7 @@ export class WavePropagation extends BaseAnimation {
     
     initializeParticles() {
         this.particles = [];
-        const particleCount = 80; // Increased for smoother waves
+        const particleCount = 80; // Reduced particles for cleaner visualization
         for (let i = 0; i < particleCount; i++) {
             this.particles.push({
                 x: (i / particleCount) * this.ctx.canvas.width,
@@ -45,49 +46,13 @@ export class WavePropagation extends BaseAnimation {
     setWaveType(type) {
         this.waveType = type;
         
-        // Reset all parameters to default values when changing wave type
-        this.speed = 1;
-        this.frequency = 1;
-        this.amplitude = 50;
-        this.wavelength = 150;
-        this.showAnalytics = false;
+        // Don't reset parameters - keep current values
+        // Just reinitialize particles with new wave type and restart time
         this.time = 0;
-        
-        // Reinitialize particles
         this.initializeParticles();
         
         // Recalculate wave parameters
         this.calculateWaveParameters();
-        
-        // Reset all controls to default values
-        const speedSlider = document.getElementById('waveSpeed');
-        const frequencySlider = document.getElementById('waveFrequency');
-        const amplitudeSlider = document.getElementById('waveAmplitude');
-        const waveTypeSelect = document.getElementById('waveType');
-        const analyticsCheckbox = document.getElementById('waveShowAnalytics');
-        
-        if (speedSlider) {
-            speedSlider.value = this.speed;
-            document.getElementById('waveSpeedValue').textContent = this.speed + 'x';
-        }
-        
-        if (frequencySlider) {
-            frequencySlider.value = this.frequency;
-            document.getElementById('waveFrequencyValue').textContent = this.frequency;
-        }
-        
-        if (amplitudeSlider) {
-            amplitudeSlider.value = this.amplitude;
-            document.getElementById('waveAmplitudeValue').textContent = this.amplitude;
-        }
-        
-        if (waveTypeSelect) {
-            waveTypeSelect.value = this.waveType;
-        }
-        
-        if (analyticsCheckbox) {
-            analyticsCheckbox.checked = this.showAnalytics;
-        }
     }
     
     setSpeed(speed) {
@@ -163,8 +128,8 @@ export class WavePropagation extends BaseAnimation {
     }
     
     update(deltaTime) {
-        // Slow down longitudinal waves for better visibility
-        const speedMultiplier = this.waveType === 'longitudinal' ? 1 : 5;
+        // Reduced speed for better observation
+        const speedMultiplier = this.waveType === 'longitudinal' ? 0.5 : 2;
         const dt = (deltaTime / 1000) * this.speed * speedMultiplier;
         this.time += dt;
         
@@ -244,27 +209,28 @@ export class WavePropagation extends BaseAnimation {
     }
     
     drawGrid() {
-        // Draw wavelength markers
+        // Draw wavelength markers with half-pixel alignment for crisp lines
         this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.3)';
         this.ctx.lineWidth = 1;
+        this.ctx.lineCap = 'butt';
         this.ctx.setLineDash([5, 5]);
-        
         for (let x = 0; x < this.ctx.canvas.width; x += this.wavelength) {
+            const px = Math.round(x) + 0.5;
             this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.ctx.canvas.height);
+            this.ctx.moveTo(px, 0.5);
+            this.ctx.lineTo(px, this.ctx.canvas.height - 0.5);
             this.ctx.stroke();
         }
         this.ctx.setLineDash([]);
-        
         // Draw amplitude markers
         const centerY = this.ctx.canvas.height / 2;
         this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.2)';
         this.ctx.lineWidth = 1;
         for (let y = centerY - this.amplitude; y <= centerY + this.amplitude; y += this.amplitude / 2) {
+            const py = Math.round(y) + 0.5;
             this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(this.ctx.canvas.width, y);
+            this.ctx.moveTo(0.5, py);
+            this.ctx.lineTo(this.ctx.canvas.width - 0.5, py);
             this.ctx.stroke();
         }
     }
@@ -279,7 +245,9 @@ export class WavePropagation extends BaseAnimation {
         gradient.addColorStop(1, '#667eea');
         
         this.ctx.strokeStyle = gradient;
-        this.ctx.lineWidth = 4;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         
         // Create smooth waveform with dense interpolation
         if (this.particles.length > 1) {
@@ -308,12 +276,6 @@ export class WavePropagation extends BaseAnimation {
             }
         }
         this.ctx.stroke();
-        
-        // Add glow effect
-        this.ctx.shadowColor = '#667eea';
-        this.ctx.shadowBlur = 10;
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
     }
     
     drawLongitudinalWaveform() {
@@ -324,7 +286,9 @@ export class WavePropagation extends BaseAnimation {
         
         // Draw a slinky-like spring with multiple coils
         this.ctx.strokeStyle = '#667eea';
-        this.ctx.lineWidth = 4;
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         
         // Create a continuous spring path
         this.ctx.beginPath();
@@ -354,12 +318,6 @@ export class WavePropagation extends BaseAnimation {
         
         this.ctx.stroke();
         
-        // Add glow effect
-        this.ctx.shadowColor = '#667eea';
-        this.ctx.shadowBlur = 10;
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
-        
         // Draw wave direction arrows
         this.drawLongitudinalWaveDirection();
     }
@@ -369,20 +327,24 @@ export class WavePropagation extends BaseAnimation {
         const waveSpeed = this.frequency * this.wavelength;
         const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
         
-        // Draw horizontal arrow
+        const y = Math.round(centerY) + 0.5;
+        const ax = Math.round(arrowX) + 0.5;
+
+        // Draw horizontal arrow (crisp)
         this.ctx.beginPath();
         this.ctx.strokeStyle = '#ff6b6b';
-        this.ctx.lineWidth = 3;
-        this.ctx.moveTo(arrowX, centerY);
-        this.ctx.lineTo(arrowX + 30, centerY);
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
+        this.ctx.moveTo(ax, y);
+        this.ctx.lineTo(ax + 30, y);
         this.ctx.stroke();
         
         // Arrowhead
         this.ctx.beginPath();
         this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.moveTo(arrowX + 30, centerY);
-        this.ctx.lineTo(arrowX + 25, centerY - 5);
-        this.ctx.lineTo(arrowX + 25, centerY + 5);
+        this.ctx.moveTo(ax + 30.5, y);
+        this.ctx.lineTo(ax + 25.5, y - 5);
+        this.ctx.lineTo(ax + 25.5, y + 5);
         this.ctx.closePath();
         this.ctx.fill();
     }
@@ -410,19 +372,16 @@ export class WavePropagation extends BaseAnimation {
             // Make particles larger for longitudinal waves
             const particleSize = this.waveType === 'longitudinal' ? 8 : 5;
             
-            this.ctx.beginPath();
+            // Draw crisp particle using rect aligned to pixel grid for sharper look
+            const px = Math.round(particle.x) + 0.5;
+            const py = Math.round(particle.y) + 0.5;
             this.ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-            this.ctx.arc(particle.x, particle.y, particleSize, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Add highlight
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            this.ctx.arc(particle.x - 1, particle.y - 1, particleSize * 0.4, 0, Math.PI * 2);
+            this.ctx.arc(px, py, particleSize, 0, Math.PI * 2);
             this.ctx.fill();
-            
-            this.ctx.strokeStyle = '#fff';
-            this.ctx.lineWidth = 1;
+            // Thin stroke for definition
+            this.ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+            this.ctx.lineWidth = 0.75;
             this.ctx.stroke();
         });
     }
@@ -434,21 +393,27 @@ export class WavePropagation extends BaseAnimation {
                 const scale = 0.1;
                 const endX = particle.x + particle.vx * scale;
                 const endY = particle.y + particle.vy * scale;
+
+                const sx = Math.round(particle.x) + 0.5;
+                const sy = Math.round(particle.y) + 0.5;
+                const ex = Math.round(endX) + 0.5;
+                const ey = Math.round(endY) + 0.5;
                 
                 this.ctx.beginPath();
                 this.ctx.strokeStyle = '#ff6b6b';
-                this.ctx.lineWidth = 2;
-                this.ctx.moveTo(particle.x, particle.y);
-                this.ctx.lineTo(endX, endY);
+                this.ctx.lineWidth = 1.5;
+                this.ctx.lineCap = 'round';
+                this.ctx.moveTo(sx, sy);
+                this.ctx.lineTo(ex, ey);
                 this.ctx.stroke();
                 
                 // Arrowhead
                 const angle = Math.atan2(particle.vy, particle.vx);
                 this.ctx.beginPath();
                 this.ctx.fillStyle = '#ff6b6b';
-                this.ctx.moveTo(endX, endY);
-                this.ctx.lineTo(endX - 6 * Math.cos(angle - Math.PI / 6), endY - 6 * Math.sin(angle - Math.PI / 6));
-                this.ctx.lineTo(endX - 6 * Math.cos(angle + Math.PI / 6), endY - 6 * Math.sin(angle + Math.PI / 6));
+                this.ctx.moveTo(ex, ey);
+                this.ctx.lineTo(ex - 6 * Math.cos(angle - Math.PI / 6), ey - 6 * Math.sin(angle - Math.PI / 6));
+                this.ctx.lineTo(ex - 6 * Math.cos(angle + Math.PI / 6), ey - 6 * Math.sin(angle + Math.PI / 6));
                 this.ctx.closePath();
                 this.ctx.fill();
             }
@@ -460,20 +425,24 @@ export class WavePropagation extends BaseAnimation {
             // Animated wave direction indicator - move at wave speed
             const waveSpeed = this.frequency * this.wavelength;
             const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
+
+            const y = 50.5;
+            const ax = Math.round(arrowX) + 0.5;
             
             this.ctx.beginPath();
             this.ctx.strokeStyle = '#ff6b6b';
-            this.ctx.lineWidth = 3;
-            this.ctx.moveTo(arrowX, 50);
-            this.ctx.lineTo(arrowX + 20, 50);
+            this.ctx.lineWidth = 2;
+            this.ctx.lineCap = 'round';
+            this.ctx.moveTo(ax, y);
+            this.ctx.lineTo(ax + 20, y);
             this.ctx.stroke();
             
             // Arrowhead
             this.ctx.beginPath();
             this.ctx.fillStyle = '#ff6b6b';
-            this.ctx.moveTo(arrowX + 20, 50);
-            this.ctx.lineTo(arrowX + 15, 45);
-            this.ctx.lineTo(arrowX + 15, 55);
+            this.ctx.moveTo(ax + 20.5, y);
+            this.ctx.lineTo(ax + 15.5, y - 5);
+            this.ctx.lineTo(ax + 15.5, y + 5);
             this.ctx.closePath();
             this.ctx.fill();
         }
@@ -484,7 +453,6 @@ export class WavePropagation extends BaseAnimation {
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         this.ctx.shadowBlur = 2;
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
         let y = 120; // Moved down to avoid overlap with main labels
@@ -537,7 +505,6 @@ export class WavePropagation extends BaseAnimation {
         // Label
         this.ctx.fillStyle = '#fff';
         this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`Energy: ${this.energy.toFixed(1)}`, barX + barWidth / 2, barY + 15);
     }
@@ -559,11 +526,12 @@ export class WavePropagation extends BaseAnimation {
 export class SoundWaves extends BaseAnimation {
     constructor(ctx) {
         super(ctx);
+        this.animationType = 'wave-propagation';
         this.particles = [];
-        this.frequency = 5; // Hz (low frequency for visualization)
+        this.frequency = 2; // Hz (even lower frequency for easier observation)
         this.amplitude = 50; // Percentage
         this.waveSpeed = 343; // m/s (speed of sound in air)
-        this.particleCount = 15;
+        this.particleCount = 80; // Much more particles for dense wave visualization
         this.waveType = 'transverse'; // 'transverse', 'longitudinal', 'combined'
         this.showPressure = true;
         this.animationSpeed = 1.0;
@@ -576,10 +544,29 @@ export class SoundWaves extends BaseAnimation {
         this.showSourceReceiver = true;
         this.sourceActive = true;
         this.pulses = [];
-        this.pulseDuration = 2; // number of wavelengths to show
+        this.pulseDuration = 15; // much longer duration to ensure wave reaches receiver
+        
+        // Control button properties
+        this.isPlaying = false;
+        this.controlButtons = {
+            playPause: { x: 220, y: 20, width: 80, height: 30, label: '▶ Play' },
+            reset: { x: 310, y: 20, width: 60, height: 30, label: '🔄 Reset' }
+        };
         
         this.initializeParticles();
         this.setupClickEvents();
+        
+        // Musical note frequencies (Hz)
+        this.musicalNotes = {
+            'C4': 261.63,
+            'D4': 293.66,
+            'E4': 329.63,
+            'F4': 349.23,
+            'G4': 392.00,
+            'A4': 440.00,
+            'B4': 493.88,
+            'C5': 523.25
+        };
     }
     
     setupClickEvents() {
@@ -612,6 +599,41 @@ export class SoundWaves extends BaseAnimation {
         });
     }
     
+    handleButtonClick(x, y) {
+        // Check if click is on any control button
+        Object.keys(this.controlButtons).forEach(key => {
+            const button = this.controlButtons[key];
+            if (x >= button.x && x <= button.x + button.width &&
+                y >= button.y && y <= button.y + button.height) {
+                this.handleControlAction(key);
+            }
+        });
+    }
+    
+    handleControlAction(action) {
+        switch (action) {
+            case 'playPause':
+                if (this.isPlaying) {
+                    // Currently playing, so pause
+                    this.isPlaying = false;
+                    this.controlButtons.playPause.label = '▶ Play';
+                } else {
+                    // Currently paused, so play
+                    this.isPlaying = true;
+                    this.controlButtons.playPause.label = '⏸ Pause';
+                    this.triggerWavePulse();
+                }
+                break;
+            case 'reset':
+                this.isPlaying = false;
+                this.pulses = [];
+                this.time = 0;
+                this.initializeParticles();
+                this.controlButtons.playPause.label = '▶ Play';
+                break;
+        }
+    }
+    
     initializeParticles() {
         this.particles = [];
         const spacing = this.ctx.canvas.width / this.particleCount;
@@ -624,7 +646,7 @@ export class SoundWaves extends BaseAnimation {
                 originalY: this.ctx.canvas.height / 2,
                 vx: 0,
                 vy: 0,
-                size: 4 + Math.random() * 2,
+                size: 2 + Math.random() * 1,
                 color: `hsl(${200 + Math.random() * 60}, 70%, 60%)`,
                 pressure: 0,
                 life: 0
@@ -679,10 +701,41 @@ export class SoundWaves extends BaseAnimation {
         this.receiverY = y;
     }
     
+    setMusicalNote(note) {
+        if (this.musicalNotes[note]) {
+            this.frequency = this.musicalNotes[note];
+        }
+    }
+    
+    setInstrumentPreset(instrument) {
+        switch (instrument) {
+            case 'guitar':
+                this.frequency = 82.41; // Low E string
+                this.amplitude = 60;
+                this.waveType = 'transverse';
+                break;
+            case 'piano':
+                this.frequency = 440.00; // A4
+                this.amplitude = 70;
+                this.waveType = 'transverse';
+                break;
+            case 'flute':
+                this.frequency = 523.25; // C5
+                this.amplitude = 50;
+                this.waveType = 'longitudinal';
+                break;
+            case 'drum':
+                this.frequency = 100; // Low frequency
+                this.amplitude = 80;
+                this.waveType = 'combined';
+                break;
+        }
+    }
+    
     triggerWavePulse() {
         const pulse = {
             startTime: this.time, // Use animation time instead of Date.now()
-            duration: 5.0, // 5 seconds in animation time - longer to ensure wave reaches receiver
+            duration: 20.0, // 20 seconds in animation time - much longer to reach receiver
             active: true
         };
         this.pulses.push(pulse);
@@ -695,6 +748,11 @@ export class SoundWaves extends BaseAnimation {
     }
     
     update(deltaTime) {
+        // Only update if playing
+        if (!this.isPlaying) {
+            return;
+        }
+        
         this.time += deltaTime * this.animationSpeed;
         
         // Update pulses - remove expired ones
@@ -703,100 +761,108 @@ export class SoundWaves extends BaseAnimation {
             return elapsed < pulse.duration;
         });
         
-        const wavelength = (this.waveSpeed / this.frequency) * 0.5; // Scale down for visualization but not too much
+        const wavelength = (this.waveSpeed / this.frequency) * 0.3; // Scale down for better visualization
         const angularFrequency = 2 * Math.PI * this.frequency;
-        const amplitude = (this.amplitude / 100) * 50; // Scale amplitude
+        const amplitude = (this.amplitude / 100) * 60; // Moderate amplitude for clear wave pattern
         
         this.particles.forEach((particle, index) => {
             // Check if any pulse is active
             let waveActive = false;
-            let pulsePhase = 0;
-            let waveProgress = 0; // How far the wave front has traveled (0 to 1)
-            
-
+            let wavePhase = 0;
+            let isInWavePacket = false;
+            let wavePacketStart = 0;
+            let wavePacketLength = 150;
+            let elapsed = 0;
             
             this.pulses.forEach(pulse => {
-                const elapsed = (this.time - pulse.startTime) / 1000; // Convert to seconds
-                const pulseDuration = pulse.duration;
+                elapsed = (this.time - pulse.startTime) / 1000; // Convert to seconds
                 
                 // Check if pulse is active
-                if (elapsed >= 0 && elapsed <= pulseDuration) {
+                if (elapsed >= 0 && elapsed <= pulse.duration) {
                     waveActive = true;
                     
-                    // Calculate how far the wave front has traveled - ensure it reaches receiver within pulse duration
-                    const totalDistance = this.receiverX - this.sourceX; // Total distance to travel
-                    const pulseDuration = pulse.duration; // Duration in seconds
+                    // Calculate wave packet properties - make it much more visible
+                    wavePacketLength = 150; // Fixed length in pixels for better visibility
+                    const waveFrontPosition = this.sourceX + (elapsed * this.waveSpeed * 0.1); // Slower wave front position
                     
-                    // Calculate required wave speed to reach receiver within pulse duration
-                    const requiredSpeed = totalDistance / pulseDuration; // pixels per second
-                    const waveSpeedScale = requiredSpeed / this.waveSpeed; // Scale factor to match required speed
+                    // Check if wave has reached the receiver for collapsing effect
+                    const hasReachedReceiver = waveFrontPosition >= this.receiverX;
                     
-                    const waveTravelDistance = elapsed * (this.waveSpeed * waveSpeedScale); // Scale for visualization
+                    let wavePacketEnd;
+                    if (hasReachedReceiver) {
+                        // Wave collapsing effect: trailing edge extends to receiver
+                        wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
+                        wavePacketEnd = this.receiverX; // Trailing edge goes all the way to receiver
+                    } else {
+                        // Normal wave packet - allow it to reach the receiver
+                        wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
+                        wavePacketEnd = Math.min(this.receiverX, waveFrontPosition) + 100;
+                    }
                     
-                    // Calculate wave front progress (0 to 1) - ensure wave reaches receiver
-                    waveProgress = Math.min(waveTravelDistance / totalDistance, 1.0);
-                    
-                    // Calculate phase for this particle based on its position within the wave packet
-                    const particleDistance = waveProgress * totalDistance;
-                    pulsePhase = (particleDistance / wavelength) * 2 * Math.PI;
+                    // Check if particle is within the wave packet
+                    if (particle.originalX >= wavePacketStart && particle.originalX <= wavePacketEnd) {
+                        isInWavePacket = true;
+                        
+                        // Calculate phase within the wave packet
+                        const positionInPacket = (particle.originalX - wavePacketStart) / wavePacketLength;
+                        const wavePosition = positionInPacket * 3; // 3 wavelengths in the packet for better visibility
+                        const timePhase = elapsed * this.frequency * 2 * Math.PI;
+                        wavePhase = wavePosition * 2 * Math.PI - timePhase;
+                    }
                 }
             });
             
-            if (waveActive) {
-                // Calculate wave packet properties
-                const wavePacketWidth = 6 * wavelength; // Wave packet spans 6 wavelengths for better visibility
-                
-                // Calculate wave packet start position - ensure it starts at source and moves forward
-                const wavePacketStart = this.sourceX + (this.receiverX - this.sourceX) * waveProgress;
-                const wavePacketEnd = Math.min(this.receiverX, wavePacketStart + wavePacketWidth);
-                
-
-                
-                // Calculate this particle's position within the wave packet
-                const particlePositionInPacket = (index / (this.particleCount - 1)) * (wavePacketEnd - wavePacketStart);
-                let particleX = wavePacketStart + particlePositionInPacket;
-                
-                // Ensure particle is within the wave packet bounds
-                if (particleX < wavePacketStart) particleX = wavePacketStart;
-                if (particleX > wavePacketEnd) particleX = wavePacketEnd;
-                
-                // Only show particles that are within the wave packet bounds and between source and receiver
-                if (particleX >= this.sourceX && particleX <= this.receiverX && particleX >= wavePacketStart && particleX <= wavePacketEnd) {
-                    // Convert amplitude from percentage to actual displacement - make it more visible
-                    const amplitudeDisplacement = (this.amplitude / 100) * 120; // Scale amplitude to reasonable pixel values
-                    
-                    if (this.waveType === 'transverse' || this.waveType === 'combined') {
-                        // Transverse wave motion - particle moves horizontally and oscillates vertically
-                        particle.x = particleX;
-                        particle.y = particle.originalY + amplitudeDisplacement * Math.sin(pulsePhase + (index * 0.2));
-                        particle.vy = amplitudeDisplacement * 2 * Math.PI * Math.cos(pulsePhase + (index * 0.2)) * this.animationSpeed * 0.001;
-                    }
-                    
-                    if (this.waveType === 'longitudinal' || this.waveType === 'combined') {
-                        // Longitudinal wave motion - particle oscillates around its traveling position
-                        particle.x = particleX + amplitudeDisplacement * 0.1 * Math.sin(pulsePhase + (index * 0.2));
-                        particle.vx = amplitudeDisplacement * 0.1 * 2 * Math.PI * Math.cos(pulsePhase + (index * 0.2)) * this.animationSpeed * 0.001;
-                    }
-                    
-                    // Calculate pressure for longitudinal waves
-                    if (this.waveType === 'longitudinal' || this.waveType === 'combined') {
-                        particle.pressure = Math.sin(pulsePhase + (index * 0.2));
-                    }
-                } else {
-                    // Hide particles outside the wave packet
-                    particle.x = -100;
-                    particle.y = -100;
-                    particle.vy = 0;
-                    particle.vx = 0;
-                    particle.pressure = 0;
+            if (waveActive && isInWavePacket) {
+                // Update particle trail history
+                if (!particle.trail) particle.trail = [];
+                particle.trail.push({ x: particle.x, y: particle.y });
+                if (particle.trail.length > 8) {
+                    particle.trail.shift();
                 }
-            } else {
-                // Reset particle to original position when no pulse is active
+                
+                // Wave motion within the packet
+                if (this.waveType === 'transverse' || this.waveType === 'combined') {
+                    // Transverse wave motion - create proper sinusoidal wave pattern
+                    particle.x = particle.originalX;
+                    
+                    // Create sinusoidal wave with proper phase relationship
+                    const wavePosition = (particle.originalX - wavePacketStart) / wavePacketLength;
+                    const spatialPhase = wavePosition * 3 * 2 * Math.PI; // 3 wavelengths in packet
+                    const temporalPhase = elapsed * this.frequency * 2 * Math.PI;
+                    const totalPhase = spatialPhase - temporalPhase;
+                    
+                    particle.y = particle.originalY + amplitude * Math.sin(totalPhase);
+                    particle.vy = amplitude * angularFrequency * Math.cos(totalPhase) * 0.1; // Slower motion
+                    particle.vx = 0;
+                }
+                
+                if (this.waveType === 'longitudinal' || this.waveType === 'combined') {
+                    // Longitudinal wave motion - create proper compression/rarefaction pattern
+                    particle.y = particle.originalY;
+                    
+                    // Create sinusoidal wave with proper phase relationship for longitudinal waves
+                    const wavePosition = (particle.originalX - wavePacketStart) / wavePacketLength;
+                    const spatialPhase = wavePosition * 3 * 2 * Math.PI; // 3 wavelengths in packet
+                    const temporalPhase = elapsed * this.frequency * 2 * Math.PI;
+                    const totalPhase = spatialPhase - temporalPhase;
+                    
+                    // Horizontal displacement for compression/rarefaction
+                    particle.x = particle.originalX + amplitude * 0.4 * Math.sin(totalPhase);
+                    particle.vx = amplitude * 0.4 * angularFrequency * Math.cos(totalPhase) * 0.1; // Slower motion
+                    particle.vy = 0;
+                    
+                    // Calculate pressure for compression/rarefaction visualization
+                    particle.pressure = Math.sin(totalPhase);
+                }
+                
+                } else {
+                // Reset particle to original position when no wave packet is present
                 particle.y = particle.originalY;
                 particle.x = particle.originalX;
                 particle.vy = 0;
                 particle.vx = 0;
                 particle.pressure = 0;
+                particle.trail = []; // Clear trail when no wave
             }
             
             particle.life += deltaTime;
@@ -832,141 +898,199 @@ export class SoundWaves extends BaseAnimation {
         
         // Always show info panels
         this.drawSoundInfo();
-        this.drawRealWorldAnalogy();
+        
+        // Draw control buttons
+        this.drawControlButtons();
+        
+        // Draw wave packet boundaries if wave is active
+        this.drawWavePacketBoundaries();
+        
     }
     
     drawInstruction() {
-        // Draw instruction to click on source
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(this.ctx.canvas.width / 2 - 200, this.ctx.canvas.height / 2 - 40, 400, 80);
+        // Draw instruction at bottom of canvas
+        const y = this.ctx.canvas.height - 30;
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(this.ctx.canvas.width / 2 - 150, y - 15, 300, 30);
         
         this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 16px Arial';
+        this.ctx.font = 'bold 12px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('🎵 Click the red source to trigger a sound wave!', this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 - 10);
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText('Watch the wave propagate from source to receiver', this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 10);
-        this.ctx.fillText('Adjust controls to see different wave behaviors', this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 30);
+        this.ctx.fillText('🎵 Click the red source to start!', this.ctx.canvas.width / 2, y);
+    }
+    
+    drawControlButtons() {
+        // Draw control buttons at top left
+        Object.keys(this.controlButtons).forEach(key => {
+            const button = this.controlButtons[key];
+            
+            // Button background
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillRect(button.x, button.y, button.width, button.height);
+            
+            // Button border
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(button.x, button.y, button.width, button.height);
+            
+            // Button text
+            this.ctx.fillStyle = 'white';
+            this.ctx.font = 'bold 10px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(button.label, button.x + button.width / 2, button.y + button.height / 2 + 3);
+        });
     }
     
     drawBackground() {
-        // Draw subtle grid
-        this.ctx.strokeStyle = 'rgba(200, 200, 200, 0.2)';
+        // Draw subtle gradient background
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(1, '#16213e');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        
+        // Draw subtle wave direction indicators
+        this.ctx.strokeStyle = 'rgba(100, 149, 237, 0.3)';
         this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([20, 10]);
         
-        // Vertical lines
-        for (let x = 0; x < this.ctx.canvas.width; x += 50) {
+        // Draw horizontal reference line
             this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.ctx.canvas.height);
+        this.ctx.moveTo(this.sourceX, this.sourceY);
+        this.ctx.lineTo(this.receiverX, this.receiverY);
+            this.ctx.stroke();
+        
+        // Add wave direction arrows
+        const arrowSpacing = 100;
+        for (let x = this.sourceX + 50; x < this.receiverX - 50; x += arrowSpacing) {
+            const y = this.sourceY;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y - 5);
+            this.ctx.lineTo(x + 15, y);
+            this.ctx.lineTo(x, y + 5);
             this.ctx.stroke();
         }
         
-        // Horizontal lines
-        for (let y = 0; y < this.ctx.canvas.height; y += 50) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(this.ctx.canvas.width, y);
-            this.ctx.stroke();
-        }
+        this.ctx.setLineDash([]);
     }
     
     drawTransverseWave() {
-        // Draw wave line
-        this.ctx.strokeStyle = '#0066CC';
-        this.ctx.lineWidth = 3;
+        // Draw particle trails first (behind particles)
+        this.particles.forEach(particle => {
+            if (particle.trail && particle.trail.length > 1) {
+        this.ctx.beginPath();
+                this.ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
+                for (let i = 1; i < particle.trail.length; i++) {
+                    this.ctx.lineTo(particle.trail[i].x, particle.trail[i].y);
+                }
+                this.ctx.strokeStyle = `rgba(100, 149, 237, ${0.4 * (particle.trail.length / 8)})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                this.ctx.stroke();
+            }
+        });
+        
+        // Draw wave envelope
+        this.ctx.strokeStyle = 'rgba(100, 149, 237, 0.8)';
+        this.ctx.lineWidth = 3; // Moderate line thickness
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         this.ctx.beginPath();
         
-        this.particles.forEach((particle, index) => {
-            if (index === 0) {
-                this.ctx.moveTo(particle.x, particle.y);
-            } else {
-                this.ctx.lineTo(particle.x, particle.y);
-            }
-        });
+        // Draw smooth curve through particles
+        this.drawSmoothWave();
         this.ctx.stroke();
         
-        // Draw particles
+        // Add a subtle background line for depth
+        this.ctx.strokeStyle = 'rgba(100, 149, 237, 0.3)';
+        this.ctx.lineWidth = 6; // Background line
+        this.ctx.beginPath();
+        this.drawSmoothWave();
+        this.ctx.stroke();
+        
+        // Draw larger, more visible particles
         this.particles.forEach(particle => {
             const velocity = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
-            const intensity = Math.min(velocity * 100, 1);
+            const intensity = Math.min(velocity * 50, 1);
             
-            // Color based on velocity
-            const hue = 200 + intensity * 60;
-            const color = `hsl(${hue}, 80%, 60%)`;
+            // Color based on frequency and amplitude
+            const frequencyHue = (this.frequency / 20) * 360; // Map frequency to hue
+            const amplitudeSat = Math.min(this.amplitude / 50, 1) * 100; // Map amplitude to saturation
+            const color = `hsl(${frequencyHue}, ${amplitudeSat}%, 70%)`;
             
-            this.ctx.fillStyle = color;
-            this.ctx.beginPath();
-            this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Add glow for fast particles
-            if (intensity > 0.5) {
+            // Draw larger particle with glow effect
                 this.ctx.shadowColor = color;
-                this.ctx.shadowBlur = 8;
+            this.ctx.shadowBlur = 6;
                 this.ctx.fillStyle = color;
                 this.ctx.beginPath();
-                this.ctx.arc(particle.x, particle.y, particle.size + 2, 0, Math.PI * 2);
+            this.ctx.arc(particle.x, particle.y, particle.size * (1 + intensity * 0.2), 0, Math.PI * 2); // Smaller particles
                 this.ctx.fill();
+            
+            // Reset shadow
                 this.ctx.shadowBlur = 0;
-            }
         });
-        
-
     }
     
     drawLongitudinalWave() {
-        // Draw air molecules as particles with enhanced pressure visualization
+        // Draw wave envelope for longitudinal waves
+        this.ctx.strokeStyle = 'rgba(255, 100, 0, 0.8)';
+        this.ctx.lineWidth = 3; // Moderate line thickness
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.beginPath();
+        
+        // Draw smooth curve through particles for longitudinal wave
+        this.drawSmoothWave();
+        this.ctx.stroke();
+        
+        // Add a subtle background line for depth
+        this.ctx.strokeStyle = 'rgba(255, 100, 0, 0.3)';
+        this.ctx.lineWidth = 6; // Background line
+        this.ctx.beginPath();
+        this.drawSmoothWave();
+        this.ctx.stroke();
+        
+        // Draw particles with compression/rarefaction visualization
         this.particles.forEach(particle => {
-            const pressure = particle.pressure;
+            const pressure = particle.pressure || 0;
             const intensity = Math.abs(pressure);
             
-            // Color based on pressure (orange for high, cyan for low)
+            // Color based on pressure (red for compression, blue for rarefaction)
             let color;
             if (pressure > 0) {
-                // High pressure (compression) - subtle orange
-                color = `hsl(30, 80%, 60%)`;
+                // High pressure (compression) - red
+                color = `hsl(0, 80%, 60%)`;
             } else {
-                // Low pressure (rarefaction) - subtle cyan
-                color = `hsl(180, 60%, 60%)`;
+                // Low pressure (rarefaction) - blue
+                color = `hsl(240, 80%, 60%)`;
             }
             
             // Draw particle with size based on pressure
-            const particleSize = particle.size + intensity * 5;
+            const particleSize = particle.size + intensity * 1.5;
             this.ctx.fillStyle = color;
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particleSize, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Add glow effect for high pressure particles
-            if (intensity > 0.5) {
-                this.ctx.shadowColor = color;
-                this.ctx.shadowBlur = 8;
-                this.ctx.fillStyle = color;
-                this.ctx.beginPath();
-                this.ctx.arc(particle.x, particle.y, particleSize + 2, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.shadowBlur = 0;
-            }
-            
-            // Add pressure indicator arrows
-            if (this.showPressure && intensity > 0.2) {
+            // Add compression/rarefaction indicators
+            if (intensity > 0.3) {
                 this.ctx.strokeStyle = color;
-                this.ctx.lineWidth = 3;
+                this.ctx.lineWidth = 2;
                 this.ctx.beginPath();
                 
                 if (pressure > 0) {
-                    // Compression arrows pointing inward
-                    this.ctx.moveTo(particle.x - 15, particle.y);
-                    this.ctx.lineTo(particle.x - 5, particle.y);
-                    this.ctx.moveTo(particle.x + 5, particle.y);
-                    this.ctx.lineTo(particle.x + 15, particle.y);
+                    // Compression - particles closer together
+                    this.ctx.moveTo(particle.x - 8, particle.y - 5);
+                    this.ctx.lineTo(particle.x - 8, particle.y + 5);
+                    this.ctx.moveTo(particle.x + 8, particle.y - 5);
+                    this.ctx.lineTo(particle.x + 8, particle.y + 5);
                 } else {
-                    // Rarefaction arrows pointing outward
-                    this.ctx.moveTo(particle.x - 5, particle.y);
-                    this.ctx.lineTo(particle.x - 15, particle.y);
-                    this.ctx.moveTo(particle.x + 15, particle.y);
-                    this.ctx.lineTo(particle.x + 5, particle.y);
+                    // Rarefaction - particles farther apart
+                    this.ctx.moveTo(particle.x - 12, particle.y - 3);
+                    this.ctx.lineTo(particle.x - 12, particle.y + 3);
+                    this.ctx.moveTo(particle.x + 12, particle.y - 3);
+                    this.ctx.lineTo(particle.x + 12, particle.y + 3);
                 }
                 this.ctx.stroke();
             }
@@ -1150,67 +1274,105 @@ export class SoundWaves extends BaseAnimation {
     }
     
     drawSoundInfo() {
-        // Simple info panel with better contrast
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        this.ctx.fillRect(10, 10, 320, 180);
+        // Compact info panel
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(10, 10, 200, 60);
         
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.font = 'bold 16px Arial';
+        this.ctx.font = 'bold 12px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('🎵 Sound Wave Properties', 20, 30);
+        this.ctx.fillText('🔊 Sound Wave', 20, 25);
         
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText(`Frequency: ${this.frequency} Hz`, 20, 50);
-        this.ctx.fillText(`Wavelength: ${(this.waveSpeed / this.frequency).toFixed(1)} m`, 20, 70);
-        this.ctx.fillText(`Wave Speed: ${this.waveSpeed} m/s`, 20, 90);
-        // Calculate the actual visual speed being used
-        const totalDistance = this.receiverX - this.sourceX;
-        const pulseDuration = 5.0; // Default pulse duration
-        const visualSpeed = totalDistance / pulseDuration;
-        this.ctx.fillText(`Visual Speed: ${visualSpeed.toFixed(1)} px/s`, 20, 110);
-        this.ctx.fillText(`Amplitude: ${this.amplitude}%`, 20, 130);
-        this.ctx.fillText(`Wave Type: ${this.waveType}`, 20, 150);
-        this.ctx.fillText(`Particles: ${this.particleCount}`, 20, 170);
-        
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
+        this.ctx.font = '11px Arial';
+        this.ctx.fillText(`${this.waveType} • ${this.frequency}Hz • ${this.amplitude}%`, 20, 40);
+        this.ctx.fillText(`λ: ${(this.waveSpeed / this.frequency).toFixed(1)}m • v: ${this.waveSpeed}m/s`, 20, 55);
     }
     
-    drawRealWorldAnalogy() {
-        // Simple analogy panel with better contrast
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        this.ctx.fillRect(this.ctx.canvas.width - 280, 10, 270, 140);
+    drawSmoothWave() {
+        // Draw smooth curve through particles using quadratic Bezier curves
+        const particles = this.particles.filter(p => p.x > 0 && p.y > 0); // Filter out hidden particles
         
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.font = 'bold 14px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('💡 Real-World Examples:', this.ctx.canvas.width - 270, 30);
+        if (particles.length < 2) return;
         
-        this.ctx.font = '12px Arial';
-        if (this.waveType === 'transverse') {
-            this.ctx.fillText('🎸 Guitar/violin strings', this.ctx.canvas.width - 270, 50);
-            this.ctx.fillText('🌊 Ocean surface waves', this.ctx.canvas.width - 270, 70);
-            this.ctx.fillText('📡 Electromagnetic waves', this.ctx.canvas.width - 270, 90);
-            this.ctx.fillText('🎪 Jump rope motion', this.ctx.canvas.width - 270, 110);
-        } else if (this.waveType === 'longitudinal') {
-            this.ctx.fillText('🔊 Sound waves in air', this.ctx.canvas.width - 270, 50);
-            this.ctx.fillText('🎤 Speaker diaphragm', this.ctx.canvas.width - 270, 70);
-            this.ctx.fillText('💨 Air compression waves', this.ctx.canvas.width - 270, 90);
-            this.ctx.fillText('🌊 Seismic P-waves', this.ctx.canvas.width - 270, 110);
-        } else {
-            this.ctx.fillText('🎵 Complex wave patterns', this.ctx.canvas.width - 270, 50);
-            this.ctx.fillText('🔊 Multiple wave types', this.ctx.canvas.width - 270, 70);
-            this.ctx.fillText('📡 Combined phenomena', this.ctx.canvas.width - 270, 90);
-            this.ctx.fillText('🎼 Musical instruments', this.ctx.canvas.width - 270, 110);
+        // Start at first particle
+        this.ctx.moveTo(particles[0].x, particles[0].y);
+        
+        // Draw smooth curve through remaining particles
+        for (let i = 1; i < particles.length - 1; i++) {
+            const current = particles[i];
+            const next = particles[i + 1];
+            
+            // Calculate control point for smooth curve
+            const cp1x = current.x + (next.x - particles[i - 1].x) * 0.2;
+            const cp1y = current.y + (next.y - particles[i - 1].y) * 0.2;
+            
+            // Use quadratic curve for smooth interpolation
+            this.ctx.quadraticCurveTo(cp1x, cp1y, (current.x + next.x) / 2, (current.y + next.y) / 2);
         }
         
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
+        // End at last particle
+        if (particles.length > 1) {
+            this.ctx.lineTo(particles[particles.length - 1].x, particles[particles.length - 1].y);
+        }
     }
+    
+    
+    drawWavePacketBoundaries() {
+        // Draw wave packet boundaries if wave is active
+        this.pulses.forEach(pulse => {
+            const elapsed = (this.time - pulse.startTime) / 1000;
+            
+            if (elapsed >= 0 && elapsed <= pulse.duration) {
+                const wavePacketLength = 150; // Fixed length in pixels for better visibility
+                const waveFrontPosition = this.sourceX + (elapsed * this.waveSpeed * 0.1);
+                
+                // Check if wave has reached the receiver for collapsing effect
+                const hasReachedReceiver = waveFrontPosition >= this.receiverX;
+                
+                let wavePacketStart, wavePacketEnd;
+                if (hasReachedReceiver) {
+                    // Wave collapsing effect: trailing edge extends to receiver
+                    wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
+                    wavePacketEnd = this.receiverX; // Trailing edge goes all the way to receiver
+        } else {
+                    // Normal wave packet - allow it to reach the receiver
+                    wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
+                    wavePacketEnd = Math.min(this.receiverX, waveFrontPosition) + 100;
+                }
+                
+                // Draw wave packet boundaries - make them more prominent
+                this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.9)';
+                this.ctx.lineWidth = 3;
+                this.ctx.setLineDash([8, 4]);
+                
+                // Leading edge (wave front)
+                this.ctx.beginPath();
+                this.ctx.moveTo(wavePacketEnd, this.sourceY - 50);
+                this.ctx.lineTo(wavePacketEnd, this.sourceY + 50);
+                this.ctx.stroke();
+                
+                // Trailing edge
+                this.ctx.beginPath();
+                this.ctx.moveTo(wavePacketStart, this.sourceY - 50);
+                this.ctx.lineTo(wavePacketStart, this.sourceY + 50);
+                this.ctx.stroke();
+                
+                // Wave packet label
+                this.ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
+                this.ctx.font = 'bold 10px Arial';
+                this.ctx.textAlign = 'center';
+                if (hasReachedReceiver) {
+                    this.ctx.fillText('Wave Collapsing', (wavePacketStart + wavePacketEnd) / 2, this.sourceY - 40);
+                } else {
+                    this.ctx.fillText('Wave Packet', (wavePacketStart + wavePacketEnd) / 2, this.sourceY - 40);
+                }
+                
+                this.ctx.setLineDash([]);
+            }
+        });
+    }
+    
+    
     
     getStats() {
         return {

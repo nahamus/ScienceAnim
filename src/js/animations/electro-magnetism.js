@@ -139,12 +139,7 @@ export class ElectricFields extends BaseAnimation {
     }
     
     render() {
-        // Modern dark gradient background
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
-        gradient.addColorStop(0, '#181c2b');
-        gradient.addColorStop(1, '#232946');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Standardized neutral background handled globally
 
         // Show analytics (field lines, particles, force arrows) if enabled
         if (this.showAnalytics) {
@@ -171,30 +166,30 @@ export class ElectricFields extends BaseAnimation {
                     const angle = Math.atan2(field.ey, field.ex);
                     const intensity = Math.min(magnitude / 50, 1); // Adjusted intensity scaling
                     
+                    // Crisp field line arrow
+                    const sx = Math.round(x) + 0.5;
+                    const sy = Math.round(y) + 0.5;
+                    const ex = Math.round(x + 25 * Math.cos(angle)) + 0.5;
+                    const ey = Math.round(y + 25 * Math.sin(angle)) + 0.5;
                     this.ctx.beginPath();
                     this.ctx.strokeStyle = `rgba(102, 126, 234, ${intensity})`;
-                    this.ctx.lineWidth = 2;
-                    this.ctx.moveTo(x, y);
-                    this.ctx.lineTo(
-                        x + 25 * Math.cos(angle), // Longer arrows
-                        y + 25 * Math.sin(angle)
-                    );
+                    this.ctx.lineWidth = 1.5;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.moveTo(sx, sy);
+                    this.ctx.lineTo(ex, ey);
                     this.ctx.stroke();
                     
                     // Arrowhead
                     this.ctx.beginPath();
                     this.ctx.fillStyle = `rgba(102, 126, 234, ${intensity})`;
-                    this.ctx.moveTo(
-                        x + 25 * Math.cos(angle),
-                        y + 25 * Math.sin(angle)
+                    this.ctx.moveTo(ex, ey);
+                    this.ctx.lineTo(
+                        ex - 5 * Math.cos(angle - Math.PI / 6),
+                        ey - 5 * Math.sin(angle - Math.PI / 6)
                     );
                     this.ctx.lineTo(
-                        x + 20 * Math.cos(angle - Math.PI / 6),
-                        y + 20 * Math.sin(angle - Math.PI / 6)
-                    );
-                    this.ctx.lineTo(
-                        x + 20 * Math.cos(angle + Math.PI / 6),
-                        y + 20 * Math.sin(angle + Math.PI / 6)
+                        ex - 5 * Math.cos(angle + Math.PI / 6),
+                        ey - 5 * Math.sin(angle + Math.PI / 6)
                     );
                     this.ctx.closePath();
                     this.ctx.fill();
@@ -239,29 +234,31 @@ export class ElectricFields extends BaseAnimation {
             this.ctx.arc(charge.x + 2, charge.y + 2, 12, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Charge symbol with modern styling
+            // Charge symbol with modern styling (outlined for contrast)
             this.ctx.fillStyle = '#ffffff';
             this.ctx.font = 'bold 20px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+            this.ctx.strokeText(charge.type === 'positive' ? '+' : '−', charge.x, charge.y);
             this.ctx.fillText(charge.type === 'positive' ? '+' : '−', charge.x, charge.y);
         });
     }
     
     drawParticles() {
         this.testParticles.forEach(particle => {
-            // Modern particle trail with gradient
+            // Higher-contrast trail
             if (particle.trail.length > 1) {
                 this.ctx.beginPath();
                 const gradient = this.ctx.createLinearGradient(
                     particle.trail[0].x, particle.trail[0].y,
                     particle.x, particle.y
                 );
-                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
-                gradient.addColorStop(1, 'rgba(255, 255, 255, 0.6)');
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
                 this.ctx.strokeStyle = gradient;
-                this.ctx.lineWidth = 3;
+                this.ctx.lineWidth = 2;
                 this.ctx.lineCap = 'round';
                 this.ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
                 particle.trail.forEach(point => {
@@ -270,32 +267,18 @@ export class ElectricFields extends BaseAnimation {
                 this.ctx.stroke();
             }
             
-            // Modern particle with glow and gradient
-            const particleGradient = this.ctx.createRadialGradient(
-                particle.x - 3, particle.y - 3, 0,
-                particle.x, particle.y, 8
-            );
-            particleGradient.addColorStop(0, '#ffffff');
-            particleGradient.addColorStop(0.7, '#f8f9fa');
-            particleGradient.addColorStop(1, '#e9ecef');
-            
-            // Glow effect
+            // Main particle: bright fill + dark outline (crisper)
+            const px = Math.round(particle.x) + 0.5;
+            const py = Math.round(particle.y) + 0.5;
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            this.ctx.arc(particle.x, particle.y, 8, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.arc(px, py, 5, 0, Math.PI * 2);
             this.ctx.fill();
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.lineWidth = 1.25;
+            this.ctx.stroke();
             
-            // Main particle
-            this.ctx.beginPath();
-            this.ctx.fillStyle = particleGradient;
-            this.ctx.arc(particle.x, particle.y, 4, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Modern shadow
-            this.ctx.beginPath();
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-            this.ctx.arc(particle.x + 1, particle.y + 1, 4, 0, Math.PI * 2);
-            this.ctx.fill();
+            // No shadow to keep sharp contrast
         });
     }
     
@@ -687,12 +670,7 @@ export class MagneticFields extends BaseAnimation {
     }
     
     render() {
-        // Enhanced modern background with gradient
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
-        gradient.addColorStop(0, '#1a1a2e');
-        gradient.addColorStop(1, '#16213e');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Standardized neutral background handled globally
         
         // Draw enhanced field lines
         if (this.showFieldLines) {
@@ -753,8 +731,9 @@ export class MagneticFields extends BaseAnimation {
         const drawProgress = Math.min(1, this.animationOffset / 1.0);
         const maxSteps = Math.floor(numSteps * drawProgress);
         
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-        this.ctx.lineWidth = 1;
+        // Combined field line color: high-contrast cyan
+        this.ctx.strokeStyle = '#00D1FF';
+        this.ctx.lineWidth = 2;
         this.ctx.lineCap = 'round';
         
         this.ctx.beginPath();
@@ -851,9 +830,9 @@ export class MagneticFields extends BaseAnimation {
         const currentEndX = startX + (endX - startX) * drawProgress;
         const currentEndY = startY + (endY - startY) * drawProgress;
         
-        // Line styling based on pole type
-        const lineColor = poleType === 'north' ? 'rgba(255, 107, 107, 0.8)' : 'rgba(102, 126, 234, 0.7)';
-        const lineWidth = poleType === 'north' ? 2.5 : 2;
+        // High-contrast line styling based on pole type
+        const lineColor = poleType === 'north' ? '#FF3B3B' : '#6FA8FF';
+        const lineWidth = poleType === 'north' ? 2.5 : 2.2;
         
         // Draw the field line
         this.ctx.strokeStyle = lineColor;
@@ -891,12 +870,12 @@ export class MagneticFields extends BaseAnimation {
         // Arrow color with enhanced visibility
         let arrowColor;
         if (poleType === 'north') {
-            arrowColor = 'rgba(255, 107, 107, 1.0)';
+            arrowColor = '#FF3B3B';
         } else if (poleType === 'south') {
-            arrowColor = 'rgba(102, 126, 234, 1.0)';
+            arrowColor = '#6FA8FF';
         } else {
-            // Combined field - use white color
-            arrowColor = 'rgba(255, 255, 255, 0.8)';
+            // Combined field - cyan to match combined lines
+            arrowColor = '#00D1FF';
         }
         
         // Add shadow for better visibility
@@ -961,10 +940,10 @@ export class MagneticFields extends BaseAnimation {
         const actualEndY = startY + (endY - startY) * animatedLength;
         
         // Draw the interaction line
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
-        this.ctx.shadowBlur = 3;
-        this.ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
-        this.ctx.lineWidth = 3;
+        this.ctx.shadowColor = 'transparent';
+        this.ctx.shadowBlur = 0;
+        this.ctx.strokeStyle = '#00D1FF';
+        this.ctx.lineWidth = 2;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         
@@ -1369,16 +1348,19 @@ export class MagneticFields extends BaseAnimation {
         this.ctx.textAlign = 'center';
         
         // Draw animation title with better contrast
+        // Outlined title for maximum contrast
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = 'rgba(0,0,0,0.9)';
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 3;
+        this.ctx.strokeText('Magnetic Fields', this.ctx.canvas.width / 2, 30);
         this.ctx.fillText('Magnetic Fields', this.ctx.canvas.width / 2, 30);
         
         // Draw mathematical formulas
         this.ctx.font = '14px Inter, Arial, sans-serif';
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-        this.ctx.shadowBlur = 2;
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+        this.ctx.strokeText('F = q(v × B)  |  F = qvB sin θ  |  B = μ₀I/2πr', this.ctx.canvas.width / 2, 50);
         this.ctx.fillText('F = q(v × B)  |  F = qvB sin θ  |  B = μ₀I/2πr', this.ctx.canvas.width / 2, 50);
         
         // Reset shadow
@@ -1538,7 +1520,7 @@ export class DiodeTransistor extends BaseAnimation {
                 vx: (Math.random() - 0.5) * 2,
                 vy: (Math.random() - 0.5) * 2,
                 size: 1.8 + Math.random() * 0.7,
-                color: '#FFFF00',
+                color: '#CC8F00',
                 life: 1.0,
                 decay: 0.02
             });
@@ -1706,7 +1688,7 @@ export class DiodeTransistor extends BaseAnimation {
                 vx: (Math.random() - 0.5) * 10,
                 vy: (Math.random() - 0.5) * 10,
                 life: 1.0,
-                color: '#FFFF00'
+                color: '#CC8F00'
             });
         }
         
@@ -1724,7 +1706,7 @@ export class DiodeTransistor extends BaseAnimation {
     render() {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         
-        this.drawBackground();
+        // Standardized neutral background; skip custom drawBackground
         this.drawEnergyField();
         this.drawBattery();
         this.drawComponent();
@@ -1737,44 +1719,7 @@ export class DiodeTransistor extends BaseAnimation {
     }
     
     drawBackground() {
-        // Create dynamic dark sci-fi background with animated gradient
-        const time = this.time * 0.001;
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
-        gradient.addColorStop(0, `hsl(${240 + Math.sin(time) * 10}, 70%, 15%)`);
-        gradient.addColorStop(1, `hsl(${250 + Math.cos(time) * 10}, 80%, 10%)`);
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        
-        // Draw animated circuit board pattern
-        this.ctx.strokeStyle = `rgba(0, 255, 255, ${0.1 + Math.sin(time * 2) * 0.05})`;
-        this.ctx.lineWidth = 1;
-        
-        // Horizontal lines with pulse effect
-        for (let y = 0; y < this.ctx.canvas.height; y += 40) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y + Math.sin(time + y * 0.01) * 2);
-            this.ctx.lineTo(this.ctx.canvas.width, y + Math.sin(time + y * 0.01) * 2);
-            this.ctx.stroke();
-        }
-        
-        // Vertical lines with pulse effect
-        for (let x = 0; x < this.ctx.canvas.width; x += 40) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(x + Math.cos(time + x * 0.01) * 2, 0);
-            this.ctx.lineTo(x + Math.cos(time + x * 0.01) * 2, this.ctx.canvas.height);
-            this.ctx.stroke();
-        }
-        
-        // Add floating energy particles in background
-        for (let i = 0; i < 20; i++) {
-            const x = (i * 37) % this.ctx.canvas.width;
-            const y = (i * 23) % this.ctx.canvas.height;
-            const alpha = 0.1 + Math.sin(time * 3 + i) * 0.05;
-            this.ctx.fillStyle = `rgba(0, 255, 255, ${alpha})`;
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, 1, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
+        // No-op: background is standardized
     }
     
     drawEnergyField() {
@@ -1817,7 +1762,7 @@ export class DiodeTransistor extends BaseAnimation {
         const time = this.time * 0.001;
         
         // Draw battery with enhanced glow effect when active
-        const glowColor = this.isActive ? `rgba(76, 175, 80, ${0.8 + this.glowIntensity * 0.2})` : '#4CAF50';
+        const glowColor = this.isActive ? `rgba(46, 139, 87, ${0.85 + this.glowIntensity * 0.15})` : '#2E8B57';
         this.ctx.fillStyle = glowColor;
         this.ctx.fillRect(this.batteryX - 25, this.batteryY - 35, 50, 70);
         
@@ -1837,7 +1782,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Draw voltage label with pulsing glow
         const labelGlow = this.isActive ? Math.sin(time * 3) * 0.3 + 0.7 : 0.7;
-        this.ctx.fillStyle = this.isActive ? `rgba(255, 255, 0, ${labelGlow})` : 'white';
+        this.ctx.fillStyle = this.isActive ? `rgba(204, 143, 0, ${labelGlow})` : '#111';
         this.ctx.font = 'bold 16px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`${this.inputVoltage}V`, this.batteryX, this.batteryY + 60);
@@ -1852,7 +1797,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Add energy indicator when active
         if (this.isActive) {
-            this.ctx.fillStyle = `rgba(0, 255, 0, ${this.glowIntensity})`;
+            this.ctx.fillStyle = `rgba(46, 139, 87, ${0.5 + this.glowIntensity * 0.5})`;
             this.ctx.beginPath();
             this.ctx.arc(this.batteryX, this.batteryY, 30, 0, Math.PI * 2);
             this.ctx.stroke();
@@ -1880,7 +1825,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Enhanced glow effects with pulsing
         const pulseEffect = Math.sin(time * 3) * 0.2;
-        const glowColor = isForward ? '#00FF00' : isReverse ? '#FF0000' : '#FFFF00';
+        const glowColor = isForward ? '#2EEA6A' : isReverse ? '#FF3B3B' : '#CC8F00';
         const glowIntensity = isForward ? glow * (1 + pulseEffect) : isReverse ? glow * 0.3 : 0;
         
         // Apply enhanced shadow effect
@@ -1888,7 +1833,7 @@ export class DiodeTransistor extends BaseAnimation {
         this.ctx.shadowBlur = this.isActive ? 15 + glowIntensity * 10 : 0;
         
         // Draw diode symbol with enhanced styling
-        const symbolColor = this.isActive ? `rgba(255, 255, 0, ${0.9 + glowIntensity})` : '#FFFFFF';
+        const symbolColor = this.isActive ? `rgba(204, 143, 0, ${0.9 + glowIntensity})` : '#333333';
         
         // Triangle (anode) with gradient effect
         this.ctx.fillStyle = symbolColor;
@@ -1947,7 +1892,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Add junction glow effect for forward bias
         if (this.isActive && isForward) {
-            this.ctx.fillStyle = `rgba(0, 255, 0, ${0.3 + pulseEffect})`;
+            this.ctx.fillStyle = `rgba(46, 139, 87, ${0.25 + pulseEffect * 0.8})`;
             this.ctx.beginPath();
             this.ctx.arc(x - size/3, y, 8, 0, Math.PI * 2);
             this.ctx.fill();
@@ -1968,7 +1913,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Enhanced glow effects with pulsing
         const pulseEffect = Math.sin(time * 3) * 0.2;
-        const glowColor = isForward ? '#00FF00' : isReverse ? '#FF0000' : '#FFFF00';
+        const glowColor = isForward ? '#2EEA6A' : isReverse ? '#FF3B3B' : '#CC8F00';
         const glowIntensity = isForward ? glow * (1 + pulseEffect) : isReverse ? glow * 0.3 : 0;
         
         // Apply enhanced shadow effect
@@ -1976,7 +1921,7 @@ export class DiodeTransistor extends BaseAnimation {
         this.ctx.shadowBlur = this.isActive ? 15 + glowIntensity * 10 : 0;
         
         // Draw transistor symbol with enhanced styling
-        const symbolColor = this.isActive ? `rgba(255, 255, 0, ${0.9 + glowIntensity})` : '#FFFFFF';
+        const symbolColor = this.isActive ? `rgba(204, 143, 0, ${0.9 + glowIntensity})` : '#333333';
         
         // Circle (transistor body) with enhanced styling
         this.ctx.strokeStyle = symbolColor;
@@ -1987,7 +1932,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Add inner glow for active state
         if (this.isActive) {
-            this.ctx.fillStyle = `rgba(255, 255, 0, ${0.1 + pulseEffect})`;
+            this.ctx.fillStyle = `rgba(204, 143, 0, ${0.1 + pulseEffect})`;
             this.ctx.beginPath();
             this.ctx.arc(x, y, radius - 2, 0, 2 * Math.PI);
             this.ctx.fill();
@@ -2048,7 +1993,7 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Add transistor type indicator
         if (this.isActive) {
-            const typeColor = this.componentType === 'npn' ? '#00AAFF' : '#FF4444';
+        const typeColor = this.componentType === 'npn' ? '#008EDA' : '#FF3B3B';
             this.ctx.fillStyle = `rgba(0, 0, 0, 0.7)`;
             this.ctx.fillRect(x - 30, y - radius - 45, 60, 20);
             this.ctx.fillStyle = typeColor;
@@ -2061,7 +2006,7 @@ export class DiodeTransistor extends BaseAnimation {
     // Helper methods for drawing components
     drawComponentLabel(text, x, y, time) {
         const labelGlow = this.isActive ? Math.sin(time * 2) * 0.3 + 0.7 : 0.7;
-        this.ctx.fillStyle = this.isActive ? `rgba(255, 255, 0, ${labelGlow})` : 'white';
+        this.ctx.fillStyle = this.isActive ? `rgba(204, 143, 0, ${labelGlow})` : '#111';
         this.ctx.font = 'bold 18px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(text, x, y);
@@ -2069,9 +2014,9 @@ export class DiodeTransistor extends BaseAnimation {
     
     drawBiasIndicator(biasType, x, y, glowIntensity) {
         const biasText = biasType.toUpperCase();
-        const biasColor = biasType === 'forward' ? '#00FF00' : 
-                         biasType === 'reverse' ? '#FF0000' : '#FFFF00';
-        this.ctx.fillStyle = this.isActive ? `rgba(0, 255, 0, ${0.8 + glowIntensity})` : biasColor;
+        const biasColor = biasType === 'forward' ? '#2EEA6A' : 
+                         biasType === 'reverse' ? '#FF3B3B' : '#CC8F00';
+        this.ctx.fillStyle = this.isActive ? `rgba(46, 139, 87, ${0.85 + glowIntensity * 0.5})` : biasColor;
         this.ctx.font = 'bold 14px Arial';
         this.ctx.fillText(biasText, x, y);
     }
@@ -2145,7 +2090,7 @@ export class DiodeTransistor extends BaseAnimation {
     }
     
     drawVoltageDrop(x, y, text, glow) {
-        this.ctx.fillStyle = `rgba(255, 255, 0, ${0.8 + glow})`;
+        this.ctx.fillStyle = `rgba(204, 143, 0, ${0.8 + glow})`;
         this.ctx.font = 'bold 10px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(text, x, y);
@@ -2301,13 +2246,13 @@ export class DiodeTransistor extends BaseAnimation {
         // Draw load (light bulb) with enhanced glow effect and animation
         const bulbGlow = this.isActive ? this.glowIntensity : 0;
         const pulseEffect = this.isActive ? Math.sin(time * 3) * 0.1 : 0;
-        const bulbColor = this.isActive ? `rgba(255, 255, 0, ${0.8 + bulbGlow * 0.2 + pulseEffect})` : '#666';
+        const bulbColor = this.isActive ? `rgba(204, 143, 0, ${0.85 + bulbGlow * 0.15 + pulseEffect})` : '#666';
         
         // Draw outer glow when active
         if (this.isActive) {
-            this.ctx.shadowColor = '#FFFF00';
+            this.ctx.shadowColor = '#CC8F00';
             this.ctx.shadowBlur = 30 + this.glowIntensity * 20;
-            this.ctx.fillStyle = `rgba(255, 255, 0, ${0.3 + this.glowIntensity * 0.2})`;
+            this.ctx.fillStyle = `rgba(204, 143, 0, ${0.3 + this.glowIntensity * 0.2})`;
             this.ctx.beginPath();
             this.ctx.arc(this.loadX, this.loadY, 45, 0, 2 * Math.PI);
             this.ctx.fill();
@@ -2366,14 +2311,14 @@ export class DiodeTransistor extends BaseAnimation {
         
         // Draw load label with pulsing glow
         const labelGlow = this.isActive ? Math.sin(time * 2) * 0.3 + 0.7 : 0.7;
-        this.ctx.fillStyle = this.isActive ? `rgba(255, 255, 0, ${labelGlow})` : 'white';
+        this.ctx.fillStyle = this.isActive ? `rgba(204, 143, 0, ${labelGlow})` : '#111';
         this.ctx.font = 'bold 16px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('LOAD', this.loadX, this.loadY + 80);
         
         // Add power indicator with enhanced styling
         if (this.isActive) {
-            this.ctx.fillStyle = `rgba(0, 255, 0, ${0.8 + this.glowIntensity})`;
+            this.ctx.fillStyle = `rgba(46, 139, 87, ${0.85 + this.glowIntensity * 0.5})`;
             this.ctx.font = 'bold 12px Arial';
             this.ctx.fillText(`${this.power.toFixed(1)}mW`, this.loadX, this.loadY - 60);
             
@@ -2381,7 +2326,7 @@ export class DiodeTransistor extends BaseAnimation {
             for (let i = 0; i < 3; i++) {
                 const waveRadius = 50 + i * 15 + Math.sin(time * 2 + i) * 5;
                 const waveAlpha = (0.2 - i * 0.05) * this.glowIntensity;
-                this.ctx.strokeStyle = `rgba(255, 255, 0, ${waveAlpha})`;
+                this.ctx.strokeStyle = `rgba(204, 143, 0, ${waveAlpha})`;
                 this.ctx.lineWidth = 1;
                 this.ctx.beginPath();
                 this.ctx.arc(this.loadX, this.loadY, waveRadius, 0, Math.PI * 2);
@@ -2479,8 +2424,8 @@ export class DiodeTransistor extends BaseAnimation {
         // Draw energy particles with enhanced effects
         this.energyParticles.forEach(particle => {
             const pulse = Math.sin(time * 5 + particle.x * 0.01) * 0.3 + 0.7;
-            this.ctx.fillStyle = `rgba(255, 255, 0, ${particle.life * pulse})`;
-            this.ctx.shadowColor = '#FFFF00';
+            this.ctx.fillStyle = `rgba(204, 143, 0, ${particle.life * pulse})`;
+            this.ctx.shadowColor = '#CC8F00';
             this.ctx.shadowBlur = particle.life * 10;
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
@@ -2492,7 +2437,7 @@ export class DiodeTransistor extends BaseAnimation {
     drawSparks() {
         // Draw sparks when current is high
         this.sparks.forEach(spark => {
-            this.ctx.fillStyle = `rgba(255, 255, 0, ${spark.life})`;
+            this.ctx.fillStyle = `rgba(204, 143, 0, ${spark.life})`;
             this.ctx.beginPath();
             this.ctx.arc(spark.x, spark.y, 2, 0, Math.PI * 2);
             this.ctx.fill();
@@ -2505,12 +2450,12 @@ export class DiodeTransistor extends BaseAnimation {
         const time = this.time * 0.001;
         
         // Draw current flow with enhanced effects and animation
-        this.ctx.strokeStyle = `rgba(255, 255, 0, ${0.8 + this.glowIntensity})`;
+        this.ctx.strokeStyle = `rgba(204, 143, 0, ${0.85 + this.glowIntensity * 0.5})`;
         this.ctx.lineWidth = 4;
         this.ctx.setLineDash([15, 8]);
         
         // Add glow effect to current flow
-        this.ctx.shadowColor = '#FFFF00';
+        this.ctx.shadowColor = '#CC8F00';
         this.ctx.shadowBlur = 10 + this.glowIntensity * 10;
         
         // Battery to component with animated dash pattern
@@ -2534,13 +2479,13 @@ export class DiodeTransistor extends BaseAnimation {
         // Draw animated current arrows with pulsing effect
         const arrowOffset = Math.sin(time * 2) * 5;
         const arrowGlow = Math.sin(time * 4) * 0.3 + 0.7;
-        this.drawArrow(this.batteryX + 35 + arrowOffset, this.batteryY, 12, 0, `rgba(255, 255, 0, ${arrowGlow})`);
-        this.drawArrow(this.componentX + 100 + arrowOffset, this.componentY, 12, 0, `rgba(255, 255, 0, ${arrowGlow})`);
+        this.drawArrow(this.batteryX + 35 + arrowOffset, this.batteryY, 12, 0, `rgba(204, 143, 0, ${arrowGlow})`);
+        this.drawArrow(this.componentX + 100 + arrowOffset, this.componentY, 12, 0, `rgba(204, 143, 0, ${arrowGlow})`);
         
         // Draw current intensity indicator with animation
         const intensity = Math.min(this.current / 20, 1);
         const pulseIntensity = intensity * (0.3 + Math.sin(time * 5) * 0.1);
-        this.ctx.fillStyle = `rgba(255, 255, 0, ${pulseIntensity})`;
+        this.ctx.fillStyle = `rgba(204, 143, 0, ${pulseIntensity})`;
         this.ctx.fillRect(this.componentX - 100, this.componentY - 10, 200, 20);
         
         // Add energy particles along the current path
@@ -2549,7 +2494,7 @@ export class DiodeTransistor extends BaseAnimation {
             const particleX = this.batteryX + 25 + (this.componentX - 90 - this.batteryX - 25) * particleProgress;
             const particleY = this.batteryY + Math.sin(time * 3 + i) * 3;
             
-            this.ctx.fillStyle = `rgba(255, 255, 0, ${0.6 + Math.sin(time * 4 + i) * 0.2})`;
+            this.ctx.fillStyle = `rgba(204, 143, 0, ${0.6 + Math.sin(time * 4 + i) * 0.2})`;
             this.ctx.beginPath();
             this.ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);
             this.ctx.fill();
@@ -2607,7 +2552,7 @@ export class DiodeTransistor extends BaseAnimation {
         this.ctx.font = 'bold 14px Arial';
         
         // Blue particles (Electrons) - filled circle
-        this.ctx.fillStyle = '#00AAFF';
+        this.ctx.fillStyle = '#008EDA';
         this.ctx.beginPath();
         this.ctx.arc(this.ctx.canvas.width - 300, 50, 2.5, 0, Math.PI * 2);
         this.ctx.fill();
@@ -2626,7 +2571,7 @@ export class DiodeTransistor extends BaseAnimation {
         this.ctx.fillText('Holes (empty circle)', this.ctx.canvas.width - 285, 75);
         
         // Yellow particles (Energy)
-        this.ctx.fillStyle = '#FFFF00';
+        this.ctx.fillStyle = '#CC8F00';
         this.ctx.beginPath();
         this.ctx.arc(this.ctx.canvas.width - 300, 90, 2.5, 0, Math.PI * 2);
         this.ctx.fill();
@@ -2635,7 +2580,7 @@ export class DiodeTransistor extends BaseAnimation {
         this.ctx.fillText('Energy Carriers', this.ctx.canvas.width - 285, 95);
         
         // Yellow arrows (Current flow)
-        this.ctx.fillStyle = '#FFFF00';
+        this.ctx.fillStyle = '#CC8F00';
         this.ctx.beginPath();
         this.ctx.moveTo(this.ctx.canvas.width - 300, 110);
         this.ctx.lineTo(this.ctx.canvas.width - 290, 110);
