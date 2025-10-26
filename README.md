@@ -2,6 +2,8 @@
 
 An interactive web application featuring real-time scientific simulations for educational purposes. Built with modern web technologies and optimized for development with hot reloading.
 
+🌐 **Live Demo**: [https://nahamus.github.io/ScienceAnim/](https://nahamus.github.io/ScienceAnim/)
+
 ## 🎨 **Label Visibility Guidelines**
 
 ### **Font Color Standards:**
@@ -54,49 +56,69 @@ When adding new animations or modifying existing ones:
 
 ## Features
 
-### 🧪 Brownian Motion Simulation
-- **Interactive Controls**: Adjust particle count, animation speed, temperature, and trail visibility
-- **Real-time Statistics**: Track active particles, average speed, and simulation time
-- **Color-coded Particles**: Each particle has a unique color for easy tracking
-- **Physics-based Movement**: Realistic random motion with temperature effects
+### 🧪 **Particle Physics**
+- **Brownian Motion**: Random particle movement with temperature effects
+- **Diffusion**: Concentration gradient visualization with Fick's laws
+- **Gas Laws**: Pressure, volume, and temperature relationships
 
-### ⏰ Simple Pendulum Simulation
-- **Realistic Physics**: Accurate pendulum motion with gravity and damping
-- **Customizable Parameters**: Adjust length, speed, initial angle, gravity, and damping
-- **Path Visualization**: Optional trail showing pendulum's motion path
-- **Period Calculation**: Real-time period calculation based on length and gravity
+### ⚡ **Classical Mechanics**
+- **Simple Pendulum**: Realistic physics with gravity and damping
+- **Orbital Motion**: Planetary motion with gravitational forces
+- **Collision Physics**: Momentum and energy conservation
+- **Friction & Inclined Planes**: Force analysis and motion
 
-### 🌊 Diffusion Simulation
-- **Concentration Gradients**: Particles move from high to low concentration areas
-- **Heatmap Visualization**: Optional concentration heatmap overlay
-- **Fick's Laws**: Demonstrates diffusion principles
-- **Interactive Controls**: Adjust particle count, speed, diffusion rate, and gradient
+### 🌊 **Wave Phenomena**
+- **Wave Propagation**: Transverse, longitudinal, and combined waves
+- **Sound Waves**: Wave packet visualization with interactive controls
+- **Wave Interference**: Constructive and destructive interference patterns
 
-### 🌊 Wave Propagation Simulation
-- **Multiple Wave Types**: Transverse, longitudinal, interference, and standing waves
-- **Real-time Parameters**: Adjust frequency, amplitude, wavelength, and speed
-- **Visualization Options**: Toggle waveform and particle displays
-- **Educational Value**: Demonstrates wave physics concepts
+### 🧲 **Electromagnetism**
+- **Electric Fields**: Charge interactions and field visualization
+- **Magnetic Fields**: Magnetic field lines and interactions
+- **Diode & Transistor**: Semiconductor behavior simulation
+
+### 🧠 **Computer Science**
+- **Neural Networks**: Machine learning with decision boundaries
+- **Memory Management**: Program execution with stack/heap visualization
+- **Blockchain**: Cryptocurrency mining and network simulation
+
+### 🌊 **Fluid Dynamics**
+- **Fluid Flow**: Viscosity and Reynolds number effects
+- **Bernoulli's Principle**: Pressure-velocity relationships
+
+### ⚛️ **Quantum & Nuclear Physics**
+- **Wave-Particle Duality**: Quantum behavior demonstration
+- **Nuclear Physics**: Radioactive decay and nuclear reactions
 
 ## Project Structure
 
 ```
-scientific-animations/
+ScienceAnim/
 ├── src/
-│   ├── index.html          # Main HTML file
+│   ├── index.html                    # Main HTML file
 │   ├── styles/
-│   │   └── main.css        # All styles and responsive design
+│   │   └── main.css                  # All styles and responsive design
 │   └── js/
-│       ├── main.js         # Application entry point
-│       └── animations.js   # All simulation classes and logic
-├── public/                 # Static assets (if any)
-├── dist/                   # Build output (generated)
-├── package.json            # Dependencies and scripts
-├── vite.config.js          # Vite configuration
-├── .gitignore             # Git ignore rules
-├── .prettierrc            # Code formatting rules
-├── .eslintrc.json         # Code linting rules
-└── README.md              # This file
+│       ├── main.js                   # Application entry point
+│       ├── animations.js             # Main animations controller
+│       └── animations/
+│           ├── base-animation.js     # Base animation class
+│           ├── particle-physics.js   # Brownian, Diffusion, Gas Laws
+│           ├── classical-mechanics.js # Pendulum, Orbital, Collision, Friction
+│           ├── wave-phenomena.js     # Wave Propagation, Sound Waves
+│           ├── electro-magnetism.js  # Electric/Magnetic Fields, Diode/Transistor
+│           ├── computer-science.js   # Neural Networks, Memory Management
+│           ├── blockchain.js         # Blockchain simulation
+│           ├── fluid-dynamics.js     # Fluid Flow, Bernoulli's Principle
+│           ├── nuclear-physics.js    # Nuclear decay simulation
+│           └── quantum-physics.js    # Wave-Particle Duality
+├── dist/                             # Build output (generated)
+├── package.json                        # Dependencies and scripts
+├── vite.config.js                    # Vite configuration
+├── .gitignore                        # Git ignore rules
+├── .prettierrc                       # Code formatting rules
+├── .eslintrc.json                    # Code linting rules
+└── README.md                         # This file
 ```
 
 ## Getting Started
@@ -109,8 +131,8 @@ scientific-animations/
 
 1. **Clone or download the project**
    ```bash
-   git clone <repository-url>
-   cd scientific-animations
+   git clone https://github.com/nahamus/ScienceAnim.git
+   cd ScienceAnim
    ```
 
 2. **Install dependencies**
@@ -124,7 +146,7 @@ scientific-animations/
    ```
 
 4. **Open your browser**
-   The application will automatically open at `http://localhost:3000`
+   The application will automatically open at `http://localhost:5173` (Vite default port)
 
 ### Development Workflow
 
@@ -153,6 +175,82 @@ npm run lint
 # Format code with Prettier
 npm run format
 ```
+
+## 🚀 Deployment
+
+### GitHub Pages Deployment
+
+This project is automatically deployed to GitHub Pages using the `gh-pages` branch. Follow these steps to deploy your changes:
+
+#### **1. Prepare for Deployment**
+```bash
+# Make sure all changes are committed
+git add .
+git commit -m "Your commit message"
+```
+
+#### **2. Deploy to GitHub Pages**
+```bash
+# Switch to the gh-pages branch
+git checkout gh-pages
+
+# Merge latest changes from develop
+git merge develop
+
+# Push to GitHub Pages
+git push origin gh-pages
+
+# Switch back to develop branch
+git checkout develop
+```
+
+#### **3. Handle Merge Conflicts (if any)**
+If you encounter merge conflicts during deployment:
+```bash
+# Pull latest changes from remote
+git pull origin gh-pages --allow-unrelated-histories
+
+# Resolve conflicts manually or use:
+git checkout --ours <conflicted-file>
+git add <conflicted-file>
+
+# Commit the merge
+git commit -m "Merge develop into gh-pages for deployment"
+
+# Push the changes
+git push origin gh-pages
+```
+
+#### **4. Verify Deployment**
+- Visit: [https://nahamus.github.io/ScienceAnim/](https://nahamus.github.io/ScienceAnim/)
+- Check that all animations are working correctly
+- Test responsive design on different devices
+
+### **Deployment Notes**
+- **Branch**: Uses `gh-pages` branch for deployment
+- **Build**: No build step required - deploys source files directly
+- **Updates**: Changes are live immediately after push
+- **Custom Domain**: Can be configured in repository settings
+
+## 🆕 Recent Improvements
+
+### **Enhanced User Experience**
+- **Simplified Controls**: Streamlined animation controls for better usability
+- **On-Canvas Controls**: Interactive play/pause/reset buttons for key animations
+- **Responsive Design**: Improved mobile and tablet experience
+- **Better Visuals**: Enhanced particle rendering and wave visualization
+
+### **Code Quality**
+- **ESLint & Prettier**: Automated code formatting and linting
+- **Modular Architecture**: Separated animation classes for better maintainability
+- **Performance**: Optimized rendering and animation loops
+- **Accessibility**: Improved contrast and keyboard navigation
+
+### **New Features**
+- **Sound Waves**: Wave packet visualization with interactive controls
+- **Program Execution**: Memory management simulation with step-by-step execution
+- **Blockchain**: Cryptocurrency mining simulation with network visualization
+- **Neural Networks**: Machine learning visualization with decision boundaries
 
 ## Development Best Practices
 
