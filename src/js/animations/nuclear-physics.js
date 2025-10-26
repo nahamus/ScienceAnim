@@ -19,6 +19,14 @@ export class NuclearReactions extends BaseAnimation {
         this.energyParticles = [];
         this.reactingParticles = [];
         this.shockwaves = [];
+        this.particleTrails = []; // For particle trail effects
+        
+        // Animation state
+        this.isPlaying = false;
+        this.controlButtons = {
+            playPause: { x: 600, y: 20, width: 80, height: 30, label: '▶ Play' },
+            reset: { x: 690, y: 20, width: 60, height: 30, label: '🔄 Reset' }
+        };
         
         // Statistics
         this.energyReleased = 0;
@@ -35,41 +43,14 @@ export class NuclearReactions extends BaseAnimation {
         // Click interaction
         this.setupClickEvents();
         this.initializeNuclei();
+        
+        // Initialize particle trails
+        this.initializeParticleTrails();
     }
     
     setupClickEvents() {
-        this.canvas.addEventListener('click', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Start reacting particle movement for all modes
-            this.reactingParticles.forEach(particle => {
-                if (!particle.moving) {
-                    // Find the target atom for this particle
-                    this.findTargetForParticle(particle);
-                    particle.moving = true;
-                }
-            });
-        });
-        
-        // Add touch event listener for mobile support
-        this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const rect = this.canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            
-            // Start reacting particle movement for all modes
-            this.reactingParticles.forEach(particle => {
-                if (!particle.moving) {
-                    // Find the target atom for this particle
-                    this.findTargetForParticle(particle);
-                    particle.moving = true;
-                }
-            });
-        });
+        // Click events are handled by the main animations controller
+        // No need to add duplicate event listeners here
     }
     
     initializeNuclei() {
@@ -102,7 +83,7 @@ export class NuclearReactions extends BaseAnimation {
                         neutrons: 143,
                         mass: 235,
                         radius: 8,
-                        color: '#FF6B35',
+                        color: '#FF6B35', // Orange-red for uranium
                         stability: 0.8,
                         fissioned: false,
                         visible: true,
@@ -119,7 +100,7 @@ export class NuclearReactions extends BaseAnimation {
                 targetY: centerY,
                 type: 'neutron',
                 radius: 12, // Much larger for better visibility
-                color: '#9C27B0',
+                color: '#9C27B0', // Purple for neutrons
                 speed: 80,
                 moving: false,
                 life: 10
@@ -224,10 +205,143 @@ export class NuclearReactions extends BaseAnimation {
         this.chainReactions = 0;
         this.fissionCount = 0;
         this.fusionCount = 0;
+        this.isPlaying = false;
+        this.controlButtons.playPause.label = '▶ Play';
         this.initializeNuclei();
+        this.initializeParticleTrails();
     }
     
+    initializeParticleTrails() {
+        this.particleTrails = [];
+    }
+    
+    addParticleTrail(particle) {
+        this.particleTrails.push({
+            x: particle.x,
+            y: particle.y,
+            color: particle.color,
+            life: 1.0,
+            maxLife: 1.0
+        });
+    }
+    
+    updateParticleTrails(deltaTime) {
+        this.particleTrails.forEach(trail => {
+            trail.life -= deltaTime * this.speed * 0.001 * 1.5; // Faster fade
+        });
+        this.particleTrails = this.particleTrails.filter(trail => trail.life > 0);
+    }
+    
+    handleButtonClick(x, y) {
+        const buttons = this.controlButtons;
+        
+        // Calculate dynamic button positions (same logic as drawControlButtons)
+        const maxX = this.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
+        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
+        const resetX = playPauseX + buttons.playPause.width + 10;
+        
+        // Check play/pause button
+        if (x >= playPauseX && x <= playPauseX + buttons.playPause.width &&
+            y >= buttons.playPause.y && y <= buttons.playPause.y + buttons.playPause.height) {
+            this.handleControlAction('playPause');
+            return true;
+        }
+        
+        // Check reset button
+        if (x >= resetX && x <= resetX + buttons.reset.width &&
+            y >= buttons.reset.y && y <= buttons.reset.y + buttons.reset.height) {
+            this.handleControlAction('reset');
+            return true;
+        }
+        
+        return false;
+    }
+    
+    handleControlAction(action) {
+        if (action === 'playPause') {
+            this.isPlaying = !this.isPlaying;
+            this.controlButtons.playPause.label = this.isPlaying ? '⏸ Pause' : '▶ Play';
+            
+            // When playing, start reactions if particles aren't already moving
+            if (this.isPlaying) {
+                this.reactingParticles.forEach(particle => {
+                    if (!particle.moving) {
+                        this.findTargetForParticle(particle);
+                        particle.moving = true;
+                    }
+                });
+            }
+        } else if (action === 'reset') {
+            this.isPlaying = false;
+            this.controlButtons.playPause.label = '▶ Play';
+            // Clear all particles and effects
+            this.neutrons = [];
+            this.fissionProducts = [];
+            this.fusionProducts = [];
+            this.energyParticles = [];
+            this.shockwaves = [];
+            this.particleTrails = [];
+            // Reset statistics
+            this.energyReleased = 0;
+            this.neutronsProduced = 0;
+            this.chainReactions = 0;
+            this.fissionCount = 0;
+            this.fusionCount = 0;
+            this.time = 0;
+            // Reinitialize everything
+            this.initializeNuclei();
+            this.initializeParticleTrails();
+        }
+    }
+    
+    drawControlButtons() {
+        const buttons = this.controlButtons;
+        
+        // Ensure buttons stay within canvas bounds
+        const maxX = this.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
+        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
+        const resetX = playPauseX + buttons.playPause.width + 10;
+        
+        // Play/Pause button
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
+        
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 12px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(buttons.playPause.label, 
+            playPauseX + buttons.playPause.width / 2, 
+            buttons.playPause.y + buttons.playPause.height / 2);
+        this.ctx.restore();
+        
+        // Reset button
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
+        
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 12px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(buttons.reset.label, 
+            resetX + buttons.reset.width / 2, 
+            buttons.reset.y + buttons.reset.height / 2);
+        this.ctx.restore();
+    }
+
     update(deltaTime) {
+        if (!this.isPlaying) {
+            return;
+        }
+        
         this.time += deltaTime * this.speed * 0.001;
         
         // Update nuclei
@@ -237,8 +351,16 @@ export class NuclearReactions extends BaseAnimation {
             // No random events - only reactions through reacting particles
         });
         
+        // Update particle trails
+        this.updateParticleTrails(deltaTime);
+        
         // Update neutrons
         this.neutrons.forEach(neutron => {
+            // Add trail for moving neutrons (less frequently)
+            if ((Math.abs(neutron.vx) > 0.1 || Math.abs(neutron.vy) > 0.1) && Math.random() < 0.3) {
+                this.addParticleTrail(neutron);
+            }
+            
             neutron.x += neutron.vx * deltaTime * this.speed * 0.001;
             neutron.y += neutron.vy * deltaTime * this.speed * 0.001;
             
@@ -399,7 +521,7 @@ export class NuclearReactions extends BaseAnimation {
             mass: 92,
             protons: 36,
             neutrons: 56,
-            color: '#FF9800',
+            color: '#4CAF50', // Green for Krypton
             radius: 8,
             life: 8 // Longer life for better visibility
         });
@@ -413,7 +535,7 @@ export class NuclearReactions extends BaseAnimation {
             mass: 141,
             protons: 56,
             neutrons: 85,
-            color: '#E91E63',
+            color: '#2196F3', // Blue for Barium
             radius: 9,
             life: 8 // Longer life for better visibility
         });
@@ -426,7 +548,7 @@ export class NuclearReactions extends BaseAnimation {
         
         // Create moderate energy release explosion - affected by temperature
         const energyParticleCount = Math.floor(8 * this.temperature); // Reduced from 20
-        const colors = ['#FFD700', '#FF6B35', '#FF8C00']; // Fewer colors
+        const colors = ['#FFD700', '#FF6B35', '#FF8C00', '#FFA500', '#FF4500']; // Energy colors
         
         for (let i = 0; i < energyParticleCount; i++) {
             const angle = (i / energyParticleCount) * Math.PI * 2;
@@ -482,7 +604,7 @@ export class NuclearReactions extends BaseAnimation {
             mass: 4,
             protons: 2,
             neutrons: 2,
-            color: '#2196F3',
+            color: '#FFD700', // Gold for Helium
             radius: 25, // Even larger radius for better visibility
             life: 8 // Longer life for better visibility
         });
@@ -492,7 +614,7 @@ export class NuclearReactions extends BaseAnimation {
         
         // Create moderate fusion energy release - affected by temperature
         const energyParticleCount = Math.floor(6 * this.temperature); // Reduced from 15
-        const colors = ['#FFEB3B', '#FFD700', '#FFA500']; // Fewer colors
+        const colors = ['#FFEB3B', '#FFD700', '#FFA500', '#FF8C00', '#FF6B35']; // Fusion energy colors
         
         for (let i = 0; i < energyParticleCount; i++) {
             const angle = (i / energyParticleCount) * Math.PI * 2;
@@ -828,6 +950,11 @@ export class NuclearReactions extends BaseAnimation {
         // Draw labels
         this.drawNuclearLabels();
         
+        // Draw control buttons
+        this.drawControlButtons();
+        
+        // Draw particle trails
+        this.drawParticleTrails();
 
     }
     
@@ -876,21 +1003,40 @@ export class NuclearReactions extends BaseAnimation {
         this.ctx.arc(nucleus.x, nucleus.y, nucleus.radius * 0.6, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Enhanced nucleon representation
-        this.ctx.fillStyle = '#000000';
-        const nucleonCount = Math.min(nucleus.protons + nucleus.neutrons, 12);
-        for (let i = 0; i < nucleonCount; i++) {
+        // Enhanced nucleon representation with proton/neutron differentiation
+        const nucleonCount = Math.min(nucleus.protons + nucleus.neutrons, 16);
+        const protonCount = Math.min(nucleus.protons, 8);
+        
+        // Draw protons (red dots)
+        for (let i = 0; i < protonCount; i++) {
             const angle = (i / nucleonCount) * Math.PI * 2;
-            const radius = nucleus.radius * 0.4;
+            const radius = nucleus.radius * 0.35;
             const x = nucleus.x + Math.cos(angle) * radius;
             const y = nucleus.y + Math.sin(angle) * radius;
             
-            // Draw nucleon with small glow
             this.ctx.save();
-            this.ctx.shadowColor = '#000000';
-            this.ctx.shadowBlur = 1;
+            this.ctx.fillStyle = '#FF4444'; // Red for protons
+            this.ctx.shadowColor = '#FF4444';
+            this.ctx.shadowBlur = 2;
             this.ctx.beginPath();
-            this.ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            this.ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+        
+        // Draw neutrons (blue dots)
+        for (let i = protonCount; i < nucleonCount; i++) {
+            const angle = (i / nucleonCount) * Math.PI * 2;
+            const radius = nucleus.radius * 0.35;
+            const x = nucleus.x + Math.cos(angle) * radius;
+            const y = nucleus.y + Math.sin(angle) * radius;
+            
+            this.ctx.save();
+            this.ctx.fillStyle = '#4444FF'; // Blue for neutrons
+            this.ctx.shadowColor = '#4444FF';
+            this.ctx.shadowBlur = 2;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 1.2, 0, Math.PI * 2);
             this.ctx.fill();
             this.ctx.restore();
         }
@@ -957,6 +1103,20 @@ export class NuclearReactions extends BaseAnimation {
             this.ctx.stroke();
             this.ctx.restore();
         }
+    }
+    
+    drawParticleTrails() {
+        this.particleTrails.forEach(trail => {
+            this.ctx.save();
+            this.ctx.globalAlpha = (trail.life / trail.maxLife) * 0.3; // Much more subtle
+            this.ctx.fillStyle = trail.color;
+            this.ctx.shadowColor = trail.color;
+            this.ctx.shadowBlur = 2; // Reduced blur
+            this.ctx.beginPath();
+            this.ctx.arc(trail.x, trail.y, 1, 0, Math.PI * 2); // Smaller radius
+            this.ctx.fill();
+            this.ctx.restore();
+        });
     }
     
     drawNuclearLabels() {
