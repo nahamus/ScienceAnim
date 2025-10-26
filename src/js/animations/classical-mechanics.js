@@ -565,16 +565,141 @@ export class OrbitalMotion extends BaseAnimation {
         this.semiMajorAxis = 200;
         this.eccentricity = 0.2;
         this.centralMass = 1000;
-        this.speed = 1.0;
+        this.speed = 0.3;
         this.angle = 0;
         this.showOrbitPath = true;
         this.showVelocityVector = false;
         this.showKeplerInfo = false;
         
+        // Animation state
+        this.isPlaying = true;
+        this.controlButtons = {
+            playPause: { x: 20, y: 20, width: 80, height: 30, label: '⏸ Pause' },
+            reset: { x: 110, y: 20, width: 60, height: 30, label: '🔄 Reset' }
+        };
+        
+        // Visual enhancements
+        this.orbitalTrail = [];
+        this.planetRotation = 0;
+        this.solarFlares = [];
+        this.stars = [];
+        this.initializeStars();
+        this.initializeSolarFlares();
+        
         // Calculate orbital parameters
         this.calculateOrbitalParameters();
     }
     
+    initializeStars() {
+        this.stars = [];
+        for (let i = 0; i < 100; i++) {
+            this.stars.push({
+                x: Math.random() * this.ctx.canvas.width,
+                y: Math.random() * this.ctx.canvas.height,
+                brightness: Math.random() * 0.8 + 0.2,
+                twinkle: Math.random() * Math.PI * 2
+            });
+        }
+    }
+    
+    initializeSolarFlares() {
+        this.solarFlares = [];
+        for (let i = 0; i < 8; i++) {
+            this.solarFlares.push({
+                angle: (i / 8) * Math.PI * 2,
+                length: 20 + Math.random() * 30,
+                intensity: Math.random() * 0.5 + 0.5,
+                speed: 0.5 + Math.random() * 1.5
+            });
+        }
+    }
+    
+    updateSolarFlares(dt) {
+        this.solarFlares.forEach(flare => {
+            flare.angle += flare.speed * dt;
+            flare.intensity = 0.3 + 0.7 * Math.sin(flare.angle * 2);
+        });
+    }
+    
+    handleButtonClick(x, y) {
+        const buttons = this.controlButtons;
+        
+        // Calculate dynamic button positions (same logic as drawControlButtons)
+        const maxX = this.ctx.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
+        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
+        const resetX = playPauseX + buttons.playPause.width + 10;
+        
+        // Check play/pause button
+        if (x >= playPauseX && x <= playPauseX + buttons.playPause.width &&
+            y >= buttons.playPause.y && y <= buttons.playPause.y + buttons.playPause.height) {
+            this.handleControlAction('playPause');
+            return true;
+        }
+        
+        // Check reset button
+        if (x >= resetX && x <= resetX + buttons.reset.width &&
+            y >= buttons.reset.y && y <= buttons.reset.y + buttons.reset.height) {
+            this.handleControlAction('reset');
+            return true;
+        }
+        
+        return false;
+    }
+    
+    handleControlAction(action) {
+        if (action === 'playPause') {
+            this.isPlaying = !this.isPlaying;
+            this.controlButtons.playPause.label = this.isPlaying ? '⏸ Pause' : '▶ Play';
+        } else if (action === 'reset') {
+            this.isPlaying = true;
+            this.controlButtons.playPause.label = '⏸ Pause';
+            this.reset();
+        }
+    }
+    
+    drawControlButtons() {
+        const buttons = this.controlButtons;
+        
+        // Calculate dynamic button positions to ensure they stay within canvas bounds
+        const maxX = this.ctx.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
+        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
+        const resetX = playPauseX + buttons.playPause.width + 10;
+        
+        // Play/Pause button
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
+        
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 12px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(buttons.playPause.label, 
+            playPauseX + buttons.playPause.width / 2, 
+            buttons.playPause.y + buttons.playPause.height / 2);
+        this.ctx.restore();
+        
+        // Reset button
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
+        
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 12px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(buttons.reset.label, 
+            resetX + buttons.reset.width / 2, 
+            buttons.reset.y + buttons.reset.height / 2);
+        this.ctx.restore();
+    }
+
     calculateOrbitalParameters() {
         // Calculate semi-minor axis from eccentricity
         this.semiMinorAxis = this.semiMajorAxis * Math.sqrt(1 - this.eccentricity * this.eccentricity);
@@ -614,11 +739,6 @@ export class OrbitalMotion extends BaseAnimation {
         this.calculateOrbitalParameters();
     }
     
-    setCentralMass(mass) {
-        this.centralMass = mass;
-        this.calculateOrbitalParameters();
-    }
-    
     setShowOrbitPath(show) {
         this.showOrbitPath = show;
     }
@@ -634,9 +754,17 @@ export class OrbitalMotion extends BaseAnimation {
     reset() {
         this.time = 0;
         this.angle = 0;
+        this.orbitalTrail = [];
+        this.planetRotation = 0;
+        this.isPlaying = true;
+        this.controlButtons.playPause.label = '⏸ Pause';
     }
     
     update(deltaTime) {
+        if (!this.isPlaying) {
+            return;
+        }
+        
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
         
@@ -651,6 +779,18 @@ export class OrbitalMotion extends BaseAnimation {
                  (1 + this.eccentricity * Math.cos(this.angle));
         this.currentX = this.centerX + r * Math.cos(this.angle);
         this.currentY = this.centerY + r * Math.sin(this.angle);
+        
+        // Add to orbital trail
+        this.orbitalTrail.push({ x: this.currentX, y: this.currentY, time: this.time });
+        if (this.orbitalTrail.length > 100) {
+            this.orbitalTrail.shift();
+        }
+        
+        // Update planet rotation
+        this.planetRotation += dt * 2;
+        
+        // Update solar flares
+        this.updateSolarFlares(dt);
         
         // Calculate velocity components
         const velocity = this.angularVelocity * r;
@@ -672,41 +812,22 @@ export class OrbitalMotion extends BaseAnimation {
     }
     
     render() {
-        // Draw central mass
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#FFD700';
-        this.ctx.arc(this.centerX, this.centerY, 15, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Draw space background
+        this.drawSpaceBackground();
         
-        // Add glow effect
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
-        this.ctx.arc(this.centerX, this.centerY, 25, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Draw orbital trail
+        this.drawOrbitalTrail();
         
         // Draw orbit path
         if (this.showOrbitPath && this.orbitPath.length > 1) {
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
-            this.ctx.lineWidth = 1;
-            this.ctx.moveTo(this.orbitPath[0].x, this.orbitPath[0].y);
-            for (let i = 1; i < this.orbitPath.length; i++) {
-                this.ctx.lineTo(this.orbitPath[i].x, this.orbitPath[i].y);
-            }
-            this.ctx.stroke();
+            this.drawOrbitPath();
         }
         
-        // Draw orbiting object
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.arc(this.currentX, this.currentY, 8, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Draw central mass with enhanced effects
+        this.drawCentralMass();
         
-        // Add shadow
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        this.ctx.arc(this.currentX + 2, this.currentY + 2, 8, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Draw orbiting object with enhanced effects
+        this.drawOrbitingObject();
         
         // Draw velocity vector with enhanced visualization
         if (this.showVelocityVector) {
@@ -843,6 +964,254 @@ export class OrbitalMotion extends BaseAnimation {
             totalEnergy: this.totalEnergy,
             time: this.time
         };
+    }
+    
+    drawSpaceBackground() {
+        // Draw gradient background
+        const gradient = this.ctx.createRadialGradient(
+            this.ctx.canvas.width / 2, this.ctx.canvas.height / 2, 0,
+            this.ctx.canvas.width / 2, this.ctx.canvas.height / 2, Math.max(this.ctx.canvas.width, this.ctx.canvas.height) / 2
+        );
+        gradient.addColorStop(0, '#0a0a0a');
+        gradient.addColorStop(1, '#000000');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        
+        // Draw twinkling stars
+        this.stars.forEach(star => {
+            star.twinkle += 0.1;
+            const twinkleIntensity = 0.5 + 0.5 * Math.sin(star.twinkle);
+            this.ctx.save();
+            this.ctx.globalAlpha = star.brightness * twinkleIntensity;
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.beginPath();
+            this.ctx.arc(star.x, star.y, 1, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.restore();
+        });
+    }
+    
+    drawOrbitalTrail() {
+        if (this.orbitalTrail.length < 2) return;
+        
+        this.ctx.save();
+        this.ctx.strokeStyle = '#4ECDC4';
+        this.ctx.lineWidth = 2;
+        this.ctx.globalAlpha = 0.6;
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.orbitalTrail[0].x, this.orbitalTrail[0].y);
+        for (let i = 1; i < this.orbitalTrail.length; i++) {
+            const alpha = i / this.orbitalTrail.length;
+            this.ctx.globalAlpha = alpha * 0.6;
+            this.ctx.lineTo(this.orbitalTrail[i].x, this.orbitalTrail[i].y);
+        }
+        this.ctx.stroke();
+        this.ctx.restore();
+    }
+    
+    drawOrbitPath() {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
+        this.ctx.lineWidth = 1;
+        this.ctx.moveTo(this.orbitPath[0].x, this.orbitPath[0].y);
+        for (let i = 1; i < this.orbitPath.length; i++) {
+            this.ctx.lineTo(this.orbitPath[i].x, this.orbitPath[i].y);
+        }
+        this.ctx.stroke();
+    }
+    
+    drawCentralMass() {
+        // Draw solar corona
+        this.ctx.save();
+        const coronaGradient = this.ctx.createRadialGradient(
+            this.centerX, this.centerY, 0,
+            this.centerX, this.centerY, 40
+        );
+        coronaGradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+        coronaGradient.addColorStop(0.7, 'rgba(255, 165, 0, 0.4)');
+        coronaGradient.addColorStop(1, 'rgba(255, 69, 0, 0.1)');
+        this.ctx.fillStyle = coronaGradient;
+        this.ctx.arc(this.centerX, this.centerY, 40, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Draw solar flares
+        this.solarFlares.forEach(flare => {
+            this.ctx.save();
+            this.ctx.strokeStyle = `rgba(255, 165, 0, ${flare.intensity * 0.6})`;
+            this.ctx.lineWidth = 2;
+            this.ctx.translate(this.centerX, this.centerY);
+            this.ctx.rotate(flare.angle);
+            this.ctx.beginPath();
+            this.ctx.moveTo(15, 0);
+            this.ctx.lineTo(15 + flare.length, 0);
+            this.ctx.stroke();
+            this.ctx.restore();
+        });
+        
+        // Draw main sun
+        this.ctx.beginPath();
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.arc(this.centerX, this.centerY, 15, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Add inner glow
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.arc(this.centerX, this.centerY, 8, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.restore();
+    }
+    
+    drawOrbitingObject() {
+        this.ctx.save();
+        
+        // Draw planet shadow
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.arc(this.currentX + 3, this.currentY + 3, 8, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Draw planet with rotation
+        this.ctx.translate(this.currentX, this.currentY);
+        this.ctx.rotate(this.planetRotation);
+        
+        // Planet body
+        this.ctx.beginPath();
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.arc(0, 0, 8, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Planet surface details
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 6, 0, Math.PI);
+        this.ctx.stroke();
+        
+        // Planet highlight
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        this.ctx.arc(-2, -2, 3, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.restore();
+        
+        // Draw velocity vector with enhanced visualization
+        if (this.showVelocityVector) {
+            this.drawVelocityVector();
+        }
+        
+        // Draw perigee and apogee markers (always visible)
+        this.drawKeplerMarkers();
+        
+        // Draw control buttons
+        this.drawControlButtons();
+        
+        // Draw canvas labels
+        this.drawOrbitalLabels();
+    }
+    
+    drawVelocityVector() {
+        const vectorLength = 40;
+        const velocity = Math.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY);
+        const normalizedVX = this.velocityX / velocity;
+        const normalizedVY = this.velocityY / velocity;
+        
+        // Draw velocity vector
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = '#FF6B6B';
+        this.ctx.lineWidth = 3;
+        this.ctx.moveTo(this.currentX, this.currentY);
+        this.ctx.lineTo(
+            this.currentX + normalizedVX * vectorLength,
+            this.currentY + normalizedVY * vectorLength
+        );
+        this.ctx.stroke();
+        
+        // Draw arrowhead
+        this.ctx.beginPath();
+        this.ctx.fillStyle = '#FF6B6B';
+        const angle = Math.atan2(this.velocityY, this.velocityX);
+        const arrowLength = 10;
+        this.ctx.moveTo(
+            this.currentX + normalizedVX * vectorLength,
+            this.currentY + normalizedVY * vectorLength
+        );
+        this.ctx.lineTo(
+            this.currentX + normalizedVX * vectorLength - arrowLength * Math.cos(angle - Math.PI / 6),
+            this.currentY + normalizedVY * vectorLength - arrowLength * Math.sin(angle - Math.PI / 6)
+        );
+        this.ctx.lineTo(
+            this.currentX + normalizedVX * vectorLength - arrowLength * Math.cos(angle + Math.PI / 6),
+            this.currentY + normalizedVY * vectorLength - arrowLength * Math.sin(angle + Math.PI / 6)
+        );
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Draw velocity label
+        this.ctx.fillStyle = '#FF6B6B';
+        this.ctx.font = 'bold 14px Inter';
+        this.ctx.fillText(`v = ${velocity.toFixed(1)}`, 
+            this.currentX + normalizedVX * (vectorLength + 15),
+            this.currentY + normalizedVY * (vectorLength + 15));
+    }
+    
+    drawKeplerMarkers() {
+        // Calculate perigee and apogee positions using orbital mechanics
+        // Perigee is at angle 0 (closest to central mass)
+        const perigeeDistance = this.semiMajorAxis * (1 - this.eccentricity);
+        const perigeeX = this.centerX + perigeeDistance;
+        const perigeeY = this.centerY;
+        
+        // Apogee is at angle π (farthest from central mass)
+        const apogeeDistance = this.semiMajorAxis * (1 + this.eccentricity);
+        const apogeeX = this.centerX - apogeeDistance;
+        const apogeeY = this.centerY;
+        
+        // Draw perigee marker (closest point) - Green
+        this.ctx.save();
+        this.ctx.strokeStyle = '#2ECC71';
+        this.ctx.lineWidth = 3;
+        this.ctx.fillStyle = 'rgba(46, 204, 113, 0.2)';
+        this.ctx.beginPath();
+        this.ctx.arc(perigeeX, perigeeY, 15, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        this.ctx.fillStyle = '#2ECC71';
+        this.ctx.font = 'bold 14px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('P', perigeeX, perigeeY);
+        this.ctx.restore();
+        
+        // Draw apogee marker (farthest point) - Red
+        this.ctx.save();
+        this.ctx.strokeStyle = '#E74C3C';
+        this.ctx.lineWidth = 3;
+        this.ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+        this.ctx.beginPath();
+        this.ctx.arc(apogeeX, apogeeY, 15, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        this.ctx.fillStyle = '#E74C3C';
+        this.ctx.font = 'bold 14px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('A', apogeeX, apogeeY);
+        this.ctx.restore();
+        
+        // Draw labels
+        this.ctx.save();
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 12px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Perigee', perigeeX, perigeeY + 25);
+        this.ctx.fillText('Apogee', apogeeX, apogeeY + 25);
+        this.ctx.restore();
     }
     
     drawOrbitalLabels() {

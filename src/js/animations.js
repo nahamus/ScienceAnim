@@ -248,21 +248,21 @@ export class ScientificAnimations {
         const playPauseBtnEl = document.getElementById('playPauseBtn');
         if (playPauseBtnEl) {
             playPauseBtnEl.addEventListener('click', () => {
-                this.togglePlayPause();
-            });
+            this.togglePlayPause();
+        });
         }
         const resetBtnEl = document.getElementById('resetBtn');
         if (resetBtnEl) {
             resetBtnEl.addEventListener('click', () => {
-                this.resetAnimation();
-            });
+            this.resetAnimation();
+        });
         }
         // Learn More button (now in stats area)
         const learnMoreBtnEl = document.getElementById('learnMoreBtn');
         if (learnMoreBtnEl) {
             learnMoreBtnEl.addEventListener('click', () => {
-                this.showScienceExplanation();
-            });
+            this.showScienceExplanation();
+        });
         }
         
         // Modal close button
@@ -325,7 +325,7 @@ export class ScientificAnimations {
 
         // Apply responsive layout once on load
         applySideNavLayout();
-
+        
         // Brownian Motion Controls
         this.setupSliderControl('particleCount', 'particleCountValue', (value) => {
             this.brownianMotion.setParticleCount(parseInt(value));
@@ -468,16 +468,10 @@ export class ScientificAnimations {
             this.orbital.setSemiMajorAxis(parseInt(value));
         });
         
-        this.setupSliderControl('centralMass', 'centralMassValue', (value) => {
-            this.orbital.setCentralMass(parseFloat(value));
+        // Velocity vector toggle
+        document.getElementById('showVelocityVector').addEventListener('change', (e) => {
+            this.orbital.showVelocityVector = e.target.checked;
         });
-        
-        document.getElementById('orbitalVisualizationMode').addEventListener('change', (e) => {
-            this.updateOrbitalVisualization(e.target.value);
-        });
-        
-        // Initialize orbital visualization mode
-        this.updateOrbitalVisualization('basic');
         
         // Electric Fields Controls
         this.setupSliderControl('efSpeed', 'efSpeedValue', (value) => {
@@ -553,6 +547,8 @@ export class ScientificAnimations {
                 this.memoryManagement.handleClick(x, y);
             } else if (this.currentAnimation === 'nuclear-reactions') {
                 this.nuclearReactions.handleButtonClick(x, y);
+            } else if (this.currentAnimation === 'orbital') {
+                this.orbital.handleButtonClick(x, y);
             }
         });
         
@@ -875,7 +871,7 @@ export class ScientificAnimations {
                 this.neuralNetwork.setSpeed(parseFloat(value));
             }
         });
-
+        
         // New NN controls
         // Simplified: no optimizer/dataset/batch/dropout/decay controls for now
         
@@ -1095,21 +1091,6 @@ export class ScientificAnimations {
                 pendulum.setShowForceVectors(true);
                 pendulum.setShowEnergyInfo(true);
                 pendulum.setShowPhaseSpace(true);
-                break;
-        }
-    }
-    
-    updateOrbitalVisualization(mode) {
-        switch(mode) {
-            case 'basic':
-                this.orbital.setShowOrbitPath(true);
-                this.orbital.setShowVelocityVector(false);
-                this.orbital.setShowKeplerInfo(false);
-                break;
-            case 'advanced':
-                this.orbital.setShowOrbitPath(true);
-                this.orbital.setShowVelocityVector(true);
-                this.orbital.setShowKeplerInfo(true);
                 break;
         }
     }
@@ -1698,7 +1679,7 @@ export class ScientificAnimations {
         
         if (format === 'decimal') {
             if (typeof value === 'number') {
-                return value.toFixed(decimalPlaces || 2);
+            return value.toFixed(decimalPlaces || 2);
             }
             return value.toString();
         }
@@ -2861,14 +2842,14 @@ export class ScientificAnimations {
                         <div class="science-content">
                             <h3>Overview</h3>
                             <p>This animation shows a small neural network learning to classify geometric shapes as <em>simple</em> or <em>complex</em> using two features: symmetry and edge complexity. You can watch data flow forward, errors flow backward, and weights update in real-time.</p>
-
+                            
                             <h3>Architecture</h3>
                             <ul>
                                 <li><strong>Layers:</strong> 2 inputs → hidden layers (4, 3) → 1 output (binary)</li>
                                 <li><strong>Activation:</strong> Sigmoid σ(x) = 1/(1 + e<sup>−x</sup>)</li>
                                 <li><strong>Output:</strong> y ∈ (0,1) interpreted as probability of “complex”</li>
                             </ul>
-
+                            
                             <h3>Training process (science)</h3>
                             <ol>
                                 <li><strong>Forward pass:</strong> y = σ(Wx + b)</li>
@@ -2876,28 +2857,28 @@ export class ScientificAnimations {
                                 <li><strong>Backpropagation:</strong> Compute ∂L/∂W via chain rule</li>
                                 <li><strong>Gradient descent:</strong> W ← W − α·∂L/∂W, b ← b − α·∂L/∂b</li>
                             </ol>
-
+                            
                             <h3>Visual guide</h3>
                             <ul>
                                 <li><strong>Decision Boundary (bottom-left):</strong> Background color shows the model’s output over the 2D feature space. Amber rings mark <em>misclassified</em> training points.</li>
                                 <li><strong>Current Phase (top-right):</strong> Forward, Backward, Update, or Pause with progress.</li>
                                 <li><strong>Particles:</strong> Blue = forward flow, Red = error flow. Updated connections flash subtly.</li>
                             </ul>
-
+                            
                             <h3>How to use</h3>
                             <ul>
                                 <li><strong>Mode:</strong> Switch Training/Testing in the controls.</li>
                                 <li><strong>Testing:</strong> Click a shape on the right to see prediction and confidence.</li>
                                 <li><strong>Learning Rate & Speed:</strong> Adjust to explore dynamics without changing the concept.</li>
                             </ul>
-
+                            
                             <h3>Scientific context</h3>
                             <ul>
                                 <li><strong>Feature learning:</strong> Hidden layers learn intermediate patterns from symmetry/edges.</li>
                                 <li><strong>Bias/variance:</strong> Too few neurons underfit; too many can overfit. This network is sized to learn the task cleanly.</li>
                                 <li><strong>Generalization:</strong> The decision boundary illustrates how the model separates classes beyond the training points.</li>
                             </ul>
-
+                            
                             <h3>Applications</h3>
                             <ul>
                                 <li>Vision (image classification), NLP (text classification), speech, robotics, medicine, finance.</li>
