@@ -551,6 +551,8 @@ export class ScientificAnimations {
                 this.neuralNetwork.handleCanvasClick(x, y);
             } else if (this.currentAnimation === 'memory-management' && this.memoryManagement) {
                 this.memoryManagement.handleClick(x, y);
+            } else if (this.currentAnimation === 'nuclear-reactions') {
+                this.nuclearReactions.handleButtonClick(x, y);
             }
         });
         
