@@ -443,18 +443,6 @@ export class ScientificAnimations {
             this.soundWaves.setFrequency(parseInt(value));
         });
         
-        this.setupSliderControl('soundAmplitude', 'soundAmplitudeValue', (value) => {
-            this.soundWaves.setAmplitude(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundSpeed', 'soundSpeedValue', (value) => {
-            this.soundWaves.setWaveSpeed(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundParticles', 'soundParticlesValue', (value) => {
-            this.soundWaves.setParticleCount(parseInt(value));
-        });
-        
         this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
             this.soundWaves.setAnimationSpeed(parseFloat(value));
         });
@@ -549,6 +537,10 @@ export class ScientificAnimations {
             } else if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
                 this.diffusion.startDiffusion();
             } else if (this.currentAnimation === 'sound-waves') {
+                // Check for control button clicks first
+                this.soundWaves.handleButtonClick(x, y);
+                
+                // Then check for source clicks
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
                 const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
@@ -692,6 +684,10 @@ export class ScientificAnimations {
                 // Add complete magnet with both poles
                 this.magneticFields.addMagnetAtPosition(x, y);
             } else if (this.currentAnimation === 'sound-waves') {
+                // Check for control button clicks first
+                this.soundWaves.handleButtonClick(x, y);
+                
+                // Then check for source clicks
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
                 const distance = Math.sqrt((x - sx) ** 2 + (y - sy) ** 2);
@@ -805,18 +801,6 @@ export class ScientificAnimations {
         
         this.setupSliderControl('soundFrequency', 'soundFrequencyValue', (value) => {
             this.soundWaves.setFrequency(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundAmplitude', 'soundAmplitudeValue', (value) => {
-            this.soundWaves.setAmplitude(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundSpeed', 'soundSpeedValue', (value) => {
-            this.soundWaves.setWaveSpeed(parseInt(value));
-        });
-        
-        this.setupSliderControl('soundParticles', 'soundParticlesValue', (value) => {
-            this.soundWaves.setParticleCount(parseInt(value));
         });
         
         document.getElementById('soundWaveType').addEventListener('change', (e) => {
@@ -1279,30 +1263,12 @@ export class ScientificAnimations {
         
         // Synchronize control values with sound waves parameters
         const frequencySlider = document.getElementById('soundFrequency');
-        const amplitudeSlider = document.getElementById('soundAmplitude');
-        const speedSlider = document.getElementById('soundSpeed');
-        const particlesSlider = document.getElementById('soundParticles');
         const animationSpeedSlider = document.getElementById('soundAnimationSpeed');
         const waveTypeSelect = document.getElementById('soundWaveType');
         
         if (frequencySlider && this.soundWaves) {
             frequencySlider.value = this.soundWaves.frequency;
             document.getElementById('soundFrequencyValue').textContent = this.soundWaves.frequency + ' Hz';
-        }
-        
-        if (amplitudeSlider && this.soundWaves) {
-            amplitudeSlider.value = this.soundWaves.amplitude;
-            document.getElementById('soundAmplitudeValue').textContent = this.soundWaves.amplitude + '%';
-        }
-        
-        if (speedSlider && this.soundWaves) {
-            speedSlider.value = this.soundWaves.waveSpeed;
-            document.getElementById('soundSpeedValue').textContent = this.soundWaves.waveSpeed + ' m/s';
-        }
-        
-        if (particlesSlider && this.soundWaves) {
-            particlesSlider.value = this.soundWaves.particleCount;
-            document.getElementById('soundParticlesValue').textContent = this.soundWaves.particleCount;
         }
         
         if (animationSpeedSlider && this.soundWaves) {
@@ -1433,10 +1399,10 @@ export class ScientificAnimations {
                 if (this.soundWaves) {
                     const waveType = document.getElementById('soundWaveType')?.value;
                     const frequency = parseFloat(document.getElementById('soundFrequency')?.value);
-                    const amplitude = parseFloat(document.getElementById('soundAmplitude')?.value);
+                    const animationSpeed = parseFloat(document.getElementById('soundAnimationSpeed')?.value);
                     if (waveType) this.soundWaves.setWaveType(waveType);
                     if (!isNaN(frequency)) this.soundWaves.setFrequency(frequency);
-                    if (!isNaN(amplitude)) this.soundWaves.setAmplitude(amplitude);
+                    if (!isNaN(animationSpeed)) this.soundWaves.setAnimationSpeed(animationSpeed);
                 }
                 break;
             // Add more cases as needed for other animations
@@ -1893,12 +1859,10 @@ export class ScientificAnimations {
     
     updateSoundWavesStats() {
         this.updateStats('soundWaves', {
-            'soundWaveTypeDisplay': { path: 'waveType', format: 'capitalize' },
+            'stat-soundWaveType': { path: 'waveType', format: 'capitalize' },
             'stat-soundFrequency': { path: 'frequency', format: 'unit', suffix: ' Hz', decimalPlaces: 2 },
-            'soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
-            'soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s', decimalPlaces: 2 },
-            'stat-soundAmplitude': { path: 'amplitude', format: 'percentage', decimalPlaces: 2 },
-            'soundParticleCount': { path: 'particleCount' }
+            'stat-soundWavelength': { path: 'wavelength', format: 'unit', suffix: ' m', decimalPlaces: 2 },
+            'stat-soundWaveSpeed': { path: 'waveSpeed', format: 'unit', suffix: ' m/s', decimalPlaces: 2 }
         });
     }
     

@@ -724,39 +724,15 @@
                     </div>
                     
                     <div class="control-group">
+                        <label for="soundFrequency">Frequency (Hz):</label>
+                        <input type="range" id="soundFrequency" min="1" max="10" value="2" class="slider">
+                        <span id="soundFrequencyValue">2 Hz</span>
+                    </div>
+                    
+                    <div class="control-group">
                         <label for="soundAnimationSpeed">Animation Speed:</label>
                         <input type="range" id="soundAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
                         <span id="soundAnimationSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="soundFrequency">Frequency (Hz):</label>
-                        <input type="range" id="soundFrequency" min="1" max="10" value="5" class="slider">
-                        <span id="soundFrequencyValue">5 Hz</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="soundAmplitude">Amplitude:</label>
-                        <input type="range" id="soundAmplitude" min="10" max="100" value="50" class="slider">
-                        <span id="soundAmplitudeValue">50%</span>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="soundSpeed">Wave Speed (m/s):</label>
-                        <input type="range" id="soundSpeed" min="100" max="500" value="343" class="slider">
-                        <span id="soundSpeedValue">343 m/s</span>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="soundParticles">Particle Count:</label>
-                        <input type="range" id="soundParticles" min="10" max="50" value="20" class="slider" data-decimals="0">
-                        <span id="soundParticlesValue" data-decimals="0">20</span>
-                    </div>
-
-                    <div class="control-group">
-
-                        
-
                     </div>
                 </div>
 
@@ -1251,31 +1227,22 @@
                         <h3>Sound Waves Simulation</h3>
                         <p>Explore how sound waves propagate through different mediums. Watch transverse waves on strings and longitudinal waves in air molecules.</p>
                         <div class="stats">
-                                                    <div class="stat">
-                            <span class="stat-label">Wave Type:</span>
-                            <span id="soundWaveTypeDisplay" class="stat-value">Transverse</span>
-                        </div>
+                            <div class="stat">
+                                <span class="stat-label">Wave Type:</span>
+                                <span id="stat-soundWaveType" class="stat-value">Transverse</span>
+                            </div>
                             <div class="stat">
                                 <span class="stat-label">Frequency:</span>
-                                <span id="stat-soundFrequency" class="stat-value">440 Hz</span>
+                                <span id="stat-soundFrequency" class="stat-value">2 Hz</span>
                             </div>
                             <div class="stat">
                                 <span class="stat-label">Wavelength:</span>
-                                <span id="soundWavelength" class="stat-value">0.78 m</span>
+                                <span id="stat-soundWavelength" class="stat-value">171.5 m</span>
                             </div>
                             <div class="stat">
                                 <span class="stat-label">Wave Speed:</span>
-                                <span id="soundWaveSpeed" class="stat-value">343 m/s</span>
+                                <span id="stat-soundWaveSpeed" class="stat-value">343 m/s</span>
                             </div>
-                            <div class="stat">
-                                <span class="stat-label">Amplitude:</span>
-                                <span id="stat-soundAmplitude" class="stat-value">50%</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Particle Count:</span>
-                                <span id="soundParticleCount" class="stat-value">15</span>
-                            </div>
-                            
                         </div>
                     </div>
 
