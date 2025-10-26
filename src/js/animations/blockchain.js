@@ -21,13 +21,13 @@ export class Blockchain extends BaseAnimation {
         this.showNetwork = true;
         this.autoMine = true;
         
-        // Enhanced visual properties - improved sizing and positioning
-        this.blockWidth = 160; // Increased for better text spacing
-        this.blockHeight = 110; // Increased height for better text layout
-        this.blockSpacing = 40; // Increased spacing
-        this.chainStartX = 40; // Pushed to the left
-        this.chainStartY = 180; // Moved up for better balance
-        this.maxBlocksVisible = 12;
+        // Enhanced visual properties - optimized for 800x600 canvas
+        this.blockWidth = 120; // Reduced to fit canvas
+        this.blockHeight = 85; // Reduced height
+        this.blockSpacing = 20; // Reduced spacing
+        this.chainStartX = 30; // Left margin
+        this.chainStartY = 160; // Positioned to allow transactions above
+        this.maxBlocksVisible = 5; // Show fewer blocks to fit canvas
         this.scrollOffset = 0;
         
         // Realistic mining properties
@@ -45,17 +45,17 @@ export class Blockchain extends BaseAnimation {
         this.lastDifficultyAdjustment = 0;
         this.blockTimes = []; // Track block times for difficulty adjustment
         
-        // Network properties - improved positioning
-        this.nodeCount = 8; // More nodes for realistic network
-        this.nodeRadius = 25; // Slightly larger nodes
+        // Network properties - optimized for 800x600 canvas
+        this.nodeCount = 6; // Reduced for cleaner visualization
+        this.nodeRadius = 20; // Smaller nodes to fit better
         this.networkCenterX = 0;
         this.networkCenterY = 0;
         
         // Dynamic network properties
-        this.maxNodes = 8; // Reduced for cleaner demo
-        this.minNodes = 6; // Minimum number of nodes
-        this.nodeJoinInterval = 10000; // Increased time between joins
-        this.nodeLeaveInterval = 15000; // Increased time between leaves
+        this.maxNodes = 6; // Reduced for cleaner demo
+        this.minNodes = 4; // Minimum number of nodes
+        this.nodeJoinInterval = 15000; // Increased time between joins
+        this.nodeLeaveInterval = 20000; // Increased time between leaves
         this.lastNodeJoin = 0;
         this.lastNodeLeave = 0;
         this.nodeJoinParticles = [];
@@ -114,9 +114,14 @@ export class Blockchain extends BaseAnimation {
         this.minerBlockConnection = null; // Visual connection between miner and block
         this.minerRewardDisplay = null; // Display miner's reward
         
-        // Animation timing
+        // Animation timing - faster for better user experience
         this.lastBlockTime = 0;
-        this.blockInterval = 3000; // 3 seconds for more realistic timing
+        this.blockInterval = 2000; // 2 seconds for snappier animation
+        
+        // Mining progress tracking
+        this.miningProgress = 0; // 0-100 percentage
+        this.miningAttempts = 0;
+        this.targetAttempts = 1000; // Estimated attempts for visual feedback
         
         // Mining cycle control
         this.isStartingMining = false; // Prevent multiple mining start attempts
@@ -212,15 +217,16 @@ export class Blockchain extends BaseAnimation {
         const canvasWidth = this.ctx.canvas.width;
         const canvasHeight = this.ctx.canvas.height;
         
-        this.networkCenterX = canvasWidth - 250; // Moved further from edge
-        this.networkCenterY = canvasHeight - 200; // Moved down more for better spacing
+        // Position network in bottom-right area, optimized for 800x600
+        this.networkCenterX = canvasWidth - 180; // Closer to edge but still visible
+        this.networkCenterY = canvasHeight - 180; // Bottom area
         
         // Create network nodes with enhanced design
         this.networkNodes = [];
         this.nextNodeId = 1; // Track the next available node ID
         for (let i = 0; i < this.nodeCount; i++) {
             const angle = (i / this.nodeCount) * 2 * Math.PI;
-            const radius = 120; // Increased radius for better spacing
+            const radius = 80; // Reduced radius to fit 800x600 canvas
             const x = this.networkCenterX + Math.cos(angle) * radius;
             const y = this.networkCenterY + Math.sin(angle) * radius;
             
@@ -1118,6 +1124,10 @@ export class Blockchain extends BaseAnimation {
         this.phaseTime = 0;
         this.miningGlow = 1.0;
         
+        // Reset mining progress
+        this.miningProgress = 0;
+        this.miningAttempts = 0;
+        
         // Create new block with realistic data
         const lastBlock = this.blocks[this.blocks.length - 1];
         const selectedTransactions = this.selectTransactionsForBlock(); // Select transactions based on fee priority
@@ -1223,13 +1233,18 @@ export class Blockchain extends BaseAnimation {
         const targetHash = '0'.repeat(this.difficulty);
         
         // Calculate mining speed based on difficulty and animation speed
-        const baseNoncesPerFrame = 500; // Increased from 200 to 500 for faster mining
-        const difficultyMultiplier = Math.max(0.1, (9 - this.difficulty) * 0.8); // Increased multiplier for faster mining
+        const baseNoncesPerFrame = 800; // Increased for faster mining
+        const difficultyMultiplier = Math.max(0.1, (9 - this.difficulty) * 1.0); // Increased multiplier
         const speedMultiplier = this.speed;
-        const noncesToTry = Math.max(50, Math.floor(baseNoncesPerFrame * difficultyMultiplier * speedMultiplier));
+        const noncesToTry = Math.max(100, Math.floor(baseNoncesPerFrame * difficultyMultiplier * speedMultiplier));
         
         // Update network hashrate
         this.networkHashrate = this.miners.length * noncesToTry * 60; // H/s
+        
+        // Update mining progress (visual feedback)
+        this.miningAttempts += noncesToTry;
+        this.targetAttempts = Math.pow(16, this.difficulty) / 10; // Rough estimate
+        this.miningProgress = Math.min(100, (this.miningAttempts / this.targetAttempts) * 100);
         
         for (let i = 0; i < noncesToTry; i++) {
             this.miningBlock.nonce++;
@@ -1287,7 +1302,7 @@ export class Blockchain extends BaseAnimation {
             const visibleIndex = totalBlocks;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
             
@@ -1355,7 +1370,7 @@ export class Blockchain extends BaseAnimation {
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
             // For the last two blocks, position at the end of the visible chain
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length - 1;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
             
@@ -1409,7 +1424,7 @@ export class Blockchain extends BaseAnimation {
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
             // For the last two blocks, position at the end of the visible chain
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length - 1;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
             
@@ -1480,20 +1495,20 @@ export class Blockchain extends BaseAnimation {
     createMiningParticles() {
         if (!this.isMining) return;
         
-        // Adjust particle creation rate based on speed
-        const particleRate = 0.4 * this.speed;
+        // Reduced particle creation rate for cleaner visualization
+        const particleRate = 0.15 * this.speed;
         
         this.miners.forEach(miner => {
             if (Math.random() < particleRate) {
                 this.miningParticles.push({
                     x: miner.x,
                     y: miner.y,
-                    vx: (Math.random() - 0.5) * 60,
-                    vy: (Math.random() - 0.5) * 60,
-                    life: 1.5,
-                    maxLife: 1.5,
+                    vx: (Math.random() - 0.5) * 40,
+                    vy: (Math.random() - 0.5) * 40,
+                    life: 1.0,
+                    maxLife: 1.0,
                     color: '#FF9800',
-                    size: 3,
+                    size: 2,
                     type: 'mining'
                 });
             }
@@ -1502,12 +1517,12 @@ export class Blockchain extends BaseAnimation {
     
     createMiningSuccessParticles() {
         this.miners.forEach(miner => {
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 6; i++) { // Reduced from 12 to 6
                 this.miningParticles.push({
                     x: miner.x,
                     y: miner.y,
-                    vx: (Math.random() - 0.5) * 250,
-                    vy: (Math.random() - 0.5) * 250,
+                    vx: (Math.random() - 0.5) * 150,
+                    vy: (Math.random() - 0.5) * 150,
                     life: 4.0,
                     maxLife: 4.0,
                     color: '#4CAF50',
@@ -1537,7 +1552,7 @@ export class Blockchain extends BaseAnimation {
             contractX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
             // For the last two blocks, position at the end of the visible chain
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length - 1;
             contractX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
             
@@ -1565,16 +1580,16 @@ export class Blockchain extends BaseAnimation {
     
     createValidationParticles() {
         this.networkNodes.forEach(node => {
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 4; i++) { // Reduced from 10 to 4
                 this.validationParticles.push({
                     x: node.x,
                     y: node.y,
-                    vx: (Math.random() - 0.5) * 150,
-                    vy: (Math.random() - 0.5) * 150,
-                    life: 2.0,
-                    maxLife: 2.0,
+                    vx: (Math.random() - 0.5) * 100,
+                    vy: (Math.random() - 0.5) * 100,
+                    life: 1.5,
+                    maxLife: 1.5,
                     color: '#FF6B35', // Orange for validation
-                    size: 4
+                    size: 3
                 });
             }
         });
@@ -1582,16 +1597,16 @@ export class Blockchain extends BaseAnimation {
     
     createConsensusParticles() {
         this.networkNodes.forEach(node => {
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 5; i++) { // Reduced from 12 to 5
                 this.consensusParticles.push({
                     x: node.x,
                     y: node.y,
-                    vx: (Math.random() - 0.5) * 120,
-                    vy: (Math.random() - 0.5) * 120,
-                    life: 2.5,
-                    maxLife: 2.5,
+                    vx: (Math.random() - 0.5) * 80,
+                    vy: (Math.random() - 0.5) * 80,
+                    life: 1.8,
+                    maxLife: 1.8,
                     color: '#9C27B0', // Purple for consensus
-                    size: 5
+                    size: 3
                 });
             }
         });
@@ -1607,7 +1622,7 @@ export class Blockchain extends BaseAnimation {
             const visibleIndex = totalBlocks - 1;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length - 1;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
             
@@ -1618,16 +1633,16 @@ export class Blockchain extends BaseAnimation {
         
         const blockY = this.chainStartY + this.blockHeight / 2;
         
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 6; i++) { // Reduced from 15 to 6
             this.finalizationParticles.push({
                 x: blockX,
                 y: blockY,
-                vx: (Math.random() - 0.5) * 120,
-                vy: (Math.random() - 0.5) * 120,
-                life: 2.5,
-                maxLife: 2.5,
+                vx: (Math.random() - 0.5) * 80,
+                vy: (Math.random() - 0.5) * 80,
+                life: 1.5,
+                maxLife: 1.5,
                 color: '#4CAF50',
-                size: 3
+                size: 2
             });
         }
     }
@@ -1642,7 +1657,7 @@ export class Blockchain extends BaseAnimation {
             const visibleIndex = totalBlocks - 1;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length - 1;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
             
@@ -1967,18 +1982,19 @@ export class Blockchain extends BaseAnimation {
     }
     
     drawBlockchain() {
-        // Calculate which blocks to show: genesis, block 1, and last block
+        // Calculate which blocks to show: genesis, block 1, block 2, and last block
         const totalBlocks = this.blocks.length;
         let visibleBlocks = [];
         
-        if (totalBlocks <= 3) {
-            // If 3 or fewer blocks, show all of them
+        if (totalBlocks <= 4) {
+            // If 4 or fewer blocks, show all of them
             visibleBlocks = this.blocks;
         } else {
-            // Show genesis, block 1, and last block only
+            // Show genesis, block 1, block 2, and last block only
             visibleBlocks = [
                 this.blocks[0], // Genesis block
                 this.blocks[1], // Block 1
+                this.blocks[2], // Block 2
                 this.blocks[totalBlocks - 1] // Last block only
             ];
         }
@@ -2003,8 +2019,8 @@ export class Blockchain extends BaseAnimation {
             let x = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing);
             const y = this.chainStartY;
             
-            // Add extra space for ellipses if this is after block 1 and there are more than 3 blocks
-            if (totalBlocks > 3 && visibleIndex >= 2) {
+            // Add extra space for ellipses if this is after block 2 and there are more than 4 blocks
+            if (totalBlocks > 4 && visibleIndex >= 3) {
                 x += 40; // Space for ellipses
             }
             
@@ -2037,14 +2053,14 @@ export class Blockchain extends BaseAnimation {
             this.roundRect(x, y, this.blockWidth, this.blockHeight, 12);
             this.ctx.fill();
             
-            // Modern block border with gradient and glow
+            // Modern block border with gradient (thinner)
             const borderGradient = this.ctx.createLinearGradient(x, y, x + this.blockWidth, y + this.blockHeight);
-            borderGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+            borderGradient.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
             borderGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
-            borderGradient.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
+            borderGradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)');
             
             this.ctx.strokeStyle = borderGradient;
-            this.ctx.lineWidth = 3;
+            this.ctx.lineWidth = 1.5; // Reduced from 3
             this.ctx.lineCap = 'round';
             this.ctx.lineJoin = 'round';
             this.roundRect(x, y, this.blockWidth, this.blockHeight, 12);
@@ -2065,37 +2081,48 @@ export class Blockchain extends BaseAnimation {
             // Modern block content with enhanced typography and styling
             this.ctx.textAlign = 'left';
             
-            // Block title with modern styling
+            // Calculate vertical centering (adjusted to fix bottom overflow)
+            const contentHeight = block.isGenesis ? 56 : 66; // Reduced content height
+            const startY = y + (this.blockHeight - contentHeight) / 2 + 10; // Reduced top offset
+            
+            // Block title with modern styling and smaller font
             const title = block.isGenesis ? 'Genesis' : `Block #${block.index}`;
-            this.ctx.font = 'bold 20px Inter, Arial, sans-serif';
+            this.ctx.font = 'bold 16px Inter, Arial, sans-serif'; // Reduced from 18px
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            this.ctx.shadowBlur = 2;
-            this.ctx.fillText(title, x + 12, y + 28);
-            this.ctx.shadowBlur = 0;
+            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.shadowBlur = 3;
+            this.ctx.shadowOffsetX = 1;
+            this.ctx.shadowOffsetY = 1;
+            this.ctx.fillText(title, x + 12, startY);
             
             // Transaction count with icon
-            this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
+            this.ctx.font = 'bold 13px Inter, Arial, sans-serif'; // Reduced from 14px
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.fillText(`📦 ${block.transactions.length} tx`, x + 12, y + 48);
+            this.ctx.fillText(`📦 ${block.transactions.length} tx`, x + 12, startY + 17);
             
             // Nonce with modern styling
-            this.ctx.font = '14px Inter, Arial, sans-serif';
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            this.ctx.fillText(`Nonce: ${block.nonce.toLocaleString()}`, x + 12, y + 65);
-            
-            // Show reward and fees for non-genesis blocks with better spacing
-            if (!block.isGenesis) {
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                this.ctx.fillText(`💰 ${block.blockReward} | 💸 ${block.totalFees.toFixed(1)}`, x + 12, y + 82);
-            }
+            this.ctx.font = '11px Inter, Arial, sans-serif'; // Reduced from 12px
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillText(`Nonce: ${block.nonce.toLocaleString()}`, x + 12, startY + 32);
             
             // Hash with modern monospace styling
             if (this.showHashes) {
-                this.ctx.font = '11px "JetBrains Mono", "Fira Code", monospace';
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                this.ctx.fillText(`🔗 ${block.hash.substring(0, 12)}...`, x + 12, y + 100);
+                this.ctx.font = '9px "JetBrains Mono", "Fira Code", monospace'; // Reduced from 10px
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillText(`🔗 ${block.hash.substring(0, 10)}...`, x + 12, startY + 45);
             }
+            
+            // Show reward and fees for non-genesis blocks
+            if (!block.isGenesis) {
+                this.ctx.font = '10px Inter, Arial, sans-serif'; // Reduced from 11px
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillText(`💰 ${block.blockReward} | 💸 ${block.totalFees.toFixed(1)}`, x + 12, startY + 58);
+            }
+            
+            // Reset shadow after block text
+            this.ctx.shadowBlur = 0;
+            this.ctx.shadowOffsetX = 0;
+            this.ctx.shadowOffsetY = 0;
             
             // Draw connection to next block with enhanced styling
             if (visibleIndex < visibleBlocks.length - 1) {
@@ -2103,71 +2130,111 @@ export class Blockchain extends BaseAnimation {
                 let nextX = this.chainStartX + (visibleIndex + 1) * (this.blockWidth + this.blockSpacing);
                 
                 // Check if we need to show ellipses instead of arrow
-                const shouldShowEllipses = totalBlocks > 3 && visibleIndex === 1;
+                const shouldShowEllipses = totalBlocks > 4 && visibleIndex === 2;
                 
                 if (shouldShowEllipses) {
-                    // Draw ellipses instead of arrow
-                    const ellipsesX = x + this.blockWidth + 20;
+                    // Draw improved ellipsis indicator
+                    const ellipsesX = x + this.blockWidth + 10;
                     const ellipsesY = y + this.blockHeight / 2;
-                    
-                    // Draw ellipses with arrow color (only once)
-                    this.ctx.fillStyle = '#4CAF50';
-                    this.ctx.font = 'bold 28px Inter, Arial, sans-serif';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.fillText('⋯', ellipsesX, ellipsesY + 10);
-                    
-                    // Show count of hidden blocks
-                    const hiddenCount = totalBlocks - 3;
-                    this.ctx.fillStyle = '#666666';
-                    this.ctx.font = '13px Inter, Arial, sans-serif';
-                    this.ctx.fillText(`+${hiddenCount} blocks`, ellipsesX + 25, ellipsesY + 30);
-                    
-                    // Draw connection line to the last block (skip the ellipses)
                     const lastBlockX = this.chainStartX + (visibleBlocks.length - 1) * (this.blockWidth + this.blockSpacing);
-                    const connectionGradient = this.ctx.createLinearGradient(ellipsesX + 30, y + this.blockHeight / 2, 
-                                                                           lastBlockX, y + this.blockHeight / 2);
-                    connectionGradient.addColorStop(0, '#ffffff');
-                    connectionGradient.addColorStop(0.5, '#4CAF50');
-                    connectionGradient.addColorStop(1, '#ffffff');
+                    const hiddenCount = totalBlocks - 4;
                     
-                    this.ctx.strokeStyle = connectionGradient;
-                    this.ctx.lineWidth = 6;
+                    // Draw connection line from current block
+                    const startLineGradient = this.ctx.createLinearGradient(x + this.blockWidth, ellipsesY, ellipsesX + 15, ellipsesY);
+                    startLineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+                    startLineGradient.addColorStop(1, 'rgba(76, 175, 80, 0.6)');
+                    this.ctx.strokeStyle = startLineGradient;
+                    this.ctx.lineWidth = 3;
                     this.ctx.lineCap = 'round';
                     this.ctx.beginPath();
-                    this.ctx.moveTo(ellipsesX + 30, y + this.blockHeight / 2);
-                    this.ctx.lineTo(lastBlockX, y + this.blockHeight / 2);
+                    this.ctx.moveTo(x + this.blockWidth, ellipsesY);
+                    this.ctx.lineTo(ellipsesX + 15, ellipsesY);
                     this.ctx.stroke();
                     
-                    // Enhanced arrow to the last block
+                    // Draw ellipsis dots (three dots)
                     this.ctx.fillStyle = '#4CAF50';
+                    for (let i = 0; i < 3; i++) {
+                        this.ctx.beginPath();
+                        this.ctx.arc(ellipsesX + 20 + (i * 8), ellipsesY, 2.5, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                    
+                    // Draw count badge below dots
+                    const badgeX = ellipsesX + 28;
+                    const badgeY = ellipsesY + 15;
+                    const badgeText = `+${hiddenCount}`;
+                    
+                    // Badge background
+                    this.ctx.fillStyle = 'rgba(76, 175, 80, 0.2)';
                     this.ctx.beginPath();
-                    this.ctx.moveTo(lastBlockX - 15, y + this.blockHeight / 2 - 8);
-                    this.ctx.lineTo(lastBlockX, y + this.blockHeight / 2);
-                    this.ctx.lineTo(lastBlockX - 15, y + this.blockHeight / 2 + 8);
+                    this.ctx.arc(badgeX, badgeY, 12, 0, Math.PI * 2);
                     this.ctx.fill();
+                    
+                    // Badge border
+                    this.ctx.strokeStyle = '#4CAF50';
+                    this.ctx.lineWidth = 1.5;
+                    this.ctx.beginPath();
+                    this.ctx.arc(badgeX, badgeY, 12, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                    
+                    // Badge text
+                    this.ctx.fillStyle = '#4CAF50';
+                    this.ctx.font = 'bold 11px Inter, Arial, sans-serif';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText(badgeText, badgeX, badgeY);
+                    
+                    // Draw connection line to the last block
+                    const endLineGradient = this.ctx.createLinearGradient(ellipsesX + 40, ellipsesY, lastBlockX, ellipsesY);
+                    endLineGradient.addColorStop(0, 'rgba(76, 175, 80, 0.6)');
+                    endLineGradient.addColorStop(0.5, '#4CAF50');
+                    endLineGradient.addColorStop(1, 'rgba(255, 255, 255, 0.4)');
+                    this.ctx.strokeStyle = endLineGradient;
+                    this.ctx.lineWidth = 3;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(ellipsesX + 40, ellipsesY);
+                    this.ctx.lineTo(lastBlockX, ellipsesY);
+                    this.ctx.stroke();
+                    
+                    // Draw arrow pointing RIGHT (at the end of the line)
+                    this.ctx.fillStyle = '#4CAF50';
+                    this.ctx.shadowColor = 'rgba(76, 175, 80, 0.5)';
+                    this.ctx.shadowBlur = 4;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(lastBlockX - 10, ellipsesY - 6);
+                    this.ctx.lineTo(lastBlockX, ellipsesY);
+                    this.ctx.lineTo(lastBlockX - 10, ellipsesY + 6);
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
                 } else {
-                    // Normal connection with arrow
+                    // Normal connection with improved arrow
                     const connectionGradient = this.ctx.createLinearGradient(x + this.blockWidth, y + this.blockHeight / 2, 
                                                                            nextX, y + this.blockHeight / 2);
-                    connectionGradient.addColorStop(0, '#ffffff');
+                    connectionGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
                     connectionGradient.addColorStop(0.5, '#4CAF50');
-                    connectionGradient.addColorStop(1, '#ffffff');
+                    connectionGradient.addColorStop(1, 'rgba(255, 255, 255, 0.4)');
                     
                     this.ctx.strokeStyle = connectionGradient;
-                    this.ctx.lineWidth = 6;
+                    this.ctx.lineWidth = 3; // Reduced from 6
                     this.ctx.lineCap = 'round';
                     this.ctx.beginPath();
                     this.ctx.moveTo(x + this.blockWidth, y + this.blockHeight / 2);
                     this.ctx.lineTo(nextX, y + this.blockHeight / 2);
                     this.ctx.stroke();
                     
-                    // Enhanced arrow with better visibility
+                    // Improved arrow with shadow
                     this.ctx.fillStyle = '#4CAF50';
+                    this.ctx.shadowColor = 'rgba(76, 175, 80, 0.5)';
+                    this.ctx.shadowBlur = 4;
                     this.ctx.beginPath();
-                    this.ctx.moveTo(nextX - 15, y + this.blockHeight / 2 - 8);
+                    this.ctx.moveTo(nextX - 10, y + this.blockHeight / 2 - 6);
                     this.ctx.lineTo(nextX, y + this.blockHeight / 2);
-                    this.ctx.lineTo(nextX - 15, y + this.blockHeight / 2 + 8);
+                    this.ctx.lineTo(nextX - 10, y + this.blockHeight / 2 + 6);
+                    this.ctx.closePath();
                     this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
                 }
             }
         });
@@ -2209,14 +2276,14 @@ export class Blockchain extends BaseAnimation {
             this.roundRect(x, y, this.blockWidth, this.blockHeight, 12);
             this.ctx.fill();
             
-            // Mining block border with animated glow
+            // Mining block border (thinner)
             const miningBorderGradient = this.ctx.createLinearGradient(x, y, x + this.blockWidth, y + this.blockHeight);
-            miningBorderGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+            miningBorderGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
             miningBorderGradient.addColorStop(0.5, 'rgba(255, 193, 7, 0.6)');
-            miningBorderGradient.addColorStop(1, 'rgba(255, 152, 0, 0.8)');
+            miningBorderGradient.addColorStop(1, 'rgba(255, 152, 0, 0.7)');
             
             this.ctx.strokeStyle = miningBorderGradient;
-            this.ctx.lineWidth = 4;
+            this.ctx.lineWidth = 1.5; // Reduced from 4
             this.ctx.lineCap = 'round';
             this.ctx.lineJoin = 'round';
             this.roundRect(x, y, this.blockWidth, this.blockHeight, 12);
@@ -2234,37 +2301,48 @@ export class Blockchain extends BaseAnimation {
             // Reset shadow
             this.ctx.shadowBlur = 0;
             
-            // Modern mining block content with enhanced styling
+            // Modern mining block content with vertical centering
             this.ctx.textAlign = 'left';
+            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.shadowBlur = 3;
+            this.ctx.shadowOffsetX = 1;
+            this.ctx.shadowOffsetY = 1;
+            
+            // Calculate vertical centering (adjusted to fix bottom overflow)
+            const miningContentHeight = this.showHashes ? 58 : 48; // Reduced
+            const miningStartY = y + (this.blockHeight - miningContentHeight) / 2 + 10; // Reduced top offset
             
             // Mining title with animated effect
-            this.ctx.font = 'bold 20px Inter, Arial, sans-serif';
+            this.ctx.font = 'bold 15px Inter, Arial, sans-serif'; // Reduced from 16px
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            this.ctx.shadowBlur = 2;
-            this.ctx.fillText('⛏️ Mining...', x + 12, y + 28);
-            this.ctx.shadowBlur = 0;
+            this.ctx.fillText('⛏️ Mining...', x + 12, miningStartY);
             
             // Nonce with modern formatting
-            this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
+            this.ctx.font = 'bold 12px Inter, Arial, sans-serif'; // Reduced from 13px
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.fillText(`🔢 ${this.miningBlock.nonce.toLocaleString()}`, x + 12, y + 48);
+            this.ctx.fillText(`Nonce: ${this.miningBlock.nonce.toLocaleString()}`, x + 12, miningStartY + 16);
             
             // Target hash with modern styling
-            this.ctx.font = '14px Inter, Arial, sans-serif';
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            this.ctx.fillText(`🎯 ${this.targetHash}`, x + 12, y + 65);
+            this.ctx.font = '10px Inter, Arial, sans-serif'; // Reduced from 11px
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillText(`Target: ${this.targetHash}`, x + 12, miningStartY + 30);
             
             // Reward and fees with icons
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            this.ctx.fillText(`💰 ${this.blockReward} | 💸 ${this.miningBlock.totalFees.toFixed(1)}`, x + 12, y + 82);
+            this.ctx.font = '10px Inter, Arial, sans-serif'; // Reduced from 11px
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillText(`💰 ${this.blockReward} | 💸 ${this.miningBlock.totalFees.toFixed(1)}`, x + 12, miningStartY + 43);
             
             // Hash with modern monospace styling
             if (this.showHashes) {
-                this.ctx.font = '11px "JetBrains Mono", "Fira Code", monospace';
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                this.ctx.fillText(`🔗 ${this.miningBlock.hash.substring(0, 12)}...`, x + 12, y + 100);
+                this.ctx.font = '8px "JetBrains Mono", "Fira Code", monospace'; // Reduced from 9px
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillText(`${this.miningBlock.hash.substring(0, 14)}...`, x + 12, miningStartY + 54);
             }
+            
+            // Reset shadow
+            this.ctx.shadowBlur = 0;
+            this.ctx.shadowOffsetX = 0;
+            this.ctx.shadowOffsetY = 0;
             
             // Modern mining progress indicator with enhanced styling
             const progress = (this.miningBlock.nonce % 100) / 100;
@@ -2294,18 +2372,18 @@ export class Blockchain extends BaseAnimation {
     drawNetwork() {
         if (!this.showNetwork) return;
         
-        // Draw network background with enhanced gradient
+        // Draw network background with enhanced gradient (smaller for 800x600)
         const networkGradient = this.ctx.createRadialGradient(this.networkCenterX, this.networkCenterY, 0, 
-                                                             this.networkCenterX, this.networkCenterY, 180);
-        networkGradient.addColorStop(0, 'rgba(33, 150, 243, 0.15)');
-        networkGradient.addColorStop(0.7, 'rgba(33, 150, 243, 0.08)');
-        networkGradient.addColorStop(1, 'rgba(33, 150, 243, 0.03)');
+                                                             this.networkCenterX, this.networkCenterY, 120);
+        networkGradient.addColorStop(0, 'rgba(33, 150, 243, 0.2)');
+        networkGradient.addColorStop(0.7, 'rgba(33, 150, 243, 0.1)');
+        networkGradient.addColorStop(1, 'rgba(33, 150, 243, 0.05)');
         this.ctx.fillStyle = networkGradient;
-        this.ctx.fillRect(this.networkCenterX - 180, this.networkCenterY - 180, 360, 360);
+        this.ctx.fillRect(this.networkCenterX - 120, this.networkCenterY - 120, 240, 240);
         
         // Draw connections between nodes with enhanced pulse effect
-        this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + 0.3 * Math.sin(this.networkPulse)})`;
-        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = `rgba(100, 180, 255, ${0.3 + 0.2 * Math.sin(this.networkPulse)})`;
+        this.ctx.lineWidth = 2;
         this.ctx.lineCap = 'round';
         
         for (let i = 0; i < this.networkNodes.length; i++) {
@@ -2318,8 +2396,10 @@ export class Blockchain extends BaseAnimation {
                 const dy = node2.y - node1.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                // Only draw connections between nearby nodes
-                if (distance < 200) {
+                // Only draw connections between nearby nodes (reduced for smaller network)
+                if (distance < 180) {
+                    const alpha = 0.3 + (0.2 * (1 - distance / 180));
+                    this.ctx.strokeStyle = `rgba(100, 180, 255, ${alpha})`;
                     this.ctx.beginPath();
                     this.ctx.moveTo(node1.x, node1.y);
                     this.ctx.lineTo(node2.x, node2.y);
@@ -2615,16 +2695,21 @@ export class Blockchain extends BaseAnimation {
             // Modern node label with enhanced styling
             this.ctx.textAlign = 'center';
             
-            // Add text shadow for better readability
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-            this.ctx.shadowBlur = 2;
-            this.ctx.shadowOffsetX = 1;
-            this.ctx.shadowOffsetY = 1;
-            
-            // Node label with modern typography
+            // Draw node label with better visibility
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '11px Inter, Arial, sans-serif';
-            this.ctx.fillText(`Node ${node.id}`, node.x, node.y + 5);
+            this.ctx.font = 'bold 10px Inter, Arial, sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.shadowBlur = 3;
+            
+            // Label based on node type
+            let label = `N${node.id}`;
+            if (node.isMining) {
+                label = `⛏ M${node.id}`;
+            }
+            
+            this.ctx.fillText(label, node.x, node.y + this.nodeRadius + 14);
             
             // Reset shadow
             this.ctx.shadowBlur = 0;
@@ -2672,14 +2757,14 @@ export class Blockchain extends BaseAnimation {
     
     drawTransactions() {
         const startX = 60;
-        const startY = 40; // Moved up to avoid overlap with blockchain
-        const txWidth = 220; // Increased width for more info
-        const txHeight = 120; // Increased height
+        const startY = 40; // At the top, above blockchain (blockchain at y=160)
+        const txWidth = 180; // Reduced width for more compact layout
+        const txHeight = 100; // Reduced height to fit better
         const currentTime = Date.now();
         
         // Draw pending transactions with enhanced design and dynamic updates
         this.pendingTransactions.slice(0, 3).forEach((tx, index) => {
-            const x = startX + index * (txWidth + 30);
+            const x = startX + index * (txWidth + 20); // Reduced spacing between transactions
             const y = startY;
             
             // Calculate transaction age for visual effects
@@ -2723,35 +2808,54 @@ export class Blockchain extends BaseAnimation {
             // Reset opacity for text
             this.ctx.globalAlpha = 1;
             
-            // Transaction content with improved typography and dynamic info
-            this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
+            // Transaction content - reorganized to fit better
             this.ctx.textAlign = 'left';
-            this.ctx.fillText(`${tx.from} → ${tx.to}`, x + 15, y + 25);
+            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            this.ctx.shadowBlur = 2;
+            this.ctx.shadowOffsetX = 1;
+            this.ctx.shadowOffsetY = 1;
             
-            this.ctx.font = '12px Inter, Arial, sans-serif';
-            this.ctx.fillText(`Amount: ${tx.amount} tokens`, x + 15, y + 45);
-            this.ctx.fillText(`Type: ${tx.type.replace('_', ' ')}`, x + 15, y + 60);
-            this.ctx.fillText(`Fee: ${tx.fee.toFixed(1)} tokens`, x + 15, y + 75);
+            // Transaction parties (from → to)
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = 'bold 11px Inter, Arial, sans-serif';
+            const fromTo = `${tx.from} → ${tx.to}`;
+            const maxFromToLength = 18; // Reduced for narrower container
+            const displayFromTo = fromTo.length > maxFromToLength ? fromTo.substring(0, maxFromToLength - 2) + '..' : fromTo;
+            this.ctx.fillText(displayFromTo, x + 10, y + 18);
             
-            // Dynamic time display with age indicator
-            const timeText = ageSeconds < 60 ? `${ageSeconds}s ago` : `${Math.floor(ageSeconds / 60)}m ago`;
-            this.ctx.fillText(`Age: ${timeText}`, x + 15, y + 90);
+            // Amount and Fee on same line
+            this.ctx.font = '9px Inter, Arial, sans-serif';
+            this.ctx.fillText(`💰 ${tx.amount} | 💸 ${tx.fee.toFixed(1)}`, x + 10, y + 32);
             
-            // Priority indicator based on fee
-            const priorityColor = tx.fee > this.transactionFee * 1.5 ? '#10B981' : 
-                                tx.fee > this.transactionFee ? '#F59E0B' : '#EF4444';
+            // Type
+            const typeText = tx.type.replace('_', ' ');
+            const displayType = typeText.length > 15 ? typeText.substring(0, 12) + '...' : typeText;
+            this.ctx.fillText(`${displayType}`, x + 10, y + 44);
+            
+            // Age and Priority on same line
+            const timeText = ageSeconds < 60 ? `${ageSeconds}s` : `${Math.floor(ageSeconds / 60)}m`;
+            const priorityText = tx.fee > this.transactionFee * 1.5 ? 'High' : 
+                                tx.fee > this.transactionFee ? 'Med' : 'Low';
+            this.ctx.fillText(`${timeText} ago`, x + 10, y + 56);
+            
+            // Priority indicator with color
+            const priorityColor = tx.fee > this.transactionFee * 1.5 ? '#22C55E' : 
+                                tx.fee > this.transactionFee ? '#FCD34D' : '#FCA5A5';
             this.ctx.fillStyle = priorityColor;
-            this.ctx.fillText(`Priority: ${tx.fee > this.transactionFee * 1.5 ? 'High' : 
-                             tx.fee > this.transactionFee ? 'Medium' : 'Low'}`, x + 15, y + 105);
+            this.ctx.fillText(`${priorityText}`, x + 10, y + 68);
             
-            // Show description if available with better spacing
+            // Description (optional, shortened)
             if (tx.description) {
-                this.ctx.font = '10px Inter, Arial, sans-serif';
-                this.ctx.fillStyle = '#E0E7FF';
-                const desc = tx.description.length > 25 ? tx.description.substring(0, 22) + '...' : tx.description;
-                this.ctx.fillText(desc, x + 15, y + 118);
+                this.ctx.font = '8px Inter, Arial, sans-serif';
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                const desc = tx.description.length > 22 ? tx.description.substring(0, 19) + '...' : tx.description;
+                this.ctx.fillText(desc, x + 10, y + 80);
             }
+            
+            // Reset shadow after transaction text
+            this.ctx.shadowBlur = 0;
+            this.ctx.shadowOffsetX = 0;
+            this.ctx.shadowOffsetY = 0;
             
             // Add pulsing effect for new transactions (first 5 seconds)
             if (age < 5000) {
@@ -2919,84 +3023,147 @@ export class Blockchain extends BaseAnimation {
         });
     }
     
-    drawUnifiedInfoPanel() {
-        const panelX = 60;
-        const panelY = this.ctx.canvas.height - 200;
-        const panelWidth = 340; // Slightly wider for better layout
-        const panelHeight = 180;
+    drawMiningProgress() {
+        // Position progress bar near the mining block
+        const canvasWidth = this.ctx.canvas.width;
+        const barWidth = 200;
+        const barHeight = 20;
+        const barX = canvasWidth - barWidth - 30;
+        const barY = 20;
         
-        // Unified info panel background with enhanced transparency
-        const panelGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
-        panelGradient.addColorStop(0, 'rgba(0, 0, 0, 0.75)');
-        panelGradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.65)');
-        panelGradient.addColorStop(1, 'rgba(0, 0, 0, 0.55)');
-        this.ctx.fillStyle = panelGradient;
-        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        // Background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(barX - 10, barY - 5, barWidth + 20, barHeight + 30);
         
-        // Enhanced panel border with transparency
-        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.8)';
+        // Border
+        this.ctx.strokeStyle = 'rgba(255, 152, 0, 0.8)';
         this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        this.ctx.strokeRect(barX - 10, barY - 5, barWidth + 20, barHeight + 30);
         
-        // Enhanced text styling with better contrast for transparency
+        // Progress bar background
+        this.ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
+        this.ctx.fillRect(barX, barY, barWidth, barHeight);
+        
+        // Progress bar fill with gradient
+        const progress = Math.min(100, this.miningProgress);
+        const fillWidth = (barWidth * progress) / 100;
+        
+        const gradient = this.ctx.createLinearGradient(barX, barY, barX + fillWidth, barY);
+        gradient.addColorStop(0, '#FF9800');
+        gradient.addColorStop(0.5, '#FFB74D');
+        gradient.addColorStop(1, '#FF9800');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(barX, barY, fillWidth, barHeight);
+        
+        // Progress text
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
-        this.ctx.textAlign = 'left';
-        
-        // Add text shadow for better readability on transparent background
+        this.ctx.font = 'bold 12px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'center';
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         this.ctx.shadowBlur = 2;
+        this.ctx.fillText(`Mining: ${progress.toFixed(0)}%`, barX + barWidth / 2, barY + barHeight + 15);
+        this.ctx.shadowBlur = 0;
+    }
+    
+    drawUnifiedInfoPanel() {
+        const panelX = 60;
+        const panelY = this.ctx.canvas.height - 160; // Moved up slightly
+        const panelWidth = 360; // Slightly wider for better layout
+        const panelHeight = 140; // Reduced height for more compact design
+        
+        // Modern gradient background with better styling
+        const panelGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+        panelGradient.addColorStop(0, 'rgba(15, 23, 42, 0.92)'); // Darker, more opaque
+        panelGradient.addColorStop(0.5, 'rgba(30, 41, 59, 0.88)');
+        panelGradient.addColorStop(1, 'rgba(15, 23, 42, 0.85)');
+        this.ctx.fillStyle = panelGradient;
+        this.roundRect(panelX, panelY, panelWidth, panelHeight, 8);
+        this.ctx.fill();
+        
+        // Enhanced panel border with gradient
+        const borderGradient = this.ctx.createLinearGradient(panelX, panelY, panelX + panelWidth, panelY);
+        borderGradient.addColorStop(0, 'rgba(59, 130, 246, 0.6)');
+        borderGradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.8)');
+        borderGradient.addColorStop(1, 'rgba(59, 130, 246, 0.6)');
+        this.ctx.strokeStyle = borderGradient;
+        this.ctx.lineWidth = 2;
+        this.roundRect(panelX, panelY, panelWidth, panelHeight, 8);
+        this.ctx.stroke();
+        
+        // Enhanced text styling with better contrast
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.shadowBlur = 3;
         this.ctx.shadowOffsetX = 1;
         this.ctx.shadowOffsetY = 1;
+        this.ctx.textAlign = 'left';
         
-        // Title
-        this.ctx.fillText('Blockchain Network Status', panelX + 15, panelY + 25);
+        // Title with icon
+        this.ctx.fillStyle = '#60A5FA'; // Light blue
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
+        this.ctx.fillText('⛓️ Network Status', panelX + 15, panelY + 22);
         
-        // Phase information with better formatting
+        // Phase information with status indicator
         const phaseText = this.animationPhase.charAt(0).toUpperCase() + this.animationPhase.slice(1).replace('_', ' ');
-        this.ctx.font = '14px Inter, Arial, sans-serif';
-        this.ctx.fillText(`Current Phase: ${phaseText}`, panelX + 15, panelY + 45);
+        const phaseColor = this.isMining ? '#22C55E' : '#94A3B8';
+        this.ctx.fillStyle = phaseColor;
+        this.ctx.font = 'bold 11px Inter, Arial, sans-serif';
+        this.ctx.fillText(`● ${phaseText}`, panelX + 15, panelY + 40);
         
-        // Key statistics (left column)
-        this.ctx.font = '12px Inter, Arial, sans-serif';
-        this.ctx.fillText(`Total Blocks: ${this.totalBlocks}`, panelX + 15, panelY + 65);
-        this.ctx.fillText(`Total Transactions: ${this.totalTransactions}`, panelX + 15, panelY + 80);
-        this.ctx.fillText(`Pending Transactions: ${this.pendingTransactions.length}`, panelX + 15, panelY + 95);
+        // Key statistics in compact 3-column layout
+        this.ctx.font = '10px Inter, Arial, sans-serif';
+        this.ctx.fillStyle = '#E2E8F0';
         
-        // Dynamic difficulty display
-        this.ctx.fillText(`Current Difficulty: ${this.difficulty}`, panelX + 15, panelY + 110);
+        // Column 1
+        this.ctx.fillText(`Blocks: ${this.totalBlocks}`, panelX + 15, panelY + 58);
+        this.ctx.fillText(`Tx: ${this.totalTransactions}`, panelX + 15, panelY + 72);
+        this.ctx.fillText(`Pending: ${this.pendingTransactions.length}`, panelX + 15, panelY + 86);
         
-        // Right column - mining info
+        // Column 2
+        this.ctx.fillText(`Difficulty: ${this.difficulty}`, panelX + 130, panelY + 58);
+        this.ctx.fillText(`Nodes: ${this.networkNodes.length}`, panelX + 130, panelY + 72);
+        this.ctx.fillText(`Miners: ${this.miners.length}`, panelX + 130, panelY + 86);
+        
+        // Column 3 - Dynamic info
         if (this.miningBlock) {
-            this.ctx.fillText(`Current Nonce: ${this.miningBlock.nonce.toLocaleString()}`, panelX + 170, panelY + 65);
-            this.ctx.fillText(`Target Hash: ${this.targetHash}`, panelX + 170, panelY + 80);
-            this.ctx.fillText(`Network Hashrate: ${this.networkHashrate.toLocaleString()} H/s`, panelX + 170, panelY + 95);
-            this.ctx.fillText(`Active Miners: ${this.miners.length}`, panelX + 170, panelY + 110);
+            this.ctx.fillText(`Nonce: ${this.miningBlock.nonce.toLocaleString()}`, panelX + 240, panelY + 58);
+            this.ctx.fillText(`H/s: ${(this.networkHashrate / 1000).toFixed(1)}k`, panelX + 240, panelY + 72);
+            this.ctx.fillText(`Target: ${this.targetHash}`, panelX + 240, panelY + 86);
         } else if (this.guidedMode && this.guidedBlock) {
-            this.ctx.fillText(`Process Step: ${this.currentStep + 1}/${this.phaseSteps.length}`, panelX + 170, panelY + 65);
-            this.ctx.fillText(`Block #${this.guidedBlock.index}`, panelX + 170, panelY + 80);
-            this.ctx.fillText(`Phase Time: ${this.phaseTime.toFixed(1)}s`, panelX + 170, panelY + 95);
-            this.ctx.fillText(`Total Rewards: ${this.totalRewards.toFixed(1)}`, panelX + 170, panelY + 110);
+            this.ctx.fillText(`Step: ${this.currentStep + 1}/${this.phaseSteps.length}`, panelX + 240, panelY + 58);
+            this.ctx.fillText(`Block: #${this.guidedBlock.index}`, panelX + 240, panelY + 72);
+            this.ctx.fillText(`Time: ${this.phaseTime.toFixed(1)}s`, panelX + 240, panelY + 86);
         }
         
-        // Bottom row - additional info
-        this.ctx.fillText(`Average Block Time: ${(this.averageBlockTime / 1000).toFixed(1)}s`, panelX + 15, panelY + 130);
-        this.ctx.fillText(`Network Nodes: ${this.networkNodes.length}`, panelX + 170, panelY + 130);
+        // Bottom info bar
+        const avgBlockTime = (this.averageBlockTime / 1000).toFixed(1);
+        this.ctx.fillStyle = '#94A3B8';
+        this.ctx.font = '9px Inter, Arial, sans-serif';
+        this.ctx.fillText(`Avg Block Time: ${avgBlockTime}s`, panelX + 15, panelY + 105);
         
-        // Consensus information
+        // Consensus information and progress bar
         if (this.guidedMode && this.guidedBlock) {
             const consensusNodes = this.networkNodes.filter(node => node.consensusReached);
             const consensusPercentage = (consensusNodes.length / this.networkNodes.length * 100).toFixed(0);
-            this.ctx.fillText(`Consensus: ${consensusPercentage}%`, panelX + 15, panelY + 150);
-        }
-        
-        // Progress indicator for guided mode
-        if (this.guidedMode && this.guidedBlock) {
+            this.ctx.fillStyle = '#94A3B8';
+            this.ctx.fillText(`Consensus: ${consensusPercentage}%`, panelX + 180, panelY + 105);
+            
+            // Progress bar for guided mode
             const progress = (this.currentStep + 1) / this.phaseSteps.length;
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.fillRect(panelX + 15, panelY + 150, 310, 6);
-            this.ctx.fillStyle = '#4CAF50';
-            this.ctx.fillRect(panelX + 15, panelY + 150, 310 * progress, 6);
+            const barWidth = 330;
+            const barHeight = 4;
+            const barY = panelY + 120;
+            
+            // Background
+            this.ctx.fillStyle = 'rgba(71, 85, 105, 0.5)';
+            this.ctx.fillRect(panelX + 15, barY, barWidth, barHeight);
+            
+            // Progress fill with gradient
+            const progressGradient = this.ctx.createLinearGradient(panelX + 15, barY, panelX + 15 + barWidth * progress, barY);
+            progressGradient.addColorStop(0, '#22C55E');
+            progressGradient.addColorStop(1, '#10B981');
+            this.ctx.fillStyle = progressGradient;
+            this.ctx.fillRect(panelX + 15, barY, barWidth * progress, barHeight);
         }
         
         // Reset shadow for clean rendering
@@ -3018,6 +3185,11 @@ export class Blockchain extends BaseAnimation {
         // this.drawPropagationArrows(); // Disabled arrows
         this.drawMinerRewardDisplay(); // Draw miner reward display
         this.drawUnifiedInfoPanel();
+        
+        // Draw mining progress indicator
+        if (this.isMining && this.miningBlock && !this.guidedBlock) {
+            this.drawMiningProgress();
+        }
         
         // Draw guided phase indicator if in guided mode
         if (this.guidedPhaseIndicator) {
@@ -3109,11 +3281,6 @@ export class Blockchain extends BaseAnimation {
     }
     
     getStats() {
-        // Calculate dynamic difficulty
-        const baseDifficulty = this.difficulty;
-        const blockCount = this.blocks.length;
-        const dynamicDifficulty = Math.min(8, baseDifficulty + Math.floor(blockCount / 5));
-        
         // Calculate consensus statistics
         const consensusNodes = this.networkNodes.filter(node => node.consensusReached);
         const consensusThreshold = this.networkNodes.length * 0.6;
@@ -3124,7 +3291,7 @@ export class Blockchain extends BaseAnimation {
             blocks: this.totalBlocks,
             transactions: this.totalTransactions,
             pending: this.pendingTransactions.length,
-            difficulty: dynamicDifficulty,
+            difficulty: this.difficulty, // Return actual difficulty, not dynamic
             hashrate: this.networkHashrate,
             miners: this.miners.length,
             nodes: this.networkNodes.length,
@@ -3310,7 +3477,7 @@ export class Blockchain extends BaseAnimation {
             const visibleIndex = totalBlocks;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
         } else {
-            const visibleBlocks = [this.blocks[0], this.blocks[1], ...this.blocks.slice(-2)];
+            const visibleBlocks = [this.blocks[0], this.blocks[1], this.blocks[2], ...this.blocks.slice(-1)];
             const visibleIndex = visibleBlocks.length;
             blockX = this.chainStartX + visibleIndex * (this.blockWidth + this.blockSpacing) + this.blockWidth / 2;
 

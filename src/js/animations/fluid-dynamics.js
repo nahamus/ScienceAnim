@@ -59,7 +59,8 @@ export class FluidFlow extends BaseAnimation {
                 size: 1.5 + Math.random() * 1, // Smaller particles
                 color: `hsl(${200 + Math.random() * 40}, 85%, 65%)`,
                 life: 0,
-                pipe: 'top'
+                pipe: 'top',
+                trail: [] // Add trail history
             });
         }
         
@@ -73,7 +74,8 @@ export class FluidFlow extends BaseAnimation {
                 size: 1.5 + Math.random() * 1, // Smaller particles
                 color: `hsl(${220 + Math.random() * 40}, 85%, 65%)`,
                 life: 0,
-                pipe: 'bottom'
+                pipe: 'bottom',
+                trail: [] // Add trail history
             });
         }
     }
@@ -211,6 +213,13 @@ export class FluidFlow extends BaseAnimation {
                 particle.vy *= viscosityFactor;
             }
             
+            // Update trail history (keep last 5 positions for smooth trail)
+            if (!particle.trail) particle.trail = [];
+            particle.trail.push({ x: particle.x, y: particle.y });
+            if (particle.trail.length > 5) {
+                particle.trail.shift();
+            }
+            
             // Update position with proper time scaling
             particle.x += particle.vx * deltaTime * 0.05; // Increased time scaling
             particle.y += particle.vy * deltaTime * 0.05;
@@ -270,7 +279,8 @@ export class FluidFlow extends BaseAnimation {
             color: `hsl(${220 + Math.random() * 40}, 80%, 60%)`,
             life: 0,
             pipe: pipeChoice,
-            opacity: 0.7 + Math.random() * 0.3
+            opacity: 0.7 + Math.random() * 0.3,
+            trail: [] // Add trail history
         });
     }
     
@@ -302,13 +312,18 @@ export class FluidFlow extends BaseAnimation {
         particle.life = 0;
     }
     
-    render() {
-        // Draw modern gradient background
+    drawStandardBackground() {
+        // Standard background matching other animations
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
         gradient.addColorStop(0, '#1a1a2e');
         gradient.addColorStop(1, '#16213e');
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+    
+    render() {
+        // Draw standardized background (matching other animations)
+        this.drawStandardBackground();
         
         // Draw pipe system
         this.drawPipeSystem();
@@ -364,18 +379,11 @@ export class FluidFlow extends BaseAnimation {
     }
     
     drawPipe(x, y, length, height, label, color) {
-        // Enhanced pipe styling with modern design
-        const pipeGradient = this.ctx.createLinearGradient(x, y, x + length, y);
-        pipeGradient.addColorStop(0, '#2C3E50'); // Dark steel
-        pipeGradient.addColorStop(0.3, '#34495E'); // Medium steel
-        pipeGradient.addColorStop(0.7, '#34495E'); // Medium steel
-        pipeGradient.addColorStop(1, '#2C3E50'); // Dark steel
-        
-        // Add subtle shadow for depth
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.shadowBlur = 8;
-        this.ctx.shadowOffsetX = 2;
-        this.ctx.shadowOffsetY = 2;
+        // Modern translucent pipe styling
+        const pipeGradient = this.ctx.createLinearGradient(x, y, x, y + height);
+        pipeGradient.addColorStop(0, 'rgba(70, 130, 180, 0.25)'); // Light blue translucent
+        pipeGradient.addColorStop(0.5, 'rgba(100, 149, 237, 0.15)'); // Cornflower blue translucent
+        pipeGradient.addColorStop(1, 'rgba(70, 130, 180, 0.25)'); // Light blue translucent
         
         // Draw pipe body with rounded corners
         this.ctx.fillStyle = pipeGradient;
@@ -383,25 +391,19 @@ export class FluidFlow extends BaseAnimation {
         this.ctx.roundRect(x, y, length, height, 8);
         this.ctx.fill();
         
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
+        // Add subtle inner glow for glass effect
+        const glowGradient = this.ctx.createLinearGradient(x, y, x, y + height / 2);
+        glowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+        glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
         
-        // Add metallic highlight
-        const highlightGradient = this.ctx.createLinearGradient(x, y, x, y + height);
-        highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-        highlightGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
-        highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+        this.ctx.fillStyle = glowGradient;
+        this.ctx.beginPath();
+        this.ctx.roundRect(x + 2, y + 2, length - 4, height / 2 - 2, 6);
+        this.ctx.fill();
         
-        this.ctx.fillStyle = highlightGradient;
-                this.ctx.beginPath();
-        this.ctx.roundRect(x + 2, y + 2, length - 4, height - 4, 6);
-                this.ctx.fill();
-        
-        // Draw pipe border with metallic effect
-        this.ctx.strokeStyle = '#1A252F';
-        this.ctx.lineWidth = 2;
+        // Draw pipe border with crisp line
+        this.ctx.strokeStyle = 'rgba(100, 149, 237, 0.6)';
+        this.ctx.lineWidth = 1.5;
             this.ctx.beginPath();
         this.ctx.roundRect(x, y, length, height, 8);
             this.ctx.stroke();
@@ -573,7 +575,10 @@ export class FluidFlow extends BaseAnimation {
         this.ctx.roundRect(topLabelX - topLabelWidth/2, topLabelY, topLabelWidth, labelHeight, 12);
                 this.ctx.stroke();
         
-        // Top pipe label text
+        // Top pipe label text with outline for better contrast
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeText('High Porosity Pipe', topLabelX, topLabelY + 5);
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fillText('High Porosity Pipe', topLabelX, topLabelY + 5);
         
@@ -604,7 +609,10 @@ export class FluidFlow extends BaseAnimation {
         this.ctx.roundRect(bottomLabelX - bottomLabelWidth/2, bottomLabelY, bottomLabelWidth, labelHeight, 12);
         this.ctx.stroke();
         
-        // Bottom pipe label text
+        // Bottom pipe label text with outline for better contrast
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeText('Low Porosity Pipe', bottomLabelX, bottomLabelY + 5);
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fillText('Low Porosity Pipe', bottomLabelX, bottomLabelY + 5);
     }
@@ -677,6 +685,20 @@ export class FluidFlow extends BaseAnimation {
     
     drawParticles() {
         this.particles.forEach(particle => {
+            // Draw particle trail first (behind the particle)
+            if (particle.trail && particle.trail.length > 1) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
+                for (let i = 1; i < particle.trail.length; i++) {
+                    this.ctx.lineTo(particle.trail[i].x, particle.trail[i].y);
+                }
+                this.ctx.strokeStyle = `rgba(100, 149, 237, ${0.3 * (particle.trail.length / 5)})`;
+                this.ctx.lineWidth = 1;
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                this.ctx.stroke();
+            }
+            
             // Calculate velocity for visual effects
             const velocity = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
             const maxVelocity = this.flowRate * 4;
@@ -1504,7 +1526,8 @@ export class Bernoulli extends BaseAnimation {
                 color: `hsl(${220 + Math.random() * 40}, 80%, 60%)`,
                 life: 0,
                 currentSection: 'left',
-                opacity: 0.7 + Math.random() * 0.3 // Varying opacity for depth
+                opacity: 0.7 + Math.random() * 0.3, // Varying opacity for depth
+                trail: [] // Add trail history
             });
         }
     }
@@ -1573,6 +1596,13 @@ export class Bernoulli extends BaseAnimation {
                 particle.vx += (Math.random() - 0.5) * 0.5;
             }
             
+            // Update trail history (keep last 5 positions for smooth trail)
+            if (!particle.trail) particle.trail = [];
+            particle.trail.push({ x: particle.x, y: particle.y });
+            if (particle.trail.length > 5) {
+                particle.trail.shift();
+            }
+            
             // Update position
             particle.x += particle.vx * deltaTime * 0.1;
             particle.y += particle.vy * deltaTime * 0.1;
@@ -1627,7 +1657,8 @@ export class Bernoulli extends BaseAnimation {
             color: `hsl(${220 + Math.random() * 40}, 80%, 60%)`,
             life: 0,
             currentSection: 'left',
-            opacity: 0.7 + Math.random() * 0.3
+            opacity: 0.7 + Math.random() * 0.3,
+            trail: [] // Add trail history
         });
     }
     
@@ -1692,8 +1723,18 @@ export class Bernoulli extends BaseAnimation {
         particle.opacity = 0.7 + Math.random() * 0.3;
     }
     
+    drawStandardBackground() {
+        // Standard background matching other animations
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.ctx.canvas.height);
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(1, '#16213e');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+    
     render() {
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Draw standardized background (matching other animations)
+        this.drawStandardBackground();
         
         // Draw pipe system
         this.drawPipeSystem();
@@ -1713,12 +1754,6 @@ export class Bernoulli extends BaseAnimation {
         const pipeWidth = 200; // Wide sections
         const narrowWidth = 100; // Narrow section
         const transitionLength = 50; // Smooth transition length
-        
-        // Add shadow for depth
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowOffsetX = 2;
-        this.ctx.shadowOffsetY = 2;
         
         // Create single continuous pipe path
         this.ctx.beginPath();
@@ -1748,47 +1783,54 @@ export class Bernoulli extends BaseAnimation {
         this.ctx.lineTo(0, 400);
         this.ctx.closePath();
         
-        // Create gradient for the entire pipe
+        // Modern translucent gradient with pressure/velocity zones
+        // Blue = High pressure, Low velocity (wide sections)
+        // Red/Orange = Low pressure, High velocity (narrow section)
         const pipeGradient = this.ctx.createLinearGradient(0, 200, this.ctx.canvas.width, 400);
-        pipeGradient.addColorStop(0, 'rgba(135, 206, 250, 0.6)');
-        pipeGradient.addColorStop(0.3, 'rgba(70, 130, 180, 0.5)');
-        pipeGradient.addColorStop(0.4, 'rgba(255, 140, 0, 0.6)');
-        pipeGradient.addColorStop(0.6, 'rgba(255, 69, 0, 0.7)');
-        pipeGradient.addColorStop(0.7, 'rgba(255, 140, 0, 0.6)');
-        pipeGradient.addColorStop(0.8, 'rgba(70, 130, 180, 0.5)');
-        pipeGradient.addColorStop(1, 'rgba(135, 206, 250, 0.6)');
+        pipeGradient.addColorStop(0, 'rgba(70, 130, 237, 0.35)'); // Blue - high pressure
+        pipeGradient.addColorStop(0.35, 'rgba(70, 130, 237, 0.35)'); // Blue
+        pipeGradient.addColorStop(0.42, 'rgba(255, 140, 60, 0.4)'); // Transition to orange
+        pipeGradient.addColorStop(0.5, 'rgba(255, 100, 50, 0.45)'); // Red/Orange - low pressure, high velocity
+        pipeGradient.addColorStop(0.58, 'rgba(255, 140, 60, 0.4)'); // Transition back
+        pipeGradient.addColorStop(0.65, 'rgba(70, 130, 237, 0.35)'); // Blue - high pressure
+        pipeGradient.addColorStop(1, 'rgba(70, 130, 237, 0.35)'); // Blue
         
         this.ctx.fillStyle = pipeGradient;
         this.ctx.fill();
         
-        // Single border for the entire pipe
-        this.ctx.strokeStyle = 'rgba(70, 130, 180, 0.9)';
-        this.ctx.lineWidth = 3;
+        // Crisp border
+        this.ctx.strokeStyle = 'rgba(100, 149, 237, 0.7)';
+        this.ctx.lineWidth = 1.5;
         this.ctx.stroke();
         
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-        
-        // Section labels with better positioning
-        this.ctx.fillStyle = '#1a1a2e';
-        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
+        // Section labels with high contrast
+        this.ctx.font = 'bold 14px Arial, sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Wide Section (Slow)', 150, 180);
-        this.ctx.fillText('Narrow Section (Fast)', 400, 180);
-        this.ctx.fillText('Wide Section (Slow)', 650, 180);
+        this.ctx.shadowBlur = 0;
         
-        // Speed indicators
-        this.ctx.fillStyle = '#0066CC';
-        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
-        this.ctx.fillText('SLOW', 150, 160);
-        this.ctx.fillText('SLOW', 650, 160);
+        // Left section label
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeText('High Pressure', 150, 180);
+        this.ctx.strokeText('Low Velocity', 150, 198);
+        this.ctx.fillStyle = '#4682FF';
+        this.ctx.fillText('High Pressure', 150, 180);
+        this.ctx.fillText('Low Velocity', 150, 198);
         
-        this.ctx.fillStyle = '#FF6600';
-        this.ctx.fillText('FAST', 400, 160);
+        // Middle section label
+        this.ctx.strokeText('Low Pressure', 400, 230);
+        this.ctx.strokeText('High Velocity', 400, 248);
+        this.ctx.fillStyle = '#FF6432';
+        this.ctx.fillText('Low Pressure', 400, 230);
+        this.ctx.fillText('High Velocity', 400, 248);
+        
+        // Right section label
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.strokeText('High Pressure', 650, 180);
+        this.ctx.strokeText('Low Velocity', 650, 198);
+        this.ctx.fillStyle = '#4682FF';
+        this.ctx.fillText('High Pressure', 650, 180);
+        this.ctx.fillText('Low Velocity', 650, 198);
         
         // Flow direction arrows
         this.ctx.strokeStyle = '#0066CC';
@@ -1813,6 +1855,74 @@ export class Bernoulli extends BaseAnimation {
         for (let y = 220; y < 380; y += 30) {
             this.drawEnhancedArrow(700, y, 750, y, '#0066CC');
         }
+        
+        // Draw visual gauges for pressure and velocity
+        this.drawPressureVelocityGauges();
+    }
+    
+    drawPressureVelocityGauges() {
+        // Pressure gauge (left side - high pressure)
+        const leftGaugeX = 150;
+        const leftGaugeY = 450;
+        this.drawGauge(leftGaugeX, leftGaugeY, 'Pressure', 0.8, '#4682FF');
+        
+        // Velocity gauge (left side - low velocity)
+        this.drawGauge(leftGaugeX + 120, leftGaugeY, 'Velocity', 0.3, '#4682FF');
+        
+        // Pressure gauge (middle - low pressure)
+        const midGaugeX = 400;
+        const midGaugeY = 450;
+        this.drawGauge(midGaugeX, midGaugeY, 'Pressure', 0.3, '#FF6432');
+        
+        // Velocity gauge (middle - high velocity)
+        this.drawGauge(midGaugeX + 120, midGaugeY, 'Velocity', 0.9, '#FF6432');
+        
+        // Pressure gauge (right side - high pressure)
+        const rightGaugeX = 650;
+        const rightGaugeY = 450;
+        this.drawGauge(rightGaugeX, rightGaugeY, 'Pressure', 0.8, '#4682FF');
+        
+        // Velocity gauge (right side - low velocity)
+        this.drawGauge(rightGaugeX + 120, rightGaugeY, 'Velocity', 0.3, '#4682FF');
+    }
+    
+    drawGauge(x, y, label, value, color) {
+        const width = 80;
+        const height = 15;
+        const radius = 3;
+        
+        // Gauge background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.beginPath();
+        this.ctx.roundRect(x - width/2, y, width, height, radius);
+        this.ctx.fill();
+        
+        // Gauge fill
+        const fillWidth = width * value;
+        const gradient = this.ctx.createLinearGradient(x - width/2, y, x - width/2 + fillWidth, y);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, this.adjustColor(color, 30));
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.roundRect(x - width/2, y, fillWidth, height, radius);
+        this.ctx.fill();
+        
+        // Gauge border
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.roundRect(x - width/2, y, width, height, radius);
+        this.ctx.stroke();
+        
+        // Label
+        this.ctx.font = 'bold 11px Arial, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.lineWidth = 2.5;
+        this.ctx.strokeText(label, x, y - 3);
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillText(label, x, y - 3);
     }
     
     drawEnhancedArrow(x1, y1, x2, y2, color) {
@@ -1888,6 +1998,20 @@ export class Bernoulli extends BaseAnimation {
             if (!particle || typeof particle.x !== 'number' || typeof particle.y !== 'number' || 
                 isNaN(particle.x) || isNaN(particle.y)) {
                 return; // Skip invalid particles
+            }
+            
+            // Draw particle trail first (behind the particle)
+            if (particle.trail && particle.trail.length > 1) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(particle.trail[0].x, particle.trail[0].y);
+                for (let i = 1; i < particle.trail.length; i++) {
+                    this.ctx.lineTo(particle.trail[i].x, particle.trail[i].y);
+                }
+                this.ctx.strokeStyle = `rgba(100, 149, 237, ${0.3 * (particle.trail.length / 5)})`;
+                this.ctx.lineWidth = 1;
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                this.ctx.stroke();
             }
             
             // Check if particle is in narrow section (Bernoulli effect)
@@ -2126,7 +2250,7 @@ export class Bernoulli extends BaseAnimation {
     drawBernoulliInfo() {
         // Modern Bernoulli info panel with enhanced styling
         const panelX = 20;
-        const panelY = 450;
+        const panelY = 20;
         const panelWidth = 320;
         const panelHeight = 120;
         

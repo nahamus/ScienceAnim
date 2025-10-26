@@ -17,9 +17,14 @@ export class BaseAnimation {
     drawLabels(title, formulas, titleY = 25, formulasY = 45) {
         this.ctx.save();
         
+        // Scale text for device pixel ratio for crisper rendering
+        const dpr = (window && window.devicePixelRatio) ? window.devicePixelRatio : 1;
+        this.ctx.scale(1, 1); // keep geometry as-is; font sizes adjusted below
+        const titleFontSize = Math.round(16 * (dpr > 1 ? 1.0 : 1));
+        const formulaFontSize = Math.round(12 * (dpr > 1 ? 1.0 : 1));
+
         // Set up text styling
-        this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
+        this.ctx.font = `bold ${titleFontSize}px Inter`;
         this.ctx.textAlign = 'center';
         
         // Determine background type and set appropriate colors
@@ -42,17 +47,24 @@ export class BaseAnimation {
             shadowColor = 'rgba(255, 255, 255, 0.8)'; // White shadow
         }
         
-        // Draw animation type label
-        this.ctx.fillStyle = textColor;
+        // Add high-contrast outline for legibility on varied backgrounds
+        const outlineColor = (textColor === '#ffffff') ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.9)';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = outlineColor;
         this.ctx.shadowColor = shadowColor;
         this.ctx.shadowBlur = 2;
+
+        // Draw animation type label
+        this.ctx.fillStyle = textColor;
+        this.ctx.strokeText(title, this.ctx.canvas.width / 2, titleY);
         this.ctx.fillText(title, this.ctx.canvas.width / 2, titleY);
         
         // Draw mathematical formulas in a more compact format
-        this.ctx.font = '12px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
+        this.ctx.font = `${formulaFontSize}px Inter`;
         this.ctx.fillStyle = textColor;
+        this.ctx.strokeStyle = outlineColor;
         this.ctx.shadowColor = shadowColor;
+        this.ctx.strokeText(formulas, this.ctx.canvas.width / 2, formulasY);
         this.ctx.fillText(formulas, this.ctx.canvas.width / 2, formulasY);
         
         // Reset shadow

@@ -172,7 +172,12 @@ export class BrownianMotion extends BaseAnimation {
             }
             
             // Update trail
-
+            if (this.showTrails) {
+                particle.trail.push({ x: particle.x, y: particle.y });
+                if (particle.trail.length > 25) particle.trail.shift();
+            } else {
+                particle.trail.length = 0;
+            }
         });
         
         // Update velocity distribution data
@@ -319,8 +324,6 @@ export class BrownianMotion extends BaseAnimation {
         // Labels
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Velocity Distribution', graphX + graphWidth / 2, graphY - 5);
     }
@@ -337,8 +340,6 @@ export class BrownianMotion extends BaseAnimation {
         
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         this.ctx.fillText(`Collisions: ${this.collisionCount}`, infoX + 10, infoY + 20);
         this.ctx.fillText(`Mean Free Path: ${this.meanFreePath.toFixed(1)}`, infoX + 10, infoY + 40);
@@ -466,7 +467,7 @@ export class Diffusion extends BaseAnimation {
     
     update(deltaTime) {
         this.time += deltaTime;
-        const dt = (deltaTime / 1000) * this.speed * 20; // Much faster animation
+        const dt = (deltaTime / 1000) * this.speed * 10; // Reduced speed for better observation
         
         // Only update particles if diffusion has started
         if (!this.diffusionStarted) return;
@@ -733,7 +734,6 @@ export class Diffusion extends BaseAnimation {
         // Enhanced labels with better styling
         this.ctx.fillStyle = '#333';
         this.ctx.font = 'bold 16px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Concentration Profile', this.ctx.canvas.width / 2, profileY - 8);
         
@@ -800,7 +800,6 @@ export class Diffusion extends BaseAnimation {
         
         this.ctx.fillStyle = textGradient;
         this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(text, this.ctx.canvas.width / 2, this.ctx.canvas.height - 35);
     }
@@ -888,12 +887,13 @@ export class GasLaws extends BaseAnimation {
     }
     
     setTemperature(temp) {
+        const prev = this.temperature || 300;
         this.temperature = temp;
-        // Adjust particle velocities based on temperature
+        // Scale velocities relative to previous temperature to avoid compounding
+        const factor = Math.sqrt((temp || 300) / (prev || 300));
         this.particles.forEach(particle => {
-            const speedFactor = Math.sqrt(temp / 300);
-            particle.vx *= speedFactor;
-            particle.vy *= speedFactor;
+            particle.vx *= factor;
+            particle.vy *= factor;
         });
     }
     
@@ -954,7 +954,7 @@ export class GasLaws extends BaseAnimation {
     
     update(deltaTime) {
         this.time += deltaTime;
-        const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
+        const dt = (deltaTime / 1000) * this.speed * 1; // Reduced speed for better observation
         
         // Update particles with collision detection
         this.particles.forEach((particle, index) => {
@@ -1010,6 +1010,22 @@ export class GasLaws extends BaseAnimation {
 
         });
         
+        // Draw trails after updating positions so lines point forward
+        if (this.showTrails) {
+            this.particles.forEach(p => {
+                if (p.trail.length > 1) {
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                    this.ctx.lineWidth = 1;
+                    this.ctx.moveTo(p.trail[0].x, p.trail[0].y);
+                    for (let i = 1; i < p.trail.length; i++) {
+                        this.ctx.lineTo(p.trail[i].x, p.trail[i].y);
+                    }
+                    this.ctx.stroke();
+                }
+            });
+        }
+
         // Update velocity distribution data
         if (this.showVelocityDistribution) {
             this.velocityData.push(...this.particles.map(p => Math.sqrt(p.vx * p.vx + p.vy * p.vy)));
@@ -1030,8 +1046,7 @@ export class GasLaws extends BaseAnimation {
             this.temperatureHistory.shift();
         }
         
-        // Calculate and apply pressure effects
-        this.calculatePressure();
+        // Calculate and apply pressure effects (already computed above)
     }
     
     calculatePressure() {
@@ -1170,13 +1185,11 @@ export class GasLaws extends BaseAnimation {
         // Add labels
         this.ctx.fillStyle = '#2C3E50';
         this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('GAS', this.containerX + this.containerWidth/2, this.pistonY + this.volume/2);
         
         // Volume indicator
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.fillStyle = '#7F8C8D';
         this.ctx.fillText(`Volume: ${this.volume}`, this.containerX + this.containerWidth/2, this.pistonY + this.volume + 25);
     }
@@ -1200,7 +1213,6 @@ export class GasLaws extends BaseAnimation {
         
         this.ctx.fillStyle = '#2C3E50';
         this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
         
         let y = panelY + 30;
@@ -1218,7 +1230,6 @@ export class GasLaws extends BaseAnimation {
         
         // Formula
         this.ctx.font = 'bold 18px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.fillStyle = '#E74C3C';
         
         switch(this.lawType) {
@@ -1226,7 +1237,6 @@ export class GasLaws extends BaseAnimation {
                 this.ctx.fillText('P₁V₁ = P₂V₂', panelX + 10, y);
                 y += 25;
                 this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
                 this.ctx.fillStyle = '#7F8C8D';
                 this.ctx.fillText('At constant temperature', panelX + 10, y);
                 y += 18;
@@ -1236,7 +1246,6 @@ export class GasLaws extends BaseAnimation {
                 this.ctx.fillText('V₁/T₁ = V₂/T₂', panelX + 10, y);
                 y += 25;
                 this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
                 this.ctx.fillStyle = '#7F8C8D';
                 this.ctx.fillText('At constant pressure', panelX + 10, y);
                 y += 18;
@@ -1246,7 +1255,6 @@ export class GasLaws extends BaseAnimation {
                 this.ctx.fillText('P₁/T₁ = P₂/T₂', panelX + 10, y);
                 y += 25;
                 this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
                 this.ctx.fillStyle = '#7F8C8D';
                 this.ctx.fillText('At constant volume', panelX + 10, y);
                 y += 18;
@@ -1256,7 +1264,6 @@ export class GasLaws extends BaseAnimation {
                 this.ctx.fillText('P₁V₁/T₁ = P₂V₂/T₂', panelX + 10, y);
                 y += 25;
                 this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
                 this.ctx.fillStyle = '#7F8C8D';
                 this.ctx.fillText('Combines all three laws', panelX + 10, y);
                 y += 18;
@@ -1267,13 +1274,11 @@ export class GasLaws extends BaseAnimation {
         // Current values
         y += 30;
         this.ctx.font = 'bold 14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.fillStyle = '#2C3E50';
         this.ctx.fillText('Current Values:', panelX + 10, y);
         y += 20;
         
         this.ctx.font = '13px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.fillStyle = '#7F8C8D';
         this.ctx.fillText(`P = ${this.pressure.toFixed(2)} atm`, panelX + 10, y);
         y += 16;
@@ -1335,7 +1340,6 @@ export class GasLaws extends BaseAnimation {
         // Draw pressure label
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Pressure', gaugeX, gaugeY + gaugeRadius + 15);
         this.ctx.fillText(pressureValue.toFixed(2), gaugeX, gaugeY + gaugeRadius + 30);
@@ -1427,7 +1431,6 @@ export class GasLaws extends BaseAnimation {
         // Labels
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('Velocity Distribution', graphX + graphWidth / 2, graphY - 5);
     }
@@ -1530,7 +1533,6 @@ export class GasLaws extends BaseAnimation {
         // Labels
         this.ctx.fillStyle = '#333';
         this.ctx.font = '14px Inter';
-        this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'center';
         
         let xLabel, yLabel;
