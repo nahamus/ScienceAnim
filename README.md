@@ -154,6 +154,55 @@ npm run lint
 npm run format
 ```
 
+## 🚀 Deployment
+
+### GitHub Pages Deployment
+
+This project is deployed to GitHub Pages using the `gh-pages` branch. Follow these steps to deploy your changes:
+
+#### **1. Prepare for Deployment**
+```bash
+# Make sure all changes are committed
+git add .
+git commit -m "Your commit message"
+```
+
+#### **2. Build the Project**
+```bash
+# Build the project for production
+npm run build
+```
+
+#### **3. Deploy to GitHub Pages**
+```bash
+# Switch to the gh-pages branch
+git checkout gh-pages
+
+# Copy built files to root directory (Windows)
+xcopy dist\* . /E /Y
+
+# Add and commit the built files
+git add .
+git commit -m "Deploy built version with latest changes"
+
+# Push to GitHub Pages
+git push origin gh-pages
+
+# Switch back to develop branch
+git checkout develop
+```
+
+#### **4. Verify Deployment**
+- Visit: [https://nahamus.github.io/ScienceAnim/](https://nahamus.github.io/ScienceAnim/)
+- Check that all animations are working correctly
+- Test responsive design on different devices
+
+### **Deployment Notes**
+- **Branch**: Uses `gh-pages` branch for deployment
+- **Build Required**: Must run `npm run build` before deployment
+- **Built Files**: Deploy the contents of the `dist/` folder
+- **Updates**: Changes are live immediately after push
+
 ## Development Best Practices
 
 ### Code Organization
