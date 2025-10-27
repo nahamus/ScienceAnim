@@ -91,6 +91,8 @@ export class BrownianMotion extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
         
@@ -381,7 +383,7 @@ export class Diffusion extends BaseAnimation {
         this.showConcentration = true; // Default to showing concentration
         this.particleSize = 4;
         this.concentrationMap = [];
-        this.diffusionStarted = false; // New: control when diffusion starts
+        this.diffusionStarted = false; // Start paused - user must press Play to start
         this.showConcentrationProfile = true; // New: show concentration profile
         this.showParticleTrails = false; // New: show particle trails
         
@@ -455,22 +457,25 @@ export class Diffusion extends BaseAnimation {
         this.showParticleTrails = show;
     }
     
-    startDiffusion() {
-        this.diffusionStarted = true;
-    }
-    
     reset() {
         this.time = 0;
-        this.diffusionStarted = false;
+        this.diffusionStarted = false; // Stay paused after reset - user must press Play
         this.initializeParticles();
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed * 10; // Reduced speed for better observation
         
-        // Only update particles if diffusion has started
-        if (!this.diffusionStarted) return;
+        // Start diffusion when play button is pressed
+        if (this.isPlaying && !this.diffusionStarted) {
+            this.diffusionStarted = true;
+        }
+        
+        // Only update particles if diffusion has started and animation is playing
+        if (!this.diffusionStarted || !this.isPlaying) return;
         
         this.particles.forEach(particle => {
             // Check if particle coordinates are valid before updating
@@ -774,34 +779,6 @@ export class Diffusion extends BaseAnimation {
         
         this.ctx.setLineDash([]);
         this.ctx.shadowBlur = 0;
-        
-        // Enhanced instruction text with modern styling
-        const text = 'Click or tap to start diffusion';
-        const textWidth = this.ctx.measureText(text).width;
-        
-        // Create glassmorphism background
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        this.ctx.fillRect(this.ctx.canvas.width / 2 - textWidth / 2 - 20, 
-                         this.ctx.canvas.height - 60, textWidth + 40, 40);
-        
-        // Add border and shadow
-        this.ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(this.ctx.canvas.width / 2 - textWidth / 2 - 20, 
-                           this.ctx.canvas.height - 60, textWidth + 40, 40);
-        
-        // Add gradient text
-        const textGradient = this.ctx.createLinearGradient(
-            this.ctx.canvas.width / 2 - textWidth / 2, this.ctx.canvas.height - 50,
-            this.ctx.canvas.width / 2 + textWidth / 2, this.ctx.canvas.height - 50
-        );
-        textGradient.addColorStop(0, '#667eea');
-        textGradient.addColorStop(1, '#764ba2');
-        
-        this.ctx.fillStyle = textGradient;
-        this.ctx.font = 'bold 18px Inter';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText(text, this.ctx.canvas.width / 2, this.ctx.canvas.height - 35);
     }
     
     getStats() {
@@ -953,6 +930,8 @@ export class GasLaws extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed * 1; // Reduced speed for better observation
         

@@ -99,6 +99,8 @@ export class ElectricFields extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 20; // Much faster animation
         this.time += dt;
         
@@ -601,6 +603,8 @@ export class MagneticFields extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 3;
         this.time += dt;
         
@@ -1641,6 +1645,8 @@ export class DiodeTransistor extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime * this.animationSpeed;
         this.calculateCurrent();
         

@@ -188,6 +188,8 @@ export class WaveParticleDuality extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 5; // Increased multiplier for better responsiveness
         this.time += dt;
         this.phase += dt * this.frequency;

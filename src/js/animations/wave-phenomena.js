@@ -128,9 +128,9 @@ export class WavePropagation extends BaseAnimation {
     }
     
     update(deltaTime) {
-        // Reduced speed for better observation
-        const speedMultiplier = this.waveType === 'longitudinal' ? 0.5 : 2;
-        const dt = (deltaTime / 1000) * this.speed * speedMultiplier;
+        // Don't call super.update() to avoid double time increment
+        // Use deltaTime directly - speed multiplier is already applied by main controller
+        const dt = (deltaTime / 1000) * this.speed;
         this.time += dt;
         
         this.particles.forEach((particle, index) => {
@@ -546,15 +546,9 @@ export class SoundWaves extends BaseAnimation {
         this.pulses = [];
         this.pulseDuration = 15; // much longer duration to ensure wave reaches receiver
         
-        // Control button properties
-        this.isPlaying = false;
-        this.controlButtons = {
-            playPause: { x: 220, y: 20, width: 80, height: 30, label: '▶ Play' },
-            reset: { x: 310, y: 20, width: 60, height: 30, label: '🔄 Reset' }
-        };
+        // Control button properties - using standardized controls from BaseAnimation
         
         this.initializeParticles();
-        this.setupClickEvents();
         
         // Musical note frequencies (Hz)
         this.musicalNotes = {
@@ -567,71 +561,6 @@ export class SoundWaves extends BaseAnimation {
             'B4': 493.88,
             'C5': 523.25
         };
-    }
-    
-    setupClickEvents() {
-        // Add click event listener to canvas for triggering wave pulses
-        this.ctx.canvas.addEventListener('click', (e) => {
-            const rect = this.ctx.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Check if click is near the source
-            const distanceFromSource = Math.sqrt((x - this.sourceX) ** 2 + (y - this.sourceY) ** 2);
-            if (distanceFromSource < 50) {
-                this.triggerWavePulse();
-            }
-        });
-        
-        // Add touch event listener for mobile support
-        this.ctx.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const rect = this.ctx.canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            
-            // Check if touch is near the source
-            const distanceFromSource = Math.sqrt((x - this.sourceX) ** 2 + (y - this.sourceY) ** 2);
-            if (distanceFromSource < 50) {
-                this.triggerWavePulse();
-            }
-        });
-    }
-    
-    handleButtonClick(x, y) {
-        // Check if click is on any control button
-        Object.keys(this.controlButtons).forEach(key => {
-            const button = this.controlButtons[key];
-            if (x >= button.x && x <= button.x + button.width &&
-                y >= button.y && y <= button.y + button.height) {
-                this.handleControlAction(key);
-            }
-        });
-    }
-    
-    handleControlAction(action) {
-        switch (action) {
-            case 'playPause':
-                if (this.isPlaying) {
-                    // Currently playing, so pause
-                    this.isPlaying = false;
-                    this.controlButtons.playPause.label = '▶ Play';
-                } else {
-                    // Currently paused, so play
-                    this.isPlaying = true;
-                    this.controlButtons.playPause.label = '⏸ Pause';
-                    this.triggerWavePulse();
-                }
-                break;
-            case 'reset':
-                this.isPlaying = false;
-                this.pulses = [];
-                this.time = 0;
-                this.initializeParticles();
-                this.controlButtons.playPause.label = '▶ Play';
-                break;
-        }
     }
     
     initializeParticles() {
@@ -745,15 +674,18 @@ export class SoundWaves extends BaseAnimation {
         this.time = 0;
         this.pulses = [];
         this.initializeParticles();
+        super.reset(); // Call parent reset to handle standardized controls
     }
     
     update(deltaTime) {
-        // Only update if playing
-        if (!this.isPlaying) {
-            return;
-        }
+        super.update(deltaTime); // Call parent update to handle standardized controls
         
         this.time += deltaTime * this.animationSpeed;
+        
+        // Automatically trigger wave pulses when animation is playing
+        if (this.isPlaying && this.pulses.length === 0) {
+            this.triggerWavePulse();
+        }
         
         // Update pulses - remove expired ones
         this.pulses = this.pulses.filter(pulse => {
@@ -892,53 +824,15 @@ export class SoundWaves extends BaseAnimation {
                     break;
             }
         } else {
-            // Show instruction when no wave is active
-            this.drawInstruction();
+            // No wave is active - animation is paused
         }
         
         // Always show info panels
         this.drawSoundInfo();
         
-        // Draw control buttons
-        this.drawControlButtons();
-        
         // Draw wave packet boundaries if wave is active
         this.drawWavePacketBoundaries();
         
-    }
-    
-    drawInstruction() {
-        // Draw instruction at bottom of canvas
-        const y = this.ctx.canvas.height - 30;
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(this.ctx.canvas.width / 2 - 150, y - 15, 300, 30);
-        
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🎵 Click the red source to start!', this.ctx.canvas.width / 2, y);
-    }
-    
-    drawControlButtons() {
-        // Draw control buttons at top left
-        Object.keys(this.controlButtons).forEach(key => {
-            const button = this.controlButtons[key];
-            
-            // Button background
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            this.ctx.fillRect(button.x, button.y, button.width, button.height);
-            
-            // Button border
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeRect(button.x, button.y, button.width, button.height);
-            
-            // Button text
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = 'bold 10px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(button.label, button.x + button.width / 2, button.y + button.height / 2 + 3);
-        });
     }
     
     drawBackground() {
@@ -1189,13 +1083,6 @@ export class SoundWaves extends BaseAnimation {
     
         
     drawSourceAndReceiver() {
-        // Draw clickable area indicator (for debugging)
-        this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.arc(this.sourceX, this.sourceY, 50, 0, Math.PI * 2);
-        this.ctx.stroke();
-        
         // Draw source (speaker/microphone)
         this.ctx.fillStyle = this.sourceActive ? '#FF6B6B' : '#666666';
         this.ctx.beginPath();

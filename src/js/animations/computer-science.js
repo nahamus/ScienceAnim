@@ -757,6 +757,8 @@ export class NeuralNetwork extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         if (this.isTestingMode) {
             this.updateTesting(deltaTime);
             return;
@@ -2334,7 +2336,7 @@ export class MemoryManagement extends BaseAnimation {
         this.animationState = 'idle'; // idle, executing, allocating, accessing, deallocating, calling, returning
         this.animationTime = 0;
         this.executionSpeed = 1.0;
-        this.isAutoRunning = false; // Start paused so users can control execution
+        // isPlaying is handled by BaseAnimation standardized controls
         
         // Speed control
         this.animationSpeed = 2.0; // 0.1 to 3.0 - Increased default speed for better engagement
@@ -2388,7 +2390,7 @@ export class MemoryManagement extends BaseAnimation {
     }
     
     setupCanvasEventListeners() {
-        // Store bound handlers so we can remove them later if needed
+        // Mouse move for button hover effects
         this.boundMouseMoveHandler = (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
@@ -2408,6 +2410,10 @@ export class MemoryManagement extends BaseAnimation {
             }
         };
         
+        // Mouse move for hover effects
+        this.canvas.addEventListener('mousemove', this.boundMouseMoveHandler);
+        
+        // Mouse click for button actions
         this.boundClickHandler = (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
@@ -2422,31 +2428,49 @@ export class MemoryManagement extends BaseAnimation {
             }
         };
         
-        // Mouse move for hover effects
-        this.canvas.addEventListener('mousemove', this.boundMouseMoveHandler);
-        
-        // Mouse click for button actions
         this.canvas.addEventListener('click', this.boundClickHandler);
     }
     
     handleButtonClick(buttonId) {
         switch (buttonId) {
             case 'play':
-                this.isAutoRunning = !this.isAutoRunning;
+                this.isPlaying = !this.isPlaying;
                 // If resuming and we're at the end, restart
-                if (this.isAutoRunning && this.currentFunction === 0 && 
+                if (this.isPlaying && this.currentFunction === 0 && 
                     this.currentLine >= this.program.functions[0].lines.length) {
                     this.resetExecution();
-                    this.isAutoRunning = true;
+                    this.isPlaying = true;
                 }
                 break;
             case 'step':
                 // Pause auto-running when stepping manually
-                this.isAutoRunning = false;
+                this.isPlaying = false;
                 // Execute next step regardless of animation state
                 if (this.animationState === 'idle' || this.animationState === 'executing') {
                     this.animationState = 'idle'; // Force idle state
                     this.executeNextStep();
+                }
+                break;
+            case 'reset':
+                this.resetExecution();
+                break;
+            case 'speed':
+                this.currentSpeedIndex = (this.currentSpeedIndex + 1) % this.speedOptions.length;
+                this.animationSpeed = this.speedOptions[this.currentSpeedIndex];
+                break;
+        }
+    }
+    
+    // Override BaseAnimation's handleControlAction to handle custom buttons
+    handleControlAction(action) {
+        switch (action) {
+            case 'playPause':
+                this.isPlaying = !this.isPlaying;
+                // If resuming and we're at the end, restart
+                if (this.isPlaying && this.currentFunction === 0 && 
+                    this.currentLine >= this.program.functions[0].lines.length) {
+                    this.resetExecution();
+                    this.isPlaying = true;
                 }
                 break;
             case 'reset':
@@ -2468,7 +2492,7 @@ export class MemoryManagement extends BaseAnimation {
         this.callStack = [];
         this.highlightedLine = 0;
         this.animationState = 'idle';
-        this.isAutoRunning = false;
+        this.isPlaying = false; // Use standardized isPlaying
         
         // Reset memory
         this.heapBlocks = [];
@@ -2525,7 +2549,7 @@ export class MemoryManagement extends BaseAnimation {
     
     startExecution() {
         // Don't auto-start - keep paused until user clicks play
-        this.isAutoRunning = false;
+        this.isPlaying = false; // Use standardized isPlaying
         this.animationState = 'idle';
         this.executionStep = 0;
     }
@@ -2572,7 +2596,7 @@ export class MemoryManagement extends BaseAnimation {
         if (this.currentFunction === 0 && this.currentLine >= currentFunc.lines.length && this.callStack.length === 0) {
             // We're at the very end of the main function, mark as complete
             this.output.push(`✅ Program execution complete`);
-            this.isAutoRunning = false;
+            this.isPlaying = false; // Use standardized isPlaying
             this.animationState = 'idle';
             
             // Add completion celebration particles
@@ -2795,7 +2819,7 @@ export class MemoryManagement extends BaseAnimation {
             if (this.currentFunction === 0 && this.currentLine >= currentFunc.lines.length) {
                 // We're at the end of main function, mark as complete
                 this.output.push(`✅ Program execution complete`);
-                this.isAutoRunning = false;
+                this.isPlaying = false; // Use standardized isPlaying
                 this.animationState = 'idle';
                 
                 // Add completion celebration particles
@@ -2815,7 +2839,7 @@ export class MemoryManagement extends BaseAnimation {
         } else {
             // Program finished
             this.output.push(`✅ Program execution complete`);
-            this.isAutoRunning = false;
+            this.isPlaying = false; // Use standardized isPlaying
         }
     }
     
@@ -3541,10 +3565,12 @@ export class MemoryManagement extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = deltaTime / 1000;
         
-        // Automatic execution
-        if (this.isAutoRunning && this.animationState === 'idle') {
+        // Automatic execution - use standardized isPlaying instead of isAutoRunning
+        if (this.isPlaying && this.animationState === 'idle') {
             this.animationTime += dt;
             if (this.animationTime >= 0.5 / this.animationSpeed) {
                 this.executeNextStep();
@@ -3792,7 +3818,7 @@ export class MemoryManagement extends BaseAnimation {
             
             // Special handling for play/pause button
             if (button.id === 'play') {
-                this.ctx.fillText(this.isAutoRunning ? '⏸' : '▶', button.x + button.width / 2, button.y + button.height / 2);
+                this.ctx.fillText(this.isPlaying ? '⏸' : '▶', button.x + button.width / 2, button.y + button.height / 2);
             } else if (button.id === 'speed') {
                 this.ctx.font = 'bold 11px Arial';
                 this.ctx.fillText(`${this.speedOptions[this.currentSpeedIndex]}x`, button.x + button.width / 2, button.y + button.height / 2);

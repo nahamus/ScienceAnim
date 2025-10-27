@@ -190,9 +190,6 @@ export class ScientificAnimations {
             this.applyControlValues();
             // Don't call resetAnimation() as it resets to defaults
             // The applyControlValues already reinitializes with the new settings
-            this.isRunning = true;
-            const playBtn = document.getElementById('playPauseBtn');
-            if (playBtn) playBtn.textContent = 'Pause';
             closeControls();
         });
         if (cancelBtn) cancelBtn.addEventListener('click', closeControls);
@@ -244,19 +241,8 @@ export class ScientificAnimations {
         });
 
         
-        // Control buttons (optional presence)
-        const playPauseBtnEl = document.getElementById('playPauseBtn');
-        if (playPauseBtnEl) {
-            playPauseBtnEl.addEventListener('click', () => {
-            this.togglePlayPause();
-        });
-        }
-        const resetBtnEl = document.getElementById('resetBtn');
-        if (resetBtnEl) {
-            resetBtnEl.addEventListener('click', () => {
-            this.resetAnimation();
-        });
-        }
+        // Control buttons (optional presence) - Now using standardized on-canvas controls
+        // Old control buttons removed in favor of standardized controls
         // Learn More button (now in stats area)
         const learnMoreBtnEl = document.getElementById('learnMoreBtn');
         if (learnMoreBtnEl) {
@@ -513,6 +499,21 @@ export class ScientificAnimations {
         
         // Removed addMagnetBtn and clearMagnetsBtn event listeners
         
+        // Canvas mouse move for hover effects on control buttons
+        this.canvas.addEventListener('mousemove', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            // Handle hover effects for standardized control buttons
+            const currentAnimation = this.getCurrentAnimationInstance();
+            if (currentAnimation && currentAnimation.handleMouseMove) {
+                currentAnimation.handleMouseMove(x, y);
+            }
+        });
+        
         // Canvas click for adding charges, magnets, toggling switch, starting diffusion, and neural network testing
         this.canvas.addEventListener('click', (e) => {
             const rect = this.canvas.getBoundingClientRect();
@@ -521,6 +522,12 @@ export class ScientificAnimations {
             const x = (e.clientX - rect.left) * scaleX;
             const y = (e.clientY - rect.top) * scaleY;
             
+            // First check for standardized control buttons on all animations
+            const currentAnimation = this.getCurrentAnimationInstance();
+            if (currentAnimation && currentAnimation.handleButtonClick && currentAnimation.handleButtonClick(x, y)) {
+                return; // Control button was clicked, don't process other clicks
+            }
+            
             if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
                 this.electricFields.addChargeAtPosition(chargeType, x, y);
@@ -528,8 +535,6 @@ export class ScientificAnimations {
                 // Add complete magnet with both poles
                 this.magneticFields.addMagnetAtPosition(x, y);
 
-            } else if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
-                this.diffusion.startDiffusion();
             } else if (this.currentAnimation === 'sound-waves') {
                 // Check for control button clicks first
                 this.soundWaves.handleButtonClick(x, y);
@@ -678,9 +683,7 @@ export class ScientificAnimations {
             const y = (touch.clientY - rect.top) * scaleY;
             
             // Handle different animations based on current animation
-            if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
-                this.diffusion.startDiffusion();
-            } else if (this.currentAnimation === 'electric-fields') {
+            if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
                 this.electricFields.addChargeAtPosition(chargeType, x, y);
             } else if (this.currentAnimation === 'magnetic-fields') {
@@ -1283,10 +1286,53 @@ export class ScientificAnimations {
         }
     }
     
-    togglePlayPause() {
-        this.isRunning = !this.isRunning;
-        const btn = document.getElementById('playPauseBtn');
-        btn.textContent = this.isRunning ? 'Pause' : 'Play';
+    /**
+     * Get the current animation instance based on currentAnimation property
+     * @returns {BaseAnimation|null} - The current animation instance
+     */
+    getCurrentAnimationInstance() {
+        switch(this.currentAnimation) {
+            case 'brownian':
+                return this.brownianMotion;
+            case 'pendulum':
+                return this.pendulum;
+            case 'diffusion':
+                return this.diffusion;
+            case 'waves':
+                return this.waves;
+            case 'orbital':
+                return this.orbital;
+            case 'electric-fields':
+                return this.electricFields;
+            case 'gas-laws':
+                return this.gasLaws;
+            case 'collisions':
+                return this.collisions;
+            case 'friction':
+                return this.friction;
+            case 'magnetic-fields':
+                return this.magneticFields;
+            case 'wave-particle-duality':
+                return this.waveParticleDuality;
+            case 'nuclear-reactions':
+                return this.nuclearReactions;
+            case 'fluid-flow':
+                return this.fluidFlow;
+            case 'bernoulli':
+                return this.bernoulli;
+            case 'sound-waves':
+                return this.soundWaves;
+            case 'diode-transistor':
+                return this.diodeTransistor;
+            case 'neural-network':
+                return this.neuralNetwork;
+            case 'memory-management':
+                return this.memoryManagement;
+            case 'blockchain':
+                return this.blockchain;
+            default:
+                return null;
+        }
     }
     
     applyControlValues() {
@@ -1493,11 +1539,6 @@ export class ScientificAnimations {
     }
     
     animate(currentTime = 0) {
-        if (!this.isRunning) {
-            requestAnimationFrame((time) => this.animate(time));
-            return;
-        }
-        
         // Initialize lastTime on first frame
         if (this.lastTime === undefined) {
             this.lastTime = currentTime;
@@ -1506,123 +1547,242 @@ export class ScientificAnimations {
         const deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;
         
+        // Get current animation instance and check if it's playing
+        const currentAnimationInstance = this.getCurrentAnimationInstance();
+        if (currentAnimationInstance && !currentAnimationInstance.isAnimationPlaying()) {
+            // Animation is paused, but we still need to render the static frame and controls
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            // Render the current animation (static frame)
+            switch(this.currentAnimation) {
+                case 'brownian':
+                    this.brownianMotion.render();
+                    this.updateBrownianStats();
+                    break;
+                case 'pendulum':
+                    this.pendulum.render();
+                    this.updatePendulumStats();
+                    break;
+                case 'diffusion':
+                    this.diffusion.render();
+                    this.updateDiffusionStats();
+                    break;
+                case 'waves':
+                    this.waves.render();
+                    this.updateWaveStats();
+                    break;
+                case 'orbital':
+                    this.orbital.render();
+                    this.updateOrbitalStats();
+                    break;
+                case 'electric-fields':
+                    this.electricFields.render();
+                    this.updateElectricFieldsStats();
+                    break;
+                case 'gas-laws':
+                    this.gasLaws.render();
+                    this.updateGasLawsStats();
+                    break;
+                case 'collisions':
+                    this.collisions.render();
+                    this.updateCollisionStats();
+                    break;
+                case 'friction':
+                    this.friction.render();
+                    this.updateFrictionStats();
+                    break;
+                case 'magnetic-fields':
+                    this.magneticFields.render();
+                    this.updateMagneticFieldsStats();
+                    break;
+                case 'wave-particle-duality':
+                    this.waveParticleDuality.render();
+                    this.updateWaveParticleDualityStats();
+                    break;
+                case 'nuclear-reactions':
+                    this.nuclearReactions.render();
+                    break;
+                case 'fluid-flow':
+                    if (this.fluidFlow) {
+                        this.fluidFlow.render();
+                        this.updateFluidFlowStats();
+                    }
+                    break;
+                case 'bernoulli':
+                    if (this.bernoulli) {
+                        this.bernoulli.render();
+                        this.updateBernoulliStats();
+                    }
+                    break;
+                case 'sound-waves':
+                    if (this.soundWaves) {
+                        this.soundWaves.render();
+                        this.updateSoundWavesStats();
+                    }
+                    break;
+                case 'diode-transistor':
+                    if (this.diodeTransistor) {
+                        this.diodeTransistor.render();
+                        this.updateDiodeTransistorStats();
+                    }
+                    break;
+                case 'neural-network':
+                    if (this.neuralNetwork) {
+                        this.neuralNetwork.render();
+                        this.updateNeuralNetworkStats();
+                    }
+                    break;
+                case 'memory-management':
+                    if (this.memoryManagement) {
+                        this.memoryManagement.render();
+                        this.updateMemoryManagementStats();
+                    }
+                    break;
+                case 'blockchain':
+                    if (this.blockchain) {
+                        this.blockchain.render();
+                        this.updateBlockchainStats();
+                    } else {
+                        console.error('Blockchain instance not found!');
+                    }
+                    break;
+            }
+            
+            // Draw standardized control buttons for all animations
+            if (currentAnimationInstance && currentAnimationInstance.drawControlButtons) {
+                currentAnimationInstance.drawControlButtons();
+            }
+            
+            requestAnimationFrame((time) => this.animate(time));
+            return;
+        }
+        
+        // Apply speed multiplier if available
+        const speedMultiplier = currentAnimationInstance ? currentAnimationInstance.getSpeedMultiplier() : 1;
+        const adjustedDeltaTime = deltaTime * speedMultiplier;
+        
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Update and render current animation
         switch(this.currentAnimation) {
             case 'brownian':
-                this.brownianMotion.update(deltaTime);
+                this.brownianMotion.update(adjustedDeltaTime);
                 this.brownianMotion.render();
                 this.updateBrownianStats();
                 break;
             case 'pendulum':
-                this.pendulum.update(deltaTime);
+                this.pendulum.update(adjustedDeltaTime);
                 this.pendulum.render();
                 this.updatePendulumStats();
                 break;
             case 'diffusion':
-                this.diffusion.update(deltaTime);
+                this.diffusion.update(adjustedDeltaTime);
                 this.diffusion.render();
                 this.updateDiffusionStats();
                 break;
             case 'waves':
-                this.waves.update(deltaTime);
+                this.waves.update(adjustedDeltaTime);
                 this.waves.render();
                 this.updateWaveStats();
                 break;
             case 'orbital':
-                this.orbital.update(deltaTime);
+                this.orbital.update(adjustedDeltaTime);
                 this.orbital.render();
                 this.updateOrbitalStats();
                 break;
             case 'electric-fields':
-                this.electricFields.update(deltaTime);
+                this.electricFields.update(adjustedDeltaTime);
                 this.electricFields.render();
                 this.updateElectricFieldsStats();
                 break;
             case 'gas-laws':
-                this.gasLaws.update(deltaTime);
+                this.gasLaws.update(adjustedDeltaTime);
                 this.gasLaws.render();
                 this.updateGasLawsStats();
                 break;
             case 'collisions':
-                this.collisions.update(deltaTime);
+                this.collisions.update(adjustedDeltaTime);
                 this.collisions.render();
                 this.updateCollisionStats();
                 break;
             case 'friction':
-                this.friction.update(deltaTime);
+                this.friction.update(adjustedDeltaTime);
                 this.friction.render();
                 this.updateFrictionStats();
                 break;
 
             case 'magnetic-fields':
-                this.magneticFields.update(deltaTime);
+                this.magneticFields.update(adjustedDeltaTime);
                 this.magneticFields.render();
                 this.updateMagneticFieldsStats();
                 break;
 
             case 'wave-particle-duality':
-                this.waveParticleDuality.update(deltaTime);
+                this.waveParticleDuality.update(adjustedDeltaTime);
                 this.waveParticleDuality.render();
                 this.updateWaveParticleDualityStats();
                 break;
             case 'nuclear-reactions':
-                this.nuclearReactions.update(deltaTime);
+                this.nuclearReactions.update(adjustedDeltaTime);
                 this.nuclearReactions.render();
                 break;
             case 'fluid-flow':
                 if (this.fluidFlow) {
-                    this.fluidFlow.update(deltaTime);
+                    this.fluidFlow.update(adjustedDeltaTime);
                     this.fluidFlow.render();
                     this.updateFluidFlowStats();
                 }
                 break;
             case 'bernoulli':
                 if (this.bernoulli) {
-                    this.bernoulli.update(deltaTime);
+                    this.bernoulli.update(adjustedDeltaTime);
                     this.bernoulli.render();
                     this.updateBernoulliStats();
                 }
                 break;
             case 'sound-waves':
                 if (this.soundWaves) {
-                    this.soundWaves.update(deltaTime);
+                    this.soundWaves.update(adjustedDeltaTime);
                     this.soundWaves.render();
                     this.updateSoundWavesStats();
                 }
                 break;
             case 'diode-transistor':
                 if (this.diodeTransistor) {
-                    this.diodeTransistor.update(deltaTime);
+                    this.diodeTransistor.update(adjustedDeltaTime);
                     this.diodeTransistor.render();
                     this.updateDiodeTransistorStats();
                 }
                 break;
             case 'neural-network':
                 if (this.neuralNetwork) {
-                    this.neuralNetwork.update(deltaTime);
+                    this.neuralNetwork.update(adjustedDeltaTime);
                     this.neuralNetwork.render();
                     this.updateNeuralNetworkStats();
                 }
                 break;
             case 'memory-management':
                 if (this.memoryManagement) {
-                    this.memoryManagement.update(deltaTime);
+                    this.memoryManagement.update(adjustedDeltaTime);
                     this.memoryManagement.render();
                     this.updateMemoryManagementStats();
                 }
                 break;
             case 'blockchain':
                 if (this.blockchain) {
-                    this.blockchain.update(deltaTime);
+                    this.blockchain.update(adjustedDeltaTime);
                     this.blockchain.render();
                     this.updateBlockchainStats();
                 } else {
                     console.error('Blockchain instance not found!');
                 }
                 break;
+        }
+        
+        // Draw standardized control buttons for all animations
+        if (currentAnimationInstance && currentAnimationInstance.drawControlButtons) {
+            currentAnimationInstance.drawControlButtons();
         }
         
         requestAnimationFrame((time) => this.animate(time));

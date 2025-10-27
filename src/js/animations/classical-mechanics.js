@@ -91,6 +91,8 @@ export class Pendulum extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed;
         const simulationRate = 10.0; // Speed up pendulum evolution while keeping correct dynamics
@@ -571,12 +573,7 @@ export class OrbitalMotion extends BaseAnimation {
         this.showVelocityVector = false;
         this.showKeplerInfo = false;
         
-        // Animation state
-        this.isPlaying = true;
-        this.controlButtons = {
-            playPause: { x: 20, y: 20, width: 80, height: 30, label: '⏸ Pause' },
-            reset: { x: 110, y: 20, width: 60, height: 30, label: '🔄 Reset' }
-        };
+        // Animation state - using standardized controls from BaseAnimation
         
         // Visual enhancements
         this.orbitalTrail = [];
@@ -621,84 +618,6 @@ export class OrbitalMotion extends BaseAnimation {
         });
     }
     
-    handleButtonClick(x, y) {
-        const buttons = this.controlButtons;
-        
-        // Calculate dynamic button positions (same logic as drawControlButtons)
-        const maxX = this.ctx.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
-        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
-        const resetX = playPauseX + buttons.playPause.width + 10;
-        
-        // Check play/pause button
-        if (x >= playPauseX && x <= playPauseX + buttons.playPause.width &&
-            y >= buttons.playPause.y && y <= buttons.playPause.y + buttons.playPause.height) {
-            this.handleControlAction('playPause');
-            return true;
-        }
-        
-        // Check reset button
-        if (x >= resetX && x <= resetX + buttons.reset.width &&
-            y >= buttons.reset.y && y <= buttons.reset.y + buttons.reset.height) {
-            this.handleControlAction('reset');
-            return true;
-        }
-        
-        return false;
-    }
-    
-    handleControlAction(action) {
-        if (action === 'playPause') {
-            this.isPlaying = !this.isPlaying;
-            this.controlButtons.playPause.label = this.isPlaying ? '⏸ Pause' : '▶ Play';
-        } else if (action === 'reset') {
-            this.isPlaying = true;
-            this.controlButtons.playPause.label = '⏸ Pause';
-            this.reset();
-        }
-    }
-    
-    drawControlButtons() {
-        const buttons = this.controlButtons;
-        
-        // Calculate dynamic button positions to ensure they stay within canvas bounds
-        const maxX = this.ctx.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
-        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
-        const resetX = playPauseX + buttons.playPause.width + 10;
-        
-        // Play/Pause button
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
-        
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(buttons.playPause.label, 
-            playPauseX + buttons.playPause.width / 2, 
-            buttons.playPause.y + buttons.playPause.height / 2);
-        this.ctx.restore();
-        
-        // Reset button
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
-        
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(buttons.reset.label, 
-            resetX + buttons.reset.width / 2, 
-            buttons.reset.y + buttons.reset.height / 2);
-        this.ctx.restore();
-    }
 
     calculateOrbitalParameters() {
         // Calculate semi-minor axis from eccentricity
@@ -756,14 +675,11 @@ export class OrbitalMotion extends BaseAnimation {
         this.angle = 0;
         this.orbitalTrail = [];
         this.planetRotation = 0;
-        this.isPlaying = true;
-        this.controlButtons.playPause.label = '⏸ Pause';
+        super.reset(); // Call parent reset to handle standardized controls
     }
     
     update(deltaTime) {
-        if (!this.isPlaying) {
-            return;
-        }
+        super.update(deltaTime); // Call parent update to handle standardized controls
         
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
@@ -1106,9 +1022,6 @@ export class OrbitalMotion extends BaseAnimation {
         // Draw perigee and apogee markers (always visible)
         this.drawKeplerMarkers();
         
-        // Draw control buttons
-        this.drawControlButtons();
-        
         // Draw canvas labels
         this.drawOrbitalLabels();
     }
@@ -1394,6 +1307,8 @@ export class CollisionPhysics extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 5; // Fixed time step calculation
         
         // Update collision effects
@@ -1875,6 +1790,8 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 3; // Increased speed multiplier for more engaging motion
         const angleRad = this.inclineAngle * Math.PI / 180;
         

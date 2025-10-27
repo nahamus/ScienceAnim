@@ -129,6 +129,8 @@ export class FluidFlow extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         
         this.particles.forEach((particle, index) => {
@@ -1554,6 +1556,8 @@ export class Bernoulli extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         
         // Maintain continuous flow by adding new particles

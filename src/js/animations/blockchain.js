@@ -1839,6 +1839,8 @@ export class Blockchain extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         // Store original deltaTime for animations
         const animationDeltaTime = deltaTime;
         
