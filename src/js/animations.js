@@ -317,10 +317,6 @@ export class ScientificAnimations {
             this.brownianMotion.setParticleCount(parseInt(value));
         });
         
-        this.setupSliderControl('speed', 'speedValue', (value) => {
-            this.brownianMotion.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('temperature', 'temperatureValue', (value) => {
             this.brownianMotion.setTemperature(parseFloat(value));
         });
@@ -339,10 +335,6 @@ export class ScientificAnimations {
         // Pendulum Controls
         this.setupSliderControl('pendulumLength', 'pendulumLengthValue', (value) => {
             this.pendulum.setLength(parseInt(value));
-        });
-        
-        this.setupSliderControl('pendulumSpeed', 'pendulumSpeedValue', (value) => {
-            this.pendulum.setSpeed(parseFloat(value));
         });
         
         this.setupSliderControl('initialAngle', 'initialAngleValue', (value) => {
@@ -367,10 +359,6 @@ export class ScientificAnimations {
         // Diffusion Controls
         this.setupSliderControl('diffusionParticles', 'diffusionParticlesValue', (value) => {
             this.diffusion.setParticleCount(parseInt(value));
-        });
-        
-        this.setupSliderControl('diffusionSpeed', 'diffusionSpeedValue', (value) => {
-            this.diffusion.setSpeed(parseFloat(value));
         });
         
         this.setupSliderControl('diffusionRate', 'diffusionRateValue', (value) => {
@@ -405,10 +393,6 @@ export class ScientificAnimations {
         });
         }
         
-        this.setupSliderControl('waveSpeed', 'waveSpeedValue', (value) => {
-            this.waves.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('waveFrequency', 'waveFrequencyValue', (value) => {
             this.waves.setFrequency(parseFloat(value));
         });
@@ -429,9 +413,6 @@ export class ScientificAnimations {
             this.soundWaves.setFrequency(parseInt(value));
         });
         
-        this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
-            this.soundWaves.setAnimationSpeed(parseFloat(value));
-        });
         
         // Sound waves select and checkbox controls
         const soundWaveTypeSelect = document.getElementById('soundWaveType');
@@ -442,10 +423,6 @@ export class ScientificAnimations {
         }
         
         // Orbital Motion Controls
-        this.setupSliderControl('orbitalSpeed', 'orbitalSpeedValue', (value) => {
-            this.orbital.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('eccentricity', 'eccentricityValue', (value) => {
             this.orbital.setEccentricity(parseFloat(value));
         });
@@ -460,10 +437,6 @@ export class ScientificAnimations {
         });
         
         // Electric Fields Controls
-        this.setupSliderControl('efSpeed', 'efSpeedValue', (value) => {
-            this.electricFields.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('efFieldStrength', 'efFieldStrengthValue', (value) => {
             this.electricFields.setFieldStrength(parseFloat(value));
         });
@@ -477,10 +450,6 @@ export class ScientificAnimations {
 
         
         // Magnetic Fields Controls
-        this.setupSliderControl('magneticSpeed', 'magneticSpeedValue', (value) => {
-            this.magneticFields.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('magneticFieldStrength', 'magneticFieldStrengthValue', (value) => {
             this.magneticFields.setFieldStrength(parseFloat(value));
         });
@@ -558,10 +527,6 @@ export class ScientificAnimations {
         });
         
         // Gas Laws Controls
-        this.setupSliderControl('gasSpeed', 'gasSpeedValue', (value) => {
-            this.gasLaws.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('gasParticleCount', 'gasParticleCountValue', (value) => {
             this.gasLaws.setParticleCount(parseInt(value));
         });
@@ -592,10 +557,6 @@ export class ScientificAnimations {
 
         
         // Collision Physics Controls
-        this.setupSliderControl('collisionSpeed', 'collisionSpeedValue', (value) => {
-            this.collisions.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('ballCount', 'ballCountValue', (value) => {
             this.collisions.setBallCount(parseInt(value));
         });
@@ -622,10 +583,6 @@ export class ScientificAnimations {
         });
         
         // Friction & Inclined Planes Controls
-        this.setupSliderControl('frictionSpeed', 'frictionSpeedValue', (value) => {
-            this.friction.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('inclineAngle', 'inclineAngleValue', (value) => {
             this.friction.setInclineAngle(parseFloat(value));
         });
@@ -732,10 +689,6 @@ export class ScientificAnimations {
             this.updateDualityControls(e.target.value);
         });
         
-        this.setupSliderControl('dualitySpeed', 'dualitySpeedValue', (value) => {
-            this.waveParticleDuality.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('dualityEnergy', 'dualityEnergyValue', (value) => {
             this.waveParticleDuality.setPhotonEnergy(parseFloat(value));
         });
@@ -757,10 +710,6 @@ export class ScientificAnimations {
         // Initialize duality controls based on current mode
         const initialMode = document.getElementById('dualityMode').value;
         this.updateDualityControls(initialMode);
-        
-        this.setupSliderControl('nuclearSpeed', 'nuclearSpeedValue', (value) => {
-            this.nuclearReactions.setSpeed(parseFloat(value));
-        });
         
         this.setupSliderControl('neutronEnergy', 'neutronEnergyValue', (value) => {
             this.nuclearReactions.setNeutronEnergy(parseFloat(value));
@@ -801,10 +750,6 @@ export class ScientificAnimations {
         });
         
         // Sound Waves Controls
-        this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
-            this.soundWaves.setAnimationSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('soundFrequency', 'soundFrequencyValue', (value) => {
             this.soundWaves.setFrequency(parseInt(value));
         });
@@ -861,22 +806,10 @@ export class ScientificAnimations {
             }
         });
         
-        this.setupSliderControl('diodeAnimationSpeed', 'diodeAnimationSpeedValue', (value) => {
-            if (this.diodeTransistor) {
-                this.diodeTransistor.setAnimationSpeed(parseFloat(value));
-            }
-        });
-        
         // Neural Network Controls
         this.setupSliderControl('neuralLearningRate', 'neuralLearningRateValue', (value) => {
             if (this.neuralNetwork) {
                 this.neuralNetwork.setLearningRate(parseFloat(value));
-            }
-        });
-        
-        this.setupSliderControl('neuralSpeed', 'neuralSpeedValue', (value) => {
-            if (this.neuralNetwork) {
-                this.neuralNetwork.setSpeed(parseFloat(value));
             }
         });
         
@@ -895,12 +828,6 @@ export class ScientificAnimations {
         }
 
         // Blockchain Controls
-        this.setupSliderControl('blockchainSpeed', 'blockchainSpeedValue', (value) => {
-            if (this.blockchain) {
-                this.blockchain.setSpeed(parseFloat(value));
-            }
-        });
-        
         this.setupSliderControl('blockchainDifficulty', 'blockchainDifficultyValue', (value) => {
             if (this.blockchain) {
                 this.blockchain.setDifficulty(parseInt(value));
@@ -1225,14 +1152,8 @@ export class ScientificAnimations {
     
     initializeWaveControls() {
         // Synchronize control values with wave parameters
-        const speedSlider = document.getElementById('waveSpeed');
         const frequencySlider = document.getElementById('waveFrequency');
         const amplitudeSlider = document.getElementById('waveAmplitude');
-        
-        if (speedSlider && this.waves) {
-            speedSlider.value = this.waves.speed;
-            document.getElementById('waveSpeedValue').textContent = this.waves.speed + 'x';
-        }
         
         if (frequencySlider && this.waves) {
             frequencySlider.value = this.waves.frequency;
@@ -1254,17 +1175,11 @@ export class ScientificAnimations {
         
         // Synchronize control values with sound waves parameters
         const frequencySlider = document.getElementById('soundFrequency');
-        const animationSpeedSlider = document.getElementById('soundAnimationSpeed');
         const waveTypeSelect = document.getElementById('soundWaveType');
         
         if (frequencySlider && this.soundWaves) {
             frequencySlider.value = this.soundWaves.frequency;
             document.getElementById('soundFrequencyValue').textContent = this.soundWaves.frequency + ' Hz';
-        }
-        
-        if (animationSpeedSlider && this.soundWaves) {
-            animationSpeedSlider.value = this.soundWaves.animationSpeed;
-            document.getElementById('soundAnimationSpeedValue').textContent = this.soundWaves.animationSpeed + 'x';
         }
         
         if (waveTypeSelect && this.soundWaves) {
@@ -1342,22 +1257,18 @@ export class ScientificAnimations {
             case 'brownian':
                 if (this.brownianMotion) {
                     const particleCount = parseInt(document.getElementById('particleCount')?.value);
-                    const speed = parseFloat(document.getElementById('speed')?.value);
                     const temperature = parseFloat(document.getElementById('temperature')?.value);
                     if (!isNaN(particleCount)) this.brownianMotion.setParticleCount(particleCount);
-                    if (!isNaN(speed)) this.brownianMotion.setSpeed(speed);
                     if (!isNaN(temperature)) this.brownianMotion.setTemperature(temperature);
                 }
                 break;
             case 'pendulum':
                 if (this.pendulum) {
                     const length = parseFloat(document.getElementById('pendulumLength')?.value);
-                    const speed = parseFloat(document.getElementById('pendulumSpeed')?.value);
                     const angle = parseFloat(document.getElementById('initialAngle')?.value);
                     const gravity = parseFloat(document.getElementById('gravity')?.value);
                     const damping = parseFloat(document.getElementById('damping')?.value);
                     if (!isNaN(length)) this.pendulum.setLength(length);
-                    if (!isNaN(speed)) this.pendulum.setSpeed(speed);
                     if (!isNaN(angle)) this.pendulum.setInitialAngle(angle);
                     if (!isNaN(gravity)) this.pendulum.setGravity(gravity);
                     if (!isNaN(damping)) this.pendulum.setDamping(damping);
@@ -1366,10 +1277,8 @@ export class ScientificAnimations {
             case 'diffusion':
                 if (this.diffusion) {
                     const particleCount = parseInt(document.getElementById('diffusionParticles')?.value);
-                    const speed = parseFloat(document.getElementById('diffusionSpeed')?.value);
                     const rate = parseFloat(document.getElementById('diffusionRate')?.value);
                     if (!isNaN(particleCount)) this.diffusion.setParticleCount(particleCount);
-                    if (!isNaN(speed)) this.diffusion.setSpeed(speed);
                     if (!isNaN(rate)) this.diffusion.setDiffusionRate(rate);
                 }
                 break;
@@ -1385,19 +1294,15 @@ export class ScientificAnimations {
                 break;
             case 'orbital':
                 if (this.orbital) {
-                    const speed = parseFloat(document.getElementById('orbitalSpeed')?.value);
                     const eccentricity = parseFloat(document.getElementById('eccentricity')?.value);
-                    if (!isNaN(speed)) this.orbital.setSpeed(speed);
                     if (!isNaN(eccentricity)) this.orbital.setEccentricity(eccentricity);
                 }
                 break;
             case 'gas-laws':
                 if (this.gasLaws) {
-                    const speed = parseFloat(document.getElementById('gasSpeed')?.value);
                     const particleCount = parseInt(document.getElementById('gasParticleCount')?.value);
                     const temperature = parseFloat(document.getElementById('gasTemperature')?.value);
                     const volume = parseFloat(document.getElementById('gasVolume')?.value);
-                    if (!isNaN(speed)) this.gasLaws.setSpeed(speed);
                     if (!isNaN(particleCount)) this.gasLaws.setParticleCount(particleCount);
                     if (!isNaN(temperature)) this.gasLaws.setTemperature(temperature);
                     if (!isNaN(volume)) this.gasLaws.setVolume(volume);
@@ -1405,27 +1310,21 @@ export class ScientificAnimations {
                 break;
             case 'collisions':
                 if (this.collisions) {
-                    const speed = parseFloat(document.getElementById('collisionSpeed')?.value);
                     const ballCount = parseInt(document.getElementById('ballCount')?.value);
-                    if (!isNaN(speed)) this.collisions.setSpeed(speed);
                     if (!isNaN(ballCount)) this.collisions.setBallCount(ballCount);
                 }
                 break;
             case 'friction':
                 if (this.friction) {
-                    const speed = parseFloat(document.getElementById('frictionSpeed')?.value);
                     const coefficient = parseFloat(document.getElementById('frictionCoefficient')?.value);
                     const angle = parseFloat(document.getElementById('inclineAngle')?.value);
-                    if (!isNaN(speed)) this.friction.setSpeed(speed);
                     if (!isNaN(coefficient)) this.friction.setFrictionCoefficient(coefficient);
                     if (!isNaN(angle)) this.friction.setInclineAngle(angle);
                 }
                 break;
             case 'electric-fields':
                 if (this.electricFields) {
-                    const speed = parseFloat(document.getElementById('efSpeed')?.value);
                     const fieldStrength = parseFloat(document.getElementById('efFieldStrength')?.value);
-                    if (!isNaN(speed)) this.electricFields.setSpeed(speed);
                     if (!isNaN(fieldStrength)) this.electricFields.setFieldStrength(fieldStrength);
                 }
                 break;
@@ -1433,10 +1332,8 @@ export class ScientificAnimations {
                 if (this.soundWaves) {
                     const waveType = document.getElementById('soundWaveType')?.value;
                     const frequency = parseFloat(document.getElementById('soundFrequency')?.value);
-                    const animationSpeed = parseFloat(document.getElementById('soundAnimationSpeed')?.value);
                     if (waveType) this.soundWaves.setWaveType(waveType);
                     if (!isNaN(frequency)) this.soundWaves.setFrequency(frequency);
-                    if (!isNaN(animationSpeed)) this.soundWaves.setAnimationSpeed(animationSpeed);
                 }
                 break;
             // Add more cases as needed for other animations
@@ -2154,8 +2051,7 @@ export class ScientificAnimations {
                     frequency: document.getElementById('soundFrequency')?.value || '5',
                     amplitude: document.getElementById('soundAmplitude')?.value || '50',
                     waveSpeed: document.getElementById('soundSpeed')?.value || '343',
-                    particleCount: document.getElementById('soundParticles')?.value || '15',
-                    animationSpeed: document.getElementById('soundAnimationSpeed')?.value || '1.0'
+                    particleCount: document.getElementById('soundParticles')?.value || '15'
                 };
                 state.stats = this.soundWaves?.getStats() || {};
                 break;

@@ -1650,7 +1650,7 @@ export class NeuralNetwork extends BaseAnimation {
         this.drawTechnicalDetails();
         
         // Draw canvas labels
-        // this.drawNetworkLabels(); // Removed neural network training label
+        this.drawNetworkLabels();
         
         // Draw object selection interface
         if (this.isTestingMode) {

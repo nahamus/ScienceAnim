@@ -11,6 +11,7 @@ export class BaseAnimation {
         this.speedMultiplier = 1; // 1x, 2x, 4x speed
         this.speedCycle = [1, 2, 4]; // Speed cycle for the speed button
         this.speedCycleIndex = 0; // Current index in speed cycle
+        this.time = 0; // Time counter for animations and effects
         
         // Control button definitions with Program Execution styling
         this.controlButtons = [
@@ -25,10 +26,10 @@ export class BaseAnimation {
      * Draw labels on the canvas with consistent styling
      * @param {string} title - The animation title to display
      * @param {string} formulas - Mathematical formulas to display
-     * @param {number} titleY - Y position for title (default: 25)
-     * @param {number} formulasY - Y position for formulas (default: 45)
+     * @param {number} titleY - Y position for title (default: 70)
+     * @param {number} formulasY - Y position for formulas (default: 90)
      */
-    drawLabels(title, formulas, titleY = 25, formulasY = 45) {
+    drawLabels(title, formulas, titleY = 70, formulasY = 90) {
         this.ctx.save();
         
         // Scale text for device pixel ratio for crisper rendering
@@ -159,9 +160,17 @@ export class BaseAnimation {
             this.roundRect(button.x, button.y, button.width, button.height, 6);
             this.ctx.fill();
             
-            // Button border
-            this.ctx.strokeStyle = isHovered ? '#7eb3d9' : '#4a6f94';
-            this.ctx.lineWidth = 1.5;
+            // Button border with pulsating effect for play button when running
+            if (button.id === 'playPause' && this.isPlaying) {
+                // Pulsating border effect
+                const pulseIntensity = 0.5 + 0.5 * Math.sin(this.time * 0.01); // Pulsating between 0.5 and 1.0
+                this.ctx.strokeStyle = `rgba(74, 175, 244, ${pulseIntensity})`; // Bright blue with pulsing opacity
+                this.ctx.lineWidth = 2 + pulseIntensity; // Thicker border that pulses
+            } else {
+                // Normal border
+                this.ctx.strokeStyle = isHovered ? '#7eb3d9' : '#4a6f94';
+                this.ctx.lineWidth = 1.5;
+            }
             this.roundRect(button.x, button.y, button.width, button.height, 6);
             this.ctx.stroke();
             

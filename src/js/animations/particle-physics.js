@@ -847,7 +847,7 @@ export class GasLaws extends BaseAnimation {
         for (let i = 0; i < this.particleCount; i++) {
             this.particles.push({
                 x: this.containerX + Math.random() * this.containerWidth,
-                y: this.pistonY + this.volume + Math.random() * (this.volume * 0.8),
+                y: this.pistonY + Math.random() * this.volume,
                 vx: (Math.random() - 0.5) * this.temperature * 0.1,
                 vy: (Math.random() - 0.5) * this.temperature * 0.1
             });

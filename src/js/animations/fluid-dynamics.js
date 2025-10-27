@@ -1751,6 +1751,9 @@ export class Bernoulli extends BaseAnimation {
         
         // Add real-world analogy for beginners
         this.drawBernoulliRealWorldAnalogy();
+        
+        // Draw canvas labels
+        this.drawBernoulliLabels();
     }
     
     drawPipeSystem() {
@@ -2396,5 +2399,12 @@ export class Bernoulli extends BaseAnimation {
             flowEfficiency: Math.min(100, (this.pressureDifference / 2) * 100),
             time: this.time
         };
+    }
+    
+    drawBernoulliLabels() {
+        this.drawLabels(
+            'Bernoulli\'s Principle',
+            'P + ½ρv² + ρgh = constant  |  v² ∝ 1/A  |  ΔP = ½ρ(v₂² - v₁²)'
+        );
     }
 }

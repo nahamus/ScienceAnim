@@ -3375,13 +3375,6 @@ export class Blockchain extends BaseAnimation {
             difficultyValue.textContent = this.difficulty;
         }
         
-        // Reset speed slider
-        const speedSlider = document.getElementById('blockchainSpeed');
-        const speedValue = document.getElementById('blockchainSpeedValue');
-        if (speedSlider && speedValue) {
-            speedSlider.value = this.speed;
-            speedValue.textContent = this.speed + 'x';
-        }
     }
     
     drawMinerBlockConnection() {

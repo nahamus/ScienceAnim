@@ -97,16 +97,10 @@ export class WavePropagation extends BaseAnimation {
         this.calculateWaveParameters();
         
         // Reset controls to match the reset state
-        const speedSlider = document.getElementById('waveSpeed');
         const frequencySlider = document.getElementById('waveFrequency');
         const amplitudeSlider = document.getElementById('waveAmplitude');
         const waveTypeSelect = document.getElementById('waveType');
         const analyticsCheckbox = document.getElementById('waveShowAnalytics');
-        
-        if (speedSlider) {
-            speedSlider.value = this.speed;
-            document.getElementById('waveSpeedValue').textContent = this.speed + 'x';
-        }
         
         if (frequencySlider) {
             frequencySlider.value = this.frequency;
@@ -833,6 +827,9 @@ export class SoundWaves extends BaseAnimation {
         // Draw wave packet boundaries if wave is active
         this.drawWavePacketBoundaries();
         
+        // Draw canvas labels
+        this.drawSoundLabels();
+        
     }
     
     drawBackground() {
@@ -1271,5 +1268,12 @@ export class SoundWaves extends BaseAnimation {
             particleCount: this.particleCount,
             time: this.time
         };
+    }
+    
+    drawSoundLabels() {
+        this.drawLabels(
+            'Sound Waves',
+            'v = f×λ  |  P = ½ρv²  |  I = P/A'
+        );
     }
 }
