@@ -742,7 +742,6 @@ export class Blockchain extends BaseAnimation {
         
         // Start mining the next block after a delay
         setTimeout(() => {
-            console.log(`[DIRECT BLOCK] 🔄 Starting mining for next block`);
             this.startMining();
         }, 2000);
     }

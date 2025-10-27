@@ -844,10 +844,13 @@ export class GasLaws extends BaseAnimation {
     
     initializeParticles() {
         this.particles = [];
+        const containerTop = this.pistonY + 15; // Gas container starts at bottom of piston (piston extends 15px below pistonY)
+        const containerBottom = this.pistonY + this.volume;
+        
         for (let i = 0; i < this.particleCount; i++) {
             this.particles.push({
                 x: this.containerX + Math.random() * this.containerWidth,
-                y: this.pistonY + Math.random() * this.volume,
+                y: containerTop + 10 + Math.random() * (containerBottom - containerTop - 20), // Keep particles away from top and bottom
                 vx: (Math.random() - 0.5) * this.temperature * 0.1,
                 vy: (Math.random() - 0.5) * this.temperature * 0.1
             });
@@ -949,9 +952,12 @@ export class GasLaws extends BaseAnimation {
             }
             
             // Bounce off piston and bottom
-            if (particle.y < this.pistonY || particle.y > this.pistonY + this.volume) {
+            const containerTop = this.pistonY + 15; // Gas container starts at bottom of piston (piston extends 15px below pistonY)
+            const containerBottom = this.pistonY + this.volume;
+            
+            if (particle.y < containerTop || particle.y > containerBottom) {
                 particle.vy *= -0.8;
-                particle.y = Math.max(this.pistonY, Math.min(this.pistonY + this.volume, particle.y));
+                particle.y = Math.max(containerTop, Math.min(containerBottom, particle.y));
                 this.collisionCount++;
             }
             

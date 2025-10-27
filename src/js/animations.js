@@ -349,12 +349,17 @@ export class ScientificAnimations {
             this.pendulum.setDamping(parseFloat(value));
         });
         
-        document.getElementById('pendulumVisualizationMode').addEventListener('change', (e) => {
+        document.getElementById('pendulumVisualizationMode')?.addEventListener('change', (e) => {
             this.updatePendulumVisualization(e.target.value);
         });
         
         // Initialize pendulum visualization mode
-        this.updatePendulumVisualization('basic');
+        const pendulumModeElement = document.getElementById('pendulumVisualizationMode');
+        if (pendulumModeElement) {
+            this.updatePendulumVisualization(pendulumModeElement.value);
+        } else {
+            this.updatePendulumVisualization('basic');
+        }
         
         // Diffusion Controls
         this.setupSliderControl('diffusionParticles', 'diffusionParticlesValue', (value) => {
@@ -377,8 +382,6 @@ export class ScientificAnimations {
             this.updateDiffusionVisualization(e.target.value);
         });
         
-        // Remove the start diffusion button event listener since the button was removed
-        // Diffusion will now start on canvas click/touch
         
         // Initialize diffusion visualization mode
         this.updateDiffusionVisualization('basic');
@@ -445,10 +448,6 @@ export class ScientificAnimations {
             this.electricFields.setParticleCount(parseInt(value));
         });
         
-        // Removed addChargeBtn and clearChargesBtn event listeners
-        
-
-        
         // Magnetic Fields Controls
         this.setupSliderControl('magneticFieldStrength', 'magneticFieldStrengthValue', (value) => {
             this.magneticFields.setFieldStrength(parseFloat(value));
@@ -461,12 +460,6 @@ export class ScientificAnimations {
         document.getElementById('magneticShowFieldLines').addEventListener('change', (e) => {
             this.magneticFields.setShowFieldLines(e.target.checked);
         });
-        
-
-        
-
-        
-        // Removed addMagnetBtn and clearMagnetsBtn event listeners
         
         // Canvas mouse move for hover effects on control buttons
         this.canvas.addEventListener('mousemove', (e) => {
@@ -704,8 +697,6 @@ export class ScientificAnimations {
         document.getElementById('performMeasurementBtn').addEventListener('click', () => {
             this.waveParticleDuality.performMeasurement();
         });
-        
-        // Removed resetDualityBtn event listener - main Reset button handles this
         
         // Initialize duality controls based on current mode
         const initialMode = document.getElementById('dualityMode').value;
@@ -1009,7 +1000,7 @@ export class ScientificAnimations {
             case 'basic':
                 pendulum.setShowPath(false);
                 pendulum.setShowVelocityVectors(false);
-                pendulum.setShowForceVectors(true);
+                pendulum.setShowForceVectors(false); // Don't show force vectors in basic mode
                 pendulum.setShowEnergyInfo(false);
                 pendulum.setShowPhaseSpace(false);
                 break;
@@ -2896,7 +2887,7 @@ export class ScientificAnimations {
                         </div>
                     `
                 };
-                        case 'neural-network':
+            case 'neural-network':
                 return {
                     title: 'Neural Network Training - Object Recognition',
                     html: `
@@ -2943,174 +2934,6 @@ export class ScientificAnimations {
                             <h3>Applications</h3>
                             <ul>
                                 <li>Vision (image classification), NLP (text classification), speech, robotics, medicine, finance.</li>
-                            </ul>
-                        </div>
-                    `
-                };
-            case 'sound-waves':
-                return {
-                    title: 'Sound Waves - Wave Propagation in Air',
-                    html: `
-                        <div class="science-content">
-                            <h3>What are Sound Waves?</h3>
-                            <p>Sound waves are longitudinal mechanical waves that travel through a medium (like air, water, or solids) by compressing and rarefying the particles of the medium. These waves carry energy and information, allowing us to hear sounds.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
-                            <ul>
-                                <li><strong>Longitudinal Waves:</strong> Particles oscillate parallel to wave direction (compression and rarefaction)</li>
-                                <li><strong>Transverse Waves:</strong> Particles oscillate perpendicular to wave direction (like guitar strings)</li>
-                                <li><strong>Wave Properties:</strong> Frequency (pitch), amplitude (loudness), wavelength, and speed</li>
-                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
-                                <li><strong>Pressure Variations:</strong> High pressure (compression) and low pressure (rarefaction) zones</li>
-                            </ul>
-                            
-                            <h3>What You Should Observe</h3>
-                            <ul>
-                                <li><strong>Transverse Mode:</strong> Particles moving up and down like a guitar string</li>
-                                <li><strong>Longitudinal Mode:</strong> Particles moving back and forth in the direction of wave travel</li>
-                                <li><strong>Pressure Zones:</strong> Red areas (compression) and blue areas (rarefaction) in longitudinal waves</li>
-                                <li><strong>Wave Speed:</strong> How fast the wave pattern travels through the medium</li>
-                                <li><strong>Frequency Effect:</strong> Higher frequency = shorter wavelength = higher pitch</li>
-                            </ul>
-                            
-                            <h3>Wave Characteristics</h3>
-                            <ul>
-                                <li><strong>Frequency (f):</strong> Number of complete cycles per second (Hz) - determines pitch</li>
-                                <li><strong>Amplitude (A):</strong> Maximum displacement from equilibrium - determines loudness</li>
-                                <li><strong>Wavelength (λ):</strong> Distance between consecutive identical points</li>
-                                <li><strong>Wave Speed (v):</strong> How fast the wave travels through the medium</li>
-                                <li><strong>Period (T):</strong> Time for one complete cycle (T = 1/f)</li>
-                            </ul>
-                            
-                            <h3>Real-World Applications</h3>
-                            <ul>
-                                <li>Musical instruments (guitar strings, air columns)</li>
-                                <li>Human speech and hearing</li>
-                <li>Ultrasound imaging in medicine</li>
-                                <li>Sonar for underwater detection</li>
-                                <li>Acoustic engineering and sound design</li>
-                                <li>Earthquake detection (seismic waves)</li>
-                            </ul>
-                            
-                            <h3>Mathematical Relationships</h3>
-                            <ul>
-                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
-                                <li><strong>Period and Frequency:</strong> T = 1/f (period = 1/frequency)</li>
-                                <li><strong>Energy:</strong> E ∝ A²f² (energy proportional to amplitude² × frequency²)</li>
-                                <li><strong>Intensity:</strong> I ∝ A² (intensity proportional to amplitude squared)</li>
-                            </ul>
-                            
-                            <h3>Wave Types Comparison</h3>
-                            <ul>
-                                <li><strong>Transverse Waves:</strong> Guitar strings, water waves, light waves</li>
-                                <li><strong>Longitudinal Waves:</strong> Sound waves in air, seismic P-waves</li>
-                                <li><strong>Combined Waves:</strong> Complex wave patterns with both components</li>
-                            </ul>
-                        </div>
-                    `
-                };
-            case 'neural-network':
-                return {
-                    title: 'Neural Network Training - Object Recognition',
-                    html: `
-                        <div class="science-content">
-                            <h3>What are Neural Networks?</h3>
-                            <p>Neural networks are computational models inspired by biological neurons in the brain. They consist of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This animation demonstrates how neural networks learn to recognize and classify different geometric objects.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
-                            <ul>
-                                <li><strong>Artificial Neurons:</strong> Mathematical functions that receive inputs, apply weights, and produce outputs. Each neuron computes: output = σ(Σ(inputs × weights) + bias)</li>
-                                <li><strong>Network Architecture:</strong> Input layer (2 neurons) → Hidden layer 1 (4 neurons) → Hidden layer 2 (3 neurons) → Output layer (1 neuron)</li>
-                            </ul>
-                            
-                            <h3>Why This Architecture?</h3>
-                            <ul>
-                                <li><strong>2 Input Neurons:</strong> Perfect for our 2-feature problem (symmetry, edges)</li>
-                                <li><strong>4 Hidden Neurons:</strong> Provides enough capacity to learn non-linear patterns without overfitting</li>
-                                <li><strong>3 Hidden Neurons:</strong> Allows further feature refinement and abstraction</li>
-                                <li><strong>1 Output Neuron:</strong> Binary classification (simple vs complex objects)</li>
-                            </ul>
-                            
-                            <h3>Layer Size Effects</h3>
-                            <ul>
-                                <li><strong>Too Few Neurons:</strong> Network can't learn complex patterns (underfitting)</li>
-                                <li><strong>Too Many Neurons:</strong> Network memorizes training data (overfitting)</li>
-                                <li><strong>Optimal Size:</strong> Balances learning capacity with generalization</li>
-                                <li><strong>Our Choice:</strong> 4→3 hidden layers provide sufficient complexity for this task</li>
-                            </ul>
-                                <li><strong>Weights & Biases:</strong> Numerical values that determine connection strength and neuron activation thresholds</li>
-                                <li><strong>Sigmoid Activation:</strong> σ(x) = 1/(1 + e^(-x)) - transforms any input to a value between 0 and 1</li>
-                                <li><strong>Backpropagation:</strong> Algorithm that calculates how much each weight should change to reduce prediction errors</li>
-                                <li><strong>Learning Rate:</strong> Controls how big weight updates are during training</li>
-                            </ul>
-                            
-                            <h3>Training Process Explained</h3>
-                            <ol>
-                                <li><strong>Forward Propagation:</strong> Input features flow through the network, each neuron computes its output using weights and activation function</li>
-                                <li><strong>Loss Calculation:</strong> Compare network output with target value using Mean Squared Error: Loss = (target - output)²</li>
-                                <li><strong>Backward Propagation:</strong> Calculate error gradients for each weight using chain rule of calculus</li>
-                                <li><strong>Weight Updates:</strong> Adjust weights using gradient descent: Δw = learning_rate × gradient</li>
-                            </ol>
-                            
-                            <h3>Object Recognition Task</h3>
-                            <p>This network learns to classify geometric objects based on their complexity using 2 features:</p>
-                            <ul>
-                                <li><strong>Feature 1 - Symmetry Score (0-1):</strong> How symmetrical the object is (high = simple)</li>
-                                <li><strong>Feature 2 - Edge Complexity (0-1):</strong> How many edges/corners the object has (high = complex)</li>
-                                <li><strong>Simple Objects:</strong> Circle [0.9,0.1], Square [0.8,0.3] → Output: 0 (classified as simple)</li>
-                                <li><strong>Complex Objects:</strong> Triangle [0.6,0.5], Star [0.3,0.9] → Output: 1 (classified as complex)</li>
-                            </ul>
-                            
-                            <h3>What You Should Observe</h3>
-                            <ul>
-                                <li><strong>Training Mode:</strong> Watch data flow forward (blue particles), errors flow backward (red particles), and weights update (flashing connections)</li>
-                                <li><strong>Testing Mode:</strong> See how the trained network processes new inputs and makes predictions with confidence scores</li>
-                                <li><strong>Visual Indicators:</strong> Active neurons pulse, weight changes are highlighted, and prediction accuracy improves over time</li>
-                                <li><strong>Object Context:</strong> Each training example shows the actual geometric object being learned</li>
-                            </ul>
-                            
-                            <h3>Mathematical Foundation</h3>
-                            <ul>
-                                <li><strong>Neuron Output:</strong> y = σ(w₁x₁ + w₂x₂ + ... + wₙxₙ + b)</li>
-                                <li><strong>Loss Function:</strong> L = (y_target - y_predicted)²</li>
-                                <li><strong>Weight Update:</strong> w_new = w_old - α × ∂L/∂w</li>
-                                <li><strong>Gradient Calculation:</strong> ∂L/∂w = ∂L/∂y × ∂y/∂w (chain rule)</li>
-                            </ul>
-                            
-                            <h3>Real-World Applications</h3>
-                            <ul>
-                                <li><strong>Computer Vision:</strong> Image classification, object detection, facial recognition</li>
-                                <li><strong>Natural Language Processing:</strong> Text classification, language translation, chatbots</li>
-                                <li><strong>Speech Recognition:</strong> Voice assistants, transcription services</li>
-                                <li><strong>Autonomous Systems:</strong> Self-driving cars, robotics, drones</li>
-                                <li><strong>Medical Diagnosis:</strong> Disease detection, medical image analysis</li>
-                                <li><strong>Financial Analysis:</strong> Fraud detection, stock prediction, risk assessment</li>
-                            </ul>
-                            
-                            <h3>Educational Insights</h3>
-                            <ul>
-                                <li><strong>Learning Process:</strong> Neural networks learn by adjusting weights to minimize prediction errors</li>
-                                <li><strong>Feature Learning:</strong> Hidden layers automatically learn useful features from raw input data</li>
-                                <li><strong>Generalization:</strong> Well-trained networks can make accurate predictions on unseen data</li>
-                                <li><strong>Overfitting:</strong> Networks can memorize training data instead of learning general patterns</li>
-                                <li><strong>Hyperparameters:</strong> Learning rate, network architecture, and activation functions affect training success</li>
-                            </ul>
-                            
-                            <h3>Interactive Features</h3>
-                            <ul>
-                                <li><strong>Training Mode:</strong> Watch the network learn through forward/backward propagation cycles</li>
-                                <li><strong>Testing Mode:</strong> Test the trained network on different objects and see predictions</li>
-                                <li><strong>Parameter Control:</strong> Adjust learning rate and animation speed to observe different training behaviors</li>
-                                <li><strong>Visual Feedback:</strong> See real-time loss, accuracy, and confidence metrics</li>
-                            </ul>
-                            
-                            <h3>Advanced Concepts</h3>
-                            <ul>
-                                <li><strong>Gradient Descent:</strong> Optimization algorithm that finds the best weights by following the steepest descent</li>
-                                <li><strong>Vanishing Gradients:</strong> Problem where gradients become very small in deep networks</li>
-                                <li><strong>Regularization:</strong> Techniques to prevent overfitting (dropout, weight decay)</li>
-                                <li><strong>Batch Processing:</strong> Training on multiple examples simultaneously for better gradient estimates</li>
-                                <li><strong>Transfer Learning:</strong> Using pre-trained networks for new tasks</li>
                             </ul>
                         </div>
                     `

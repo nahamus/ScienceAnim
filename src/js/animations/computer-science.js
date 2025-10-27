@@ -1729,8 +1729,6 @@ export class NeuralNetwork extends BaseAnimation {
         this.ctx.restore();
     }
 
-    // Removed mini-plots for simplicity
-    
     drawObjectContext() {
         const objectX = 20;
         const objectY = this.ctx.canvas.height - 100;
@@ -3845,30 +3843,6 @@ export class MemoryManagement extends BaseAnimation {
     }
     
     drawCodePanel() {
-        // Code panel background with shadow
-        for (let i = 0; i < 20; i++) {
-            const x = (i * 137.5) % this.canvas.width;
-            const y = (i * 73.3 + this.animationTime * 10) % this.canvas.height;
-            const alpha = 0.3 + 0.2 * Math.sin(this.animationTime * 2 + i);
-            
-            this.ctx.fillStyle = `rgba(46, 204, 113, ${alpha})`;
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, 1, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-        
-        // Add subtle radial glow effect
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.8;
-        const radialGradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-        radialGradient.addColorStop(0, 'rgba(46, 204, 113, 0.05)');
-        radialGradient.addColorStop(1, 'rgba(46, 204, 113, 0)');
-        this.ctx.fillStyle = radialGradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-    
-    drawCodePanel() {
         // Code panel background with enhanced shadow
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         this.ctx.fillRect(this.codePanel.x + 4, this.codePanel.y + 4, this.codePanel.width, this.codePanel.height);
@@ -4608,14 +4582,6 @@ export class MemoryManagement extends BaseAnimation {
                 this.runGarbageCollection();
             }
         }
-    }
-    
-    // handleButtonClick moved earlier in the class - removed duplicate
-    
-    resetExecution() {
-        this.initializeExecution();
-        this.startExecution();
-        this.resetPerformanceMetrics();
     }
     
     reset() {

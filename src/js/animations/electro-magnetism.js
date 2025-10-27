@@ -709,7 +709,7 @@ export class MagneticFields extends BaseAnimation {
         const lineLength = 150;
         
         // Create a grid of starting points
-        const gridSize = 8;
+        const gridSize = 12; // Increased from 8 to 12 for more field lines
         const stepX = this.ctx.canvas.width / gridSize;
         const stepY = this.ctx.canvas.height / gridSize;
         
@@ -737,7 +737,7 @@ export class MagneticFields extends BaseAnimation {
         
         // Combined field line color: high-contrast cyan
         this.ctx.strokeStyle = '#00D1FF';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 1; // Reduced thickness for cleaner appearance
         this.ctx.lineCap = 'round';
         
         this.ctx.beginPath();
@@ -2448,65 +2448,6 @@ export class DiodeTransistor extends BaseAnimation {
             this.ctx.arc(spark.x, spark.y, 2, 0, Math.PI * 2);
             this.ctx.fill();
         });
-    }
-    
-    drawCurrentFlow() {
-        if (!this.showCurrent || !this.isActive) return;
-        
-        const time = this.time * 0.001;
-        
-        // Draw current flow with enhanced effects and animation
-        this.ctx.strokeStyle = `rgba(204, 143, 0, ${0.85 + this.glowIntensity * 0.5})`;
-        this.ctx.lineWidth = 4;
-        this.ctx.setLineDash([15, 8]);
-        
-        // Add glow effect to current flow
-        this.ctx.shadowColor = '#CC8F00';
-        this.ctx.shadowBlur = 10 + this.glowIntensity * 10;
-        
-        // Battery to component with animated dash pattern
-        const dashOffset = Math.sin(time * 3) * 5;
-        this.ctx.setLineDash([15 + dashOffset, 8 - dashOffset]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.batteryX + 25, this.batteryY);
-        this.ctx.lineTo(this.componentX - 90, this.componentY);
-        this.ctx.stroke();
-        
-        // Component to load with animated dash pattern
-        this.ctx.setLineDash([15 - dashOffset, 8 + dashOffset]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.componentX + 90, this.componentY);
-        this.ctx.lineTo(this.loadX - 35, this.loadY);
-        this.ctx.stroke();
-        
-        this.ctx.setLineDash([]);
-        this.ctx.shadowBlur = 0;
-        
-        // Draw animated current arrows with pulsing effect
-        const arrowOffset = Math.sin(time * 2) * 5;
-        const arrowGlow = Math.sin(time * 4) * 0.3 + 0.7;
-        this.drawArrow(this.batteryX + 35 + arrowOffset, this.batteryY, 12, 0, `rgba(204, 143, 0, ${arrowGlow})`);
-        this.drawArrow(this.componentX + 100 + arrowOffset, this.componentY, 12, 0, `rgba(204, 143, 0, ${arrowGlow})`);
-        
-        // Draw current intensity indicator with animation
-        const intensity = Math.min(this.current / 20, 1);
-        const pulseIntensity = intensity * (0.3 + Math.sin(time * 5) * 0.1);
-        this.ctx.fillStyle = `rgba(204, 143, 0, ${pulseIntensity})`;
-        this.ctx.fillRect(this.componentX - 100, this.componentY - 10, 200, 20);
-        
-        // Add energy particles along the current path
-        for (let i = 0; i < 5; i++) {
-            const particleProgress = (time * 0.5 + i * 0.2) % 1;
-            const particleX = this.batteryX + 25 + (this.componentX - 90 - this.batteryX - 25) * particleProgress;
-            const particleY = this.batteryY + Math.sin(time * 3 + i) * 3;
-            
-            this.ctx.fillStyle = `rgba(204, 143, 0, ${0.6 + Math.sin(time * 4 + i) * 0.2})`;
-            this.ctx.beginPath();
-            this.ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-        
-        // Voltage drop indicators are already shown on the component symbol
     }
     
     drawArrow(x, y, dx, dy, color) {

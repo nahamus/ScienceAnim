@@ -367,7 +367,7 @@ export class Pendulum extends BaseAnimation {
         const velocityMagnitude = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
         
         if (velocityMagnitude > 0.1) {
-            const scale = 20 / velocityMagnitude;
+            const scale = 50 / velocityMagnitude; // Increased from 20 to 50 for more visible vectors
             const scaledVX = velocityX * scale;
             const scaledVY = velocityY * scale;
             
@@ -631,6 +631,12 @@ export class OrbitalMotion extends BaseAnimation {
         
         // Calculate angular velocity
         this.angularVelocity = 2 * Math.PI / this.period;
+        
+        // Initialize current position (so object is visible at start)
+        const r = this.semiMajorAxis * (1 - this.eccentricity * this.eccentricity) / 
+                 (1 + this.eccentricity * Math.cos(this.angle));
+        this.currentX = this.centerX + r * Math.cos(this.angle);
+        this.currentY = this.centerY + r * Math.sin(this.angle);
         
         // Store orbit path points
         this.orbitPath = [];
@@ -1477,8 +1483,6 @@ export class CollisionPhysics extends BaseAnimation {
                 this.ctx.lineWidth = 2; // Reduced from 4 to 2
                 this.ctx.arc(effect.x, effect.y, radius * 0.6, 0, Math.PI * 2);
                 this.ctx.stroke();
-                
-                // Remove ripple effect to reduce distraction
             }
         });
         
@@ -1676,8 +1680,6 @@ export class CollisionPhysics extends BaseAnimation {
         this.ctx.fillText(`Bounce: ${this.restitution}`, panelX + 8, y);
         y += 16;
         this.ctx.fillText(`Type: ${this.collisionType}`, panelX + 8, y);
-        
-        // Remove detailed collision analysis to reduce clutter
     }
     
     getStats() {
@@ -1780,7 +1782,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         
         // Scale object size with mass for positioning
         const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
-        this.object.y = adjustedStartY + offsetDistance * Math.tan(angleRad) - objectSize - 18 * Math.cos(angleRad);
+        this.object.y = adjustedStartY + offsetDistance * Math.tan(angleRad) - objectSize - 25;
         this.object.vx = this.initialVelocity * Math.cos(angleRad);
         this.object.vy = 0;
     }
@@ -1851,7 +1853,11 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         // Position object ON TOP of the incline surface (not embedded)
         // Scale object size with mass for positioning
         const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
-        this.object.y = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad) - objectSize - 18 * Math.cos(angleRad);
+        // Calculate the incline surface Y position at the object's X position
+        const inclineY = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad);
+        // Position object so its bottom surface sits ON TOP of the incline
+        // Use constant adjustment to prevent penetration at all angles
+        this.object.y = inclineY - objectSize - 25;
     }
     
     render() {
@@ -1898,9 +1904,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.ctx.lineTo(startX + 20 * Math.sin(angleRad), adjustedStartY - 20 * Math.cos(angleRad));
         this.ctx.closePath();
         
-        // Modern surface colors - use generic surface appearance
-        const surfaceColor = '#f5f5f5';
-        const textureColor = '#757575';
+        // Modern surface colors - use darker surface appearance for better visibility
+        const surfaceColor = '#8d6e63'; // Brownish surface color
+        const textureColor = '#5d4037'; // Darker brown for texture
         
         // Main surface fill
         this.ctx.fillStyle = surfaceColor;
@@ -1958,15 +1964,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.ctx.translate(this.object.x, this.object.y);
         this.ctx.rotate(angleRad);
         
-        // Add subtle bounce effect based on velocity
-        const bounceOffset = Math.sin(this.time * 0.01) * Math.min(Math.abs(this.object.vx) * 0.1, 2);
-        this.ctx.translate(0, bounceOffset);
-        
-        // Add rolling rotation effect when moving
-        if (Math.abs(this.object.vx) > 0.1) {
-            const rotationSpeed = this.object.vx * 0.02; // Rotation based on velocity
-            this.ctx.rotate(this.time * rotationSpeed);
-        }
+        // Remove rolling rotation effect - object should slide, not roll
         
         // Enhanced 3D shadow effect with blur and dynamic positioning
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
@@ -2051,7 +2049,6 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         // Draw analytics if enabled
         if (this.showAnalytics) {
             this.drawForceVectors();
-            // Removed on-canvas stats panel for a cleaner view
         }
         
         // Draw canvas labels for physics context
