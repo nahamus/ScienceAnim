@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Science Animations - Interactive Physics Simulations</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/ScienceAnim/assets/index-BN12K0Hx.js"></script>
+  <script type="module" crossorigin src="/ScienceAnim/assets/index-Ca9gCtxS.js"></script>
   <link rel="stylesheet" crossorigin href="/ScienceAnim/assets/index-BsZ4iJcl.css">
 </head>
 <body>
@@ -217,12 +217,6 @@
                     </div>
                     
                     <div class="control-group">
-                        <label for="speed">Animation Speed:</label>
-                        <input type="range" id="speed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="speedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="temperature">Temperature (Motion Intensity):</label>
                         <input type="range" id="temperature" min="0.5" max="3" value="1" step="0.1" class="slider" data-decimals="1">
                         <span id="temperatureValue" data-decimals="1">1.0</span>
@@ -250,12 +244,6 @@
                         <label for="pendulumLength">Pendulum Length:</label>
                         <input type="range" id="pendulumLength" min="100" max="300" value="200" class="slider">
                         <span id="pendulumLengthValue">200</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="pendulumSpeed">Animation Speed:</label>
-                        <input type="range" id="pendulumSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="pendulumSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -295,12 +283,6 @@
                     </div>
                     
                     <div class="control-group">
-                        <label for="diffusionSpeed">Animation Speed:</label>
-                        <input type="range" id="diffusionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="diffusionSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="diffusionRate">Diffusion Rate:</label>
                         <input type="range" id="diffusionRate" min="0.1" max="3" value="1" step="0.1" class="slider">
                         <span id="diffusionRateValue">1.0</span>
@@ -334,12 +316,6 @@
                 <!-- Orbital Motion Controls -->
                 <div id="orbital-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
-                        <label for="orbitalSpeed">Animation Speed:</label>
-                        <input type="range" id="orbitalSpeed" min="0.1" max="3" value="0.3" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="orbitalSpeedValue" data-unit="x" data-decimals="1">0.3x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="eccentricity">Orbit Eccentricity:</label>
                         <input type="range" id="eccentricity" min="0" max="0.8" value="0.2" step="0.05" class="slider" data-decimals="2">
                         <span id="eccentricityValue" data-decimals="2">0.20</span>
@@ -367,12 +343,6 @@
                             <option value="gay-lussac">Gay-Lussac's Law</option>
                             <option value="combined">Combined Gas Law</option>
                         </select>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="gasSpeed">Animation Speed:</label>
-                        <input type="range" id="gasSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="gasSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -414,12 +384,6 @@
                 <!-- Collision Physics Controls -->
                 <div id="collisions-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
-                        <label for="collisionSpeed">Animation Speed:</label>
-                        <input type="range" id="collisionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="collisionSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="collisionType">Collision Scenario:</label>
                         <select id="collisionType" class="select-control">
                             <option value="elastic">Elastic Bouncing</option>
@@ -457,12 +421,6 @@
                 <!-- Friction & Inclined Planes Controls -->
                 <div id="friction-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
-                        <label for="frictionSpeed">Animation Speed:</label>
-                        <input type="range" id="frictionSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="frictionSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="frictionCoefficient">Friction Coefficient:</label>
                         <input type="range" id="frictionCoefficient" min="0.01" max="1" value="0.3" step="0.01" class="slider">
                         <span id="frictionCoefficientValue">0.3</span>
@@ -492,12 +450,6 @@
                 <!-- Electric Fields Controls -->
                 <div id="electric-fields-controls" class="animation-controls" style="display: none;">
                     <div class="control-group">
-                        <label for="efSpeed">Animation Speed:</label>
-                        <input type="range" id="efSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="efSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="efFieldStrength">Field Strength:</label>
                         <input type="range" id="efFieldStrength" min="0.1" max="3" value="1" step="0.1" class="slider">
                         <span id="efFieldStrengthValue">1.0</span>
@@ -525,12 +477,6 @@
 
                 <!-- Magnetic Fields Controls -->
                 <div id="magnetic-fields-controls" class="animation-controls" style="display: none;">
-                    <div class="control-group">
-                        <label for="magneticSpeed">Animation Speed:</label>
-                        <input type="range" id="magneticSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="magneticSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
                     <div class="control-group">
                         <label for="magneticFieldStrength">Magnetic Field Strength:</label>
                         <input type="range" id="magneticFieldStrength" min="0.1" max="3" value="1" step="0.1" class="slider">
@@ -570,12 +516,6 @@
                     </div>
                     
                     <div class="control-group">
-                        <label for="dualitySpeed">Animation Speed:</label>
-                        <input type="range" id="dualitySpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="dualitySpeedValue">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="dualityEnergy">Photon Energy:</label>
                         <input type="range" id="dualityEnergy" min="1" max="10" value="5" step="0.5" class="slider">
                         <span id="dualityEnergyValue">5.0 eV</span>
@@ -609,12 +549,6 @@
                     </div>
                     
                     <div class="control-group">
-                        <label for="nuclearSpeed">Animation Speed:</label>
-                        <input type="range" id="nuclearSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="nuclearSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="neutronEnergy">Neutron Energy:</label>
                         <input type="range" id="neutronEnergy" min="0.1" max="2" value="1" step="0.1" class="slider">
                         <span id="neutronEnergyValue">1.0</span>
@@ -629,12 +563,6 @@
 
                 <!-- Fluid Flow Controls -->
                 <div id="fluid-flow-controls" class="animation-controls" style="display: none;">
-                    <div class="control-group">
-                        <label for="fluidSpeed">Animation Speed:</label>
-                        <input type="range" id="fluidSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="fluidSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
                     <div class="control-group">
                         <label for="flowRate">Flow Rate:</label>
                         <input type="range" id="flowRate" min="0.1" max="5" value="1" step="0.1" class="slider">
@@ -686,12 +614,6 @@
                     </div>
                     
                     <div class="control-group">
-                        <label for="waveSpeed">Animation Speed:</label>
-                        <input type="range" id="waveSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="waveSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
-                    
-                    <div class="control-group">
                         <label for="waveFrequency">Frequency (Hz):</label>
                         <input type="range" id="waveFrequency" min="0.5" max="5" value="1" step="0.1" class="slider">
                         <span id="waveFrequencyValue">1.0</span>
@@ -724,12 +646,6 @@
                         <label for="soundFrequency">Frequency (Hz):</label>
                         <input type="range" id="soundFrequency" min="1" max="10" value="2" class="slider">
                         <span id="soundFrequencyValue">2 Hz</span>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="soundAnimationSpeed">Animation Speed:</label>
-                        <input type="range" id="soundAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="soundAnimationSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                 </div>
 
@@ -764,12 +680,6 @@
                         <input type="range" id="diodeBaseVoltage" min="0" max="2" value="0.7" step="0.1" class="slider">
                         <span id="diodeBaseVoltageValue">0.7V</span>
                     </div>
-
-                    <div class="control-group">
-                        <label for="diodeAnimationSpeed">Animation Speed:</label>
-                        <input type="range" id="diodeAnimationSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="diodeAnimationSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
-                    </div>
                 </div>
 
                 <!-- Neural Network Controls -->
@@ -778,12 +688,6 @@
                         <label for="neuralLearningRate">Learning Rate:</label>
                         <input type="range" id="neuralLearningRate" min="0.01" max="0.5" value="0.1" step="0.01" class="slider">
                         <span id="neuralLearningRateValue">0.1</span>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="neuralSpeed">Animation Speed:</label>
-                        <input type="range" id="neuralSpeed" min="0.1" max="3" value="1" step="0.1" class="slider" data-unit="x" data-decimals="1">
-                        <span id="neuralSpeedValue" data-unit="x" data-decimals="1">1.0x</span>
                     </div>
                     
                     <div class="control-group">
@@ -805,12 +709,6 @@
 
                 <!-- Blockchain Controls -->
                 <div id="blockchain-controls" class="animation-controls" style="display: none;">
-                    <div class="control-group">
-                        <label for="blockchainSpeed">Simulation Speed:</label>
-                        <input type="range" id="blockchainSpeed" min="0.1" max="3" value="1" step="0.1" class="slider">
-                        <span id="blockchainSpeedValue">1.0x</span>
-                    </div>
-                    
                     <div class="control-group">
                         <label for="blockchainDifficulty">Mining Difficulty:</label>
                         <input type="range" id="blockchainDifficulty" min="1" max="8" value="4" step="1" class="slider">
