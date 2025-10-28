@@ -552,7 +552,9 @@ export class Pendulum extends BaseAnimation {
     drawPendulumLabels() {
         this.drawLabels(
             'Simple Pendulum',
-            'T = 2π√(L/g)  |  θ̈ + (g/L)sin(θ) = 0  |  E = ½mL²θ̇² + mgL(1-cos(θ))'
+            'T = 2π√(L/g)  |  θ̈ + (g/L)sin(θ) = 0  |  E = ½mL²θ̇² + mgL(1-cos(θ))',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -1136,7 +1138,9 @@ export class OrbitalMotion extends BaseAnimation {
     drawOrbitalLabels() {
         this.drawLabels(
             'Orbital Motion',
-            'r = a(1-e²)/(1+ecos(θ))  |  T² ∝ a³  |  E = ½mv² - GMm/r'
+            'r = a(1-e²)/(1+ecos(θ))  |  T² ∝ a³  |  E = ½mv² - GMm/r',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -1656,7 +1660,7 @@ export class CollisionPhysics extends BaseAnimation {
         // Smaller, more compact panel
         const panelWidth = Math.min(canvasWidth * 0.15, 200);
         const panelHeight = Math.min(canvasHeight * 0.15, 120);
-        const panelX = 10;
+        const panelX = canvasWidth - panelWidth - 10; // Move to right side
         const panelY = 10;
         
         this.ctx.fillStyle = 'rgba(26, 26, 46, 0.8)';
@@ -1704,7 +1708,9 @@ export class CollisionPhysics extends BaseAnimation {
     drawCollisionLabels() {
         this.drawLabels(
             'Collision Physics',
-            'p = mv  |  Σp = constant  |  KE = ½mv²'
+            'p = mv  |  Σp = constant  |  KE = ½mv²',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -1736,7 +1742,41 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     
     setInclineAngle(angle) {
         this.inclineAngle = angle;
-        // Don't reset object position when changing angle
+        // Update object position to stay attached to the inclined plane
+        this.updateObjectPositionForAngle();
+    }
+    
+    updateObjectPositionForAngle() {
+        const angleRad = this.inclineAngle * Math.PI / 180;
+        const canvasWidth = this.ctx.canvas.width;
+        const canvasHeight = this.ctx.canvas.height;
+        const inclineLength = canvasWidth * 0.75;
+        const startX = canvasWidth * 0.125;
+        const startY = canvasHeight * 0.5;
+        const endX = startX + inclineLength * Math.cos(angleRad);
+        const endY = startY + inclineLength * Math.sin(angleRad);
+        
+        // Calculate how much to move the incline up to keep it within bounds
+        const maxEndY = canvasHeight * 0.95;
+        const verticalOffset = Math.max(0, endY - maxEndY);
+        const adjustedStartY = startY - verticalOffset;
+        
+        // Keep object within the incline bounds
+        if (this.object.x < startX) {
+            this.object.x = startX;
+        }
+        if (this.object.x > endX) {
+            this.object.x = endX;
+        }
+        
+        // Position object ON TOP of the incline surface
+        const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
+        const inclineY = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad);
+        this.object.y = inclineY - objectSize - 25;
+        
+        // Reset velocity when angle changes
+        this.object.vx = 0;
+        this.object.vy = 0;
     }
     
     setFrictionCoefficient(coefficient) {
@@ -1933,30 +1973,55 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         }
         this.ctx.restore();
 
-        // Draw angle label at the base of the incline
+        // Draw enhanced angle label at the base of the incline
         this.ctx.save();
         
-        // Draw horizontal reference line at the base
-        this.ctx.strokeStyle = 'rgba(78, 205, 196, 0.6)';
-        this.ctx.lineWidth = 2;
+        // Draw horizontal reference line at the base with better styling
+        this.ctx.strokeStyle = 'rgba(78, 205, 196, 0.8)';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
         this.ctx.beginPath();
         this.ctx.moveTo(endX - 80, adjustedEndY);
         this.ctx.lineTo(endX + 20, adjustedEndY);
         this.ctx.stroke();
         
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.font = 'bold 20px Inter';
-        this.ctx.textAlign = 'center';
         // Position label at the bottom of the incline where it meets the ground
         const labelX = endX - 35; // Position near the bottom end
-        const labelY = adjustedEndY + 25; // Position below the incline at the base
-        this.ctx.fillText(`${this.inclineAngle}°`, labelX, labelY);
+        const labelY = adjustedEndY + 30; // Position below the incline at the base
         
-        // Add a subtle background for better readability
-        this.ctx.fillStyle = 'rgba(26, 26, 46, 0.8)';
-        this.ctx.fillRect(labelX - 25, labelY - 15, 50, 20);
+        // Enhanced background with gradient and border
+        const labelWidth = 60;
+        const labelHeight = 30;
+        const labelBgX = labelX - labelWidth / 2;
+        const labelBgY = labelY - labelHeight / 2;
+        
+        // Background gradient
+        const bgGradient = this.ctx.createLinearGradient(labelBgX, labelBgY, labelBgX, labelBgY + labelHeight);
+        bgGradient.addColorStop(0, 'rgba(26, 26, 46, 0.95)');
+        bgGradient.addColorStop(1, 'rgba(22, 33, 62, 0.95)');
+        
+        this.ctx.fillStyle = bgGradient;
+        this.ctx.fillRect(labelBgX, labelBgY, labelWidth, labelHeight);
+        
+        // Border with glow effect
+        this.ctx.shadowColor = 'rgba(78, 205, 196, 0.6)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.strokeStyle = '#4ECDC4';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(labelBgX, labelBgY, labelWidth, labelHeight);
+        this.ctx.shadowBlur = 0;
+        
+        // Enhanced text with better styling
         this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
         this.ctx.fillText(`${this.inclineAngle}°`, labelX, labelY);
+        this.ctx.shadowBlur = 0;
         this.ctx.restore();
 
         // Draw enhanced object with modern styling
@@ -2105,7 +2170,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         drawArrow(x, y, 0, weight * 0.12, '#1565C0', 'mg');
         
         // Parallel component of gravity (down the incline) - Orange
-        drawArrow(x, y, parallelForce * Math.cos(angleRad) * 0.12, parallelForce * Math.sin(angleRad) * 0.12, '#FF8C00', `mg sin(${this.inclineAngle}°)`);
+        drawArrow(x, y, parallelForce * Math.cos(angleRad) * 0.12, parallelForce * Math.sin(angleRad) * 0.12, '#FF8C00', 'mg sin(θ)');
         
         // Friction (opposes motion, along incline) - Dark Red
         let frictionDir = -1;
@@ -2177,7 +2242,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     drawFrictionLabels() {
         this.drawLabels(
             'Friction & Inclined Planes',
-            'F = μN  |  F∥ = mg sin θ  |  N = mg cos θ'
+            'F = μN  |  F∥ = mg sin θ  |  N = mg cos θ',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }

@@ -898,20 +898,25 @@ export class WaveParticleDuality extends BaseAnimation {
     }
     
     drawQuantumLabels() {
-        this.drawLabels('Wave-Particle Duality', '');
+        this.drawLabels(
+            'Wave-Particle Duality',
+            '',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title (empty in this case)
+        );
     }
     
     drawDescriptiveLabels() {
         // Draw descriptive labels in the bottom-right corner
         this.ctx.save();
         
-        // Set up text styling with better contrast for dark background
+        // Set up text styling with better contrast for white background
         this.ctx.font = 'bold 13px Inter';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
         this.ctx.textAlign = 'left';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
+        this.ctx.fillStyle = '#1A1A1A'; // Dark gray for good contrast on white background
+        this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        this.ctx.shadowBlur = 1;
         
         const startX = this.ctx.canvas.width - 200;
         const startY = this.ctx.canvas.height - 120;

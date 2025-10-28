@@ -23,12 +23,27 @@ export class WavePropagation extends BaseAnimation {
     initializeParticles() {
         this.particles = [];
         const particleCount = 80; // Reduced particles for cleaner visualization
+        const centerY = this.ctx.canvas.height / 2;
+        
         for (let i = 0; i < particleCount; i++) {
+            const x = (i / particleCount) * this.ctx.canvas.width;
+            
+            // Create default wave pattern based on wave type
+            let y = centerY;
+            if (this.waveType === 'transverse') {
+                // Default transverse wave pattern (sine wave)
+                const phase = (x / this.wavelength) * 2 * Math.PI;
+                y = centerY + this.amplitude * Math.sin(phase);
+            } else if (this.waveType === 'longitudinal') {
+                // For longitudinal waves, particles stay at center but will show compression/rarefaction
+                y = centerY;
+            }
+            
             this.particles.push({
-                x: (i / particleCount) * this.ctx.canvas.width,
-                y: this.ctx.canvas.height / 2,
-                originalY: this.ctx.canvas.height / 2,
-                originalX: (i / particleCount) * this.ctx.canvas.width,
+                x: x,
+                y: y,
+                originalY: centerY,
+                originalX: x,
                 vx: 0,
                 vy: 0,
                 index: i
@@ -347,7 +362,9 @@ export class WavePropagation extends BaseAnimation {
         const waveTypeLabel = this.waveType.charAt(0).toUpperCase() + this.waveType.slice(1) + ' Wave';
         this.drawLabels(
             waveTypeLabel,
-            `v = f×λ = ${this.waveSpeed.toFixed(1)} px/s  |  y = A sin(2π(ft-x/λ))  |  E ∝ A²f²`
+            `v = f×λ = ${this.waveSpeed.toFixed(1)} px/s  |  y = A sin(2π(ft-x/λ))  |  E ∝ A²f²`,
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
     
@@ -420,7 +437,7 @@ export class WavePropagation extends BaseAnimation {
             const waveSpeed = this.frequency * this.wavelength;
             const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
 
-            const y = 50.5;
+            const y = 80.5; // Moved down from 50.5 to 80.5
             const ax = Math.round(arrowX) + 0.5;
             
             this.ctx.beginPath();
@@ -1273,7 +1290,9 @@ export class SoundWaves extends BaseAnimation {
     drawSoundLabels() {
         this.drawLabels(
             'Sound Waves',
-            'v = f×λ  |  P = ½ρv²  |  I = P/A'
+            'v = f×λ  |  P = ½ρv²  |  I = P/A',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }

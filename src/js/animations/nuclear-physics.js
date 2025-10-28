@@ -1038,7 +1038,12 @@ export class NuclearReactions extends BaseAnimation {
             formulas = 'E = mc²';
         }
         
-        this.drawLabels(title, formulas);
+        this.drawLabels(
+            title,
+            formulas,
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
+        );
     }
     
 

@@ -365,7 +365,9 @@ export class BrownianMotion extends BaseAnimation {
     drawBrownianLabels() {
         this.drawLabels(
             'Brownian Motion',
-            '⟨v²⟩ = 3kBT/m  |  λ = 1/(√2πd²n)  |  D = kBT/(6πηr)'
+            '⟨v²⟩ = 3kBT/m  |  λ = 1/(√2πd²n)  |  D = kBT/(6πηr)',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -395,14 +397,28 @@ export class Diffusion extends BaseAnimation {
         this.particles = [];
         const startRegion = this.ctx.canvas.width * 0.2; // Concentrated in left 20%
         
+        // Define different particle types with varying sizes and diffusion rates
+        const particleTypes = [
+            { size: 3, color: '#FF6B6B', diffusionRate: 1.0, name: 'Small' },      // Small particles diffuse fastest
+            { size: 5, color: '#4ECDC4', diffusionRate: 0.6, name: 'Medium' },    // Medium particles diffuse slower
+            { size: 7, color: '#45B7D1', diffusionRate: 0.4, name: 'Large' },     // Large particles diffuse slowest
+            { size: 9, color: '#96CEB4', diffusionRate: 0.25, name: 'Very Large' } // Very large particles diffuse very slowly
+        ];
+        
         for (let i = 0; i < this.particleCount; i++) {
+            // Randomly assign particle type
+            const type = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+            
             this.particles.push({
                 x: Math.random() * startRegion, // Start in concentrated region
                 y: Math.random() * this.ctx.canvas.height,
                 vx: 0,
                 vy: 0,
-                color: '#FF6B6B', // Consistent red color for better visibility
-                trail: [] // New: store trail positions
+                size: type.size,
+                color: type.color,
+                diffusionRate: type.diffusionRate,
+                type: type.name,
+                trail: [] // Store trail positions
             });
         }
     }
@@ -489,9 +505,9 @@ export class Diffusion extends BaseAnimation {
                 return;
             }
             
-            // Add random diffusion motion
-            particle.vx += (Math.random() - 0.5) * this.diffusionRate * 0.5;
-            particle.vy += (Math.random() - 0.5) * this.diffusionRate * 0.5;
+            // Add random diffusion motion (rate varies by particle size)
+            particle.vx += (Math.random() - 0.5) * this.diffusionRate * particle.diffusionRate * 0.5;
+            particle.vy += (Math.random() - 0.5) * this.diffusionRate * particle.diffusionRate * 0.5;
             
             // Apply concentration gradient force (particles move from high to low concentration)
             const gridX = Math.floor(particle.x / 15);
@@ -636,22 +652,22 @@ export class Diffusion extends BaseAnimation {
             gradient.addColorStop(0.6, `rgba(255, 107, 107, ${0.8 - velocityFactor * 0.2})`);
             gradient.addColorStop(1, `rgba(255, 107, 107, 0.4)`);
             
+            // Draw particle with individual size and color based on type
             this.ctx.beginPath();
-            this.ctx.fillStyle = gradient;
-            this.ctx.arc(particle.x, particle.y, this.particleSize * (1 + velocityFactor * 0.2), 0, Math.PI * 2);
+            this.ctx.fillStyle = particle.color;
+            this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // Enhanced border with velocity-based opacity
-            this.ctx.shadowBlur = 0;
-            this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.9 + velocityFactor * 0.1})`;
-            this.ctx.lineWidth = 1.5;
+            // Add particle border with size-appropriate thickness
+            this.ctx.strokeStyle = '#fff';
+            this.ctx.lineWidth = Math.max(1, particle.size * 0.2);
             this.ctx.stroke();
             
             // Add inner highlight for depth
             this.ctx.beginPath();
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + velocityFactor * 0.2})`;
-            this.ctx.arc(particle.x - this.particleSize * 0.3, particle.y - this.particleSize * 0.3, 
-                         this.particleSize * 0.3, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(255, 255, 255, 0.3)`;
+            this.ctx.arc(particle.x - particle.size * 0.3, particle.y - particle.size * 0.3, 
+                         particle.size * 0.3, 0, Math.PI * 2);
             this.ctx.fill();
         });
         
@@ -667,6 +683,9 @@ export class Diffusion extends BaseAnimation {
         
         // Draw canvas labels
         this.drawDiffusionLabels();
+        
+        // Draw particle type legend
+        this.drawParticleLegend();
     }
     
     drawConcentrationProfile() {
@@ -801,8 +820,58 @@ export class Diffusion extends BaseAnimation {
     drawDiffusionLabels() {
         this.drawLabels(
             'Particle Diffusion',
-            '∂c/∂t = D∇²c  |  J = -D∇c  |  D = kBT/(6πηr)'
+            '∂c/∂t = D∇²c  |  J = -D∇c  |  D = kBT/(6πηr)',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
+    }
+    
+    drawParticleLegend() {
+        // Draw particle type legend in bottom-right corner
+        const legendX = this.ctx.canvas.width - 200;
+        const legendY = this.ctx.canvas.height - 120;
+        const legendWidth = 180;
+        const legendHeight = 100;
+        
+        // Legend background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(legendX, legendY, legendWidth, legendHeight);
+        
+        // Legend border
+        this.ctx.strokeStyle = '#4ECDC4';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(legendX, legendY, legendWidth, legendHeight);
+        
+        // Legend title
+        this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'top';
+        this.ctx.fillText('Particle Types', legendX + 10, legendY + 10);
+        
+        // Particle types with their properties
+        const particleTypes = [
+            { size: 3, color: '#FF6B6B', name: 'Small', rate: 'Fast' },
+            { size: 5, color: '#4ECDC4', name: 'Medium', rate: 'Medium' },
+            { size: 7, color: '#45B7D1', name: 'Large', rate: 'Slow' },
+            { size: 9, color: '#96CEB4', name: 'Very Large', rate: 'Very Slow' }
+        ];
+        
+        this.ctx.font = '12px Inter, Arial, sans-serif';
+        particleTypes.forEach((type, index) => {
+            const y = legendY + 30 + (index * 18); // Increased spacing for better alignment
+            
+            // Draw particle example - centered vertically
+            this.ctx.beginPath();
+            this.ctx.fillStyle = type.color;
+            this.ctx.arc(legendX + 15, y, type.size * 0.8, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Draw particle label - properly aligned with text baseline
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.textBaseline = 'middle'; // Center text vertically
+            this.ctx.fillText(`${type.name} (${type.rate})`, legendX + 35, y);
+        });
     }
 }
 
@@ -1559,6 +1628,6 @@ export class GasLaws extends BaseAnimation {
     }
     
     drawGasLabels() {
-        this.drawLabels('Gas Laws', '');
+        this.drawLabels('Gas Laws', '', 25, 45); // Move title to top of canvas
     }
 }

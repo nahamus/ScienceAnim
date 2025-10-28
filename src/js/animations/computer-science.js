@@ -1528,8 +1528,10 @@ export class NeuralNetwork extends BaseAnimation {
     }
     
     drawTrainingInfo() {
+        // Position panel where decision boundary was (bottom-left area)
+        const plotW = 220, plotH = 160;
         const infoX = 20;
-        const infoY = 20;
+        const infoY = this.ctx.canvas.height - plotH - 20;
         
         // Compact info panel background
         this.ctx.fillStyle = 'rgba(26, 26, 46, 0.9)';
@@ -1542,7 +1544,7 @@ export class NeuralNetwork extends BaseAnimation {
         this.ctx.fillStyle = '#4ECDC4';
         this.ctx.font = 'bold 16px Inter';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('Training Status', infoX + 15, infoY + 25);
+        this.ctx.fillText('Learning Status', infoX + 15, infoY + 25);
         
         // Key metrics only
         this.ctx.font = '13px Inter';
@@ -1568,10 +1570,13 @@ export class NeuralNetwork extends BaseAnimation {
         this.ctx.fillText(`→ ${predicted === 1 ? 'COMPLEX' : 'SIMPLE'} (${isCorrect ? '✓' : '✗'}) [${output.toFixed(3)}]`, infoX + 15, y);
     }
     
+    
     drawNetworkLabels() {
         this.drawLabels(
             'Neural Network Training',
-            'σ(x) = 1/(1 + e^(-x))  |  δ = (target - output) × σ\'(output)  |  w = w + α × δ × input'
+            'σ(x) = 1/(1 + e^(-x))  |  δ = (target - output) × σ\'(output)  |  w = w + α × δ × input',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
     
@@ -1630,12 +1635,11 @@ export class NeuralNetwork extends BaseAnimation {
             this.drawTestingParticles();
         }
         
+        // Decision boundary removed - Learning Status panel moved to that position
+        
         // Draw training information
         if (this.showLoss && !this.isTestingMode) {
             this.drawTrainingInfo();
-        }
-        if (!this.isTestingMode) {
-            this.drawDecisionBoundary();
         }
         
         // Draw testing information
@@ -1670,11 +1674,7 @@ export class NeuralNetwork extends BaseAnimation {
         this.ctx.save();
         this.ctx.fillStyle = 'rgba(26,26,46,0.6)';
         this.ctx.fillRect(x0-2, y0-2, plotW+4, plotH+4);
-        // Title and legend
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.font = 'bold 12px Inter';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Decision Boundary', x0, y0 - 6);
+        // Title and legend - Decision Boundary label removed
         // Legend for misclassified points
         this.ctx.beginPath();
         this.ctx.arc(x0 + 130, y0 - 9, 3.5, 0, Math.PI * 2);
