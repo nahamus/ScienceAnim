@@ -8,9 +8,9 @@ export class BaseAnimation {
         
         // Standardized control system
         this.isPlaying = false; // Default to paused - user must press Play to start
-        this.speedMultiplier = 1; // 1x, 2x, 4x speed
-        this.speedCycle = [1, 2, 4]; // Speed cycle for the speed button
-        this.speedCycleIndex = 0; // Current index in speed cycle
+        this.speedMultiplier = 1; // 0.5x, 1x, 2x, 4x speed
+        this.speedCycle = [0.5, 1, 2, 4]; // Speed cycle for the speed button
+        this.speedCycleIndex = 1; // Start at 1x speed (index 1)
         this.time = 0; // Time counter for animations and effects
         
         // Control button definitions with Program Execution styling
@@ -185,7 +185,9 @@ export class BaseAnimation {
                 this.ctx.fillText(this.isPlaying ? '⏸' : '▶', button.x + button.width / 2, button.y + button.height / 2);
             } else if (button.id === 'speed') {
                 this.ctx.font = 'bold 11px Arial';
-                this.ctx.fillText(`${this.speedMultiplier}x`, button.x + button.width / 2, button.y + button.height / 2);
+                // Format speed display properly for 0.5x
+                const speedText = this.speedMultiplier === 0.5 ? '0.5x' : `${this.speedMultiplier}x`;
+                this.ctx.fillText(speedText, button.x + button.width / 2, button.y + button.height / 2);
             } else {
                 this.ctx.fillText(button.label, button.x + button.width / 2, button.y + button.height / 2);
             }
@@ -237,7 +239,7 @@ export class BaseAnimation {
             case 'reset':
                 this.isPlaying = false; // Stay paused after reset - user must press Play
                 this.speedMultiplier = 1;
-                this.speedCycleIndex = 0;
+                this.speedCycleIndex = 1; // Reset to 1x speed (index 1)
                 this.reset();
                 break;
             case 'speed':
