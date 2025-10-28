@@ -173,10 +173,11 @@ export class BaseAnimation {
             
             // Button border with pulsating effect for play button when running
             if (button.id === 'playPause' && this.isPlaying) {
-                // Pulsating border effect
-                const pulseIntensity = 0.5 + 0.5 * Math.sin(this.time * 0.01); // Pulsating between 0.5 and 1.0
-                this.ctx.strokeStyle = `rgba(74, 175, 244, ${pulseIntensity})`; // Bright blue with pulsing opacity
-                this.ctx.lineWidth = 2 + pulseIntensity; // Thicker border that pulses
+                // Pulsating border effect - slower pulse with speed-based rate
+                const pulseRate = 0.005 * this.speedMultiplier; // Slower base rate, scales with speed
+                const pulseIntensity = 0.3 + 0.4 * Math.sin(this.time * pulseRate); // Pulsating between 0.3 and 0.7
+                this.ctx.strokeStyle = `rgba(102, 255, 178, ${pulseIntensity})`; // Nice green color with pulsing opacity
+                this.ctx.lineWidth = 1.2 + pulseIntensity * 0.3; // Thinner border that pulses subtly
             } else {
                 // Normal border
                 this.ctx.strokeStyle = isHovered ? '#7eb3d9' : '#4a6f94';

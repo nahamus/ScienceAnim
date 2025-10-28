@@ -228,6 +228,9 @@ export class BrownianMotion extends BaseAnimation {
         
         // Draw canvas labels
         this.drawBrownianLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     getVelocityColor(velocity) {
@@ -686,6 +689,9 @@ export class Diffusion extends BaseAnimation {
         
         // Draw particle type legend
         this.drawParticleLegend();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawConcentrationProfile() {
@@ -1204,6 +1210,9 @@ export class GasLaws extends BaseAnimation {
         
         // Draw canvas labels
         this.drawGasLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawEnhancedContainer() {

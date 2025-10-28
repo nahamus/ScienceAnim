@@ -299,6 +299,9 @@ export class WaveParticleDuality extends BaseAnimation {
         
         // Draw descriptive labels
         this.drawDescriptiveLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawGrid() {

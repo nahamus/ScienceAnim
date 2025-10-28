@@ -154,6 +154,9 @@ export class ElectricFields extends BaseAnimation {
         
         // Draw canvas labels
         this.drawElectricLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawFieldLines() {
@@ -665,6 +668,9 @@ export class MagneticFields extends BaseAnimation {
         
         // Draw canvas labels
         this.drawMagneticLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawFieldLines() {
@@ -1655,6 +1661,9 @@ export class DiodeTransistor extends BaseAnimation {
         this.drawCurrentFlow();
         this.drawInfo();
         this.drawInstructions();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawBackground() {

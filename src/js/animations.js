@@ -726,10 +726,6 @@ export class ScientificAnimations {
         });
         
         // Fluid Flow Controls
-        this.setupSliderControl('fluidSpeed', 'fluidSpeedValue', (value) => {
-            this.fluidFlow.setFlowRate(parseFloat(value));
-        });
-        
         this.setupSliderControl('flowRate', 'flowRateValue', (value) => {
             this.fluidFlow.setFlowRate(parseFloat(value));
         });

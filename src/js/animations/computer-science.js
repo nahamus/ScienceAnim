@@ -1665,6 +1665,9 @@ export class NeuralNetwork extends BaseAnimation {
         if (!this.isTestingMode && this.showTrainingIndicator) {
             this.drawTrainingIndicator();
         }
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
 
     drawDecisionBoundary() {

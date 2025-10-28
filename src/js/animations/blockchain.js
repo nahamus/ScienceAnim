@@ -3162,6 +3162,9 @@ export class Blockchain extends BaseAnimation {
         if (this.minerRewardDisplay) {
             this.drawMinerRewardDisplay();
         }
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawGuidedPhaseIndicator() {

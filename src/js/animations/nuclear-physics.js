@@ -857,7 +857,9 @@ export class NuclearReactions extends BaseAnimation {
         
         // Draw particle trails
         this.drawParticleTrails();
-
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawGrid() {

@@ -363,6 +363,9 @@ export class FluidFlow extends BaseAnimation {
         
         // Draw mouse interaction indicator
         this.drawMouseIndicator();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawPipeSystem() {
@@ -1751,6 +1754,9 @@ export class Bernoulli extends BaseAnimation {
         
         // Draw canvas labels
         this.drawBernoulliLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawPipeSystem() {
