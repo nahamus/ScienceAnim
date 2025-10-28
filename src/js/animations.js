@@ -190,9 +190,6 @@ export class ScientificAnimations {
             this.applyControlValues();
             // Don't call resetAnimation() as it resets to defaults
             // The applyControlValues already reinitializes with the new settings
-            this.isRunning = true;
-            const playBtn = document.getElementById('playPauseBtn');
-            if (playBtn) playBtn.textContent = 'Pause';
             closeControls();
         });
         if (cancelBtn) cancelBtn.addEventListener('click', closeControls);
@@ -244,19 +241,8 @@ export class ScientificAnimations {
         });
 
         
-        // Control buttons (optional presence)
-        const playPauseBtnEl = document.getElementById('playPauseBtn');
-        if (playPauseBtnEl) {
-            playPauseBtnEl.addEventListener('click', () => {
-            this.togglePlayPause();
-        });
-        }
-        const resetBtnEl = document.getElementById('resetBtn');
-        if (resetBtnEl) {
-            resetBtnEl.addEventListener('click', () => {
-            this.resetAnimation();
-        });
-        }
+        // Control buttons (optional presence) - Now using standardized on-canvas controls
+        // Old control buttons removed in favor of standardized controls
         // Learn More button (now in stats area)
         const learnMoreBtnEl = document.getElementById('learnMoreBtn');
         if (learnMoreBtnEl) {
@@ -331,10 +317,6 @@ export class ScientificAnimations {
             this.brownianMotion.setParticleCount(parseInt(value));
         });
         
-        this.setupSliderControl('speed', 'speedValue', (value) => {
-            this.brownianMotion.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('temperature', 'temperatureValue', (value) => {
             this.brownianMotion.setTemperature(parseFloat(value));
         });
@@ -355,10 +337,6 @@ export class ScientificAnimations {
             this.pendulum.setLength(parseInt(value));
         });
         
-        this.setupSliderControl('pendulumSpeed', 'pendulumSpeedValue', (value) => {
-            this.pendulum.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('initialAngle', 'initialAngleValue', (value) => {
             this.pendulum.setInitialAngle(parseFloat(value));
         });
@@ -371,20 +349,21 @@ export class ScientificAnimations {
             this.pendulum.setDamping(parseFloat(value));
         });
         
-        document.getElementById('pendulumVisualizationMode').addEventListener('change', (e) => {
+        document.getElementById('pendulumVisualizationMode')?.addEventListener('change', (e) => {
             this.updatePendulumVisualization(e.target.value);
         });
         
         // Initialize pendulum visualization mode
-        this.updatePendulumVisualization('basic');
+        const pendulumModeElement = document.getElementById('pendulumVisualizationMode');
+        if (pendulumModeElement) {
+            this.updatePendulumVisualization(pendulumModeElement.value);
+        } else {
+            this.updatePendulumVisualization('basic');
+        }
         
         // Diffusion Controls
         this.setupSliderControl('diffusionParticles', 'diffusionParticlesValue', (value) => {
             this.diffusion.setParticleCount(parseInt(value));
-        });
-        
-        this.setupSliderControl('diffusionSpeed', 'diffusionSpeedValue', (value) => {
-            this.diffusion.setSpeed(parseFloat(value));
         });
         
         this.setupSliderControl('diffusionRate', 'diffusionRateValue', (value) => {
@@ -403,8 +382,6 @@ export class ScientificAnimations {
             this.updateDiffusionVisualization(e.target.value);
         });
         
-        // Remove the start diffusion button event listener since the button was removed
-        // Diffusion will now start on canvas click/touch
         
         // Initialize diffusion visualization mode
         this.updateDiffusionVisualization('basic');
@@ -418,10 +395,6 @@ export class ScientificAnimations {
             this.waves.setWaveType(e.target.value);
         });
         }
-        
-        this.setupSliderControl('waveSpeed', 'waveSpeedValue', (value) => {
-            this.waves.setSpeed(parseFloat(value));
-        });
         
         this.setupSliderControl('waveFrequency', 'waveFrequencyValue', (value) => {
             this.waves.setFrequency(parseFloat(value));
@@ -443,9 +416,6 @@ export class ScientificAnimations {
             this.soundWaves.setFrequency(parseInt(value));
         });
         
-        this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
-            this.soundWaves.setAnimationSpeed(parseFloat(value));
-        });
         
         // Sound waves select and checkbox controls
         const soundWaveTypeSelect = document.getElementById('soundWaveType');
@@ -456,10 +426,6 @@ export class ScientificAnimations {
         }
         
         // Orbital Motion Controls
-        this.setupSliderControl('orbitalSpeed', 'orbitalSpeedValue', (value) => {
-            this.orbital.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('eccentricity', 'eccentricityValue', (value) => {
             this.orbital.setEccentricity(parseFloat(value));
         });
@@ -474,10 +440,6 @@ export class ScientificAnimations {
         });
         
         // Electric Fields Controls
-        this.setupSliderControl('efSpeed', 'efSpeedValue', (value) => {
-            this.electricFields.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('efFieldStrength', 'efFieldStrengthValue', (value) => {
             this.electricFields.setFieldStrength(parseFloat(value));
         });
@@ -486,15 +448,7 @@ export class ScientificAnimations {
             this.electricFields.setParticleCount(parseInt(value));
         });
         
-        // Removed addChargeBtn and clearChargesBtn event listeners
-        
-
-        
         // Magnetic Fields Controls
-        this.setupSliderControl('magneticSpeed', 'magneticSpeedValue', (value) => {
-            this.magneticFields.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('magneticFieldStrength', 'magneticFieldStrengthValue', (value) => {
             this.magneticFields.setFieldStrength(parseFloat(value));
         });
@@ -507,11 +461,20 @@ export class ScientificAnimations {
             this.magneticFields.setShowFieldLines(e.target.checked);
         });
         
-
-        
-
-        
-        // Removed addMagnetBtn and clearMagnetsBtn event listeners
+        // Canvas mouse move for hover effects on control buttons
+        this.canvas.addEventListener('mousemove', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            // Handle hover effects for standardized control buttons
+            const currentAnimation = this.getCurrentAnimationInstance();
+            if (currentAnimation && currentAnimation.handleMouseMove) {
+                currentAnimation.handleMouseMove(x, y);
+            }
+        });
         
         // Canvas click for adding charges, magnets, toggling switch, starting diffusion, and neural network testing
         this.canvas.addEventListener('click', (e) => {
@@ -521,6 +484,12 @@ export class ScientificAnimations {
             const x = (e.clientX - rect.left) * scaleX;
             const y = (e.clientY - rect.top) * scaleY;
             
+            // First check for standardized control buttons on all animations
+            const currentAnimation = this.getCurrentAnimationInstance();
+            if (currentAnimation && currentAnimation.handleButtonClick && currentAnimation.handleButtonClick(x, y)) {
+                return; // Control button was clicked, don't process other clicks
+            }
+            
             if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
                 this.electricFields.addChargeAtPosition(chargeType, x, y);
@@ -528,8 +497,6 @@ export class ScientificAnimations {
                 // Add complete magnet with both poles
                 this.magneticFields.addMagnetAtPosition(x, y);
 
-            } else if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
-                this.diffusion.startDiffusion();
             } else if (this.currentAnimation === 'sound-waves') {
                 // Check for control button clicks first
                 this.soundWaves.handleButtonClick(x, y);
@@ -553,10 +520,6 @@ export class ScientificAnimations {
         });
         
         // Gas Laws Controls
-        this.setupSliderControl('gasSpeed', 'gasSpeedValue', (value) => {
-            this.gasLaws.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('gasParticleCount', 'gasParticleCountValue', (value) => {
             this.gasLaws.setParticleCount(parseInt(value));
         });
@@ -587,10 +550,6 @@ export class ScientificAnimations {
 
         
         // Collision Physics Controls
-        this.setupSliderControl('collisionSpeed', 'collisionSpeedValue', (value) => {
-            this.collisions.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('ballCount', 'ballCountValue', (value) => {
             this.collisions.setBallCount(parseInt(value));
         });
@@ -617,10 +576,6 @@ export class ScientificAnimations {
         });
         
         // Friction & Inclined Planes Controls
-        this.setupSliderControl('frictionSpeed', 'frictionSpeedValue', (value) => {
-            this.friction.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('inclineAngle', 'inclineAngleValue', (value) => {
             this.friction.setInclineAngle(parseFloat(value));
         });
@@ -678,9 +633,7 @@ export class ScientificAnimations {
             const y = (touch.clientY - rect.top) * scaleY;
             
             // Handle different animations based on current animation
-            if (this.currentAnimation === 'diffusion' && !this.diffusion.diffusionStarted) {
-                this.diffusion.startDiffusion();
-            } else if (this.currentAnimation === 'electric-fields') {
+            if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
                 this.electricFields.addChargeAtPosition(chargeType, x, y);
             } else if (this.currentAnimation === 'magnetic-fields') {
@@ -729,10 +682,6 @@ export class ScientificAnimations {
             this.updateDualityControls(e.target.value);
         });
         
-        this.setupSliderControl('dualitySpeed', 'dualitySpeedValue', (value) => {
-            this.waveParticleDuality.setSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('dualityEnergy', 'dualityEnergyValue', (value) => {
             this.waveParticleDuality.setPhotonEnergy(parseFloat(value));
         });
@@ -749,15 +698,9 @@ export class ScientificAnimations {
             this.waveParticleDuality.performMeasurement();
         });
         
-        // Removed resetDualityBtn event listener - main Reset button handles this
-        
         // Initialize duality controls based on current mode
         const initialMode = document.getElementById('dualityMode').value;
         this.updateDualityControls(initialMode);
-        
-        this.setupSliderControl('nuclearSpeed', 'nuclearSpeedValue', (value) => {
-            this.nuclearReactions.setSpeed(parseFloat(value));
-        });
         
         this.setupSliderControl('neutronEnergy', 'neutronEnergyValue', (value) => {
             this.nuclearReactions.setNeutronEnergy(parseFloat(value));
@@ -798,10 +741,6 @@ export class ScientificAnimations {
         });
         
         // Sound Waves Controls
-        this.setupSliderControl('soundAnimationSpeed', 'soundAnimationSpeedValue', (value) => {
-            this.soundWaves.setAnimationSpeed(parseFloat(value));
-        });
-        
         this.setupSliderControl('soundFrequency', 'soundFrequencyValue', (value) => {
             this.soundWaves.setFrequency(parseInt(value));
         });
@@ -858,22 +797,10 @@ export class ScientificAnimations {
             }
         });
         
-        this.setupSliderControl('diodeAnimationSpeed', 'diodeAnimationSpeedValue', (value) => {
-            if (this.diodeTransistor) {
-                this.diodeTransistor.setAnimationSpeed(parseFloat(value));
-            }
-        });
-        
         // Neural Network Controls
         this.setupSliderControl('neuralLearningRate', 'neuralLearningRateValue', (value) => {
             if (this.neuralNetwork) {
                 this.neuralNetwork.setLearningRate(parseFloat(value));
-            }
-        });
-        
-        this.setupSliderControl('neuralSpeed', 'neuralSpeedValue', (value) => {
-            if (this.neuralNetwork) {
-                this.neuralNetwork.setSpeed(parseFloat(value));
             }
         });
         
@@ -892,12 +819,6 @@ export class ScientificAnimations {
         }
 
         // Blockchain Controls
-        this.setupSliderControl('blockchainSpeed', 'blockchainSpeedValue', (value) => {
-            if (this.blockchain) {
-                this.blockchain.setSpeed(parseFloat(value));
-            }
-        });
-        
         this.setupSliderControl('blockchainDifficulty', 'blockchainDifficultyValue', (value) => {
             if (this.blockchain) {
                 this.blockchain.setDifficulty(parseInt(value));
@@ -1079,7 +1000,7 @@ export class ScientificAnimations {
             case 'basic':
                 pendulum.setShowPath(false);
                 pendulum.setShowVelocityVectors(false);
-                pendulum.setShowForceVectors(true);
+                pendulum.setShowForceVectors(false); // Don't show force vectors in basic mode
                 pendulum.setShowEnergyInfo(false);
                 pendulum.setShowPhaseSpace(false);
                 break;
@@ -1222,14 +1143,8 @@ export class ScientificAnimations {
     
     initializeWaveControls() {
         // Synchronize control values with wave parameters
-        const speedSlider = document.getElementById('waveSpeed');
         const frequencySlider = document.getElementById('waveFrequency');
         const amplitudeSlider = document.getElementById('waveAmplitude');
-        
-        if (speedSlider && this.waves) {
-            speedSlider.value = this.waves.speed;
-            document.getElementById('waveSpeedValue').textContent = this.waves.speed + 'x';
-        }
         
         if (frequencySlider && this.waves) {
             frequencySlider.value = this.waves.frequency;
@@ -1251,17 +1166,11 @@ export class ScientificAnimations {
         
         // Synchronize control values with sound waves parameters
         const frequencySlider = document.getElementById('soundFrequency');
-        const animationSpeedSlider = document.getElementById('soundAnimationSpeed');
         const waveTypeSelect = document.getElementById('soundWaveType');
         
         if (frequencySlider && this.soundWaves) {
             frequencySlider.value = this.soundWaves.frequency;
             document.getElementById('soundFrequencyValue').textContent = this.soundWaves.frequency + ' Hz';
-        }
-        
-        if (animationSpeedSlider && this.soundWaves) {
-            animationSpeedSlider.value = this.soundWaves.animationSpeed;
-            document.getElementById('soundAnimationSpeedValue').textContent = this.soundWaves.animationSpeed + 'x';
         }
         
         if (waveTypeSelect && this.soundWaves) {
@@ -1283,10 +1192,53 @@ export class ScientificAnimations {
         }
     }
     
-    togglePlayPause() {
-        this.isRunning = !this.isRunning;
-        const btn = document.getElementById('playPauseBtn');
-        btn.textContent = this.isRunning ? 'Pause' : 'Play';
+    /**
+     * Get the current animation instance based on currentAnimation property
+     * @returns {BaseAnimation|null} - The current animation instance
+     */
+    getCurrentAnimationInstance() {
+        switch(this.currentAnimation) {
+            case 'brownian':
+                return this.brownianMotion;
+            case 'pendulum':
+                return this.pendulum;
+            case 'diffusion':
+                return this.diffusion;
+            case 'waves':
+                return this.waves;
+            case 'orbital':
+                return this.orbital;
+            case 'electric-fields':
+                return this.electricFields;
+            case 'gas-laws':
+                return this.gasLaws;
+            case 'collisions':
+                return this.collisions;
+            case 'friction':
+                return this.friction;
+            case 'magnetic-fields':
+                return this.magneticFields;
+            case 'wave-particle-duality':
+                return this.waveParticleDuality;
+            case 'nuclear-reactions':
+                return this.nuclearReactions;
+            case 'fluid-flow':
+                return this.fluidFlow;
+            case 'bernoulli':
+                return this.bernoulli;
+            case 'sound-waves':
+                return this.soundWaves;
+            case 'diode-transistor':
+                return this.diodeTransistor;
+            case 'neural-network':
+                return this.neuralNetwork;
+            case 'memory-management':
+                return this.memoryManagement;
+            case 'blockchain':
+                return this.blockchain;
+            default:
+                return null;
+        }
     }
     
     applyControlValues() {
@@ -1296,22 +1248,18 @@ export class ScientificAnimations {
             case 'brownian':
                 if (this.brownianMotion) {
                     const particleCount = parseInt(document.getElementById('particleCount')?.value);
-                    const speed = parseFloat(document.getElementById('speed')?.value);
                     const temperature = parseFloat(document.getElementById('temperature')?.value);
                     if (!isNaN(particleCount)) this.brownianMotion.setParticleCount(particleCount);
-                    if (!isNaN(speed)) this.brownianMotion.setSpeed(speed);
                     if (!isNaN(temperature)) this.brownianMotion.setTemperature(temperature);
                 }
                 break;
             case 'pendulum':
                 if (this.pendulum) {
                     const length = parseFloat(document.getElementById('pendulumLength')?.value);
-                    const speed = parseFloat(document.getElementById('pendulumSpeed')?.value);
                     const angle = parseFloat(document.getElementById('initialAngle')?.value);
                     const gravity = parseFloat(document.getElementById('gravity')?.value);
                     const damping = parseFloat(document.getElementById('damping')?.value);
                     if (!isNaN(length)) this.pendulum.setLength(length);
-                    if (!isNaN(speed)) this.pendulum.setSpeed(speed);
                     if (!isNaN(angle)) this.pendulum.setInitialAngle(angle);
                     if (!isNaN(gravity)) this.pendulum.setGravity(gravity);
                     if (!isNaN(damping)) this.pendulum.setDamping(damping);
@@ -1320,10 +1268,8 @@ export class ScientificAnimations {
             case 'diffusion':
                 if (this.diffusion) {
                     const particleCount = parseInt(document.getElementById('diffusionParticles')?.value);
-                    const speed = parseFloat(document.getElementById('diffusionSpeed')?.value);
                     const rate = parseFloat(document.getElementById('diffusionRate')?.value);
                     if (!isNaN(particleCount)) this.diffusion.setParticleCount(particleCount);
-                    if (!isNaN(speed)) this.diffusion.setSpeed(speed);
                     if (!isNaN(rate)) this.diffusion.setDiffusionRate(rate);
                 }
                 break;
@@ -1339,19 +1285,15 @@ export class ScientificAnimations {
                 break;
             case 'orbital':
                 if (this.orbital) {
-                    const speed = parseFloat(document.getElementById('orbitalSpeed')?.value);
                     const eccentricity = parseFloat(document.getElementById('eccentricity')?.value);
-                    if (!isNaN(speed)) this.orbital.setSpeed(speed);
                     if (!isNaN(eccentricity)) this.orbital.setEccentricity(eccentricity);
                 }
                 break;
             case 'gas-laws':
                 if (this.gasLaws) {
-                    const speed = parseFloat(document.getElementById('gasSpeed')?.value);
                     const particleCount = parseInt(document.getElementById('gasParticleCount')?.value);
                     const temperature = parseFloat(document.getElementById('gasTemperature')?.value);
                     const volume = parseFloat(document.getElementById('gasVolume')?.value);
-                    if (!isNaN(speed)) this.gasLaws.setSpeed(speed);
                     if (!isNaN(particleCount)) this.gasLaws.setParticleCount(particleCount);
                     if (!isNaN(temperature)) this.gasLaws.setTemperature(temperature);
                     if (!isNaN(volume)) this.gasLaws.setVolume(volume);
@@ -1359,27 +1301,21 @@ export class ScientificAnimations {
                 break;
             case 'collisions':
                 if (this.collisions) {
-                    const speed = parseFloat(document.getElementById('collisionSpeed')?.value);
                     const ballCount = parseInt(document.getElementById('ballCount')?.value);
-                    if (!isNaN(speed)) this.collisions.setSpeed(speed);
                     if (!isNaN(ballCount)) this.collisions.setBallCount(ballCount);
                 }
                 break;
             case 'friction':
                 if (this.friction) {
-                    const speed = parseFloat(document.getElementById('frictionSpeed')?.value);
                     const coefficient = parseFloat(document.getElementById('frictionCoefficient')?.value);
                     const angle = parseFloat(document.getElementById('inclineAngle')?.value);
-                    if (!isNaN(speed)) this.friction.setSpeed(speed);
                     if (!isNaN(coefficient)) this.friction.setFrictionCoefficient(coefficient);
                     if (!isNaN(angle)) this.friction.setInclineAngle(angle);
                 }
                 break;
             case 'electric-fields':
                 if (this.electricFields) {
-                    const speed = parseFloat(document.getElementById('efSpeed')?.value);
                     const fieldStrength = parseFloat(document.getElementById('efFieldStrength')?.value);
-                    if (!isNaN(speed)) this.electricFields.setSpeed(speed);
                     if (!isNaN(fieldStrength)) this.electricFields.setFieldStrength(fieldStrength);
                 }
                 break;
@@ -1387,10 +1323,8 @@ export class ScientificAnimations {
                 if (this.soundWaves) {
                     const waveType = document.getElementById('soundWaveType')?.value;
                     const frequency = parseFloat(document.getElementById('soundFrequency')?.value);
-                    const animationSpeed = parseFloat(document.getElementById('soundAnimationSpeed')?.value);
                     if (waveType) this.soundWaves.setWaveType(waveType);
                     if (!isNaN(frequency)) this.soundWaves.setFrequency(frequency);
-                    if (!isNaN(animationSpeed)) this.soundWaves.setAnimationSpeed(animationSpeed);
                 }
                 break;
             // Add more cases as needed for other animations
@@ -1493,11 +1427,6 @@ export class ScientificAnimations {
     }
     
     animate(currentTime = 0) {
-        if (!this.isRunning) {
-            requestAnimationFrame((time) => this.animate(time));
-            return;
-        }
-        
         // Initialize lastTime on first frame
         if (this.lastTime === undefined) {
             this.lastTime = currentTime;
@@ -1506,123 +1435,242 @@ export class ScientificAnimations {
         const deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;
         
+        // Get current animation instance and check if it's playing
+        const currentAnimationInstance = this.getCurrentAnimationInstance();
+        if (currentAnimationInstance && !currentAnimationInstance.isAnimationPlaying()) {
+            // Animation is paused, but we still need to render the static frame and controls
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            // Render the current animation (static frame)
+            switch(this.currentAnimation) {
+                case 'brownian':
+                    this.brownianMotion.render();
+                    this.updateBrownianStats();
+                    break;
+                case 'pendulum':
+                    this.pendulum.render();
+                    this.updatePendulumStats();
+                    break;
+                case 'diffusion':
+                    this.diffusion.render();
+                    this.updateDiffusionStats();
+                    break;
+                case 'waves':
+                    this.waves.render();
+                    this.updateWaveStats();
+                    break;
+                case 'orbital':
+                    this.orbital.render();
+                    this.updateOrbitalStats();
+                    break;
+                case 'electric-fields':
+                    this.electricFields.render();
+                    this.updateElectricFieldsStats();
+                    break;
+                case 'gas-laws':
+                    this.gasLaws.render();
+                    this.updateGasLawsStats();
+                    break;
+                case 'collisions':
+                    this.collisions.render();
+                    this.updateCollisionStats();
+                    break;
+                case 'friction':
+                    this.friction.render();
+                    this.updateFrictionStats();
+                    break;
+                case 'magnetic-fields':
+                    this.magneticFields.render();
+                    this.updateMagneticFieldsStats();
+                    break;
+                case 'wave-particle-duality':
+                    this.waveParticleDuality.render();
+                    this.updateWaveParticleDualityStats();
+                    break;
+                case 'nuclear-reactions':
+                    this.nuclearReactions.render();
+                    break;
+                case 'fluid-flow':
+                    if (this.fluidFlow) {
+                        this.fluidFlow.render();
+                        this.updateFluidFlowStats();
+                    }
+                    break;
+                case 'bernoulli':
+                    if (this.bernoulli) {
+                        this.bernoulli.render();
+                        this.updateBernoulliStats();
+                    }
+                    break;
+                case 'sound-waves':
+                    if (this.soundWaves) {
+                        this.soundWaves.render();
+                        this.updateSoundWavesStats();
+                    }
+                    break;
+                case 'diode-transistor':
+                    if (this.diodeTransistor) {
+                        this.diodeTransistor.render();
+                        this.updateDiodeTransistorStats();
+                    }
+                    break;
+                case 'neural-network':
+                    if (this.neuralNetwork) {
+                        this.neuralNetwork.render();
+                        this.updateNeuralNetworkStats();
+                    }
+                    break;
+                case 'memory-management':
+                    if (this.memoryManagement) {
+                        this.memoryManagement.render();
+                        this.updateMemoryManagementStats();
+                    }
+                    break;
+                case 'blockchain':
+                    if (this.blockchain) {
+                        this.blockchain.render();
+                        this.updateBlockchainStats();
+                    } else {
+                        console.error('Blockchain instance not found!');
+                    }
+                    break;
+            }
+            
+            // Draw standardized control buttons for all animations
+            if (currentAnimationInstance && currentAnimationInstance.drawControlButtons) {
+                currentAnimationInstance.drawControlButtons();
+            }
+            
+            requestAnimationFrame((time) => this.animate(time));
+            return;
+        }
+        
+        // Apply speed multiplier if available
+        const speedMultiplier = currentAnimationInstance ? currentAnimationInstance.getSpeedMultiplier() : 1;
+        const adjustedDeltaTime = deltaTime * speedMultiplier;
+        
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Update and render current animation
         switch(this.currentAnimation) {
             case 'brownian':
-                this.brownianMotion.update(deltaTime);
+                this.brownianMotion.update(adjustedDeltaTime);
                 this.brownianMotion.render();
                 this.updateBrownianStats();
                 break;
             case 'pendulum':
-                this.pendulum.update(deltaTime);
+                this.pendulum.update(adjustedDeltaTime);
                 this.pendulum.render();
                 this.updatePendulumStats();
                 break;
             case 'diffusion':
-                this.diffusion.update(deltaTime);
+                this.diffusion.update(adjustedDeltaTime);
                 this.diffusion.render();
                 this.updateDiffusionStats();
                 break;
             case 'waves':
-                this.waves.update(deltaTime);
+                this.waves.update(adjustedDeltaTime);
                 this.waves.render();
                 this.updateWaveStats();
                 break;
             case 'orbital':
-                this.orbital.update(deltaTime);
+                this.orbital.update(adjustedDeltaTime);
                 this.orbital.render();
                 this.updateOrbitalStats();
                 break;
             case 'electric-fields':
-                this.electricFields.update(deltaTime);
+                this.electricFields.update(adjustedDeltaTime);
                 this.electricFields.render();
                 this.updateElectricFieldsStats();
                 break;
             case 'gas-laws':
-                this.gasLaws.update(deltaTime);
+                this.gasLaws.update(adjustedDeltaTime);
                 this.gasLaws.render();
                 this.updateGasLawsStats();
                 break;
             case 'collisions':
-                this.collisions.update(deltaTime);
+                this.collisions.update(adjustedDeltaTime);
                 this.collisions.render();
                 this.updateCollisionStats();
                 break;
             case 'friction':
-                this.friction.update(deltaTime);
+                this.friction.update(adjustedDeltaTime);
                 this.friction.render();
                 this.updateFrictionStats();
                 break;
 
             case 'magnetic-fields':
-                this.magneticFields.update(deltaTime);
+                this.magneticFields.update(adjustedDeltaTime);
                 this.magneticFields.render();
                 this.updateMagneticFieldsStats();
                 break;
 
             case 'wave-particle-duality':
-                this.waveParticleDuality.update(deltaTime);
+                this.waveParticleDuality.update(adjustedDeltaTime);
                 this.waveParticleDuality.render();
                 this.updateWaveParticleDualityStats();
                 break;
             case 'nuclear-reactions':
-                this.nuclearReactions.update(deltaTime);
+                this.nuclearReactions.update(adjustedDeltaTime);
                 this.nuclearReactions.render();
                 break;
             case 'fluid-flow':
                 if (this.fluidFlow) {
-                    this.fluidFlow.update(deltaTime);
+                    this.fluidFlow.update(adjustedDeltaTime);
                     this.fluidFlow.render();
                     this.updateFluidFlowStats();
                 }
                 break;
             case 'bernoulli':
                 if (this.bernoulli) {
-                    this.bernoulli.update(deltaTime);
+                    this.bernoulli.update(adjustedDeltaTime);
                     this.bernoulli.render();
                     this.updateBernoulliStats();
                 }
                 break;
             case 'sound-waves':
                 if (this.soundWaves) {
-                    this.soundWaves.update(deltaTime);
+                    this.soundWaves.update(adjustedDeltaTime);
                     this.soundWaves.render();
                     this.updateSoundWavesStats();
                 }
                 break;
             case 'diode-transistor':
                 if (this.diodeTransistor) {
-                    this.diodeTransistor.update(deltaTime);
+                    this.diodeTransistor.update(adjustedDeltaTime);
                     this.diodeTransistor.render();
                     this.updateDiodeTransistorStats();
                 }
                 break;
             case 'neural-network':
                 if (this.neuralNetwork) {
-                    this.neuralNetwork.update(deltaTime);
+                    this.neuralNetwork.update(adjustedDeltaTime);
                     this.neuralNetwork.render();
                     this.updateNeuralNetworkStats();
                 }
                 break;
             case 'memory-management':
                 if (this.memoryManagement) {
-                    this.memoryManagement.update(deltaTime);
+                    this.memoryManagement.update(adjustedDeltaTime);
                     this.memoryManagement.render();
                     this.updateMemoryManagementStats();
                 }
                 break;
             case 'blockchain':
                 if (this.blockchain) {
-                    this.blockchain.update(deltaTime);
+                    this.blockchain.update(adjustedDeltaTime);
                     this.blockchain.render();
                     this.updateBlockchainStats();
                 } else {
                     console.error('Blockchain instance not found!');
                 }
                 break;
+        }
+        
+        // Draw standardized control buttons for all animations
+        if (currentAnimationInstance && currentAnimationInstance.drawControlButtons) {
+            currentAnimationInstance.drawControlButtons();
         }
         
         requestAnimationFrame((time) => this.animate(time));
@@ -1994,8 +2042,7 @@ export class ScientificAnimations {
                     frequency: document.getElementById('soundFrequency')?.value || '5',
                     amplitude: document.getElementById('soundAmplitude')?.value || '50',
                     waveSpeed: document.getElementById('soundSpeed')?.value || '343',
-                    particleCount: document.getElementById('soundParticles')?.value || '15',
-                    animationSpeed: document.getElementById('soundAnimationSpeed')?.value || '1.0'
+                    particleCount: document.getElementById('soundParticles')?.value || '15'
                 };
                 state.stats = this.soundWaves?.getStats() || {};
                 break;
@@ -2840,7 +2887,7 @@ export class ScientificAnimations {
                         </div>
                     `
                 };
-                        case 'neural-network':
+            case 'neural-network':
                 return {
                     title: 'Neural Network Training - Object Recognition',
                     html: `
@@ -2887,174 +2934,6 @@ export class ScientificAnimations {
                             <h3>Applications</h3>
                             <ul>
                                 <li>Vision (image classification), NLP (text classification), speech, robotics, medicine, finance.</li>
-                            </ul>
-                        </div>
-                    `
-                };
-            case 'sound-waves':
-                return {
-                    title: 'Sound Waves - Wave Propagation in Air',
-                    html: `
-                        <div class="science-content">
-                            <h3>What are Sound Waves?</h3>
-                            <p>Sound waves are longitudinal mechanical waves that travel through a medium (like air, water, or solids) by compressing and rarefying the particles of the medium. These waves carry energy and information, allowing us to hear sounds.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
-                            <ul>
-                                <li><strong>Longitudinal Waves:</strong> Particles oscillate parallel to wave direction (compression and rarefaction)</li>
-                                <li><strong>Transverse Waves:</strong> Particles oscillate perpendicular to wave direction (like guitar strings)</li>
-                                <li><strong>Wave Properties:</strong> Frequency (pitch), amplitude (loudness), wavelength, and speed</li>
-                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
-                                <li><strong>Pressure Variations:</strong> High pressure (compression) and low pressure (rarefaction) zones</li>
-                            </ul>
-                            
-                            <h3>What You Should Observe</h3>
-                            <ul>
-                                <li><strong>Transverse Mode:</strong> Particles moving up and down like a guitar string</li>
-                                <li><strong>Longitudinal Mode:</strong> Particles moving back and forth in the direction of wave travel</li>
-                                <li><strong>Pressure Zones:</strong> Red areas (compression) and blue areas (rarefaction) in longitudinal waves</li>
-                                <li><strong>Wave Speed:</strong> How fast the wave pattern travels through the medium</li>
-                                <li><strong>Frequency Effect:</strong> Higher frequency = shorter wavelength = higher pitch</li>
-                            </ul>
-                            
-                            <h3>Wave Characteristics</h3>
-                            <ul>
-                                <li><strong>Frequency (f):</strong> Number of complete cycles per second (Hz) - determines pitch</li>
-                                <li><strong>Amplitude (A):</strong> Maximum displacement from equilibrium - determines loudness</li>
-                                <li><strong>Wavelength (λ):</strong> Distance between consecutive identical points</li>
-                                <li><strong>Wave Speed (v):</strong> How fast the wave travels through the medium</li>
-                                <li><strong>Period (T):</strong> Time for one complete cycle (T = 1/f)</li>
-                            </ul>
-                            
-                            <h3>Real-World Applications</h3>
-                            <ul>
-                                <li>Musical instruments (guitar strings, air columns)</li>
-                                <li>Human speech and hearing</li>
-                <li>Ultrasound imaging in medicine</li>
-                                <li>Sonar for underwater detection</li>
-                                <li>Acoustic engineering and sound design</li>
-                                <li>Earthquake detection (seismic waves)</li>
-                            </ul>
-                            
-                            <h3>Mathematical Relationships</h3>
-                            <ul>
-                                <li><strong>Wave Equation:</strong> v = fλ (speed = frequency × wavelength)</li>
-                                <li><strong>Period and Frequency:</strong> T = 1/f (period = 1/frequency)</li>
-                                <li><strong>Energy:</strong> E ∝ A²f² (energy proportional to amplitude² × frequency²)</li>
-                                <li><strong>Intensity:</strong> I ∝ A² (intensity proportional to amplitude squared)</li>
-                            </ul>
-                            
-                            <h3>Wave Types Comparison</h3>
-                            <ul>
-                                <li><strong>Transverse Waves:</strong> Guitar strings, water waves, light waves</li>
-                                <li><strong>Longitudinal Waves:</strong> Sound waves in air, seismic P-waves</li>
-                                <li><strong>Combined Waves:</strong> Complex wave patterns with both components</li>
-                            </ul>
-                        </div>
-                    `
-                };
-            case 'neural-network':
-                return {
-                    title: 'Neural Network Training - Object Recognition',
-                    html: `
-                        <div class="science-content">
-                            <h3>What are Neural Networks?</h3>
-                            <p>Neural networks are computational models inspired by biological neurons in the brain. They consist of interconnected nodes (neurons) organized in layers that process information and learn patterns from data. This animation demonstrates how neural networks learn to recognize and classify different geometric objects.</p>
-                            
-                            <h3>Key Scientific Concepts</h3>
-                            <ul>
-                                <li><strong>Artificial Neurons:</strong> Mathematical functions that receive inputs, apply weights, and produce outputs. Each neuron computes: output = σ(Σ(inputs × weights) + bias)</li>
-                                <li><strong>Network Architecture:</strong> Input layer (2 neurons) → Hidden layer 1 (4 neurons) → Hidden layer 2 (3 neurons) → Output layer (1 neuron)</li>
-                            </ul>
-                            
-                            <h3>Why This Architecture?</h3>
-                            <ul>
-                                <li><strong>2 Input Neurons:</strong> Perfect for our 2-feature problem (symmetry, edges)</li>
-                                <li><strong>4 Hidden Neurons:</strong> Provides enough capacity to learn non-linear patterns without overfitting</li>
-                                <li><strong>3 Hidden Neurons:</strong> Allows further feature refinement and abstraction</li>
-                                <li><strong>1 Output Neuron:</strong> Binary classification (simple vs complex objects)</li>
-                            </ul>
-                            
-                            <h3>Layer Size Effects</h3>
-                            <ul>
-                                <li><strong>Too Few Neurons:</strong> Network can't learn complex patterns (underfitting)</li>
-                                <li><strong>Too Many Neurons:</strong> Network memorizes training data (overfitting)</li>
-                                <li><strong>Optimal Size:</strong> Balances learning capacity with generalization</li>
-                                <li><strong>Our Choice:</strong> 4→3 hidden layers provide sufficient complexity for this task</li>
-                            </ul>
-                                <li><strong>Weights & Biases:</strong> Numerical values that determine connection strength and neuron activation thresholds</li>
-                                <li><strong>Sigmoid Activation:</strong> σ(x) = 1/(1 + e^(-x)) - transforms any input to a value between 0 and 1</li>
-                                <li><strong>Backpropagation:</strong> Algorithm that calculates how much each weight should change to reduce prediction errors</li>
-                                <li><strong>Learning Rate:</strong> Controls how big weight updates are during training</li>
-                            </ul>
-                            
-                            <h3>Training Process Explained</h3>
-                            <ol>
-                                <li><strong>Forward Propagation:</strong> Input features flow through the network, each neuron computes its output using weights and activation function</li>
-                                <li><strong>Loss Calculation:</strong> Compare network output with target value using Mean Squared Error: Loss = (target - output)²</li>
-                                <li><strong>Backward Propagation:</strong> Calculate error gradients for each weight using chain rule of calculus</li>
-                                <li><strong>Weight Updates:</strong> Adjust weights using gradient descent: Δw = learning_rate × gradient</li>
-                            </ol>
-                            
-                            <h3>Object Recognition Task</h3>
-                            <p>This network learns to classify geometric objects based on their complexity using 2 features:</p>
-                            <ul>
-                                <li><strong>Feature 1 - Symmetry Score (0-1):</strong> How symmetrical the object is (high = simple)</li>
-                                <li><strong>Feature 2 - Edge Complexity (0-1):</strong> How many edges/corners the object has (high = complex)</li>
-                                <li><strong>Simple Objects:</strong> Circle [0.9,0.1], Square [0.8,0.3] → Output: 0 (classified as simple)</li>
-                                <li><strong>Complex Objects:</strong> Triangle [0.6,0.5], Star [0.3,0.9] → Output: 1 (classified as complex)</li>
-                            </ul>
-                            
-                            <h3>What You Should Observe</h3>
-                            <ul>
-                                <li><strong>Training Mode:</strong> Watch data flow forward (blue particles), errors flow backward (red particles), and weights update (flashing connections)</li>
-                                <li><strong>Testing Mode:</strong> See how the trained network processes new inputs and makes predictions with confidence scores</li>
-                                <li><strong>Visual Indicators:</strong> Active neurons pulse, weight changes are highlighted, and prediction accuracy improves over time</li>
-                                <li><strong>Object Context:</strong> Each training example shows the actual geometric object being learned</li>
-                            </ul>
-                            
-                            <h3>Mathematical Foundation</h3>
-                            <ul>
-                                <li><strong>Neuron Output:</strong> y = σ(w₁x₁ + w₂x₂ + ... + wₙxₙ + b)</li>
-                                <li><strong>Loss Function:</strong> L = (y_target - y_predicted)²</li>
-                                <li><strong>Weight Update:</strong> w_new = w_old - α × ∂L/∂w</li>
-                                <li><strong>Gradient Calculation:</strong> ∂L/∂w = ∂L/∂y × ∂y/∂w (chain rule)</li>
-                            </ul>
-                            
-                            <h3>Real-World Applications</h3>
-                            <ul>
-                                <li><strong>Computer Vision:</strong> Image classification, object detection, facial recognition</li>
-                                <li><strong>Natural Language Processing:</strong> Text classification, language translation, chatbots</li>
-                                <li><strong>Speech Recognition:</strong> Voice assistants, transcription services</li>
-                                <li><strong>Autonomous Systems:</strong> Self-driving cars, robotics, drones</li>
-                                <li><strong>Medical Diagnosis:</strong> Disease detection, medical image analysis</li>
-                                <li><strong>Financial Analysis:</strong> Fraud detection, stock prediction, risk assessment</li>
-                            </ul>
-                            
-                            <h3>Educational Insights</h3>
-                            <ul>
-                                <li><strong>Learning Process:</strong> Neural networks learn by adjusting weights to minimize prediction errors</li>
-                                <li><strong>Feature Learning:</strong> Hidden layers automatically learn useful features from raw input data</li>
-                                <li><strong>Generalization:</strong> Well-trained networks can make accurate predictions on unseen data</li>
-                                <li><strong>Overfitting:</strong> Networks can memorize training data instead of learning general patterns</li>
-                                <li><strong>Hyperparameters:</strong> Learning rate, network architecture, and activation functions affect training success</li>
-                            </ul>
-                            
-                            <h3>Interactive Features</h3>
-                            <ul>
-                                <li><strong>Training Mode:</strong> Watch the network learn through forward/backward propagation cycles</li>
-                                <li><strong>Testing Mode:</strong> Test the trained network on different objects and see predictions</li>
-                                <li><strong>Parameter Control:</strong> Adjust learning rate and animation speed to observe different training behaviors</li>
-                                <li><strong>Visual Feedback:</strong> See real-time loss, accuracy, and confidence metrics</li>
-                            </ul>
-                            
-                            <h3>Advanced Concepts</h3>
-                            <ul>
-                                <li><strong>Gradient Descent:</strong> Optimization algorithm that finds the best weights by following the steepest descent</li>
-                                <li><strong>Vanishing Gradients:</strong> Problem where gradients become very small in deep networks</li>
-                                <li><strong>Regularization:</strong> Techniques to prevent overfitting (dropout, weight decay)</li>
-                                <li><strong>Batch Processing:</strong> Training on multiple examples simultaneously for better gradient estimates</li>
-                                <li><strong>Transfer Learning:</strong> Using pre-trained networks for new tasks</li>
                             </ul>
                         </div>
                     `

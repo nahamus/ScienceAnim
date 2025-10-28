@@ -99,6 +99,8 @@ export class ElectricFields extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 20; // Much faster animation
         this.time += dt;
         
@@ -394,7 +396,9 @@ export class ElectricFields extends BaseAnimation {
     drawElectricLabels() {
         this.drawLabels(
             'Electric Fields',
-            'E = kQ/r²  |  F = kq₁q₂/r²  |  E = ΣEᵢ'
+            'E = kQ/r²  |  F = kq₁q₂/r²  |  E = ΣEᵢ',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
         
         // Draw test particle explanation banner
@@ -402,46 +406,18 @@ export class ElectricFields extends BaseAnimation {
     }
     
     drawTestParticleBanner() {
-        // Create banner background with gradient
-        const bannerWidth = 320;
-        const bannerHeight = 40;
-        const bannerX = 10;
-        const bannerY = this.ctx.canvas.height - 55;
+        // Position label at center bottom of canvas - no background
+        const bannerY = this.ctx.canvas.height - 30; // Bottom of canvas
         
-        // Banner background with gradient
-        const bannerGradient = this.ctx.createLinearGradient(bannerX, bannerY, bannerX, bannerY + bannerHeight);
-        bannerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-        bannerGradient.addColorStop(1, 'rgba(240, 240, 240, 0.95)');
-        
-        this.ctx.fillStyle = bannerGradient;
-        this.ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
-        
-        // Banner border with glow
-        this.ctx.shadowColor = 'rgba(102, 126, 234, 0.6)';
-        this.ctx.shadowBlur = 4;
-        this.ctx.strokeStyle = 'rgba(102, 126, 234, 0.8)';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(bannerX, bannerY, bannerWidth, bannerHeight);
-        this.ctx.shadowBlur = 0;
-        
-        // Banner text
+        // Banner text - centered, smaller font, no background, no border
         this.ctx.fillStyle = '#1a1a2e';
-        this.ctx.font = 'bold 13px Inter, Arial, sans-serif';
+        this.ctx.font = 'bold 11px Inter, Arial, sans-serif'; // Reduced from 13px to 11px
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'left';
+        this.ctx.textAlign = 'center'; // Center aligned
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('White particles = Test charges (positive)', bannerX + 12, bannerY + bannerHeight/2);
+        this.ctx.fillText('White particles = Test charges (positive)', this.ctx.canvas.width / 2, bannerY);
         
-        // Add small test charge icon with glow
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        this.ctx.arc(bannerX + 290, bannerY + bannerHeight/2, 6, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.arc(bannerX + 290, bannerY + bannerHeight/2, 3, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Icon removed since there's no background banner
     }
 }
 
@@ -601,6 +577,8 @@ export class MagneticFields extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 3;
         this.time += dt;
         
@@ -705,7 +683,7 @@ export class MagneticFields extends BaseAnimation {
         const lineLength = 150;
         
         // Create a grid of starting points
-        const gridSize = 8;
+        const gridSize = 12; // Increased from 8 to 12 for more field lines
         const stepX = this.ctx.canvas.width / gridSize;
         const stepY = this.ctx.canvas.height / gridSize;
         
@@ -733,7 +711,7 @@ export class MagneticFields extends BaseAnimation {
         
         // Combined field line color: high-contrast cyan
         this.ctx.strokeStyle = '#00D1FF';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 1; // Reduced thickness for cleaner appearance
         this.ctx.lineCap = 'round';
         
         this.ctx.beginPath();
@@ -1372,62 +1350,21 @@ export class MagneticFields extends BaseAnimation {
     }
     
     drawMagneticBanner() {
-        // Create banner background with modern dark theme
-        const bannerWidth = 450;
-        const bannerHeight = 60;
-        const bannerX = 15;
-        const bannerY = this.ctx.canvas.height - 75;
+        // Position labels at center bottom of canvas - no background
+        const bannerY = this.ctx.canvas.height - 30; // Bottom of canvas
         
-        // Banner background with dark gradient
-        const bannerGradient = this.ctx.createLinearGradient(bannerX, bannerY, bannerX, bannerY + bannerHeight);
-        bannerGradient.addColorStop(0, 'rgba(26, 26, 46, 0.95)');
-        bannerGradient.addColorStop(1, 'rgba(22, 33, 62, 0.95)');
-        
-        this.ctx.fillStyle = bannerGradient;
-        this.ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
-        
-        // Banner border with subtle glow
-        this.ctx.shadowColor = 'rgba(255, 107, 107, 0.3)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.strokeStyle = 'rgba(255, 107, 107, 0.6)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(bannerX, bannerY, bannerWidth, bannerHeight);
-        this.ctx.shadowBlur = 0;
-        
-        // Banner text with better contrast
-        this.ctx.fillStyle = '#ffffff';
+        // Main instruction text - centered, dark color for contrast against white canvas
+        this.ctx.fillStyle = '#1a1a1a'; // Dark color for good contrast against white
         this.ctx.font = 'bold 14px Inter, Arial, sans-serif';
         this.ctx.textRenderingOptimization = 'optimizeLegibility';
-        this.ctx.textAlign = 'left';
+        this.ctx.textAlign = 'center'; // Center aligned
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('Click to add complete magnets (N-S pairs)', bannerX + 15, bannerY + bannerHeight/2 - 10);
+        this.ctx.fillText('Click to add complete magnets (N-S pairs)', this.ctx.canvas.width / 2, bannerY - 15);
         
+        // Secondary text - smaller, also centered
         this.ctx.font = '12px Inter, Arial, sans-serif';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.fillText('Red particles = Positive charge, Blue particles = Negative charge', bannerX + 15, bannerY + bannerHeight/2 + 10);
-        
-        // Add magnet icon with better styling
-        const iconX = bannerX + 400;
-        const iconY = bannerY + bannerHeight/2;
-        
-        // Magnet icon background
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(255, 107, 107, 0.2)';
-        this.ctx.arc(iconX, iconY, 8, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Magnet icon
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.arc(iconX, iconY, 4, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Add N label to magnet icon
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = 'bold 10px Inter, Arial, sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('N', iconX, iconY);
+        this.ctx.fillStyle = '#333333'; // Dark gray for good contrast
+        this.ctx.fillText('Red particles = Positive charge, Blue particles = Negative charge', this.ctx.canvas.width / 2, bannerY + 5);
     }
 }
 
@@ -1641,6 +1578,8 @@ export class DiodeTransistor extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime * this.animationSpeed;
         this.calculateCurrent();
         
@@ -2444,65 +2383,6 @@ export class DiodeTransistor extends BaseAnimation {
         });
     }
     
-    drawCurrentFlow() {
-        if (!this.showCurrent || !this.isActive) return;
-        
-        const time = this.time * 0.001;
-        
-        // Draw current flow with enhanced effects and animation
-        this.ctx.strokeStyle = `rgba(204, 143, 0, ${0.85 + this.glowIntensity * 0.5})`;
-        this.ctx.lineWidth = 4;
-        this.ctx.setLineDash([15, 8]);
-        
-        // Add glow effect to current flow
-        this.ctx.shadowColor = '#CC8F00';
-        this.ctx.shadowBlur = 10 + this.glowIntensity * 10;
-        
-        // Battery to component with animated dash pattern
-        const dashOffset = Math.sin(time * 3) * 5;
-        this.ctx.setLineDash([15 + dashOffset, 8 - dashOffset]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.batteryX + 25, this.batteryY);
-        this.ctx.lineTo(this.componentX - 90, this.componentY);
-        this.ctx.stroke();
-        
-        // Component to load with animated dash pattern
-        this.ctx.setLineDash([15 - dashOffset, 8 + dashOffset]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.componentX + 90, this.componentY);
-        this.ctx.lineTo(this.loadX - 35, this.loadY);
-        this.ctx.stroke();
-        
-        this.ctx.setLineDash([]);
-        this.ctx.shadowBlur = 0;
-        
-        // Draw animated current arrows with pulsing effect
-        const arrowOffset = Math.sin(time * 2) * 5;
-        const arrowGlow = Math.sin(time * 4) * 0.3 + 0.7;
-        this.drawArrow(this.batteryX + 35 + arrowOffset, this.batteryY, 12, 0, `rgba(204, 143, 0, ${arrowGlow})`);
-        this.drawArrow(this.componentX + 100 + arrowOffset, this.componentY, 12, 0, `rgba(204, 143, 0, ${arrowGlow})`);
-        
-        // Draw current intensity indicator with animation
-        const intensity = Math.min(this.current / 20, 1);
-        const pulseIntensity = intensity * (0.3 + Math.sin(time * 5) * 0.1);
-        this.ctx.fillStyle = `rgba(204, 143, 0, ${pulseIntensity})`;
-        this.ctx.fillRect(this.componentX - 100, this.componentY - 10, 200, 20);
-        
-        // Add energy particles along the current path
-        for (let i = 0; i < 5; i++) {
-            const particleProgress = (time * 0.5 + i * 0.2) % 1;
-            const particleX = this.batteryX + 25 + (this.componentX - 90 - this.batteryX - 25) * particleProgress;
-            const particleY = this.batteryY + Math.sin(time * 3 + i) * 3;
-            
-            this.ctx.fillStyle = `rgba(204, 143, 0, ${0.6 + Math.sin(time * 4 + i) * 0.2})`;
-            this.ctx.beginPath();
-            this.ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-        
-        // Voltage drop indicators are already shown on the component symbol
-    }
-    
     drawArrow(x, y, dx, dy, color) {
         this.ctx.fillStyle = color;
         this.ctx.beginPath();
@@ -2514,96 +2394,104 @@ export class DiodeTransistor extends BaseAnimation {
     }
     
     drawInfo() {
-        // Draw info panel
+        // Draw compact info panel at bottom-left to avoid control button overlap
+        const panelWidth = 280;
+        const panelHeight = 120;
+        const panelX = 10;
+        const panelY = this.ctx.canvas.height - panelHeight - 10;
+        
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(10, 10, 300, 200);
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
         
         this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 16px Arial';
+        this.ctx.font = 'bold 14px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('🔌 Diode & Transistor', 20, 30);
+        this.ctx.fillText('🔌 Diode & Transistor', panelX + 10, panelY + 20);
         
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText(`Component: ${this.componentType.toUpperCase()}`, 20, 50);
-        this.ctx.fillText(`Bias: ${this.biasType.toUpperCase()}`, 20, 70);
-        this.ctx.fillText(`Input Voltage: ${this.inputVoltage}V`, 20, 90);
+        this.ctx.font = '12px Arial';
+        // Compact layout with essential info only
+        this.ctx.fillText(`${this.componentType.toUpperCase()} | ${this.biasType.toUpperCase()}`, panelX + 10, panelY + 40);
+        this.ctx.fillText(`V: ${this.inputVoltage}V | I: ${this.current.toFixed(1)}mA`, panelX + 10, panelY + 55);
+        this.ctx.fillText(`P: ${this.power.toFixed(1)}mW | ${this.isActive ? 'ON' : 'OFF'}`, panelX + 10, panelY + 70);
         
         if (this.componentType === 'npn' || this.componentType === 'pnp') {
-            this.ctx.fillText(`Base Voltage: ${this.baseVoltage}V`, 20, 110);
+            this.ctx.fillText(`Base: ${this.baseVoltage}V`, panelX + 10, panelY + 85);
         }
         
-        this.ctx.fillText(`Current: ${this.current.toFixed(1)}mA`, 20, 130);
-        this.ctx.fillText(`Power: ${this.power.toFixed(1)}mW`, 20, 150);
-        this.ctx.fillText(`Status: ${this.isActive ? 'ACTIVE' : 'INACTIVE'}`, 20, 170);
-        this.ctx.fillText(`Temperature: ${this.temperature}°C`, 20, 190);
+        this.ctx.fillText(`Temp: ${this.temperature}°C`, panelX + 10, panelY + 100);
     }
     
     drawInstructions() {
-        // Draw instruction panel with color legend
+        // Draw instruction panel with color legend at bottom-right
+        const panelWidth = 300;
+        const panelHeight = 160;
+        const panelX = this.ctx.canvas.width - panelWidth - 10;
+        const panelY = this.ctx.canvas.height - panelHeight - 10;
+        
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        this.ctx.fillRect(this.ctx.canvas.width - 320, 10, 310, 180);
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
         
         this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 16px Arial';
+        this.ctx.font = 'bold 14px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('🔌 Particle Legend:', this.ctx.canvas.width - 310, 30);
+        this.ctx.fillText('⚡ Particle Legend', panelX + 10, panelY + 20);
         
         // Draw color-coded legend
-        this.ctx.font = 'bold 14px Arial';
+        this.ctx.font = 'bold 12px Arial';
         
         // Blue particles (Electrons) - filled circle
         this.ctx.fillStyle = '#008EDA';
         this.ctx.beginPath();
-        this.ctx.arc(this.ctx.canvas.width - 300, 50, 2.5, 0, Math.PI * 2);
+        this.ctx.arc(panelX + 20, panelY + 35, 2.5, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('Electrons (filled circle)', this.ctx.canvas.width - 285, 55);
+        this.ctx.font = '11px Arial';
+        this.ctx.fillText('Electrons (filled)', panelX + 30, panelY + 38);
         
         // Red particles (Holes) - empty circle
         this.ctx.strokeStyle = '#FF4444';
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
-        this.ctx.arc(this.ctx.canvas.width - 300, 70, 2.5, 0, Math.PI * 2);
+        this.ctx.arc(panelX + 20, panelY + 50, 2.5, 0, Math.PI * 2);
         this.ctx.stroke();
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('Holes (empty circle)', this.ctx.canvas.width - 285, 75);
+        this.ctx.font = '11px Arial';
+        this.ctx.fillText('Holes (empty)', panelX + 30, panelY + 53);
         
         // Yellow particles (Energy)
         this.ctx.fillStyle = '#CC8F00';
         this.ctx.beginPath();
-        this.ctx.arc(this.ctx.canvas.width - 300, 90, 2.5, 0, Math.PI * 2);
+        this.ctx.arc(panelX + 20, panelY + 65, 2.5, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('Energy Carriers', this.ctx.canvas.width - 285, 95);
+        this.ctx.font = '11px Arial';
+        this.ctx.fillText('Energy Carriers', panelX + 30, panelY + 68);
         
         // Yellow arrows (Current flow)
         this.ctx.fillStyle = '#CC8F00';
         this.ctx.beginPath();
-        this.ctx.moveTo(this.ctx.canvas.width - 300, 110);
-        this.ctx.lineTo(this.ctx.canvas.width - 290, 110);
-        this.ctx.lineTo(this.ctx.canvas.width - 292, 108);
-        this.ctx.lineTo(this.ctx.canvas.width - 290, 110);
-        this.ctx.lineTo(this.ctx.canvas.width - 292, 112);
+        this.ctx.moveTo(panelX + 18, panelY + 80);
+        this.ctx.lineTo(panelX + 25, panelY + 80);
+        this.ctx.lineTo(panelX + 23, panelY + 78);
+        this.ctx.lineTo(panelX + 25, panelY + 80);
+        this.ctx.lineTo(panelX + 23, panelY + 82);
         this.ctx.fill();
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText('Current Flow', this.ctx.canvas.width - 285, 115);
+        this.ctx.font = '11px Arial';
+        this.ctx.fillText('Current Flow', panelX + 30, panelY + 83);
         
         // Component behavior
         this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.fillText('💡 Behavior:', this.ctx.canvas.width - 310, 140);
+        this.ctx.font = 'bold 11px Arial';
+        this.ctx.fillText('💡 Behavior:', panelX + 10, panelY + 100);
         
-        this.ctx.font = '11px Arial';
+        this.ctx.font = '10px Arial';
         if (this.componentType === 'diode') {
-            this.ctx.fillText('• Forward bias: Electrons flow, light on', this.ctx.canvas.width - 310, 155);
-            this.ctx.fillText('• Reverse bias: No flow, light off', this.ctx.canvas.width - 310, 170);
+            this.ctx.fillText('• Forward: Electrons flow, light on', panelX + 10, panelY + 115);
+            this.ctx.fillText('• Reverse: No flow, light off', panelX + 10, panelY + 130);
         } else {
-            this.ctx.fillText('• Base controls collector current', this.ctx.canvas.width - 310, 155);
-            this.ctx.fillText('• Small base = Large collector', this.ctx.canvas.width - 310, 170);
+            this.ctx.fillText('• Base controls collector current', panelX + 10, panelY + 115);
+            this.ctx.fillText('• Small base = Large collector', panelX + 10, panelY + 130);
         }
     }
     

@@ -9,6 +9,7 @@ export class WavePropagation extends BaseAnimation {
         this.waveType = 'transverse';
         this.speed = 1;
         this.frequency = 1;
+        this.frequencyMultiplier = 0.3; // Reduce oscillation speed
         this.amplitude = 50;
         this.wavelength = 150;
         this.showAnalytics = false;
@@ -23,12 +24,27 @@ export class WavePropagation extends BaseAnimation {
     initializeParticles() {
         this.particles = [];
         const particleCount = 80; // Reduced particles for cleaner visualization
+        const centerY = this.ctx.canvas.height / 2;
+        
         for (let i = 0; i < particleCount; i++) {
+            const x = (i / particleCount) * this.ctx.canvas.width;
+            
+            // Create default wave pattern based on wave type
+            let y = centerY;
+            if (this.waveType === 'transverse') {
+                // Default transverse wave pattern (sine wave)
+                const phase = (x / this.wavelength) * 2 * Math.PI;
+                y = centerY + this.amplitude * Math.sin(phase);
+            } else if (this.waveType === 'longitudinal') {
+                // For longitudinal waves, particles stay at center but will show compression/rarefaction
+                y = centerY;
+            }
+            
             this.particles.push({
-                x: (i / particleCount) * this.ctx.canvas.width,
-                y: this.ctx.canvas.height / 2,
-                originalY: this.ctx.canvas.height / 2,
-                originalX: (i / particleCount) * this.ctx.canvas.width,
+                x: x,
+                y: y,
+                originalY: centerY,
+                originalX: x,
                 vx: 0,
                 vy: 0,
                 index: i
@@ -97,16 +113,10 @@ export class WavePropagation extends BaseAnimation {
         this.calculateWaveParameters();
         
         // Reset controls to match the reset state
-        const speedSlider = document.getElementById('waveSpeed');
         const frequencySlider = document.getElementById('waveFrequency');
         const amplitudeSlider = document.getElementById('waveAmplitude');
         const waveTypeSelect = document.getElementById('waveType');
         const analyticsCheckbox = document.getElementById('waveShowAnalytics');
-        
-        if (speedSlider) {
-            speedSlider.value = this.speed;
-            document.getElementById('waveSpeedValue').textContent = this.speed + 'x';
-        }
         
         if (frequencySlider) {
             frequencySlider.value = this.frequency;
@@ -128,14 +138,14 @@ export class WavePropagation extends BaseAnimation {
     }
     
     update(deltaTime) {
-        // Reduced speed for better observation
-        const speedMultiplier = this.waveType === 'longitudinal' ? 0.5 : 2;
-        const dt = (deltaTime / 1000) * this.speed * speedMultiplier;
+        // Don't call super.update() to avoid double time increment
+        // Use deltaTime directly - speed multiplier is already applied by main controller
+        const dt = (deltaTime / 1000) * this.speed;
         this.time += dt;
         
         this.particles.forEach((particle, index) => {
             const phase = (particle.x / this.wavelength) * 2 * Math.PI;
-            const timePhase = this.time * this.frequency * 2 * Math.PI;
+            const timePhase = this.time * this.frequency * this.frequencyMultiplier * 2 * Math.PI;
             
             let displacement = 0;
             let velocity = 0;
@@ -143,7 +153,7 @@ export class WavePropagation extends BaseAnimation {
             switch (this.waveType) {
                 case 'transverse':
                     displacement = this.amplitude * Math.sin(phase - timePhase);
-                    velocity = -this.amplitude * this.frequency * 2 * Math.PI * Math.cos(phase - timePhase);
+                    velocity = -this.amplitude * this.frequency * this.frequencyMultiplier * 2 * Math.PI * Math.cos(phase - timePhase);
                     particle.y = particle.originalY + displacement;
                     particle.vy = velocity;
                     break;
@@ -153,7 +163,7 @@ export class WavePropagation extends BaseAnimation {
                     // Use smaller amplitude for more visible movement
                     const longitudinalAmplitude = this.amplitude * 0.5;
                     displacement = longitudinalAmplitude * Math.sin(phase - timePhase);
-                    velocity = -longitudinalAmplitude * this.frequency * 2 * Math.PI * Math.cos(phase - timePhase);
+                    velocity = -longitudinalAmplitude * this.frequency * this.frequencyMultiplier * 2 * Math.PI * Math.cos(phase - timePhase);
                     particle.x = particle.originalX + displacement;
                     particle.y = particle.originalY; // Keep vertical position constant
                     particle.vx = velocity;
@@ -165,14 +175,14 @@ export class WavePropagation extends BaseAnimation {
                     const wave1 = this.amplitude * Math.sin(phase - timePhase);
                     const wave2 = this.amplitude * Math.sin(phase + timePhase);
                     displacement = wave1 + wave2;
-                    velocity = -this.amplitude * this.frequency * 2 * Math.PI * 
+                    velocity = -this.amplitude * this.frequency * this.frequencyMultiplier * 2 * Math.PI * 
                               (Math.cos(phase - timePhase) - Math.cos(phase + timePhase));
                     particle.y = particle.originalY + displacement;
                     particle.vy = velocity;
                     break;
                 case 'standing':
                     displacement = this.amplitude * Math.sin(phase) * Math.cos(timePhase);
-                    velocity = -this.amplitude * this.frequency * 2 * Math.PI * Math.sin(phase) * Math.sin(timePhase);
+                    velocity = -this.amplitude * this.frequency * this.frequencyMultiplier * 2 * Math.PI * Math.sin(phase) * Math.sin(timePhase);
                     particle.y = particle.originalY + displacement;
                     particle.vy = velocity;
                     break;
@@ -193,9 +203,6 @@ export class WavePropagation extends BaseAnimation {
         
         // Always draw particles with velocity-based coloring
         this.drawParticles();
-        
-        // Draw wave direction indicator
-        this.drawWaveDirection();
         
         // Draw canvas labels
         this.drawCanvasLabels();
@@ -304,7 +311,7 @@ export class WavePropagation extends BaseAnimation {
             
             // Calculate wave displacement at this position
             const phase = (x / this.wavelength) * 2 * Math.PI;
-            const timePhase = this.time * this.frequency * 2 * Math.PI;
+            const timePhase = this.time * this.frequency * this.frequencyMultiplier * 2 * Math.PI;
             const waveDisplacement = this.amplitude * Math.sin(phase - timePhase);
             
             // Add smooth spring coil offset
@@ -317,43 +324,15 @@ export class WavePropagation extends BaseAnimation {
         }
         
         this.ctx.stroke();
-        
-        // Draw wave direction arrows
-        this.drawLongitudinalWaveDirection();
-    }
-    
-    drawLongitudinalWaveDirection() {
-        const centerY = this.ctx.canvas.height / 2;
-        const waveSpeed = this.frequency * this.wavelength;
-        const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
-        
-        const y = Math.round(centerY) + 0.5;
-        const ax = Math.round(arrowX) + 0.5;
-
-        // Draw horizontal arrow (crisp)
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = '#ff6b6b';
-        this.ctx.lineWidth = 2;
-        this.ctx.lineCap = 'round';
-        this.ctx.moveTo(ax, y);
-        this.ctx.lineTo(ax + 30, y);
-        this.ctx.stroke();
-        
-        // Arrowhead
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.moveTo(ax + 30.5, y);
-        this.ctx.lineTo(ax + 25.5, y - 5);
-        this.ctx.lineTo(ax + 25.5, y + 5);
-        this.ctx.closePath();
-        this.ctx.fill();
     }
     
     drawCanvasLabels() {
         const waveTypeLabel = this.waveType.charAt(0).toUpperCase() + this.waveType.slice(1) + ' Wave';
         this.drawLabels(
             waveTypeLabel,
-            `v = f×λ = ${this.waveSpeed.toFixed(1)} px/s  |  y = A sin(2π(ft-x/λ))  |  E ∝ A²f²`
+            `v = f×λ = ${this.waveSpeed.toFixed(1)} px/s  |  y = A sin(2π(ft-x/λ))  |  E ∝ A²f²`,
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
     
@@ -361,7 +340,7 @@ export class WavePropagation extends BaseAnimation {
         this.particles.forEach(particle => {
             // Calculate velocity magnitude for coloring
             const velocity = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
-            const maxVelocity = this.amplitude * this.frequency * 2 * Math.PI;
+            const maxVelocity = this.amplitude * this.frequency * this.frequencyMultiplier * 2 * Math.PI;
             const velocityRatio = Math.min(velocity / maxVelocity, 1);
             
             // Color based on velocity (blue = slow, red = fast)
@@ -387,65 +366,11 @@ export class WavePropagation extends BaseAnimation {
     }
     
     drawVelocityVectors() {
-        this.particles.forEach(particle => {
-            const velocity = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
-            if (velocity > 1) {
-                const scale = 0.1;
-                const endX = particle.x + particle.vx * scale;
-                const endY = particle.y + particle.vy * scale;
-
-                const sx = Math.round(particle.x) + 0.5;
-                const sy = Math.round(particle.y) + 0.5;
-                const ex = Math.round(endX) + 0.5;
-                const ey = Math.round(endY) + 0.5;
-                
-                this.ctx.beginPath();
-                this.ctx.strokeStyle = '#ff6b6b';
-                this.ctx.lineWidth = 1.5;
-                this.ctx.lineCap = 'round';
-                this.ctx.moveTo(sx, sy);
-                this.ctx.lineTo(ex, ey);
-                this.ctx.stroke();
-                
-                // Arrowhead
-                const angle = Math.atan2(particle.vy, particle.vx);
-                this.ctx.beginPath();
-                this.ctx.fillStyle = '#ff6b6b';
-                this.ctx.moveTo(ex, ey);
-                this.ctx.lineTo(ex - 6 * Math.cos(angle - Math.PI / 6), ey - 6 * Math.sin(angle - Math.PI / 6));
-                this.ctx.lineTo(ex - 6 * Math.cos(angle + Math.PI / 6), ey - 6 * Math.sin(angle + Math.PI / 6));
-                this.ctx.closePath();
-                this.ctx.fill();
-            }
-        });
+        // Velocity arrows removed
     }
     
     drawWaveDirection() {
-        if (this.waveType !== 'standing') {
-            // Animated wave direction indicator - move at wave speed
-            const waveSpeed = this.frequency * this.wavelength;
-            const arrowX = 50 + (this.time * waveSpeed * 0.1) % 100;
-
-            const y = 50.5;
-            const ax = Math.round(arrowX) + 0.5;
-            
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = '#ff6b6b';
-            this.ctx.lineWidth = 2;
-            this.ctx.lineCap = 'round';
-            this.ctx.moveTo(ax, y);
-            this.ctx.lineTo(ax + 20, y);
-            this.ctx.stroke();
-            
-            // Arrowhead
-            this.ctx.beginPath();
-            this.ctx.fillStyle = '#ff6b6b';
-            this.ctx.moveTo(ax + 20.5, y);
-            this.ctx.lineTo(ax + 15.5, y - 5);
-            this.ctx.lineTo(ax + 15.5, y + 5);
-            this.ctx.closePath();
-            this.ctx.fill();
-        }
+        // Arrow drawing removed
     }
     
     drawWaveInfo() {
@@ -546,15 +471,9 @@ export class SoundWaves extends BaseAnimation {
         this.pulses = [];
         this.pulseDuration = 15; // much longer duration to ensure wave reaches receiver
         
-        // Control button properties
-        this.isPlaying = false;
-        this.controlButtons = {
-            playPause: { x: 220, y: 20, width: 80, height: 30, label: '▶ Play' },
-            reset: { x: 310, y: 20, width: 60, height: 30, label: '🔄 Reset' }
-        };
+        // Control button properties - using standardized controls from BaseAnimation
         
         this.initializeParticles();
-        this.setupClickEvents();
         
         // Musical note frequencies (Hz)
         this.musicalNotes = {
@@ -569,79 +488,14 @@ export class SoundWaves extends BaseAnimation {
         };
     }
     
-    setupClickEvents() {
-        // Add click event listener to canvas for triggering wave pulses
-        this.ctx.canvas.addEventListener('click', (e) => {
-            const rect = this.ctx.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Check if click is near the source
-            const distanceFromSource = Math.sqrt((x - this.sourceX) ** 2 + (y - this.sourceY) ** 2);
-            if (distanceFromSource < 50) {
-                this.triggerWavePulse();
-            }
-        });
-        
-        // Add touch event listener for mobile support
-        this.ctx.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const rect = this.ctx.canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            
-            // Check if touch is near the source
-            const distanceFromSource = Math.sqrt((x - this.sourceX) ** 2 + (y - this.sourceY) ** 2);
-            if (distanceFromSource < 50) {
-                this.triggerWavePulse();
-            }
-        });
-    }
-    
-    handleButtonClick(x, y) {
-        // Check if click is on any control button
-        Object.keys(this.controlButtons).forEach(key => {
-            const button = this.controlButtons[key];
-            if (x >= button.x && x <= button.x + button.width &&
-                y >= button.y && y <= button.y + button.height) {
-                this.handleControlAction(key);
-            }
-        });
-    }
-    
-    handleControlAction(action) {
-        switch (action) {
-            case 'playPause':
-                if (this.isPlaying) {
-                    // Currently playing, so pause
-                    this.isPlaying = false;
-                    this.controlButtons.playPause.label = '▶ Play';
-                } else {
-                    // Currently paused, so play
-                    this.isPlaying = true;
-                    this.controlButtons.playPause.label = '⏸ Pause';
-                    this.triggerWavePulse();
-                }
-                break;
-            case 'reset':
-                this.isPlaying = false;
-                this.pulses = [];
-                this.time = 0;
-                this.initializeParticles();
-                this.controlButtons.playPause.label = '▶ Play';
-                break;
-        }
-    }
-    
     initializeParticles() {
         this.particles = [];
-        const spacing = this.ctx.canvas.width / this.particleCount;
+        const spacing = (this.receiverX - this.sourceX) / this.particleCount;
         
         for (let i = 0; i < this.particleCount; i++) {
             this.particles.push({
-                x: i * spacing,
-                originalX: i * spacing,
+                x: this.sourceX + i * spacing,
+                originalX: this.sourceX + i * spacing,
                 y: this.ctx.canvas.height / 2,
                 originalY: this.ctx.canvas.height / 2,
                 vx: 0,
@@ -745,15 +599,18 @@ export class SoundWaves extends BaseAnimation {
         this.time = 0;
         this.pulses = [];
         this.initializeParticles();
+        super.reset(); // Call parent reset to handle standardized controls
     }
     
     update(deltaTime) {
-        // Only update if playing
-        if (!this.isPlaying) {
-            return;
-        }
+        super.update(deltaTime); // Call parent update to handle standardized controls
         
         this.time += deltaTime * this.animationSpeed;
+        
+        // Automatically trigger wave pulses when animation is playing
+        if (this.isPlaying && this.pulses.length === 0) {
+            this.triggerWavePulse();
+        }
         
         // Update pulses - remove expired ones
         this.pulses = this.pulses.filter(pulse => {
@@ -790,13 +647,25 @@ export class SoundWaves extends BaseAnimation {
                     
                     let wavePacketEnd;
                     if (hasReachedReceiver) {
-                        // Wave collapsing effect: trailing edge extends to receiver
-                        wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
-                        wavePacketEnd = this.receiverX; // Trailing edge goes all the way to receiver
+                        // Wave collapsing effect: leading edge stops at receiver, trailing edge continues
+                        const leadingEdgePosition = this.receiverX; // Leading edge stops at receiver center
+                        // Make trailing edge move faster toward receiver center
+                        const timeSinceReachingReceiver = elapsed - ((this.receiverX - this.sourceX) / (this.waveSpeed * 0.1));
+                        const trailingEdgePosition = Math.max(this.sourceX, this.receiverX - wavePacketLength + (timeSinceReachingReceiver * this.waveSpeed * 0.1));
+                        
+                        // Check if trailing edge has caught up to leading edge (wave disappears)
+                        if (trailingEdgePosition >= leadingEdgePosition) {
+                            // Wave has completely collapsed - no active wave packet
+                            waveActive = false;
+                            isInWavePacket = false;
+                        } else {
+                            wavePacketStart = trailingEdgePosition;
+                            wavePacketEnd = leadingEdgePosition;
+                        }
                     } else {
                         // Normal wave packet - allow it to reach the receiver
-                        wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
-                        wavePacketEnd = Math.min(this.receiverX, waveFrontPosition) + 100;
+                        wavePacketStart = Math.max(this.sourceX, waveFrontPosition - wavePacketLength);
+                        wavePacketEnd = Math.min(this.receiverX, waveFrontPosition);
                     }
                     
                     // Check if particle is within the wave packet
@@ -805,8 +674,8 @@ export class SoundWaves extends BaseAnimation {
                         
                         // Calculate phase within the wave packet
                         const positionInPacket = (particle.originalX - wavePacketStart) / wavePacketLength;
-                        const wavePosition = positionInPacket * 3; // 3 wavelengths in the packet for better visibility
-                        const timePhase = elapsed * this.frequency * 2 * Math.PI;
+                        const wavePosition = positionInPacket * 2; // 2 wavelengths in the packet
+                        const timePhase = elapsed * this.frequency * 0.3 * 2 * Math.PI;
                         wavePhase = wavePosition * 2 * Math.PI - timePhase;
                     }
                 }
@@ -827,8 +696,8 @@ export class SoundWaves extends BaseAnimation {
                     
                     // Create sinusoidal wave with proper phase relationship
                     const wavePosition = (particle.originalX - wavePacketStart) / wavePacketLength;
-                    const spatialPhase = wavePosition * 3 * 2 * Math.PI; // 3 wavelengths in packet
-                    const temporalPhase = elapsed * this.frequency * 2 * Math.PI;
+                    const spatialPhase = wavePosition * 2 * 2 * Math.PI; // 2 wavelengths in packet
+                    const temporalPhase = elapsed * this.frequency * 0.3 * 2 * Math.PI;
                     const totalPhase = spatialPhase - temporalPhase;
                     
                     particle.y = particle.originalY + amplitude * Math.sin(totalPhase);
@@ -842,8 +711,8 @@ export class SoundWaves extends BaseAnimation {
                     
                     // Create sinusoidal wave with proper phase relationship for longitudinal waves
                     const wavePosition = (particle.originalX - wavePacketStart) / wavePacketLength;
-                    const spatialPhase = wavePosition * 3 * 2 * Math.PI; // 3 wavelengths in packet
-                    const temporalPhase = elapsed * this.frequency * 2 * Math.PI;
+                    const spatialPhase = wavePosition * 2 * 2 * Math.PI; // 2 wavelengths in packet
+                    const temporalPhase = elapsed * this.frequency * 0.3 * 2 * Math.PI;
                     const totalPhase = spatialPhase - temporalPhase;
                     
                     // Horizontal displacement for compression/rarefaction
@@ -892,53 +761,18 @@ export class SoundWaves extends BaseAnimation {
                     break;
             }
         } else {
-            // Show instruction when no wave is active
-            this.drawInstruction();
+            // No wave is active - animation is paused
         }
         
         // Always show info panels
         this.drawSoundInfo();
         
-        // Draw control buttons
-        this.drawControlButtons();
-        
         // Draw wave packet boundaries if wave is active
         this.drawWavePacketBoundaries();
         
-    }
-    
-    drawInstruction() {
-        // Draw instruction at bottom of canvas
-        const y = this.ctx.canvas.height - 30;
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(this.ctx.canvas.width / 2 - 150, y - 15, 300, 30);
+        // Draw canvas labels
+        this.drawSoundLabels();
         
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🎵 Click the red source to start!', this.ctx.canvas.width / 2, y);
-    }
-    
-    drawControlButtons() {
-        // Draw control buttons at top left
-        Object.keys(this.controlButtons).forEach(key => {
-            const button = this.controlButtons[key];
-            
-            // Button background
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            this.ctx.fillRect(button.x, button.y, button.width, button.height);
-            
-            // Button border
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeRect(button.x, button.y, button.width, button.height);
-            
-            // Button text
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = 'bold 10px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(button.label, button.x + button.width / 2, button.y + button.height / 2 + 3);
-        });
     }
     
     drawBackground() {
@@ -959,17 +793,6 @@ export class SoundWaves extends BaseAnimation {
         this.ctx.moveTo(this.sourceX, this.sourceY);
         this.ctx.lineTo(this.receiverX, this.receiverY);
             this.ctx.stroke();
-        
-        // Add wave direction arrows
-        const arrowSpacing = 100;
-        for (let x = this.sourceX + 50; x < this.receiverX - 50; x += arrowSpacing) {
-            const y = this.sourceY;
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, y - 5);
-            this.ctx.lineTo(x + 15, y);
-            this.ctx.lineTo(x, y + 5);
-            this.ctx.stroke();
-        }
         
         this.ctx.setLineDash([]);
     }
@@ -1189,13 +1012,6 @@ export class SoundWaves extends BaseAnimation {
     
         
     drawSourceAndReceiver() {
-        // Draw clickable area indicator (for debugging)
-        this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.arc(this.sourceX, this.sourceY, 50, 0, Math.PI * 2);
-        this.ctx.stroke();
-        
         // Draw source (speaker/microphone)
         this.ctx.fillStyle = this.sourceActive ? '#FF6B6B' : '#666666';
         this.ctx.beginPath();
@@ -1252,40 +1068,26 @@ export class SoundWaves extends BaseAnimation {
         this.ctx.shadowBlur = 0;
         this.ctx.shadowOffsetX = 0;
         this.ctx.shadowOffsetY = 0;
-        
-        // Draw wave direction arrow
-        this.ctx.strokeStyle = '#FFD93D';
-        this.ctx.lineWidth = 3;
-        this.ctx.setLineDash([10, 5]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.sourceX + 40, this.sourceY);
-        this.ctx.lineTo(this.receiverX - 30, this.receiverY);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
-        
-        // Add arrowhead
-        this.ctx.fillStyle = '#FFD93D';
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.receiverX - 30, this.receiverY);
-        this.ctx.lineTo(this.receiverX - 40, this.receiverY - 5);
-        this.ctx.lineTo(this.receiverX - 40, this.receiverY + 5);
-        this.ctx.closePath();
-        this.ctx.fill();
     }
     
     drawSoundInfo() {
-        // Compact info panel
+        // Compact info panel moved to right side of canvas
+        const panelX = this.ctx.canvas.width - 210; // Move to right side
+        const panelY = 10;
+        const panelWidth = 200;
+        const panelHeight = 60;
+        
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(10, 10, 200, 60);
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
         
         this.ctx.fillStyle = '#ffffff';
         this.ctx.font = 'bold 12px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('🔊 Sound Wave', 20, 25);
+        this.ctx.fillText('🔊 Sound Wave', panelX + 10, panelY + 15);
         
         this.ctx.font = '11px Arial';
-        this.ctx.fillText(`${this.waveType} • ${this.frequency}Hz • ${this.amplitude}%`, 20, 40);
-        this.ctx.fillText(`λ: ${(this.waveSpeed / this.frequency).toFixed(1)}m • v: ${this.waveSpeed}m/s`, 20, 55);
+        this.ctx.fillText(`${this.waveType} • ${this.frequency}Hz • ${this.amplitude}%`, panelX + 10, panelY + 30);
+        this.ctx.fillText(`λ: ${(this.waveSpeed / this.frequency).toFixed(1)}m • v: ${this.waveSpeed}m/s`, panelX + 10, panelY + 45);
     }
     
     drawSmoothWave() {
@@ -1331,13 +1133,24 @@ export class SoundWaves extends BaseAnimation {
                 
                 let wavePacketStart, wavePacketEnd;
                 if (hasReachedReceiver) {
-                    // Wave collapsing effect: trailing edge extends to receiver
-                    wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
-                    wavePacketEnd = this.receiverX; // Trailing edge goes all the way to receiver
-        } else {
+                    // Wave collapsing effect: leading edge stops at receiver, trailing edge continues
+                    const leadingEdgePosition = this.receiverX; // Leading edge stops at receiver center
+                    // Make trailing edge move faster toward receiver center
+                    const timeSinceReachingReceiver = elapsed - ((this.receiverX - this.sourceX) / (this.waveSpeed * 0.1));
+                    const trailingEdgePosition = Math.max(this.sourceX, this.receiverX - wavePacketLength + (timeSinceReachingReceiver * this.waveSpeed * 0.1));
+                    
+                    // Check if trailing edge has caught up to leading edge (wave disappears)
+                    if (trailingEdgePosition >= leadingEdgePosition) {
+                        // Wave has completely collapsed - don't draw anything
+                        return;
+                    } else {
+                        wavePacketStart = trailingEdgePosition;
+                        wavePacketEnd = leadingEdgePosition;
+                    }
+                } else {
                     // Normal wave packet - allow it to reach the receiver
-                    wavePacketStart = Math.max(this.sourceX - 50, waveFrontPosition - wavePacketLength) + 100;
-                    wavePacketEnd = Math.min(this.receiverX, waveFrontPosition) + 100;
+                    wavePacketStart = Math.max(this.sourceX, waveFrontPosition - wavePacketLength);
+                    wavePacketEnd = Math.min(this.receiverX, waveFrontPosition);
                 }
                 
                 // Draw wave packet boundaries - make them more prominent
@@ -1384,5 +1197,14 @@ export class SoundWaves extends BaseAnimation {
             particleCount: this.particleCount,
             time: this.time
         };
+    }
+    
+    drawSoundLabels() {
+        this.drawLabels(
+            'Sound Waves',
+            'v = f×λ  |  P = ½ρv²  |  I = P/A',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
+        );
     }
 }

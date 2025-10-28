@@ -742,7 +742,6 @@ export class Blockchain extends BaseAnimation {
         
         // Start mining the next block after a delay
         setTimeout(() => {
-            console.log(`[DIRECT BLOCK] 🔄 Starting mining for next block`);
             this.startMining();
         }, 2000);
     }
@@ -1839,6 +1838,8 @@ export class Blockchain extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         // Store original deltaTime for animations
         const animationDeltaTime = deltaTime;
         
@@ -3024,46 +3025,7 @@ export class Blockchain extends BaseAnimation {
     }
     
     drawMiningProgress() {
-        // Position progress bar near the mining block
-        const canvasWidth = this.ctx.canvas.width;
-        const barWidth = 200;
-        const barHeight = 20;
-        const barX = canvasWidth - barWidth - 30;
-        const barY = 20;
-        
-        // Background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(barX - 10, barY - 5, barWidth + 20, barHeight + 30);
-        
-        // Border
-        this.ctx.strokeStyle = 'rgba(255, 152, 0, 0.8)';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(barX - 10, barY - 5, barWidth + 20, barHeight + 30);
-        
-        // Progress bar background
-        this.ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
-        this.ctx.fillRect(barX, barY, barWidth, barHeight);
-        
-        // Progress bar fill with gradient
-        const progress = Math.min(100, this.miningProgress);
-        const fillWidth = (barWidth * progress) / 100;
-        
-        const gradient = this.ctx.createLinearGradient(barX, barY, barX + fillWidth, barY);
-        gradient.addColorStop(0, '#FF9800');
-        gradient.addColorStop(0.5, '#FFB74D');
-        gradient.addColorStop(1, '#FF9800');
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(barX, barY, fillWidth, barHeight);
-        
-        // Progress text
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = 'bold 12px Inter, Arial, sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 2;
-        this.ctx.fillText(`Mining: ${progress.toFixed(0)}%`, barX + barWidth / 2, barY + barHeight + 15);
-        this.ctx.shadowBlur = 0;
+        // Mining progress bar removed
     }
     
     drawUnifiedInfoPanel() {
@@ -3373,13 +3335,6 @@ export class Blockchain extends BaseAnimation {
             difficultyValue.textContent = this.difficulty;
         }
         
-        // Reset speed slider
-        const speedSlider = document.getElementById('blockchainSpeed');
-        const speedValue = document.getElementById('blockchainSpeedValue');
-        if (speedSlider && speedValue) {
-            speedSlider.value = this.speed;
-            speedValue.textContent = this.speed + 'x';
-        }
     }
     
     drawMinerBlockConnection() {

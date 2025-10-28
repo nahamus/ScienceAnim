@@ -21,12 +21,7 @@ export class NuclearReactions extends BaseAnimation {
         this.shockwaves = [];
         this.particleTrails = []; // For particle trail effects
         
-        // Animation state
-        this.isPlaying = false;
-        this.controlButtons = {
-            playPause: { x: 600, y: 20, width: 80, height: 30, label: '▶ Play' },
-            reset: { x: 690, y: 20, width: 60, height: 30, label: '🔄 Reset' }
-        };
+        // Animation state - using standardized controls from BaseAnimation
         
         // Statistics
         this.energyReleased = 0;
@@ -205,8 +200,7 @@ export class NuclearReactions extends BaseAnimation {
         this.chainReactions = 0;
         this.fissionCount = 0;
         this.fusionCount = 0;
-        this.isPlaying = false;
-        this.controlButtons.playPause.label = '▶ Play';
+        super.reset(); // Call parent reset to handle standardized controls
         this.initializeNuclei();
         this.initializeParticleTrails();
     }
@@ -232,117 +226,28 @@ export class NuclearReactions extends BaseAnimation {
         this.particleTrails = this.particleTrails.filter(trail => trail.life > 0);
     }
     
-    handleButtonClick(x, y) {
-        const buttons = this.controlButtons;
-        
-        // Calculate dynamic button positions (same logic as drawControlButtons)
-        const maxX = this.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
-        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
-        const resetX = playPauseX + buttons.playPause.width + 10;
-        
-        // Check play/pause button
-        if (x >= playPauseX && x <= playPauseX + buttons.playPause.width &&
-            y >= buttons.playPause.y && y <= buttons.playPause.y + buttons.playPause.height) {
-            this.handleControlAction('playPause');
-            return true;
-        }
-        
-        // Check reset button
-        if (x >= resetX && x <= resetX + buttons.reset.width &&
-            y >= buttons.reset.y && y <= buttons.reset.y + buttons.reset.height) {
-            this.handleControlAction('reset');
-            return true;
-        }
-        
-        return false;
-    }
     
-    handleControlAction(action) {
-        if (action === 'playPause') {
-            this.isPlaying = !this.isPlaying;
-            this.controlButtons.playPause.label = this.isPlaying ? '⏸ Pause' : '▶ Play';
-            
-            // When playing, start reactions if particles aren't already moving
-            if (this.isPlaying) {
-                this.reactingParticles.forEach(particle => {
-                    if (!particle.moving) {
-                        this.findTargetForParticle(particle);
-                        particle.moving = true;
-                    }
-                });
-            }
-        } else if (action === 'reset') {
-            this.isPlaying = false;
-            this.controlButtons.playPause.label = '▶ Play';
-            // Clear all particles and effects
-            this.neutrons = [];
-            this.fissionProducts = [];
-            this.fusionProducts = [];
-            this.energyParticles = [];
-            this.shockwaves = [];
-            this.particleTrails = [];
-            // Reset statistics
-            this.energyReleased = 0;
-            this.neutronsProduced = 0;
-            this.chainReactions = 0;
-            this.fissionCount = 0;
-            this.fusionCount = 0;
-            this.time = 0;
-            // Reinitialize everything
-            this.initializeNuclei();
-            this.initializeParticleTrails();
-        }
-    }
     
-    drawControlButtons() {
-        const buttons = this.controlButtons;
-        
-        // Ensure buttons stay within canvas bounds
-        const maxX = this.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
-        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
-        const resetX = playPauseX + buttons.playPause.width + 10;
-        
-        // Play/Pause button
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
-        
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(buttons.playPause.label, 
-            playPauseX + buttons.playPause.width / 2, 
-            buttons.playPause.y + buttons.playPause.height / 2);
-        this.ctx.restore();
-        
-        // Reset button
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
-        
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(buttons.reset.label, 
-            resetX + buttons.reset.width / 2, 
-            buttons.reset.y + buttons.reset.height / 2);
-        this.ctx.restore();
-    }
 
     update(deltaTime) {
-        if (!this.isPlaying) {
-            return;
-        }
+        super.update(deltaTime); // Call parent update to handle standardized controls
         
         this.time += deltaTime * this.speed * 0.001;
+        
+        // Start reacting particles when animation is playing (replaces click action)
+        if (this.isPlaying) {
+            this.reactingParticles.forEach(particle => {
+                if (!particle.moving) {
+                    this.findTargetForParticle(particle);
+                    particle.moving = true;
+                }
+            });
+        } else {
+            // Stop reacting particles when animation is paused
+            this.reactingParticles.forEach(particle => {
+                particle.moving = false;
+            });
+        }
         
         // Update nuclei
         this.nuclei.forEach(nucleus => {
@@ -950,9 +855,6 @@ export class NuclearReactions extends BaseAnimation {
         // Draw labels
         this.drawNuclearLabels();
         
-        // Draw control buttons
-        this.drawControlButtons();
-        
         // Draw particle trails
         this.drawParticleTrails();
 
@@ -1136,7 +1038,12 @@ export class NuclearReactions extends BaseAnimation {
             formulas = 'E = mc²';
         }
         
-        this.drawLabels(title, formulas);
+        this.drawLabels(
+            title,
+            formulas,
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
+        );
     }
     
 
