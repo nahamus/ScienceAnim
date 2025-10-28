@@ -20,6 +20,7 @@ export class BaseAnimation {
             { id: 'speed', label: '⚡', x: 100, y: 20, width: 35, height: 30, tooltip: 'Speed' }
         ];
         this.hoveredButton = null;
+        this.lastButtonClickTime = 0; // For debouncing rapid taps
     }
     
     /**
@@ -135,8 +136,14 @@ export class BaseAnimation {
      * Standardized control button rendering with Program Execution styling
      */
     drawControlButtons() {
+        // Detect mobile devices and adjust button size accordingly
+        const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
+        const buttonWidth = isMobile ? 50 : 35;  // Larger buttons on mobile
+        const buttonHeight = isMobile ? 40 : 30; // Larger buttons on mobile
+        const buttonSpacing = isMobile ? 55 : 40; // More spacing on mobile
+        
         // Calculate dynamic button positions to ensure they stay within canvas bounds
-        const totalButtonWidth = this.controlButtons.length * 40 + (this.controlButtons.length - 1) * 5; // 35px width + 5px spacing
+        const totalButtonWidth = this.controlButtons.length * buttonSpacing + (this.controlButtons.length - 1) * 5;
         const maxX = this.ctx.canvas.width - totalButtonWidth - 10;
         const startX = Math.min(20, maxX);
         
@@ -144,8 +151,12 @@ export class BaseAnimation {
             const button = this.controlButtons[i];
             const isHovered = this.hoveredButton === button.id;
             
+            // Update button dimensions for mobile
+            button.width = buttonWidth;
+            button.height = buttonHeight;
+            
             // Update button position dynamically
-            button.x = startX + i * 40;
+            button.x = startX + i * buttonSpacing;
             
             // Button background with gradient
             const bgGradient = this.ctx.createLinearGradient(button.x, button.y, button.x, button.y + button.height);
@@ -162,10 +173,11 @@ export class BaseAnimation {
             
             // Button border with pulsating effect for play button when running
             if (button.id === 'playPause' && this.isPlaying) {
-                // Pulsating border effect
-                const pulseIntensity = 0.5 + 0.5 * Math.sin(this.time * 0.01); // Pulsating between 0.5 and 1.0
-                this.ctx.strokeStyle = `rgba(74, 175, 244, ${pulseIntensity})`; // Bright blue with pulsing opacity
-                this.ctx.lineWidth = 2 + pulseIntensity; // Thicker border that pulses
+                // Pulsating border effect - slower pulse with speed-based rate
+                const pulseRate = 0.005 * this.speedMultiplier; // Slower base rate, scales with speed
+                const pulseIntensity = 0.3 + 0.4 * Math.sin(this.time * pulseRate); // Pulsating between 0.3 and 0.7
+                this.ctx.strokeStyle = `rgba(102, 255, 178, ${pulseIntensity})`; // Nice green color with pulsing opacity
+                this.ctx.lineWidth = 1.2 + pulseIntensity * 0.3; // Thinner border that pulses subtly
             } else {
                 // Normal border
                 this.ctx.strokeStyle = isHovered ? '#7eb3d9' : '#4a6f94';
@@ -176,7 +188,8 @@ export class BaseAnimation {
             
             // Button icon/label
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = 'bold 16px Arial';
+            const fontSize = isMobile ? 'bold 18px Arial' : 'bold 16px Arial';
+            this.ctx.font = fontSize;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             
@@ -184,7 +197,8 @@ export class BaseAnimation {
             if (button.id === 'playPause') {
                 this.ctx.fillText(this.isPlaying ? '⏸' : '▶', button.x + button.width / 2, button.y + button.height / 2);
             } else if (button.id === 'speed') {
-                this.ctx.font = 'bold 11px Arial';
+                const speedFontSize = isMobile ? 'bold 13px Arial' : 'bold 11px Arial';
+                this.ctx.font = speedFontSize;
                 // Format speed display properly for 0.5x
                 const speedText = this.speedMultiplier === 0.5 ? '0.5x' : `${this.speedMultiplier}x`;
                 this.ctx.fillText(speedText, button.x + button.width / 2, button.y + button.height / 2);
@@ -217,9 +231,16 @@ export class BaseAnimation {
      * @returns {boolean} - True if a button was clicked
      */
     handleButtonClick(x, y) {
+        // Debounce rapid taps (especially important for mobile)
+        const currentTime = Date.now();
+        if (currentTime - this.lastButtonClickTime < 300) { // 300ms debounce
+            return false;
+        }
+        
         for (const button of this.controlButtons) {
             if (x >= button.x && x <= button.x + button.width &&
                 y >= button.y && y <= button.y + button.height) {
+                this.lastButtonClickTime = currentTime;
                 this.handleControlAction(button.id);
                 return true;
             }

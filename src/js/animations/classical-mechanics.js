@@ -261,6 +261,9 @@ export class Pendulum extends BaseAnimation {
         
         // Draw canvas labels
         this.drawPendulumLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawForceVectors(centerX, centerY, bobX, bobY) {
@@ -868,6 +871,9 @@ export class OrbitalMotion extends BaseAnimation {
         
         // Draw canvas labels
         this.drawOrbitalLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     getStats() {
@@ -1598,6 +1604,9 @@ export class CollisionPhysics extends BaseAnimation {
         
         // Draw canvas labels for physics context
         this.drawCollisionLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawGravityForceArrows() {
@@ -2118,6 +2127,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         
         // Draw canvas labels for physics context
         this.drawFrictionLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawForceVectors() {

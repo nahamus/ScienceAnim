@@ -213,6 +213,9 @@ export class WavePropagation extends BaseAnimation {
             this.drawWaveInfo();
             this.drawEnergyVisualization();
         }
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawGrid() {
@@ -773,6 +776,8 @@ export class SoundWaves extends BaseAnimation {
         // Draw canvas labels
         this.drawSoundLabels();
         
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawBackground() {

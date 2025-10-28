@@ -632,7 +632,7 @@ export class ScientificAnimations {
             const x = (touch.clientX - rect.left) * scaleX;
             const y = (touch.clientY - rect.top) * scaleY;
             
-            // Handle different animations based on current animation
+            // Handle different animations based on current animation (no button handling here)
             if (this.currentAnimation === 'electric-fields') {
                 const chargeType = document.getElementById('efChargeType').value;
                 this.electricFields.addChargeAtPosition(chargeType, x, y);
@@ -640,9 +640,6 @@ export class ScientificAnimations {
                 // Add complete magnet with both poles
                 this.magneticFields.addMagnetAtPosition(x, y);
             } else if (this.currentAnimation === 'sound-waves') {
-                // Check for control button clicks first
-                this.soundWaves.handleButtonClick(x, y);
-                
                 // Then check for source clicks
                 const sx = this.soundWaves.sourceX;
                 const sy = this.soundWaves.sourceY;
@@ -672,6 +669,20 @@ export class ScientificAnimations {
         
         this.canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.changedTouches[0];
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
+            
+            // First check for standardized control buttons on all animations
+            const currentAnimation = this.getCurrentAnimationInstance();
+            if (currentAnimation && currentAnimation.handleButtonClick && currentAnimation.handleButtonClick(x, y)) {
+                return; // Control button was clicked, don't process other touches
+            }
+            
+            // Handle other touch interactions if needed (currently none for touchend)
         });
         
 
@@ -715,10 +726,6 @@ export class ScientificAnimations {
         });
         
         // Fluid Flow Controls
-        this.setupSliderControl('fluidSpeed', 'fluidSpeedValue', (value) => {
-            this.fluidFlow.setFlowRate(parseFloat(value));
-        });
-        
         this.setupSliderControl('flowRate', 'flowRateValue', (value) => {
             this.fluidFlow.setFlowRate(parseFloat(value));
         });
