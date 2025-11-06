@@ -91,6 +91,8 @@ export class Pendulum extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed;
         const simulationRate = 10.0; // Speed up pendulum evolution while keeping correct dynamics
@@ -259,6 +261,9 @@ export class Pendulum extends BaseAnimation {
         
         // Draw canvas labels
         this.drawPendulumLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawForceVectors(centerX, centerY, bobX, bobY) {
@@ -365,7 +370,7 @@ export class Pendulum extends BaseAnimation {
         const velocityMagnitude = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
         
         if (velocityMagnitude > 0.1) {
-            const scale = 20 / velocityMagnitude;
+            const scale = 50 / velocityMagnitude; // Increased from 20 to 50 for more visible vectors
             const scaledVX = velocityX * scale;
             const scaledVY = velocityY * scale;
             
@@ -550,7 +555,9 @@ export class Pendulum extends BaseAnimation {
     drawPendulumLabels() {
         this.drawLabels(
             'Simple Pendulum',
-            'T = 2π√(L/g)  |  θ̈ + (g/L)sin(θ) = 0  |  E = ½mL²θ̇² + mgL(1-cos(θ))'
+            'T = 2π√(L/g)  |  θ̈ + (g/L)sin(θ) = 0  |  E = ½mL²θ̇² + mgL(1-cos(θ))',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -571,12 +578,7 @@ export class OrbitalMotion extends BaseAnimation {
         this.showVelocityVector = false;
         this.showKeplerInfo = false;
         
-        // Animation state
-        this.isPlaying = true;
-        this.controlButtons = {
-            playPause: { x: 20, y: 20, width: 80, height: 30, label: '⏸ Pause' },
-            reset: { x: 110, y: 20, width: 60, height: 30, label: '🔄 Reset' }
-        };
+        // Animation state - using standardized controls from BaseAnimation
         
         // Visual enhancements
         this.orbitalTrail = [];
@@ -621,84 +623,6 @@ export class OrbitalMotion extends BaseAnimation {
         });
     }
     
-    handleButtonClick(x, y) {
-        const buttons = this.controlButtons;
-        
-        // Calculate dynamic button positions (same logic as drawControlButtons)
-        const maxX = this.ctx.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
-        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
-        const resetX = playPauseX + buttons.playPause.width + 10;
-        
-        // Check play/pause button
-        if (x >= playPauseX && x <= playPauseX + buttons.playPause.width &&
-            y >= buttons.playPause.y && y <= buttons.playPause.y + buttons.playPause.height) {
-            this.handleControlAction('playPause');
-            return true;
-        }
-        
-        // Check reset button
-        if (x >= resetX && x <= resetX + buttons.reset.width &&
-            y >= buttons.reset.y && y <= buttons.reset.y + buttons.reset.height) {
-            this.handleControlAction('reset');
-            return true;
-        }
-        
-        return false;
-    }
-    
-    handleControlAction(action) {
-        if (action === 'playPause') {
-            this.isPlaying = !this.isPlaying;
-            this.controlButtons.playPause.label = this.isPlaying ? '⏸ Pause' : '▶ Play';
-        } else if (action === 'reset') {
-            this.isPlaying = true;
-            this.controlButtons.playPause.label = '⏸ Pause';
-            this.reset();
-        }
-    }
-    
-    drawControlButtons() {
-        const buttons = this.controlButtons;
-        
-        // Calculate dynamic button positions to ensure they stay within canvas bounds
-        const maxX = this.ctx.canvas.width - Math.max(buttons.playPause.width, buttons.reset.width) - 10;
-        const playPauseX = Math.min(buttons.playPause.x, maxX - buttons.reset.width - 10);
-        const resetX = playPauseX + buttons.playPause.width + 10;
-        
-        // Play/Pause button
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(playPauseX, buttons.playPause.y, buttons.playPause.width, buttons.playPause.height);
-        
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(buttons.playPause.label, 
-            playPauseX + buttons.playPause.width / 2, 
-            buttons.playPause.y + buttons.playPause.height / 2);
-        this.ctx.restore();
-        
-        // Reset button
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(resetX, buttons.reset.y, buttons.reset.width, buttons.reset.height);
-        
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(buttons.reset.label, 
-            resetX + buttons.reset.width / 2, 
-            buttons.reset.y + buttons.reset.height / 2);
-        this.ctx.restore();
-    }
 
     calculateOrbitalParameters() {
         // Calculate semi-minor axis from eccentricity
@@ -712,6 +636,12 @@ export class OrbitalMotion extends BaseAnimation {
         
         // Calculate angular velocity
         this.angularVelocity = 2 * Math.PI / this.period;
+        
+        // Initialize current position (so object is visible at start)
+        const r = this.semiMajorAxis * (1 - this.eccentricity * this.eccentricity) / 
+                 (1 + this.eccentricity * Math.cos(this.angle));
+        this.currentX = this.centerX + r * Math.cos(this.angle);
+        this.currentY = this.centerY + r * Math.sin(this.angle);
         
         // Store orbit path points
         this.orbitPath = [];
@@ -756,14 +686,11 @@ export class OrbitalMotion extends BaseAnimation {
         this.angle = 0;
         this.orbitalTrail = [];
         this.planetRotation = 0;
-        this.isPlaying = true;
-        this.controlButtons.playPause.label = '⏸ Pause';
+        super.reset(); // Call parent reset to handle standardized controls
     }
     
     update(deltaTime) {
-        if (!this.isPlaying) {
-            return;
-        }
+        super.update(deltaTime); // Call parent update to handle standardized controls
         
         this.time += deltaTime;
         const dt = (deltaTime / 1000) * this.speed * 2; // Standardized time step scaling
@@ -944,6 +871,9 @@ export class OrbitalMotion extends BaseAnimation {
         
         // Draw canvas labels
         this.drawOrbitalLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     getStats() {
@@ -1106,9 +1036,6 @@ export class OrbitalMotion extends BaseAnimation {
         // Draw perigee and apogee markers (always visible)
         this.drawKeplerMarkers();
         
-        // Draw control buttons
-        this.drawControlButtons();
-        
         // Draw canvas labels
         this.drawOrbitalLabels();
     }
@@ -1217,7 +1144,9 @@ export class OrbitalMotion extends BaseAnimation {
     drawOrbitalLabels() {
         this.drawLabels(
             'Orbital Motion',
-            'r = a(1-e²)/(1+ecos(θ))  |  T² ∝ a³  |  E = ½mv² - GMm/r'
+            'r = a(1-e²)/(1+ecos(θ))  |  T² ∝ a³  |  E = ½mv² - GMm/r',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -1394,6 +1323,8 @@ export class CollisionPhysics extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 5; // Fixed time step calculation
         
         // Update collision effects
@@ -1562,8 +1493,6 @@ export class CollisionPhysics extends BaseAnimation {
                 this.ctx.lineWidth = 2; // Reduced from 4 to 2
                 this.ctx.arc(effect.x, effect.y, radius * 0.6, 0, Math.PI * 2);
                 this.ctx.stroke();
-                
-                // Remove ripple effect to reduce distraction
             }
         });
         
@@ -1675,6 +1604,9 @@ export class CollisionPhysics extends BaseAnimation {
         
         // Draw canvas labels for physics context
         this.drawCollisionLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawGravityForceArrows() {
@@ -1737,7 +1669,7 @@ export class CollisionPhysics extends BaseAnimation {
         // Smaller, more compact panel
         const panelWidth = Math.min(canvasWidth * 0.15, 200);
         const panelHeight = Math.min(canvasHeight * 0.15, 120);
-        const panelX = 10;
+        const panelX = canvasWidth - panelWidth - 10; // Move to right side
         const panelY = 10;
         
         this.ctx.fillStyle = 'rgba(26, 26, 46, 0.8)';
@@ -1761,8 +1693,6 @@ export class CollisionPhysics extends BaseAnimation {
         this.ctx.fillText(`Bounce: ${this.restitution}`, panelX + 8, y);
         y += 16;
         this.ctx.fillText(`Type: ${this.collisionType}`, panelX + 8, y);
-        
-        // Remove detailed collision analysis to reduce clutter
     }
     
     getStats() {
@@ -1787,7 +1717,9 @@ export class CollisionPhysics extends BaseAnimation {
     drawCollisionLabels() {
         this.drawLabels(
             'Collision Physics',
-            'p = mv  |  Σp = constant  |  KE = ½mv²'
+            'p = mv  |  Σp = constant  |  KE = ½mv²',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }
@@ -1819,7 +1751,41 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     
     setInclineAngle(angle) {
         this.inclineAngle = angle;
-        // Don't reset object position when changing angle
+        // Update object position to stay attached to the inclined plane
+        this.updateObjectPositionForAngle();
+    }
+    
+    updateObjectPositionForAngle() {
+        const angleRad = this.inclineAngle * Math.PI / 180;
+        const canvasWidth = this.ctx.canvas.width;
+        const canvasHeight = this.ctx.canvas.height;
+        const inclineLength = canvasWidth * 0.75;
+        const startX = canvasWidth * 0.125;
+        const startY = canvasHeight * 0.5;
+        const endX = startX + inclineLength * Math.cos(angleRad);
+        const endY = startY + inclineLength * Math.sin(angleRad);
+        
+        // Calculate how much to move the incline up to keep it within bounds
+        const maxEndY = canvasHeight * 0.95;
+        const verticalOffset = Math.max(0, endY - maxEndY);
+        const adjustedStartY = startY - verticalOffset;
+        
+        // Keep object within the incline bounds
+        if (this.object.x < startX) {
+            this.object.x = startX;
+        }
+        if (this.object.x > endX) {
+            this.object.x = endX;
+        }
+        
+        // Position object ON TOP of the incline surface
+        const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
+        const inclineY = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad);
+        this.object.y = inclineY - objectSize - 25;
+        
+        // Reset velocity when angle changes
+        this.object.vx = 0;
+        this.object.vy = 0;
     }
     
     setFrictionCoefficient(coefficient) {
@@ -1865,7 +1831,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         
         // Scale object size with mass for positioning
         const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
-        this.object.y = adjustedStartY + offsetDistance * Math.tan(angleRad) - objectSize - 18 * Math.cos(angleRad);
+        this.object.y = adjustedStartY + offsetDistance * Math.tan(angleRad) - objectSize - 25;
         this.object.vx = this.initialVelocity * Math.cos(angleRad);
         this.object.vy = 0;
     }
@@ -1875,6 +1841,8 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         const dt = (deltaTime / 1000) * this.speed * 3; // Increased speed multiplier for more engaging motion
         const angleRad = this.inclineAngle * Math.PI / 180;
         
@@ -1934,7 +1902,11 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         // Position object ON TOP of the incline surface (not embedded)
         // Scale object size with mass for positioning
         const objectSize = Math.max(12, Math.min(25, 12 + this.objectMass * 2));
-        this.object.y = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad) - objectSize - 18 * Math.cos(angleRad);
+        // Calculate the incline surface Y position at the object's X position
+        const inclineY = adjustedStartY + (this.object.x - startX) * Math.tan(angleRad);
+        // Position object so its bottom surface sits ON TOP of the incline
+        // Use constant adjustment to prevent penetration at all angles
+        this.object.y = inclineY - objectSize - 25;
     }
     
     render() {
@@ -1981,9 +1953,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.ctx.lineTo(startX + 20 * Math.sin(angleRad), adjustedStartY - 20 * Math.cos(angleRad));
         this.ctx.closePath();
         
-        // Modern surface colors - use generic surface appearance
-        const surfaceColor = '#f5f5f5';
-        const textureColor = '#757575';
+        // Modern surface colors - use darker surface appearance for better visibility
+        const surfaceColor = '#8d6e63'; // Brownish surface color
+        const textureColor = '#5d4037'; // Darker brown for texture
         
         // Main surface fill
         this.ctx.fillStyle = surfaceColor;
@@ -2010,30 +1982,55 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         }
         this.ctx.restore();
 
-        // Draw angle label at the base of the incline
+        // Draw enhanced angle label at the base of the incline
         this.ctx.save();
         
-        // Draw horizontal reference line at the base
-        this.ctx.strokeStyle = 'rgba(78, 205, 196, 0.6)';
-        this.ctx.lineWidth = 2;
+        // Draw horizontal reference line at the base with better styling
+        this.ctx.strokeStyle = 'rgba(78, 205, 196, 0.8)';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
         this.ctx.beginPath();
         this.ctx.moveTo(endX - 80, adjustedEndY);
         this.ctx.lineTo(endX + 20, adjustedEndY);
         this.ctx.stroke();
         
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.font = 'bold 20px Inter';
-        this.ctx.textAlign = 'center';
         // Position label at the bottom of the incline where it meets the ground
         const labelX = endX - 35; // Position near the bottom end
-        const labelY = adjustedEndY + 25; // Position below the incline at the base
-        this.ctx.fillText(`${this.inclineAngle}°`, labelX, labelY);
+        const labelY = adjustedEndY + 30; // Position below the incline at the base
         
-        // Add a subtle background for better readability
-        this.ctx.fillStyle = 'rgba(26, 26, 46, 0.8)';
-        this.ctx.fillRect(labelX - 25, labelY - 15, 50, 20);
+        // Enhanced background with gradient and border
+        const labelWidth = 60;
+        const labelHeight = 30;
+        const labelBgX = labelX - labelWidth / 2;
+        const labelBgY = labelY - labelHeight / 2;
+        
+        // Background gradient
+        const bgGradient = this.ctx.createLinearGradient(labelBgX, labelBgY, labelBgX, labelBgY + labelHeight);
+        bgGradient.addColorStop(0, 'rgba(26, 26, 46, 0.95)');
+        bgGradient.addColorStop(1, 'rgba(22, 33, 62, 0.95)');
+        
+        this.ctx.fillStyle = bgGradient;
+        this.ctx.fillRect(labelBgX, labelBgY, labelWidth, labelHeight);
+        
+        // Border with glow effect
+        this.ctx.shadowColor = 'rgba(78, 205, 196, 0.6)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.strokeStyle = '#4ECDC4';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(labelBgX, labelBgY, labelWidth, labelHeight);
+        this.ctx.shadowBlur = 0;
+        
+        // Enhanced text with better styling
         this.ctx.fillStyle = '#4ECDC4';
+        this.ctx.font = 'bold 18px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 2;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
         this.ctx.fillText(`${this.inclineAngle}°`, labelX, labelY);
+        this.ctx.shadowBlur = 0;
         this.ctx.restore();
 
         // Draw enhanced object with modern styling
@@ -2041,15 +2038,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         this.ctx.translate(this.object.x, this.object.y);
         this.ctx.rotate(angleRad);
         
-        // Add subtle bounce effect based on velocity
-        const bounceOffset = Math.sin(this.time * 0.01) * Math.min(Math.abs(this.object.vx) * 0.1, 2);
-        this.ctx.translate(0, bounceOffset);
-        
-        // Add rolling rotation effect when moving
-        if (Math.abs(this.object.vx) > 0.1) {
-            const rotationSpeed = this.object.vx * 0.02; // Rotation based on velocity
-            this.ctx.rotate(this.time * rotationSpeed);
-        }
+        // Remove rolling rotation effect - object should slide, not roll
         
         // Enhanced 3D shadow effect with blur and dynamic positioning
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
@@ -2134,11 +2123,13 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         // Draw analytics if enabled
         if (this.showAnalytics) {
             this.drawForceVectors();
-            // Removed on-canvas stats panel for a cleaner view
         }
         
         // Draw canvas labels for physics context
         this.drawFrictionLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawForceVectors() {
@@ -2191,7 +2182,7 @@ export class FrictionInclinedPlanes extends BaseAnimation {
         drawArrow(x, y, 0, weight * 0.12, '#1565C0', 'mg');
         
         // Parallel component of gravity (down the incline) - Orange
-        drawArrow(x, y, parallelForce * Math.cos(angleRad) * 0.12, parallelForce * Math.sin(angleRad) * 0.12, '#FF8C00', `mg sin(${this.inclineAngle}°)`);
+        drawArrow(x, y, parallelForce * Math.cos(angleRad) * 0.12, parallelForce * Math.sin(angleRad) * 0.12, '#FF8C00', 'mg sin(θ)');
         
         // Friction (opposes motion, along incline) - Dark Red
         let frictionDir = -1;
@@ -2263,7 +2254,9 @@ export class FrictionInclinedPlanes extends BaseAnimation {
     drawFrictionLabels() {
         this.drawLabels(
             'Friction & Inclined Planes',
-            'F = μN  |  F∥ = mg sin θ  |  N = mg cos θ'
+            'F = μN  |  F∥ = mg sin θ  |  N = mg cos θ',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
         );
     }
 }

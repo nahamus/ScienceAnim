@@ -129,6 +129,8 @@ export class FluidFlow extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         
         this.particles.forEach((particle, index) => {
@@ -361,6 +363,9 @@ export class FluidFlow extends BaseAnimation {
         
         // Draw mouse interaction indicator
         this.drawMouseIndicator();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawPipeSystem() {
@@ -1044,66 +1049,61 @@ export class FluidFlow extends BaseAnimation {
         this.ctx.fillText('💡 Higher porosity = slower flow', 20, this.ctx.canvas.height - 20);
     }
     
-    drawRealWorldAnalogy() {
-        // Modern analogy panel with enhanced styling
-        const panelX = this.ctx.canvas.width - 290;
-        const panelY = 20;
-        const panelWidth = 270;
-        const panelHeight = 100;
+    drawRealWorldAnalogy(examples = null) {
+        // Position panel in bottom-right area to avoid overlaps
+        const panelX = this.ctx.canvas.width - 320; // 320px from right edge
+        const panelY = this.ctx.canvas.height - 140; // 140px from bottom
+        const panelWidth = 300; // 300px wide
+        const panelHeight = 120; // 120px tall
         
-        // Enhanced panel background with shadow and gradient
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(panelX + 4, panelY + 4, panelWidth, panelHeight);
-        
-        const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
-        gradient.addColorStop(0, 'rgba(26, 26, 46, 0.98)');
-        gradient.addColorStop(0.3, 'rgba(26, 26, 46, 0.95)');
-        gradient.addColorStop(0.7, 'rgba(26, 26, 46, 0.92)');
-        gradient.addColorStop(1, 'rgba(26, 26, 46, 0.88)');
-        this.ctx.fillStyle = gradient;
+        // Enhanced panel background with gradient
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
         
-        // Enhanced border with gradient
-        this.ctx.shadowColor = '#FFD700';
-        this.ctx.shadowBlur = 8;
+        // Enhanced border with gradient effect
+        this.ctx.strokeStyle = '#FFD700';
         this.ctx.lineWidth = 2;
-        
-        // Create gradient border
-        const borderGradient = this.ctx.createLinearGradient(
-            panelX, panelY, 
-            panelX + panelWidth, panelY + panelHeight
-        );
-        borderGradient.addColorStop(0, '#FFD700');
-        borderGradient.addColorStop(0.5, '#FFA500');
-        borderGradient.addColorStop(1, '#FFD700');
-        
-        this.ctx.strokeStyle = borderGradient;
         this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
-        this.ctx.shadowBlur = 0;
         
-        // Add inner highlight for 3D effect
-        const innerGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + 30);
-        innerGradient.addColorStop(0, 'rgba(255, 215, 0, 0.1)');
-        innerGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
-        this.ctx.fillStyle = innerGradient;
-        this.ctx.fillRect(panelX, panelY, panelWidth, 30);
+        // Enhanced title with modern styling
+        this.ctx.save();
         
-        // Modern title with crisp font rendering
-        this.ctx.fillStyle = '#FFD700';
+        // Add subtle shadow for depth
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.shadowBlur = 3;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
+        
+        // Create gradient for the title text
+        const titleGradient = this.ctx.createLinearGradient(panelX + 10, panelY + 10, panelX + panelWidth - 10, panelY + 30);
+        titleGradient.addColorStop(0, '#FF6B35'); // Vibrant orange-red
+        titleGradient.addColorStop(0.5, '#F7931E'); // Golden orange
+        titleGradient.addColorStop(1, '#FFD700'); // Gold
+        
+        this.ctx.fillStyle = titleGradient;
         this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
         this.ctx.textAlign = 'left';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('💡 Real-World Examples:', panelX + 15, panelY + 22);
+        this.ctx.textBaseline = 'top';
+        this.ctx.fillText('💡 Real-World Examples:', panelX + 10, panelY + 10);
         
-        // Enhanced examples with modern styling
+        this.ctx.restore();
+        
+        // Enhanced examples with better styling
+        this.ctx.fillStyle = '#FFFFFF';
         this.ctx.font = '13px Inter, Arial, sans-serif';
-        this.ctx.textBaseline = 'middle';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'top';
         
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.fillText('🧽 Sponge: water flows through', panelX + 15, panelY + 45);
-        this.ctx.fillText('🪨 Rock: water flows around', panelX + 15, panelY + 62);
-        this.ctx.fillText('🌊 River: natural flow patterns', panelX + 15, panelY + 79);
-        this.ctx.fillText('🏊 Pool: controlled fluid motion', panelX + 15, panelY + 96);
+        const exampleTexts = examples || [
+            '🧽 Sponge: water flows through',
+            '🪨 Rock: water flows around', 
+            '🌊 River: natural flow patterns',
+            '🏊 Pool: controlled fluid motion'
+        ];
+        
+        exampleTexts.forEach((text, index) => {
+            this.ctx.fillText(text, panelX + 15, panelY + 35 + (index * 18));
+        });
     }
     
     drawMouseIndicator() {
@@ -1554,6 +1554,8 @@ export class Bernoulli extends BaseAnimation {
     }
     
     update(deltaTime) {
+        super.update(deltaTime); // Call parent update to handle standardized controls
+        
         this.time += deltaTime;
         
         // Maintain continuous flow by adding new particles
@@ -1742,11 +1744,19 @@ export class Bernoulli extends BaseAnimation {
         // Draw particles
         this.drawParticles();
         
-        // Draw Bernoulli information
-        this.drawBernoulliInfo();
-        
         // Add real-world analogy for beginners
-        this.drawBernoulliRealWorldAnalogy();
+        this.drawRealWorldAnalogy([
+            '🚿 Garden hose: narrow = faster',
+            '✈️ Airplane wings: curved = lift',
+            '🏥 Venturi meters: flow measurement',
+            '🩸 Blood flow: artery constriction'
+        ]);
+        
+        // Draw canvas labels
+        this.drawBernoulliLabels();
+        
+        // Draw standardized control buttons
+        this.drawControlButtons();
     }
     
     drawPipeSystem() {
@@ -2320,67 +2330,6 @@ export class Bernoulli extends BaseAnimation {
         this.ctx.fillText(`🎯 Flow Efficiency: ${efficiency.toFixed(0)}%`, panelX + 15, panelY + 130);
     }
     
-    drawBernoulliRealWorldAnalogy() {
-        // Modern analogy panel with enhanced styling
-        const panelX = this.ctx.canvas.width - 290;
-        const panelY = 20;
-        const panelWidth = 270;
-        const panelHeight = 100;
-        
-        // Enhanced panel background with shadow and gradient
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(panelX + 4, panelY + 4, panelWidth, panelHeight);
-        
-        const gradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
-        gradient.addColorStop(0, 'rgba(26, 26, 46, 0.98)');
-        gradient.addColorStop(0.3, 'rgba(26, 26, 46, 0.95)');
-        gradient.addColorStop(0.7, 'rgba(26, 26, 46, 0.92)');
-        gradient.addColorStop(1, 'rgba(26, 26, 46, 0.88)');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
-        
-        // Enhanced border with gradient
-        this.ctx.shadowColor = '#FFD700';
-        this.ctx.shadowBlur = 8;
-        this.ctx.lineWidth = 2;
-        
-        // Create gradient border
-        const borderGradient = this.ctx.createLinearGradient(
-            panelX, panelY, 
-            panelX + panelWidth, panelY + panelHeight
-        );
-        borderGradient.addColorStop(0, '#FFD700');
-        borderGradient.addColorStop(0.5, '#FFA500');
-        borderGradient.addColorStop(1, '#FFD700');
-        
-        this.ctx.strokeStyle = borderGradient;
-        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
-        this.ctx.shadowBlur = 0;
-        
-        // Add inner highlight for 3D effect
-        const innerGradient = this.ctx.createLinearGradient(panelX, panelY, panelX, panelY + 30);
-        innerGradient.addColorStop(0, 'rgba(255, 215, 0, 0.1)');
-        innerGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
-        this.ctx.fillStyle = innerGradient;
-        this.ctx.fillRect(panelX, panelY, panelWidth, 30);
-        
-        // Modern title with crisp font rendering
-        this.ctx.fillStyle = '#FFD700';
-        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
-        this.ctx.textAlign = 'left';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('💡 Real-World Examples:', panelX + 15, panelY + 22);
-        
-        // Enhanced examples with modern styling
-        this.ctx.font = '13px Inter, Arial, sans-serif';
-        this.ctx.textBaseline = 'middle';
-        
-        this.ctx.fillStyle = '#4ECDC4';
-        this.ctx.fillText('🚿 Garden hose: narrow = faster', panelX + 15, panelY + 45);
-        this.ctx.fillText('✈️ Airplane wings: curved = lift', panelX + 15, panelY + 62);
-        this.ctx.fillText('🏥 Venturi meters: flow measurement', panelX + 15, panelY + 79);
-        this.ctx.fillText('🩸 Blood flow: artery constriction', panelX + 15, panelY + 96);
-    }
     
     getStats() {
         return {
@@ -2392,5 +2341,71 @@ export class Bernoulli extends BaseAnimation {
             flowEfficiency: Math.min(100, (this.pressureDifference / 2) * 100),
             time: this.time
         };
+    }
+    
+    drawRealWorldAnalogy(examples = null) {
+        // Position panel in bottom-right area to avoid overlaps
+        const panelX = this.ctx.canvas.width - 320; // 320px from right edge
+        const panelY = this.ctx.canvas.height - 140; // 140px from bottom
+        const panelWidth = 300; // 300px wide
+        const panelHeight = 120; // 120px tall
+        
+        // Enhanced panel background with gradient
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Enhanced border with gradient effect
+        this.ctx.strokeStyle = '#FFD700';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Enhanced title with modern styling
+        this.ctx.save();
+        
+        // Add subtle shadow for depth
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.shadowBlur = 3;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
+        
+        // Create gradient for the title text
+        const titleGradient = this.ctx.createLinearGradient(panelX + 10, panelY + 10, panelX + panelWidth - 10, panelY + 30);
+        titleGradient.addColorStop(0, '#FF6B35'); // Vibrant orange-red
+        titleGradient.addColorStop(0.5, '#F7931E'); // Golden orange
+        titleGradient.addColorStop(1, '#FFD700'); // Gold
+        
+        this.ctx.fillStyle = titleGradient;
+        this.ctx.font = 'bold 16px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'top';
+        this.ctx.fillText('💡 Real-World Examples:', panelX + 10, panelY + 10);
+        
+        this.ctx.restore();
+        
+        // Enhanced examples with better styling
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = '13px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'top';
+        
+        const exampleTexts = examples || [
+            '🧽 Sponge: water flows through',
+            '🪨 Rock: water flows around', 
+            '🌊 River: natural flow patterns',
+            '🏊 Pool: controlled fluid motion'
+        ];
+        
+        exampleTexts.forEach((text, index) => {
+            this.ctx.fillText(text, panelX + 15, panelY + 35 + (index * 18));
+        });
+    }
+    
+    drawBernoulliLabels() {
+        this.drawLabels(
+            'Bernoulli\'s Principle',
+            'P + ½ρv² + ρgh = constant  |  v² ∝ 1/A  |  ΔP = ½ρ(v₂² - v₁²)',
+            25,  // Move title to top of canvas
+            45   // Move formulas just below title
+        );
     }
 }
