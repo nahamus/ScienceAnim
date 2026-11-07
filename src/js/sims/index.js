@@ -5,11 +5,11 @@ const modules = import.meta.glob('./*/*.js', { eager: true });
 
 const ORDER = [
   // physics
-  'projectile', 'double-pendulum', 'pendulum-wave', 'ripple-tank', 'standing-waves', 'doppler', 'refraction',
-  'double-slit', 'quantum-tunneling', 'electric-field', 'induction', 'em-radiation', 'kinetic-gas', 'brownian',
-  'fluid', 'chain-reaction', 'relativity',
+  'projectile', 'double-pendulum', 'pendulum-wave', 'resonance', 'ripple-tank', 'standing-waves', 'doppler',
+  'refraction', 'double-slit', 'quantum-tunneling', 'electric-field', 'circuits', 'induction', 'em-radiation',
+  'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity',
   // astronomy
-  'gravity', 'orbital-transfer', 'exoplanets', 'black-hole',
+  'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole',
   // chemistry
   'phases', 'molecule-shapes', 'orbitals', 'equilibrium',
   // biology
@@ -18,8 +18,10 @@ const ORDER = [
   'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis',
   // cs
   'neural-network', 'gradient-descent', 'kmeans', 'sorting', 'pathfinding', 'tsp', 'life',
+  // technology
+  'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'power-grid',
   // earth
-  'seasons', 'greenhouse', 'seismic-waves',
+  'seasons', 'coriolis', 'greenhouse', 'seismic-waves',
 ];
 
 const all = Object.values(modules).map((m) => m.default).filter(Boolean);

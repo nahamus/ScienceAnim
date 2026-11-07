@@ -41,6 +41,12 @@ export const CATEGORIES = [
     icon: svg('<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 9l-2 2 2 2M16 9l2 2-2 2M13 8l-2 6"/>'),
   },
   {
+    id: 'tech',
+    name: 'Technology',
+    color: '#ff8a3d',
+    icon: svg('<rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 10h4v4h-4zM9 3v4M12 3v4M15 3v4M9 17v4M12 17v4M15 17v4M3 9h4M3 12h4M3 15h4M17 9h4M17 12h4M17 15h4"/>'),
+  },
+  {
     id: 'earth',
     name: 'Earth & Climate',
     color: '#38d6f5',
