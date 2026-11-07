@@ -2,17 +2,17 @@
 
 Cinematic, interactive simulations of the ideas behind science, all running live in the browser. Every simulation tells a short **guided story** (narrated chapters that set up the scene and change parameters smoothly), then hands you the controls to explore.
 
-**28 simulations across 7 fields:**
+**48 simulations across 7 fields:**
 
 | Field | Simulations |
 | --- | --- |
-| Physics | Double-pendulum chaos · Waves & interference (ripple tank) · Quantum double slit · Electric fields · How light is made (EM radiation) · Doppler effect & sonic booms · Kinetic theory of gases · Brownian motion · Fluid dynamics (Navier–Stokes) · Nuclear chain reaction · Special relativity |
-| Astronomy | Orbits & gravity (Kepler, three-body, sandbox) · Ray-traced black hole (WebGL) |
-| Chemistry | Hydrogen orbitals · Reactions & equilibrium |
-| Biology | Natural selection · Epidemics (SIR) · Neuron action potential (Hodgkin–Huxley) · Flocking |
-| Mathematics | Fourier epicycles · Lorenz attractor · Mandelbrot & Julia sets (WebGL) · Golden angle / phyllotaxis |
-| Computer science | Neural network training · Sorting race · Pathfinding (BFS, Dijkstra, A*, greedy) · Game of Life |
-| Earth & climate | Greenhouse effect |
+| Physics | Projectile motion & air drag · Double-pendulum chaos · Pendulum waves · Waves & interference (ripple tank) · Strings & harmonics · Doppler effect & sonic booms · Light, lenses & rainbows (ray tracing) · Quantum double slit · Quantum tunnelling (split-step Schrödinger) · Electric fields · Electromagnetic induction · How light is made (EM radiation) · Kinetic theory of gases · Brownian motion · Fluid dynamics (Navier–Stokes) · Nuclear chain reaction · Special relativity |
+| Astronomy | Orbits & gravity (Kepler, three-body, sandbox) · Orbital manoeuvres (Hohmann transfer, rendezvous) · Hunting exoplanets (transits & wobble) · Ray-traced black hole (WebGL) |
+| Chemistry | Solid, liquid, gas (Lennard-Jones) · Molecule shapes (VSEPR, 3D) · Hydrogen orbitals · Reactions & equilibrium |
+| Biology | DNA (helix, replication, transcription, translation) · Natural selection · Predators & prey · Epidemics (SIR) · Turing patterns (reaction–diffusion) · Neuron action potential (Hodgkin–Huxley) · Flocking |
+| Mathematics | Galton board & the bell curve · Fourier epicycles · Logistic map & the road to chaos · Lorenz attractor · Mandelbrot & Julia sets (WebGL) · Golden angle / phyllotaxis |
+| Computer science | Neural network training · Gradient descent (SGD, momentum, Adam) · k-means clustering · Sorting race · Pathfinding (BFS, Dijkstra, A*, greedy) · Travelling salesperson (greedy, 2-opt, annealing) · Game of Life |
+| Earth & climate | Why we have seasons · Greenhouse effect · Seismic waves & Earth's core |
 
 ## Running
 

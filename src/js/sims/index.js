@@ -5,20 +5,21 @@ const modules = import.meta.glob('./*/*.js', { eager: true });
 
 const ORDER = [
   // physics
-  'double-pendulum', 'ripple-tank', 'double-slit', 'electric-field', 'em-radiation', 'doppler',
-  'kinetic-gas', 'brownian', 'fluid', 'chain-reaction', 'relativity',
+  'projectile', 'double-pendulum', 'pendulum-wave', 'ripple-tank', 'standing-waves', 'doppler', 'refraction',
+  'double-slit', 'quantum-tunneling', 'electric-field', 'induction', 'em-radiation', 'kinetic-gas', 'brownian',
+  'fluid', 'chain-reaction', 'relativity',
   // astronomy
-  'gravity', 'black-hole',
+  'gravity', 'orbital-transfer', 'exoplanets', 'black-hole',
   // chemistry
-  'orbitals', 'equilibrium',
+  'phases', 'molecule-shapes', 'orbitals', 'equilibrium',
   // biology
-  'natural-selection', 'epidemic', 'neuron', 'flocking',
+  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'flocking',
   // math
-  'fourier', 'lorenz', 'mandelbrot', 'phyllotaxis',
+  'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis',
   // cs
-  'neural-network', 'sorting', 'pathfinding', 'life',
+  'neural-network', 'gradient-descent', 'kmeans', 'sorting', 'pathfinding', 'tsp', 'life',
   // earth
-  'greenhouse',
+  'seasons', 'greenhouse', 'seismic-waves',
 ];
 
 const all = Object.values(modules).map((m) => m.default).filter(Boolean);
