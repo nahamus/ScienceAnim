@@ -1,47 +1,33 @@
-import { ScientificAnimations } from './animations.js';
+import { SIMS } from './sims/index.js';
+import { Gallery } from './gallery.js';
+import { Player } from './player.js';
 
-// Initialize the application when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('animationCanvas');
-    new ScientificAnimations(canvas);
-    
-    // Initialize controls panel toggle
-    initializeControlsToggle();
-});
+const root = document.getElementById('app');
+let view = null;
+let galleryScroll = 0;
 
-// Controls panel toggle functionality
-function initializeControlsToggle() {
-    const controlsPanel = document.querySelector('.controls-panel');
-    const toggleButton = document.querySelector('.controls-toggle');
-    
-    if (!controlsPanel || !toggleButton) return;
-    
-    // Check if user has a preference stored
-    const isCollapsed = localStorage.getItem('controlsCollapsed') === 'true';
-    
-    if (isCollapsed) {
-        controlsPanel.classList.add('collapsed');
-    }
-    
-    toggleButton.addEventListener('click', () => {
-        const isCurrentlyCollapsed = controlsPanel.classList.contains('collapsed');
-        
-        if (isCurrentlyCollapsed) {
-            // Expand the panel
-            controlsPanel.classList.remove('collapsed');
-            localStorage.setItem('controlsCollapsed', 'false');
-        } else {
-            // Collapse the panel
-            controlsPanel.classList.add('collapsed');
-            localStorage.setItem('controlsCollapsed', 'true');
-        }
+function route() {
+  const m = location.hash.match(/^#\/sim\/([\w-]+)/);
+  const def = m && SIMS.find((s) => s.id === m[1]);
+  if (view instanceof Gallery) galleryScroll = window.scrollY;
+  view?.destroy();
+  view = null;
+  if (def) {
+    const i = SIMS.indexOf(def);
+    document.title = `${def.title} · ScienceAnim`;
+    document.body.classList.add('in-player');
+    view = new Player(root, def, {
+      onBack: () => (location.hash = '#/'),
+      prev: SIMS[i - 1],
+      next: SIMS[i + 1],
     });
-    
-    // Add keyboard shortcut (Ctrl/Cmd + T)
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 't') {
-            e.preventDefault();
-            toggleButton.click();
-        }
-    });
-} 
+  } else {
+    document.title = 'ScienceAnim · Interactive science, beautifully animated';
+    document.body.classList.remove('in-player');
+    view = new Gallery(root, SIMS);
+    requestAnimationFrame(() => window.scrollTo(0, galleryScroll));
+  }
+}
+
+window.addEventListener('hashchange', route);
+route();
