@@ -133,7 +133,7 @@ export default {
   story: [
     {
       title: 'A brain made of maths',
-      text: 'Orange and blue points need sorting. The network on the right starts with <b>random weights</b>; the background shows what it currently guesses for every location. Right now: nonsense.',
+      text: 'Orange and blue points need sorting. The network diagram starts with <b>random weights</b>; the background shows what it currently guesses for every location. Right now: nonsense.',
       params: { data: 'circle', layers: 1, width: 4, lr: 0.08, train: false },
       enter: (s) => s.rebuild(true),
       duration: 9,

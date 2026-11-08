@@ -103,7 +103,7 @@ export default {
     },
     {
       title: 'Explore',
-      text: 'Pick any orbital and rotate it. The chart on the right shows how likely the electron is to be found at each distance from the nucleus.',
+      text: 'Pick any orbital and rotate it. The Live data chart shows how likely the electron is to be found at each distance from the nucleus.',
       params: { orb: '3p' },
       duration: 20,
     },

@@ -28,7 +28,7 @@ export default {
   story: [
     {
       title: 'Always half lit',
-      text: 'Seen from far above, sunlight streams in from the right. The Moon, like Earth, always has a bright day side facing the Sun and a dark night side. The big disc on the left shows what we see from Earth.',
+      text: 'Seen from far above, sunlight streams in from the right. The Moon, like Earth, always has a bright day side facing the Sun and a dark night side. The big disc shows what we see from Earth.',
       params: { speed: 1.5, tilt: true, node: 60 },
       duration: 12,
     },
