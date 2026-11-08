@@ -5,6 +5,8 @@ export default {
   title: 'Bernoulli’s Principle',
   category: 'physics',
   tagline: 'Squeeze a flow and it speeds up — and where it is fast, pressure drops.',
+  ages: ['14-16', '16+'],
+  topics: ['Fluids', 'Pressure'],
   blurb:
     'Water speeding through a narrow pipe, air rushing over a wing, a shower curtain sucked inward: all are Bernoulli’s principle. A moving fluid trades pressure for speed. Where it flows fast its pressure is low; where it slows, pressure rises. It explains perfume sprayers, carburettors, aircraft speed sensors and part of how wings lift.',
   ideas: [

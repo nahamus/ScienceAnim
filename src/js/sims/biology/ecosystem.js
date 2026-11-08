@@ -7,6 +7,8 @@ export default {
   title: 'Predators & Prey',
   category: 'biology',
   tagline: 'Rabbits boom, foxes feast, everyone crashes — and the cycle starts again.',
+  ages: ['11-14', '14-16'],
+  topics: ['Ecology', 'Populations'],
   blurb:
     'Grass feeds rabbits, rabbits feed foxes. Each animal here follows a few simple rules: wander, eat, breed when well fed, starve when not. Nobody plans anything, yet the populations rise and fall in endless chasing waves — the same cycles fur trappers recorded for lynx and hares over a century.',
   ideas: [

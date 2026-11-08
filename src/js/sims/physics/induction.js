@@ -35,6 +35,8 @@ export default {
   title: 'Electromagnetic Induction',
   category: 'physics',
   tagline: 'Move a magnet, make electricity. The trick behind every power station.',
+  ages: ['14-16', '16+'],
+  topics: ['Electromagnetism', 'Electricity'],
   blurb:
     'In 1831 Michael Faraday found that a magnet moving near a coil of wire makes an electric current flow. A still magnet does nothing — only change counts. Nearly all the electricity you use is made this way, by spinning magnets past coils in generators.',
   ideas: [

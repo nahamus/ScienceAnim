@@ -47,6 +47,8 @@ export default {
   title: 'The Mandelbrot Set',
   category: 'math',
   tagline: 'Infinite complexity from z → z² + c. Dive into the most famous shape in mathematics.',
+  ages: ['14-16', '16+'],
+  topics: ['Complex numbers', 'Fractals'],
   blurb:
     'Take a number, square it and add a constant. Repeat. For some constants the numbers stay small forever; for others they explode. Colour the plane by which is which, and the Mandelbrot set appears — a boundary of infinite intricacy, endlessly self-similar, from a rule a child could follow.',
   ideas: [

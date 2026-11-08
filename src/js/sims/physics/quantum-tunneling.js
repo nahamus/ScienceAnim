@@ -45,6 +45,8 @@ export default {
   title: 'Quantum Tunnelling',
   category: 'physics',
   tagline: 'A particle walks through a wall it can’t climb. Quantum mechanics says it can.',
+  ages: ['16+'],
+  topics: ['Quantum'],
   blurb:
     'In the quantum world a particle is a spread-out wave of possibility. When that wave meets a barrier it does not simply bounce: part of it leaks through to the other side. This “tunnelling” powers the Sun, lets flash memory store your photos, and lets microscopes see single atoms.',
   ideas: [

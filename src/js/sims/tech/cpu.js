@@ -30,6 +30,8 @@ export default {
   title: 'Inside a Computer Processor',
   category: 'tech',
   tagline: 'Fetch, decode, execute — the three-step loop every program runs on, billions of times a second.',
+  ages: ['14-16', '16+'],
+  topics: ['Computer systems'],
   blurb:
     'Software is just a list of very simple instructions stored as numbers in memory. The processor fetches one, works out what it means, does it, and moves on to the next. This tiny 8-bit computer runs real programs step by step, so you can follow every number as it moves between memory, registers and the arithmetic unit.',
   ideas: [

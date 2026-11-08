@@ -30,6 +30,8 @@ export default {
   title: 'Conway’s Game of Life',
   category: 'cs',
   tagline: 'Two rules on a grid produce gliders, guns and patterns that compute anything.',
+  ages: ['11-14', '14-16', '16+'],
+  topics: ['Algorithms', 'Emergence'],
   blurb:
     'In 1970 mathematician John Conway invented a “game” with no players. Each square on a grid lives or dies based only on its eight neighbours. From that, stable shapes, oscillators, moving spaceships and even working computers emerge. It’s a playground for how complexity arises from simplicity.',
   ideas: [

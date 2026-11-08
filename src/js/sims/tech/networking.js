@@ -8,6 +8,8 @@ export default {
   title: 'How the Internet Works',
   category: 'tech',
   tagline: 'Your message is chopped into packets that each find their own way across the world.',
+  ages: ['11-14', '14-16'],
+  topics: ['Networks'],
   blurb:
     'When you send a message or load a video, the data is cut into small packets, each labelled with where it is going and its place in the sequence. Routers pass every packet hop by hop toward its destination, choosing whichever route looks best right now. Packets may take different paths, arrive out of order or get lost — and the receiving computer puts it all back together.',
   ideas: [

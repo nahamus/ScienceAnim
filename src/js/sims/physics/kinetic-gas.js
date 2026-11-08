@@ -7,6 +7,8 @@ export default {
   title: 'The Kinetic Theory of Gases',
   category: 'physics',
   tagline: 'Temperature, pressure and the ideal gas law — explained by billions of tiny collisions.',
+  ages: ['14-16', '16+'],
+  topics: ['Particles', 'Gases', 'Thermal physics'],
   blurb:
     'A gas is a swarm of molecules flying around and bouncing off each other and the walls. Temperature is just their average kinetic energy; pressure is the drumbeat of impacts on the container. Squeeze, heat and watch the ideal gas law emerge from pure mechanics.',
   ideas: [

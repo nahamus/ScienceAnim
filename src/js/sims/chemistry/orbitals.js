@@ -48,6 +48,8 @@ export default {
   title: 'The Shapes of Atoms',
   category: 'chemistry',
   tagline: 'Electron clouds of hydrogen, built dot by dot from the Schrödinger equation.',
+  ages: ['16+'],
+  topics: ['Atomic structure', 'Quantum'],
   blurb:
     'Electrons don’t orbit the nucleus like planets. Quantum mechanics only gives the probability of finding one at each point — a cloud whose shape is set by the Schrödinger equation. These shapes, called orbitals, decide how atoms bond and so underpin all of chemistry.',
   ideas: [

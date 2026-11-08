@@ -12,6 +12,8 @@ export default {
   title: 'Strings, Harmonics & Music',
   category: 'physics',
   tagline: 'Pluck a string and hear a chord of hidden frequencies.',
+  ages: ['14-16', '16+'],
+  topics: ['Waves', 'Sound'],
   blurb:
     'A plucked guitar string does not vibrate in one simple way. Waves race back and forth, reflect from both ends and interfere, leaving only patterns that fit exactly on the string: the harmonics. Their mixture is what makes a guitar sound different from a piano playing the same note.',
   ideas: [

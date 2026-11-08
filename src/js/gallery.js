@@ -58,10 +58,44 @@ async function pumpThumbs() {
   setTimeout(pumpThumbs, 30);
 }
 
+// Age bands used for curriculum tags (a sim's `ages`), in order.
+const AGE_BANDS = [
+  { id: '11-14', from: 11, to: 14 },
+  { id: '14-16', from: 14, to: 16 },
+  { id: '16+', from: 16, to: Infinity },
+];
+
+/** "Ages 11–16", "Ages 14+" … from a sim's bands. */
+function agesLabel(ages) {
+  const bands = AGE_BANDS.filter((b) => ages?.includes(b.id));
+  if (!bands.length) return '';
+  const from = bands[0].from, to = bands[bands.length - 1].to;
+  return to === Infinity ? `Ages ${from}+` : `Ages ${from}–${to}`;
+}
+
+const session = {
+  get: (k) => {
+    try {
+      return sessionStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set: (k, v) => {
+    try {
+      sessionStorage.setItem(k, v);
+    } catch {
+      /* storage blocked: filters just won't be remembered */
+    }
+  },
+};
+
 export class Gallery {
   constructor(root, sims) {
     this.sims = sims;
-    this.filter = sessionStorage.getItem('sa-filter') || 'all';
+    this.filter = session.get('sa-filter') || 'all';
+    this.age = session.get('sa-age') || 'all';
+    if (this.age !== 'all' && !AGE_BANDS.some((b) => b.id === this.age)) this.age = 'all';
     this.query = '';
     const el = (this.el = document.createElement('div'));
     el.className = 'gallery';
@@ -89,10 +123,18 @@ export class Gallery {
               .map((c) => `<button data-f="${c.id}" style="--c:${c.color}"><i>${c.icon}</i>${c.name} <small>${counts[c.id]}</small></button>`)
               .join('')}
           </div>
-          <label class="search">${ICONS.search}<input type="search" placeholder="Search simulations…" aria-label="Search simulations"></label>
+          <div class="tools">
+            <label class="age">
+              <select aria-label="Age range">
+                <option value="all">All ages</option>
+                ${AGE_BANDS.map((b) => `<option value="${b.id}">Ages ${b.id.replace('-', '–')}</option>`).join('')}
+              </select>
+            </label>
+            <label class="search">${ICONS.search}<input type="search" placeholder="Search simulations or topics…" aria-label="Search simulations"></label>
+          </div>
         </div>
         <div class="grid"></div>
-        <p class="empty" hidden>No simulations match that search.</p>
+        <p class="empty" hidden>No simulations match those filters.</p>
       </section>
       <footer class="foot">
         <span>Built with plain JavaScript, Canvas and WebGL. Every frame is computed live.</span>
@@ -107,10 +149,17 @@ export class Gallery {
     el.querySelectorAll('.pills button').forEach((b) =>
       b.addEventListener('click', () => {
         this.filter = b.dataset.f;
-        sessionStorage.setItem('sa-filter', this.filter);
+        session.set('sa-filter', this.filter);
         this.apply();
       }),
     );
+    const age = el.querySelector('.age select');
+    age.value = this.age;
+    age.addEventListener('change', () => {
+      this.age = age.value;
+      session.set('sa-age', this.age);
+      this.apply();
+    });
     el.querySelector('.search input').addEventListener('input', (e) => {
       this.query = e.target.value.trim().toLowerCase();
       this.apply();
@@ -130,9 +179,10 @@ export class Gallery {
     a.innerHTML = `
       <div class="thumb"><div class="thumb-img"></div><div class="thumb-live"></div><span class="play">${ICONS.play}</span></div>
       <div class="meta">
-        <span class="cat"><i>${cat.icon}</i>${cat.name}</span>
+        <span class="cat"><i>${cat.icon}</i>${cat.name}${s.ages ? `<em>${agesLabel(s.ages)}</em>` : ''}</span>
         <h3>${s.title}</h3>
         <p>${s.tagline || ''}</p>
+        ${s.topics?.length ? `<p class="topics">${s.topics.join(' · ')}</p>` : ''}
       </div>`;
     const cached = cachedThumb(s.id);
     if (cached) a.querySelector('.thumb-img').style.backgroundImage = `url(${cached})`;
@@ -189,12 +239,18 @@ export class Gallery {
   }
 
   apply() {
-    this.el.querySelectorAll('.pills button').forEach((b) => b.classList.toggle('on', b.dataset.f === this.filter));
+    const forAge = (s) => this.age === 'all' || !!s.ages?.includes(this.age);
+    // pill counts follow the age filter, so each pill says how many it will show
+    this.el.querySelectorAll('.pills button').forEach((b) => {
+      b.classList.toggle('on', b.dataset.f === this.filter);
+      const n = this.sims.filter((s) => forAge(s) && (b.dataset.f === 'all' || s.category === b.dataset.f)).length;
+      b.querySelector('small').textContent = n;
+    });
     let shown = 0;
     this.cards.forEach((c, i) => {
       const s = this.sims[i];
-      const hay = `${s.title} ${s.tagline} ${s.blurb} ${CATEGORY[s.category].name} ${(s.keywords || []).join(' ')}`.toLowerCase();
-      const ok = (this.filter === 'all' || s.category === this.filter) && (!this.query || hay.includes(this.query));
+      const hay = [s.title, s.tagline, s.blurb, CATEGORY[s.category].name, ...(s.keywords || []), ...(s.topics || [])].join(' ').toLowerCase();
+      const ok = (this.filter === 'all' || s.category === this.filter) && forAge(s) && (!this.query || hay.includes(this.query));
       c.hidden = !ok;
       if (ok) c.style.setProperty('--i', shown++);
     });

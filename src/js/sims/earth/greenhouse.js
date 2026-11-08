@@ -15,6 +15,8 @@ export default {
   title: 'The Greenhouse Effect',
   category: 'earth',
   tagline: 'Sunlight in, heat out — and the invisible gases that decide how warm our planet stays.',
+  ages: ['11-14', '14-16'],
+  topics: ['Climate', 'Radiation'],
   blurb:
     'Sunlight passes easily through the air and warms the ground. The warm ground glows back in infrared, which we can’t see. Carbon dioxide, water vapour and methane absorb that infrared and send some of it back down. More of these gases means more heat kept in.',
   ideas: [

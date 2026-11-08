@@ -8,6 +8,8 @@ export default {
   title: 'Moon Phases & Eclipses',
   category: 'astronomy',
   tagline: 'Half the Moon is always lit. What changes is how much of that half we can see.',
+  ages: ['11-14'],
+  topics: ['Space', 'Light'],
   blurb:
     'The Moon makes no light of its own; it reflects sunlight. One half is always lit, but as the Moon circles Earth each month we see different amounts of that bright half, from a thin crescent to a full disc. Occasionally Sun, Earth and Moon line up exactly — and we get an eclipse.',
   ideas: [

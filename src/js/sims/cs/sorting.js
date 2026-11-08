@@ -156,6 +156,8 @@ export default {
   title: 'The Great Sorting Race',
   category: 'cs',
   tagline: 'Bubble, merge, quick and heap sort race on the same data. Clever beats brute force.',
+  ages: ['11-14', '14-16', '16+'],
+  topics: ['Algorithms'],
   blurb:
     'Putting things in order is one of computing’s most common jobs. There are dozens of ways to do it, and the difference between a naive method and a clever one can be a billion-fold on large data. Watch algorithms compete on identical inputs and count every comparison they make.',
   ideas: [

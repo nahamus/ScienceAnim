@@ -65,7 +65,7 @@ Each simulation is its own code chunk, downloaded only when it is opened (or whe
 
 ### Adding a simulation
 
-Create `src/js/sims/<field>/<id>.js` exporting a definition; it is picked up automatically (add the id to `ORDER` in `sims/index.js` to place it). `id`, `title`, `category`, `tagline` and `blurb` (and `keywords`, if used) must be plain string literals, because the gallery reads them at build time without loading the simulation. Restart `npm run dev` after adding a new file.
+Create `src/js/sims/<field>/<id>.js` exporting a definition; it is picked up automatically (add the id to `ORDER` in `sims/index.js` to place it). `id`, `title`, `category`, `tagline`, `blurb`, `ages` and `topics` (and `keywords`, if used) must be plain literals, because the gallery reads them at build time without loading the simulation. Restart `npm run dev` after adding a new file.
 
 ```js
 export default {
@@ -73,6 +73,8 @@ export default {
   title: 'My Simulation',
   category: 'physics',                 // a key from categories.js
   tagline: 'One line for the gallery card.',
+  ages: ['11-14', '14-16'],            // curriculum bands: '11-14', '14-16', '16+'
+  topics: ['Forces', 'Motion'],        // shown on the card and searchable
   blurb: 'A short paragraph for the side panel.',
   ideas: ['Key idea one', 'Key idea two'],
   hint: 'What the viewer can do with the mouse',

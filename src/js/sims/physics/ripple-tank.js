@@ -6,6 +6,8 @@ export default {
   title: 'Waves & Interference',
   category: 'physics',
   tagline: 'Drop pebbles in a digital ripple tank and watch waves add, cancel and bend.',
+  ages: ['14-16', '16+'],
+  topics: ['Waves'],
   blurb:
     'Every wave — water, sound, light — obeys the same rule: neighbouring points pull on each other. When waves overlap they simply add. Where crest meets crest they reinforce; where crest meets trough they cancel. That one idea explains interference and diffraction.',
   ideas: [

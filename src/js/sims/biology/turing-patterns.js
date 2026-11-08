@@ -13,6 +13,8 @@ export default {
   title: 'How the Leopard Got Its Spots',
   category: 'biology',
   tagline: 'Two chemicals, one simple rule — and nature paints spots, stripes and mazes.',
+  ages: ['16+'],
+  topics: ['Development', 'Patterns', 'Modelling'],
   blurb:
     'In 1952 Alan Turing — the codebreaker and father of computing — proposed how a uniform clump of cells could develop spots and stripes. Two chemicals spread out at different speeds while reacting with each other. Tiny random bumps grow into regular patterns. Biologists have since found Turing patterns in fish skin, fingers and hair follicles.',
   ideas: [

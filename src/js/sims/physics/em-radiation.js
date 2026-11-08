@@ -5,6 +5,8 @@ export default {
   title: 'How Light Is Made',
   category: 'physics',
   tagline: 'Shake an electric charge and its field lines ripple outward at the speed of light.',
+  ages: ['16+'],
+  topics: ['Electromagnetism', 'Light'],
   blurb:
     'A charge’s field cannot update everywhere at once — news of any change spreads outward at the speed of light. When a charge accelerates, its field lines develop a kink that races away. That travelling kink is electromagnetic radiation: radio, light and X-rays are all made this way.',
   ideas: [

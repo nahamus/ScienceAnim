@@ -111,6 +111,8 @@ export default {
   title: 'How a Neural Network Learns',
   category: 'cs',
   tagline: 'Watch a tiny artificial brain bend its decision boundary to separate the data.',
+  ages: ['16+'],
+  topics: ['Machine learning'],
   blurb:
     'A neural network is a stack of simple units, each computing a weighted sum and squashing it. Learning means nudging every weight slightly downhill on the error — gradient descent — over and over. Here a small network learns, live, to tell orange points from blue ones.',
   ideas: [

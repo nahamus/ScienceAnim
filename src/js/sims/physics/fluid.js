@@ -6,6 +6,8 @@ export default {
   title: 'Fluid Dynamics',
   category: 'physics',
   tagline: 'Stir a living fluid: vortices, jets, wakes and the swirling billows of clouds.',
+  ages: ['16+'],
+  topics: ['Fluids'],
   blurb:
     'Fluids obey the Navier–Stokes equations: momentum is carried along by the flow, pressure keeps the fluid from compressing, and viscosity smooths things out. Simple rules, astonishing results — the swirl of cream in coffee, the wake behind an island, the bands of Jupiter.',
   ideas: [

@@ -14,6 +14,8 @@ export default {
   title: 'Logic Gates: How Computers Think',
   category: 'tech',
   tagline: 'Wire a few on/off switches together cleverly and they can add numbers.',
+  ages: ['11-14', '14-16'],
+  topics: ['Logic', 'Computer systems'],
   blurb:
     'Inside every chip, transistors are wired into logic gates — tiny circuits that take 1s and 0s in and give a 1 or 0 out according to a simple rule. Combine a handful and you can add two bits. Chain those together and you can add any numbers. Billions of gates doing this, billions of times a second, is a computer.',
   ideas: [

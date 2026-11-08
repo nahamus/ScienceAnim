@@ -5,6 +5,8 @@ export default {
   title: 'Special Relativity: Time Dilation',
   category: 'physics',
   tagline: 'Why moving clocks tick slower — explained with nothing but a bouncing beam of light.',
+  ages: ['16+'],
+  topics: ['Relativity'],
   blurb:
     'Einstein started from one strange fact: everyone measures the same speed of light, no matter how fast they move. Follow that idea with a “light clock” — a photon bouncing between two mirrors — and time itself has to stretch.',
   ideas: [

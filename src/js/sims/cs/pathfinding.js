@@ -46,6 +46,8 @@ export default {
   title: 'Pathfinding: How GPS Finds a Route',
   category: 'cs',
   tagline: 'Breadth-first, Dijkstra, A* and greedy search race to find the shortest way through a maze.',
+  ages: ['14-16', '16+'],
+  topics: ['Algorithms', 'Graphs'],
   blurb:
     'Every time a map app plans a route or a game character walks around a wall, a search algorithm explores possibilities. Blind searches flood outward in every direction; smart ones use a sense of direction to focus on promising paths. Watch them think.',
   ideas: [

@@ -35,6 +35,8 @@ export default {
   title: 'The Shapes of Molecules',
   category: 'chemistry',
   tagline: 'Electron pairs push each other apart — and that decides the shape of every molecule.',
+  ages: ['14-16', '16+'],
+  topics: ['Bonding', 'Molecules'],
   blurb:
     'Why is water bent while carbon dioxide is straight? Around a central atom, pairs of electrons — in bonds or sitting alone — repel each other and spread out as far as possible, like balloons tied together. This simple rule (VSEPR theory) predicts the 3D shape of most molecules, and shape decides how they behave.',
   ideas: [
