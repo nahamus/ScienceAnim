@@ -5,6 +5,8 @@ export default {
   title: 'Doppler Effect & Sonic Booms',
   category: 'physics',
   tagline: 'Why a passing siren drops in pitch — and what happens when you outrun your own sound.',
+  ages: ['14-16', '16+'],
+  topics: ['Waves', 'Sound'],
   blurb:
     'A moving source crowds its waves together in front and stretches them out behind. Listeners ahead hear a higher pitch; listeners behind hear a lower one. Push past the speed of sound and the wavefronts pile into a shock cone: a sonic boom.',
   ideas: [

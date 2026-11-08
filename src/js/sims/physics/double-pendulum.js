@@ -33,6 +33,8 @@ export default {
   title: 'Chaos & the Double Pendulum',
   category: 'physics',
   tagline: 'Two hinged rods, perfectly predictable laws — and a future no one can predict.',
+  ages: ['16+'],
+  topics: ['Chaos', 'Forces'],
   blurb:
     'A double pendulum follows Newton’s laws exactly, yet the tiniest nudge to its starting angle grows exponentially until two copies have nothing in common. This is deterministic chaos — the “butterfly effect.”',
   ideas: [

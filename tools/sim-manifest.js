@@ -13,7 +13,7 @@ import { parseAst } from 'vite';
 
 const ID = 'virtual:sim-manifest';
 const RESOLVED = '\0' + ID;
-const FIELDS = ['id', 'title', 'category', 'tagline', 'blurb', 'keywords', 'renderer'];
+const FIELDS = ['id', 'title', 'category', 'tagline', 'blurb', 'keywords', 'ages', 'topics', 'renderer'];
 const REQUIRED = ['id', 'title', 'category'];
 
 function literal(node) {

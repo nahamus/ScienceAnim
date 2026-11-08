@@ -14,6 +14,8 @@ export default {
   title: 'How Neurons Fire',
   category: 'biology',
   tagline: 'Ion channels snap open and a spike of voltage races down a nerve fibre.',
+  ages: ['14-16', '16+'],
+  topics: ['Nervous system', 'Cells'],
   blurb:
     'Every thought, feeling and movement rides on action potentials — brief electrical spikes that travel along nerve fibres. They are created by tiny gates in the cell membrane letting sodium rush in and potassium rush out. This is the Nobel-winning Hodgkin–Huxley model, running live.',
   ideas: [

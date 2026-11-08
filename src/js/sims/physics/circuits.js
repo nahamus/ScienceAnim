@@ -7,6 +7,8 @@ export default {
   title: 'Electric Circuits',
   category: 'physics',
   tagline: 'Voltage pushes, resistance resists, current flows. Why one dead bulb can kill the whole string.',
+  ages: ['11-14', '14-16'],
+  topics: ['Electricity'],
   blurb:
     'A battery is a pump for electric charge. It pushes electrons around a closed loop of wire, and anything in the loop — a bulb, a heater, a phone — turns that flow into light, heat or work. Wire bulbs one after another or side by side and they behave completely differently.',
   ideas: [

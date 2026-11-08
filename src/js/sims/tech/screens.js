@@ -5,6 +5,8 @@ export default {
   title: 'How Screens Make Pictures',
   category: 'tech',
   tagline: 'Millions of tiny red, green and blue lights fool your eyes into seeing a photo.',
+  ages: ['11-14', '14-16'],
+  topics: ['Light', 'Colour'],
   blurb:
     'Look closely at any screen — phone, laptop or TV — and the picture dissolves into a grid of pixels. Look closer still and each pixel is just three tiny lights: red, green and blue. By varying their brightness, a screen can make almost any colour your eye can see. Old tube TVs painted the picture line by line with an electron beam, fast enough that you never noticed.',
   ideas: [

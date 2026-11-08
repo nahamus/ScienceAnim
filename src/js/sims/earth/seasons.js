@@ -17,6 +17,8 @@ export default {
   title: 'Why We Have Seasons',
   category: 'earth',
   tagline: 'It’s not how close we are to the Sun. It’s the tilt.',
+  ages: ['11-14'],
+  topics: ['Space', 'Climate'],
   blurb:
     'Most people guess that summer happens when Earth is closest to the Sun. In fact Earth is closest in early January — midwinter in the north. Seasons come from Earth’s 23.4° tilt: for half the year one hemisphere leans toward the Sun, getting longer days and more direct, concentrated sunlight.',
   ideas: [

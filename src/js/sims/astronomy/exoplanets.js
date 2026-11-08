@@ -17,6 +17,8 @@ export default {
   title: 'Hunting Exoplanets',
   category: 'astronomy',
   tagline: 'How we find planets around other stars from a dip of light or a tiny wobble.',
+  ages: ['14-16', '16+'],
+  topics: ['Space', 'Light', 'Data'],
   blurb:
     'Planets around other stars are far too faint and close to their star to photograph. Astronomers find them indirectly: a planet crossing in front of its star blocks a sliver of light, and its gravity makes the star wobble. Space telescopes like Kepler and TESS have found thousands of worlds this way.',
   ideas: [

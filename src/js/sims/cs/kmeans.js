@@ -7,6 +7,8 @@ export default {
   title: 'Finding Clusters (k-means)',
   category: 'cs',
   tagline: 'How a computer sorts a cloud of data into groups — with no labels at all.',
+  ages: ['14-16', '16+'],
+  topics: ['Machine learning', 'Data'],
   blurb:
     'Shops group customers, biologists group cells, astronomers group galaxies — usually without being told what the groups are. k-means is the classic way to find them: place k centres, give each point to its nearest centre, move each centre to the middle of its points, and repeat until nothing changes.',
   ideas: [

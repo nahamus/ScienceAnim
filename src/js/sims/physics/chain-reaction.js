@@ -5,6 +5,8 @@ export default {
   title: 'Nuclear Chain Reaction',
   category: 'physics',
   tagline: 'One neutron splits one atom — and sets off an avalanche. Can you keep it under control?',
+  ages: ['14-16', '16+'],
+  topics: ['Nuclear', 'Energy'],
   blurb:
     'When a slow neutron strikes a uranium-235 nucleus, the nucleus splits into two smaller atoms, releases enormous energy and spits out two or three more neutrons. If those go on to split more nuclei, the reaction feeds itself. Bombs let it run away; reactors balance it on a knife edge.',
   ideas: [

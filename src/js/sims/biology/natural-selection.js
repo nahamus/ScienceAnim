@@ -5,6 +5,8 @@ export default {
   title: 'Evolution by Natural Selection',
   category: 'biology',
   tagline: 'Creatures with random genes compete for food. Watch a population adapt before your eyes.',
+  ages: ['11-14', '14-16', '16+'],
+  topics: ['Evolution', 'Genetics'],
   blurb:
     'Each creature carries three genes: speed, size and sensing range. Faster, bigger, sharper creatures find food more easily — but burn more energy. Creatures that eat enough reproduce, passing on their genes with small random mutations. No one designs anything; the population simply drifts toward whatever works.',
   ideas: [

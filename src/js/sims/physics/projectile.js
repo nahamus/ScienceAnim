@@ -43,6 +43,8 @@ export default {
   title: 'Projectile Motion',
   category: 'physics',
   tagline: 'Why a 45° throw goes farthest — until the air gets in the way.',
+  ages: ['14-16', '16+'],
+  topics: ['Forces', 'Motion'],
   blurb:
     'Anything thrown — a ball, an arrow, a cannonball — follows the same curve. Gravity pulls it down while it keeps drifting sideways, and the two motions never interfere. Launch shells, compare angles, add air resistance and try other planets.',
   ideas: [

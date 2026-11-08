@@ -7,6 +7,8 @@ export default {
   title: 'How Epidemics Spread',
   category: 'biology',
   tagline: 'One infection becomes thousands. See how distancing and vaccines bend the curve.',
+  ages: ['14-16', '16+'],
+  topics: ['Disease', 'Populations', 'Modelling'],
   blurb:
     'Each dot is a person. Infected people pass the disease to others they come close to, then recover with immunity. From these simple rules come exponential outbreaks, peaks, herd immunity — and the reason flattening the curve and vaccination work.',
   ideas: [

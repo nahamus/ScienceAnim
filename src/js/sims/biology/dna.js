@@ -22,6 +22,8 @@ export default {
   title: 'DNA: The Code of Life',
   category: 'biology',
   tagline: 'Watch DNA unzip, copy itself, and get read out into a protein.',
+  ages: ['14-16', '16+'],
+  topics: ['Genetics', 'Cells'],
   blurb:
     'Every cell carries instructions written in a four-letter chemical alphabet along a twisted ladder: DNA. Here you can watch the three processes at the heart of all life: copying the DNA before a cell divides, transcribing a gene into a messenger RNA, and translating that message into a protein, one amino acid at a time.',
   ideas: [

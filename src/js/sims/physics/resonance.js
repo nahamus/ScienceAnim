@@ -7,6 +7,8 @@ export default {
   title: 'Springs & Resonance',
   category: 'physics',
   tagline: 'Push at just the right rhythm and a small shake becomes a huge swing.',
+  ages: ['14-16', '16+'],
+  topics: ['Oscillations', 'Forces'],
   blurb:
     'Anything springy — a child on a swing, a guitar string, a skyscraper, a wine glass — has a natural rhythm it likes to wobble at. Push it at that rhythm and every push adds to the last: the swings grow enormous. This is resonance. It tunes radios and makes music, and it can shake bridges apart.',
   ideas: [

@@ -23,6 +23,8 @@ export default {
   title: 'Electric Fields',
   category: 'physics',
   tagline: 'Drag charges around and watch invisible lines of force flow between them.',
+  ages: ['14-16', '16+'],
+  topics: ['Electricity', 'Fields'],
   blurb:
     'Every charge reaches out through space with an electric field. Here, thousands of tracer particles drift along the field so you can see its shape — streaming out of positive charges and into negative ones. Background colour shows the electric potential: the “height” a charge would roll down.',
   ideas: [

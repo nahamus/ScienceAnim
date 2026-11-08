@@ -5,6 +5,8 @@ export default {
   title: 'The Coriolis Effect',
   category: 'earth',
   tagline: 'On a spinning planet, straight lines bend — and that is why hurricanes spin.',
+  ages: ['14-16', '16+'],
+  topics: ['Weather', 'Forces'],
   blurb:
     'Throw a ball across a spinning merry-go-round and, to the riders, it curves away. Nothing pushed it; the ground turned underneath. Earth is a giant merry-go-round, so moving air and water are deflected too: to the right in the north, to the left in the south. That sets the spin of every hurricane.',
   ideas: [

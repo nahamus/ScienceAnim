@@ -5,6 +5,8 @@ export default {
   title: 'Radioactive Decay & Half-Life',
   category: 'physics',
   tagline: 'No one can say when an atom will decay — yet half of them always go in the same time.',
+  ages: ['14-16', '16+'],
+  topics: ['Radioactivity', 'Nuclear'],
   blurb:
     'An unstable atomic nucleus can spit out a particle at any moment, turning into a different element. Each individual decay is completely random. But with billions of atoms, the randomness averages out into a precise clock: the half-life. That clock dates ancient bones, powers spacecraft and shapes nuclear waste policy.',
   ideas: [
