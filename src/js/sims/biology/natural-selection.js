@@ -41,12 +41,24 @@ export default {
     },
     {
       title: 'Selection at work',
+      check: {
+        q: 'Food is plentiful and the fastest creatures reach it first. Over many generations, average speed will…',
+        options: ['rise', 'fall', 'stay the same'],
+        answer: 0,
+        explain: 'Fast creatures eat more, so they split more often and pass on their speed genes. No creature changes during its life: the population shifts because of who gets to reproduce.',
+      },
       text: 'The charts track the average of each gene. With plenty of food, fast creatures win the race to each meal and speed creeps up generation after generation.',
       formula: 'variation + inheritance + selection = evolution',
       duration: 15,
     },
     {
       title: 'Hard times',
+      check: {
+        q: 'Now food is scarce, and speed burns energy fast. What happens to average speed now?',
+        options: ['It keeps rising', 'It falls', 'It stays the same'],
+        answer: 1,
+        explain: 'When meals are rare, burning energy to run fast is a losing bet. Thrifty, slower creatures outlast the fast ones: “fittest” depends on the environment.',
+      },
       text: 'Now food becomes scarce. Speed and size are expensive to run (energy cost ∝ size³ × speed²). Watch thrifty, slower creatures gain the edge — the environment decides what “fittest” means.',
       params: { food: 12 },
       duration: 16,

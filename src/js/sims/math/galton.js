@@ -45,6 +45,12 @@ export default {
     },
     {
       title: 'Order out of randomness',
+      check: {
+        q: 'Thousands of balls bounce left or right at random. What shape will the pile make?',
+        options: ['Flat: every slot equally full', 'A hill, highest in the middle', 'A valley, highest at the edges', 'Different every time'],
+        answer: 1,
+        explain: 'To reach the middle a ball can take any mix of lefts and rights, and there are far more of those paths than all-left or all-right ones. Random bounces add up to a bell curve.',
+      },
       text: 'Now let thousands fall. Each one is unpredictable, yet together they build the same shape every time: a smooth hill, highest in the middle — the <b>bell curve</b>.',
       params: { rate: 40, curve: false, p: 0.5 },
       enter: (s) => s.clear(),
@@ -59,6 +65,13 @@ export default {
     },
     {
       title: 'Loaded pegs',
+      check: {
+        q: 'Now each bounce goes right 70% of the time. What happens to the hill?',
+        options: ['It slides right but keeps its bell shape', 'It splits into two hills', 'It flattens out'],
+        answer: 0,
+        setup: { p: 0.5, curve: true },
+        explain: 'Every ball now drifts right on average, so the whole hill moves right. Many random bounces still add up to a bell shape, just shifted and a little narrower.',
+      },
       text: 'Tilt the odds so each bounce goes right 70% of the time. The hill slides right but keeps its bell shape — just shifted and slightly narrower.',
       params: { p: 0.7, rate: 45, curve: true },
       enter: (s) => s.clear(),

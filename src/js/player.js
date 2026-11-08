@@ -3,7 +3,7 @@
 import { Runner } from './core/engine.js';
 import { CATEGORY, ICONS } from './categories.js';
 import { FONT, MONO, rgba } from './core/util.js';
-import { buildShare } from './share.js';
+import { buildShare, chapterBaseline } from './share.js';
 
 const h = (tag, cls, html) => {
   const el = document.createElement(tag);
@@ -20,6 +20,7 @@ export class Player {
     this.story = def.story || [];
     this.chapter = -1;
     this.chapterTime = 0;
+    this.answers = new Map(); // chapter index -> chosen option (-1 = skipped) for quick checks
     this.auto = this.story.length > 0;
     this.onBack = onBack;
     this.embed = embed; // inside someone else's page (an iframe): no way back to the gallery
@@ -129,7 +130,7 @@ export class Player {
   shareHash(embed = this.embed) {
     const values = { ...this.runner.params };
     for (const [k, tw] of this.runner.tweens) values[k] = tw.to;
-    return buildShare(this.def, this.chapter, values, { embed });
+    return buildShare(this.def, this.chapter, values, { embed, asking: this.pendingCheck() });
   }
 
   /** Full URL of the current view, as a normal page or as an embeddable one. */
@@ -276,12 +277,14 @@ export class Player {
     card.innerHTML = `
       <div class="sc-head">
         <span class="sc-step"></span>
-        <div class="sc-dots">${this.story.map((_, i) => `<button data-ch="${i}" title="${this.story[i].title}"><i></i></button>`).join('')}</div>
+        <div class="sc-dots">${this.story
+          .map((c, i) => `<button data-ch="${i}" title="${c.title}${c.check ? ' (quick check)' : ''}"${c.check ? ' class="q"' : ''}><i></i></button>`)
+          .join('')}</div>
         <button class="sc-mode" title="Toggle auto-play of the guided story"></button>
         <button class="icon-btn sm sc-min" title="Collapse">${ICONS.minimize}</button>
       </div>
       <div class="sc-body">
-        <h2></h2><p></p><div class="formula"></div>
+        <h2></h2><p class="sc-text"></p><div class="sc-check"></div><div class="formula"></div>
       </div>
       <div class="sc-nav">
         <button class="icon-btn sm" data-act="prev" title="Previous (←)">${ICONS.prev}</button>
@@ -289,12 +292,7 @@ export class Player {
       </div>`;
     card.querySelectorAll('.sc-dots button').forEach((b) => b.addEventListener('click', () => this.goto(+b.dataset.ch)));
     card.querySelector('[data-act=prev]').addEventListener('click', () => this.goto(this.chapter - 1));
-    card.querySelector('[data-act=next]').addEventListener('click', () => {
-      if (this.chapter >= this.story.length - 1) {
-        card.classList.add('min');
-        this.setAuto(false);
-      } else this.goto(this.chapter + 1);
-    });
+    card.querySelector('[data-act=next]').addEventListener('click', () => this.next());
     card.querySelector('.sc-min').addEventListener('click', () => card.classList.toggle('min'));
     card.querySelector('.sc-mode').addEventListener('click', () => this.setAuto(!this.auto));
     this.setAuto(this.auto);
@@ -309,6 +307,35 @@ export class Player {
     }
   }
 
+  /** Next button / → key: reveal a pending quick check first, then move on. */
+  next() {
+    if (this.pendingCheck()) return this.answer(-1);
+    if (this.chapter >= this.story.length - 1) {
+      this.$('.story-card').classList.add('min');
+      this.setAuto(false);
+    } else this.goto(this.chapter + 1);
+  }
+
+  pendingCheck() {
+    return !!this.story[this.chapter]?.check && !this.answers.has(this.chapter);
+  }
+
+  /** Record a quick-check answer (or -1 to skip), then play out the chapter that shows why. */
+  answer(choice) {
+    const i = this.chapter;
+    const ch = this.story[i];
+    if (!ch?.check || this.answers.has(i)) return;
+    this.answers.set(i, choice);
+    if (this.pausedForCheck) {
+      this.pausedForCheck = false;
+      if (this.runner.paused) this.togglePlay();
+    }
+    this.chapterTime = 0;
+    this.runner.applyParams(ch.params, ch.tween ?? 1.4);
+    ch.enter?.(this.runner.sim, this.runner);
+    this.renderChapter();
+  }
+
   userTook() {
     // Touching a control means the viewer is exploring; stop auto-advancing.
     if (this.auto) this.setAuto(false);
@@ -319,8 +346,26 @@ export class Player {
     const ch = this.story[i];
     this.chapter = i;
     this.chapterTime = 0;
-    this.runner.applyParams(ch.params, instant ? 0 : ch.tween ?? 1.4);
-    ch.enter?.(this.runner.sim, this.runner);
+    if (this.pausedForCheck && this.runner.paused) this.togglePlay();
+    this.pausedForCheck = false;
+    if (ch.check && !this.answers.has(i)) {
+      // quick check: set the scene (the same however you got here), then hold still until the
+      // viewer predicts what happens
+      this.runner.applyParams(chapterBaseline(this.def, i, true), instant ? 0 : ch.tween ?? 1.4);
+      if (!this.runner.paused) {
+        this.togglePlay();
+        this.pausedForCheck = true;
+      }
+    } else {
+      this.runner.applyParams(ch.params, instant ? 0 : ch.tween ?? 1.4);
+      ch.enter?.(this.runner.sim, this.runner);
+    }
+    this.renderChapter();
+  }
+
+  renderChapter() {
+    const i = this.chapter;
+    const ch = this.story[i];
     const card = this.$('.story-card');
     const body = card.querySelector('.sc-body');
     body.classList.remove('in');
@@ -328,22 +373,51 @@ export class Player {
     body.classList.add('in');
     card.querySelector('.sc-step').textContent = `${pad(i + 1)} / ${pad(this.story.length)}`;
     card.querySelector('h2').textContent = ch.title;
-    card.querySelector('p').innerHTML = ch.text;
+    const pending = this.pendingCheck();
+    const text = card.querySelector('.sc-text');
+    text.innerHTML = ch.text;
+    text.hidden = pending; // the chapter text gives the answer away
     const f = card.querySelector('.formula');
     f.innerHTML = ch.formula || '';
-    f.style.display = ch.formula ? '' : 'none';
+    f.style.display = ch.formula && !pending ? '' : 'none';
+    this.renderCheck(card.querySelector('.sc-check'), ch.check, this.answers.get(i));
     card.querySelectorAll('.sc-dots button').forEach((b, j) => {
       b.classList.toggle('done', j < i);
       b.classList.toggle('on', j === i);
       b.style.setProperty('--p', j < i ? 1 : 0);
     });
     const next = card.querySelector('[data-act=next]');
-    next.innerHTML = i === this.story.length - 1 ? 'Explore freely' : `Next ${ICONS.next}`;
+    next.innerHTML = pending ? 'Show me' : i === this.story.length - 1 ? 'Explore freely' : `Next ${ICONS.next}`;
+  }
+
+  /** A prediction question with its options, or (once answered) the verdict and explanation. */
+  renderCheck(box, check, choice) {
+    box.innerHTML = '';
+    box.hidden = !check;
+    if (!check) return;
+    const answered = choice !== undefined;
+    box.className = 'sc-check' + (answered ? ' answered' : '');
+    box.appendChild(h('div', 'sc-q', `<b>Predict</b> ${check.q}`));
+    const opts = h('div', 'sc-options');
+    check.options.forEach((label, k) => {
+      const b = h('button', '', label);
+      if (answered) {
+        b.disabled = true;
+        if (k === check.answer) b.classList.add('right');
+        else if (k === choice) b.classList.add('wrong');
+      } else b.addEventListener('click', () => this.answer(k));
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);
+    if (answered) {
+      const verdict = choice === check.answer ? 'Yes!' : choice === -1 ? 'Here’s why.' : 'Not quite.';
+      box.appendChild(h('p', 'sc-explain', `<b>${verdict}</b> ${check.explain}`));
+    }
   }
 
   tick(dt) {
     // story auto-advance
-    if (this.story.length && this.auto && !this.runner.paused) {
+    if (this.story.length && this.auto && !this.runner.paused && !this.pendingCheck()) {
       const ch = this.story[this.chapter];
       this.chapterTime += dt;
       const dur = ch.duration || 12;
@@ -442,7 +516,7 @@ export class Player {
       if (e.key === ' ') {
         e.preventDefault();
         this.togglePlay();
-      } else if (e.key === 'ArrowRight') this.goto(this.chapter + 1);
+      } else if (e.key === 'ArrowRight') this.next();
       else if (e.key === 'ArrowLeft') this.goto(this.chapter - 1);
       else if (e.key === 'r' || e.key === 'R') this.restart();
       else if (e.key === 'f' || e.key === 'F') this.fullscreen();
@@ -463,6 +537,7 @@ export class Player {
   }
 
   restart() {
+    this.answers.clear();
     this.runner.reset();
     if (this.story.length) {
       this.setAuto(true);

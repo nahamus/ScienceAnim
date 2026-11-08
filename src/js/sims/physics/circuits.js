@@ -53,6 +53,13 @@ export default {
     },
     {
       title: 'Bulbs in series',
+      check: {
+        q: 'This bulb runs on a 9 V battery. Add two more identical bulbs in a single line (in series). Each bulb will glow…',
+        options: ['brighter', 'the same', 'dimmer'],
+        answer: 2,
+        setup: { layout: 'single', V: 9, R: 10, on: true },
+        explain: 'The same 9 V now pushes current through three times the resistance, so the current falls to a third and each bulb gets just 3 V.',
+      },
       text: 'Three bulbs in a single line. The same current must pass through all of them, and they share the battery’s voltage, so each glows dimly. Now one bulb breaks — and <b>all</b> go dark. Old Christmas lights were wired like this.',
       formula: 'R_total = R₁ + R₂ + R₃',
       params: { layout: 'series', n: 3, V: 9, R: 10, on: true },
@@ -64,6 +71,12 @@ export default {
     },
     {
       title: 'Bulbs in parallel',
+      check: {
+        q: 'Now give each bulb its own path across the battery (in parallel). How bright is each one?',
+        options: ['Dimmer than in series', 'As bright as one bulb alone', 'Dark: parallel wires short out the battery'],
+        answer: 1,
+        explain: 'In parallel each bulb gets the full 9 V, so each glows like a bulb on its own. The battery supplies three times the current, so it runs down three times faster.',
+      },
       text: 'Now each bulb has its own path straight across the battery. Each gets the full voltage and glows brightly; the battery supplies the sum of the currents. Break one and the others carry on — that is how your home is wired.',
       formula: '1/R_total = 1/R₁ + 1/R₂ + 1/R₃',
       params: { layout: 'parallel', n: 3, V: 9, R: 10, on: true },

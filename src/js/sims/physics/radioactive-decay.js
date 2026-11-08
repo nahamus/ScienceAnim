@@ -35,6 +35,13 @@ export default {
     },
     {
       title: 'Half, then half again',
+      check: {
+        q: 'The half-life is 4 seconds. Starting with 2,500 atoms, about how many are left after 8 seconds?',
+        options: ['None', '625', '1,250', '1,875'],
+        answer: 1,
+        setup: { half: 4, N: 2500, chain: false, units: 'sec' },
+        explain: 'Eight seconds is two half-lives: 2,500 → 1,250 → 625. Each half-life removes half of what is <em>left</em>, not half of what you started with.',
+      },
       text: 'Count them, though, and a pattern appears. After one half-life (here 4 s) half are left. After another, half of those — a quarter. Then an eighth. The curve is an <b>exponential decay</b>, and it never quite reaches zero.',
       formula: 'N(t) = N₀ · (½)^(t / T½)',
       params: { half: 4, N: 2500, chain: false, units: 'sec' },

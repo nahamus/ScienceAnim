@@ -106,4 +106,22 @@ export default {
 
 Numeric params tween smoothly when a story chapter changes them; mark a param `instant: true` if changing it rebuilds the scene.
 
+**Quick checks.** A chapter can ask a prediction question before it plays out:
+
+```js
+{
+  title: 'Bulbs in series',
+  check: {
+    q: 'Add two more bulbs in series. Each bulb will glow…',
+    options: ['brighter', 'the same', 'dimmer'],
+    answer: 2,                                      // index into options
+    setup: { layout: 'single', on: true },          // optional: the scene while the question is open
+    explain: 'The same voltage now pushes through three times the resistance…',
+  },
+  text: '…', params: { layout: 'series' }, // applied once the viewer answers or taps "Show me"
+}
+```
+
+While the question is open the sim is paused, the chapter text is hidden (it would give the answer away), and auto-play waits. Not on the first chapter. `tests/story.spec.js` checks every question is well formed.
+
 **Performance on slow devices.** WebGL simulations adapt their resolution automatically: if frames fall below about 45 fps, the engine draws fewer pixels (down to a third of full) and raises the resolution again when there is headroom. Opt out with `adaptive: false`. Their shaders must size themselves from `gl.drawingBufferWidth/Height` each frame, as the existing ones do. 2D simulations draw at full resolution, so a heavy one should limit its own work per frame. `turing-patterns` caps its steps at about 9 ms, and `fluid` trims its pressure-solver passes to stay within about 8 ms.
