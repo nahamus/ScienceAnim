@@ -43,6 +43,8 @@ export default {
   title: 'Orbits & Gravity',
   category: 'astronomy',
   tagline: 'Kepler’s laws, dancing binary stars, the three-body problem — and your own solar system.',
+  ages: ['14-16', '16+'],
+  topics: ['Gravity', 'Orbits', 'Forces'],
   blurb:
     'Every orbit is a fall that keeps missing. A single law — every mass pulls every other mass with a force that weakens with the square of distance — produces ellipses, figure-eights and chaotic ejections. Launch planets of your own and see what survives.',
   ideas: [

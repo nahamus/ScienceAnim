@@ -53,6 +53,8 @@ export default {
   title: 'The Life of Stars',
   category: 'astronomy',
   tagline: 'Born in a cloud, burning for billions of years, dying as a dwarf — or a supernova.',
+  ages: ['14-16', '16+'],
+  topics: ['Space', 'Nuclear'],
   blurb:
     'A star’s whole life is decided by one number: its mass. Small stars sip their fuel and glow for trillions of years. Stars like the Sun shine for ten billion years, swell into red giants and fade as white dwarfs. Giants burn out in a few million years and explode, scattering the elements that make planets and people.',
   ideas: [

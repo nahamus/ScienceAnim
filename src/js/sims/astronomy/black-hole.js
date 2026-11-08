@@ -107,6 +107,8 @@ export default {
   title: 'Inside the Gravity of a Black Hole',
   category: 'astronomy',
   tagline: 'Ray-traced in real time: watch spacetime bend starlight and its own glowing disk.',
+  ages: ['16+'],
+  topics: ['Gravity', 'Space', 'Relativity'],
   blurb:
     'A black hole is matter crushed so tightly that not even light can escape from within its event horizon. Around it, gravity bends the paths of light, warping the starry sky and lifting the far side of its glowing accretion disk into view. Every pixel here is a light ray traced through curved spacetime.',
   ideas: [

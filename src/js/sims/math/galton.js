@@ -15,6 +15,8 @@ export default {
   title: 'The Bell Curve from Chaos',
   category: 'math',
   tagline: 'Thousands of random bounces add up to one perfectly predictable shape.',
+  ages: ['14-16', '16+'],
+  topics: ['Probability', 'Statistics'],
   blurb:
     'Drop a ball through rows of pegs and you cannot predict where it will land. Drop thousands and they always build the same smooth bell-shaped pile. This Galton board shows the central limit theorem — the reason heights, test scores and measurement errors so often follow a bell curve.',
   ideas: [

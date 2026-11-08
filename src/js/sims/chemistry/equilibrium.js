@@ -7,6 +7,8 @@ export default {
   title: 'Chemical Reactions & Equilibrium',
   category: 'chemistry',
   tagline: 'Molecules collide, bond and break apart — until the two directions perfectly balance.',
+  ages: ['14-16', '16+'],
+  topics: ['Reactions', 'Rates', 'Equilibrium'],
   blurb:
     'A reaction happens when molecules collide with enough energy to get over an activation barrier. Most reactions also run backwards. Eventually the forward and reverse rates match and the mixture stops changing — not because nothing is happening, but because everything happens equally both ways.',
   ideas: [

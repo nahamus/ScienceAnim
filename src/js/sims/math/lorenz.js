@@ -5,6 +5,8 @@ export default {
   title: 'The Lorenz Attractor',
   category: 'math',
   tagline: 'Three simple equations, a butterfly-shaped path that never repeats — and the birth of chaos theory.',
+  ages: ['16+'],
+  topics: ['Chaos', 'Differential equations'],
   blurb:
     'In 1963 meteorologist Edward Lorenz boiled weather down to three equations. To his shock, rounding a number from six digits to three changed his forecast completely. The paths his equations trace wind forever around two wings without ever repeating: a strange attractor.',
   ideas: [

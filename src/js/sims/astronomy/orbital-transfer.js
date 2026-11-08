@@ -19,6 +19,8 @@ export default {
   title: 'Orbital Manoeuvres',
   category: 'astronomy',
   tagline: 'To catch something ahead of you in orbit, first slow down. Rocket science, literally.',
+  ages: ['14-16', '16+'],
+  topics: ['Orbits', 'Gravity', 'Energy'],
   blurb:
     'Orbits defy intuition. Fire your engine forward and you end up higher but slower. Brake and you drop lower and overtake everything above you. Fly the moves real spacecraft use to reach space stations, change orbits and rendezvous.',
   ideas: [

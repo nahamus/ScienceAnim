@@ -5,6 +5,8 @@ export default {
   title: 'Flocking & Emergence',
   category: 'biology',
   tagline: 'Three simple rules, no leader — and a murmuration of hundreds of birds appears.',
+  ages: ['11-14', '14-16'],
+  topics: ['Behaviour', 'Emergence', 'Modelling'],
   blurb:
     'Starlings, fish schools and locust swarms move as one, yet no individual is in charge. In 1986 Craig Reynolds showed that just three local rules — keep your distance, match your neighbours’ heading, and stay close to the group — are enough. Complex group behaviour emerges from simple individual decisions.',
   ideas: [

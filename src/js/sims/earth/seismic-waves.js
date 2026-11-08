@@ -89,6 +89,8 @@ export default {
   title: 'Seeing Inside the Earth',
   category: 'earth',
   tagline: 'Nobody has drilled past the crust. Earthquakes showed us the liquid core anyway.',
+  ages: ['14-16'],
+  topics: ['Earth structure', 'Waves'],
   blurb:
     'The deepest hole ever drilled reaches just 12 km — 0.2% of the way to Earth’s centre. Everything we know about the deep interior comes from earthquakes. Their waves bend, speed up and get blocked as they pass through the planet, and seismometers around the world record the result. The pattern reveals a liquid outer core and a solid inner core.',
   ideas: [

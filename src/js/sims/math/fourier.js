@@ -90,6 +90,8 @@ export default {
   title: 'Drawing with Circles',
   category: 'math',
   tagline: 'Spinning circles stacked on spinning circles can draw any shape. This is Fourier’s big idea.',
+  ages: ['16+'],
+  topics: ['Waves', 'Trigonometry'],
   blurb:
     'In 1807 Joseph Fourier claimed that any repeating pattern can be built from simple rotations. Chain enough spinning arrows tip-to-tail, each turning at a different speed, and the last tip will trace any drawing you like. The same maths compresses your music, photos and video.',
   ideas: [

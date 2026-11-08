@@ -43,6 +43,8 @@ export default {
   title: 'How Machines Learn: Gradient Descent',
   category: 'cs',
   tagline: 'Every AI model learns by rolling downhill. Watch three strategies race to the bottom.',
+  ages: ['16+'],
+  topics: ['Machine learning', 'Calculus'],
   blurb:
     'Training a neural network means finding the settings that make its error as small as possible. Picture the error as a landscape of hills and valleys; learning is walking downhill. Gradient descent takes steps in the steepest downhill direction. How big a step, and whether to build up momentum, makes all the difference.',
   ideas: [

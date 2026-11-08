@@ -8,6 +8,8 @@ export default {
   title: 'From Power Station to Plug',
   category: 'tech',
   tagline: 'Why electricity travels at 400,000 volts — and how the grid matches supply to demand every second.',
+  ages: ['11-14', '14-16'],
+  topics: ['Electricity', 'Energy'],
   blurb:
     'Flip a switch and power arrives instantly from a station perhaps hundreds of kilometres away. On the way it is stepped up to enormous voltages to cross the country, then stepped back down before it reaches your home. Meanwhile grid operators must make exactly as much electricity as everyone is using, at every moment.',
   ideas: [

@@ -11,6 +11,8 @@ export default {
   title: 'The Road to Chaos',
   category: 'math',
   tagline: 'One tiny equation for population growth — and it breaks into chaos.',
+  ages: ['16+'],
+  topics: ['Chaos', 'Sequences'],
   blurb:
     'Model a population that grows quickly but is limited by food: next year = r × this year × (1 − this year). Turn up the growth rate r and the population settles, then flips between two values, then four, eight… and finally behaves chaotically, never repeating. This “period-doubling route to chaos” turns up in dripping taps, heart rhythms and lasers.',
   ideas: [

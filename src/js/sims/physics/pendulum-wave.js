@@ -16,6 +16,8 @@ export default {
   title: 'Pendulum Waves',
   category: 'physics',
   tagline: 'Sixteen simple pendulums dance in snakes, braids and chaos — then fall back in step.',
+  ages: ['11-14', '14-16'],
+  topics: ['Oscillations', 'Waves'],
   blurb:
     'Each pendulum is a little shorter than the one before, so it swings a little faster. Released together, they slowly drift out of step, forming travelling waves, braids and apparent chaos — until, exactly 60 seconds later, they all line up again. A hypnotic lesson in frequency and phase.',
   ideas: [

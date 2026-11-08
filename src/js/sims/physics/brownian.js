@@ -5,6 +5,8 @@ export default {
   title: 'Brownian Motion',
   category: 'physics',
   tagline: 'The restless jiggle of pollen grains that finally proved atoms are real.',
+  ages: ['11-14', '14-16'],
+  topics: ['Particles'],
   blurb:
     'In 1827 Robert Brown saw pollen grains in water dancing endlessly with no apparent cause. In 1905 Einstein explained it: the grains are being battered by invisible water molecules. His math let scientists count atoms for the first time.',
   ideas: [

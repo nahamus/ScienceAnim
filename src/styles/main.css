@@ -82,6 +82,17 @@ kbd { font-family: var(--mono); font-size: 0.85em; padding: 1px 6px; border: 1px
 .pills button small { font-size: 11px; color: var(--ink3); font-family: var(--mono); }
 .pills button:hover { color: var(--ink); border-color: var(--line2); }
 .pills button.on { color: var(--ink); background: color-mix(in srgb, var(--c) 14%, transparent); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
+.tools { display: flex; gap: 10px; align-items: center; }
+.tools .search { flex: 1; }
+.age select {
+  height: 36px; padding: 0 30px 0 12px; border-radius: 12px; border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 13.5px;
+  background: rgba(255, 255, 255, 0.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%239aa3bd' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E") no-repeat right 11px center;
+  appearance: none; cursor: pointer;
+}
+.age select:hover { border-color: var(--line2); }
+.age select option { background: #0c1020; color: var(--ink); }
+.card .cat em { font-style: normal; font-weight: 500; color: var(--ink3); margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--line2); letter-spacing: 0; text-transform: none; }
+.card .topics { margin-top: 6px; font-size: 12px; color: var(--ink3); }
 .search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); min-width: min(260px, 100%); }
 .search svg { width: 16px; height: 16px; color: var(--ink3); flex: none; }
 .search input { flex: 1; background: none; border: 0; outline: 0; color: var(--ink); font: inherit; font-size: 14px; min-width: 0; }

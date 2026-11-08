@@ -7,6 +7,8 @@ export default {
   title: 'Solid, Liquid, Gas',
   category: 'chemistry',
   tagline: 'Turn the temperature dial and watch atoms freeze into crystals, melt and boil away.',
+  ages: ['11-14', '14-16'],
+  topics: ['Particles', 'States of matter'],
   blurb:
     'Every substance is made of atoms that attract each other when close and push apart when squeezed. Whether it is a solid, liquid or gas is just a contest between that stickiness and how fast the atoms are jiggling — which is what temperature really is. These atoms follow the Lennard-Jones force law used by real chemists.',
   ideas: [

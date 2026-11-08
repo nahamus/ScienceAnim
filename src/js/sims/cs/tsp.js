@@ -14,6 +14,8 @@ export default {
   title: 'The Travelling Salesperson',
   category: 'cs',
   tagline: 'The shortest route through every city — easy to state, fiendishly hard to solve.',
+  ages: ['14-16', '16+'],
+  topics: ['Algorithms', 'Optimisation'],
   blurb:
     'Visit every city once and return home by the shortest route. Delivery firms, circuit-board drills and DNA sequencing all face this problem. Checking every possible route is hopeless — 60 cities have more routes than atoms in the universe — so computer scientists use clever shortcuts that find excellent routes fast.',
   ideas: [

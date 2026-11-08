@@ -20,6 +20,8 @@ export default {
   title: 'How Wings Fly',
   category: 'physics',
   tagline: 'Air races over the top of a wing, pressure drops, and 400 tonnes of aircraft rise.',
+  ages: ['11-14', '14-16'],
+  topics: ['Forces', 'Fluids', 'Pressure'],
   blurb:
     'A wing is shaped and tilted so it turns the air flowing past it downward. In doing so the air above speeds up and its pressure falls, while the air below slows and pushes up. This simulation solves the classic equations for air flowing around a wing and shows the speed, pressure and resulting lift.',
   ideas: [

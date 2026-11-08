@@ -5,6 +5,8 @@ export default {
   title: 'The Quantum Double Slit',
   category: 'physics',
   tagline: 'Fire electrons one at a time. Each lands as a dot — yet together they paint a wave.',
+  ages: ['16+'],
+  topics: ['Quantum', 'Waves'],
   blurb:
     'Richard Feynman called it “the only mystery” of quantum mechanics. Single electrons pass through a wall with two slits. Each arrives as one point, but thousands build up an interference pattern — as if every electron went through both slits. Watch which slit it uses and the pattern vanishes.',
   ideas: [

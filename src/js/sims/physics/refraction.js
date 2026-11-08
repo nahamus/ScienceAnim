@@ -76,6 +76,8 @@ export default {
   title: 'Light, Lenses & Rainbows',
   category: 'physics',
   tagline: 'Why light bends in water, gets trapped in glass and splits into colours.',
+  ages: ['11-14', '14-16'],
+  topics: ['Light', 'Waves'],
   blurb:
     'Light travels slower in water and glass than in air. That single fact explains why a straw looks broken in a glass, how lenses focus images in your eye and camera, how optical fibres carry the internet under the ocean, and why prisms and raindrops paint rainbows.',
   ideas: [

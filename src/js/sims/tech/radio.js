@@ -16,6 +16,8 @@ export default {
   title: 'Radio, TV & Wireless Signals',
   category: 'tech',
   tagline: 'How a voice rides an invisible wave across a country — AM, FM and digital.',
+  ages: ['14-16', '16+'],
+  topics: ['Waves', 'Communication'],
   blurb:
     'Sound fades within metres, but radio waves race at the speed of light for thousands of kilometres. To send a voice or a picture, a transmitter takes a steady high-frequency “carrier” wave and changes it to match the message. Change its height and you have AM; change its frequency and you have FM; switch between set patterns and you have digital radio, TV, Wi-Fi and mobile data.',
   ideas: [

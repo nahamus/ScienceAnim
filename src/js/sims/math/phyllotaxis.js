@@ -7,6 +7,8 @@ export default {
   title: 'The Golden Angle in Nature',
   category: 'math',
   tagline: 'Why sunflowers, pinecones and daisies all count their spirals in Fibonacci numbers.',
+  ages: ['11-14', '14-16'],
+  topics: ['Sequences', 'Geometry'],
   blurb:
     'Plants grow new seeds, petals and leaves one at a time from a central point, each rotated by a fixed angle from the last. Which angle packs them best? Almost any choice leaves wasteful gaps — except one: the golden angle, 137.5°, tied to the golden ratio and the Fibonacci numbers.',
   ideas: [

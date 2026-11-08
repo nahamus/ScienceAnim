@@ -5,6 +5,8 @@ export default {
   title: 'Binary: How Computers Count',
   category: 'tech',
   tagline: 'Everything on your phone — words, photos, music — is just on and off switches.',
+  ages: ['11-14', '14-16'],
+  topics: ['Data representation'],
   blurb:
     'A computer is built from billions of tiny switches that are either off (0) or on (1). One switch is a bit. Line up eight bits and you have a byte, which can stand for any number from 0 to 255 — or a letter, or the brightness of one colour in a pixel. Here you can flip the bits yourself.',
   ideas: [

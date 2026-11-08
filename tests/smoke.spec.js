@@ -48,6 +48,37 @@ test.describe('gallery', () => {
     expect(errors).toEqual([]);
   });
 
+  test('every simulation has curriculum tags', () => {
+    const bands = ['11-14', '14-16', '16+'];
+    for (const s of SIMS) {
+      expect(s.ages?.length, `${s.id} ages`).toBeGreaterThan(0);
+      expect(s.ages.every((a) => bands.includes(a)), `${s.id} ages ${s.ages}`).toBe(true);
+      expect(s.topics?.length, `${s.id} topics`).toBeGreaterThan(0);
+    }
+  });
+
+  test('filters by age range and finds topics', async ({ page }) => {
+    await page.route((url) => !isLocal(url.href), (route) => route.abort());
+    await page.goto('./');
+    const shown = page.locator('.card:not([hidden])');
+    for (const band of ['11-14', '14-16', '16+']) {
+      await page.locator('.age select').selectOption(band);
+      const want = SIMS.filter((s) => s.ages.includes(band)).length;
+      await expect(shown).toHaveCount(want);
+      await expect(page.locator('.pills button[data-f=all] small')).toHaveText(String(want));
+    }
+    // the choice survives a trip into a simulation and back
+    await shown.first().dispatchEvent('click'); // cards can sit under the sticky filter bar on phones
+    await page.locator('.player').waitFor();
+    await page.goBack();
+    await expect(page.locator('.age select')).toHaveValue('16+');
+
+    await page.locator('.age select').selectOption('all');
+    await page.locator('.search input').fill('algorithms');
+    await expect(shown).toHaveCount(SIMS.filter((s) => s.topics.includes('Algorithms')).length);
+    await expect(shown.first().locator('.topics')).toContainText('Algorithms');
+  });
+
   test('unknown routes fall back to the gallery', async ({ page }) => {
     await page.goto('./#/sim/does-not-exist');
     await expect(page.locator('.card').first()).toBeVisible();
