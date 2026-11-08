@@ -10,9 +10,11 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist --repo https://github.com/nahamus/ScienceAnim.git",
     "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "eslint": "^8.55.0",
     "gh-pages": "^6.3.0",
     "prettier": "^3.1.0",

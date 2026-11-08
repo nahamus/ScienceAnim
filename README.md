@@ -1,344 +1,99 @@
-# Scientific Animations
+# ScienceAnim
 
-An interactive web application featuring real-time scientific simulations for educational purposes. Built with modern web technologies and optimized for development with hot reloading.
+Cinematic, interactive simulations of the ideas behind science, all running live in the browser. Every simulation tells a short **guided story** (narrated chapters that set up the scene and change parameters smoothly), then hands you the controls to explore.
 
-## 🎨 **Label Visibility Guidelines**
+**63 simulations across 8 fields:**
 
-### **Font Color Standards:**
-```javascript
-// Dark backgrounds
-this.ctx.fillStyle = '#ffffff';
-this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+| Field | Simulations |
+| --- | --- |
+| Physics | Projectile motion & air drag · Double-pendulum chaos · Pendulum waves · Springs & resonance · Waves & interference (ripple tank) · Strings & harmonics · Doppler effect & sonic booms · Light, lenses & rainbows (ray tracing) · Quantum double slit · Quantum tunnelling (split-step Schrödinger) · Electric fields · Electric circuits (series & parallel) · Electromagnetic induction · How light is made (EM radiation) · Kinetic theory of gases · Brownian motion · Bernoulli’s principle · How wings fly (Joukowski airfoil) · Fluid dynamics (Navier–Stokes) · Radioactive decay & half-life · Nuclear chain reaction · Special relativity |
+| Astronomy | Moon phases & eclipses · Orbits & gravity (Kepler, three-body, sandbox) · Orbital manoeuvres (Hohmann transfer, rendezvous) · The life of stars (H–R diagram) · Hunting exoplanets (transits & wobble) · Ray-traced black hole (WebGL) |
+| Chemistry | Solid, liquid, gas (Lennard-Jones) · Molecule shapes (VSEPR, 3D) · Hydrogen orbitals · Reactions & equilibrium |
+| Biology | DNA (helix, replication, transcription, translation) · Natural selection · Predators & prey · Epidemics (SIR) · Turing patterns (reaction–diffusion) · Neuron action potential (Hodgkin–Huxley) · Flocking |
+| Mathematics | Galton board & the bell curve · Fourier epicycles · Logistic map & the road to chaos · Lorenz attractor · Mandelbrot & Julia sets (WebGL) · Golden angle / phyllotaxis |
+| Computer science | Neural network training · Gradient descent (SGD, momentum, Adam) · k-means clustering · Sorting race · Pathfinding (BFS, Dijkstra, A*, greedy) · Travelling salesperson (greedy, 2-opt, annealing) · Game of Life |
+| Technology | Binary numbers · Logic gates & adders · Inside a CPU (fetch–decode–execute) · How the internet works (packet routing) · Radio, TV & wireless (AM/FM/digital) · How screens make pictures · The power grid |
+| Earth & climate | Why we have seasons · The Coriolis effect & hurricanes · Greenhouse effect · Seismic waves & Earth's core |
 
-// Light backgrounds  
-this.ctx.fillStyle = '#1a1a2e';
-this.ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-```
-
-### **Smart Base Animation Class**
-The base animation class automatically detects animation type and applies appropriate colors:
-```javascript
-// Check for animations with transparent/light backgrounds that need dark text
-if (this.constructor.name === 'FluidFlow' || 
-    this.constructor.name === 'Bernoulli' ||
-    this.constructor.name === 'BrownianMotion' || 
-    this.constructor.name === 'Diffusion' || 
-    this.constructor.name === 'GasLaws' ||
-    this.constructor.name === 'Pendulum' ||
-    this.constructor.name === 'OrbitalMotion' ||
-    this.constructor.name === 'CollisionPhysics' ||
-    this.constructor.name === 'FrictionInclinedPlanes' ||
-    this.constructor.name === 'WaveParticleDuality' ||
-    this.constructor.name === 'WavePropagation') {
-    textColor = '#1a1a2e'; // Dark text for transparent/light backgrounds
-    shadowColor = 'rgba(255, 255, 255, 0.8)'; // White shadow
-}
-```
-
-### **⚠️ IMPORTANT: Always Check Label Visibility**
-When adding new animations or modifying existing ones:
-1. **Test label visibility** against the animation background
-2. **Use appropriate font colors** with shadows for contrast
-3. **Test on different screen sizes and brightness levels**
-
-### **Common Issues to Avoid:**
-- ❌ White text on white/light backgrounds
-- ❌ Dark text on dark backgrounds  
-- ❌ Low contrast text without shadows
-
-### **Best Practices:**
-- ✅ Always use text shadows for better readability
-- ✅ Test visibility across different monitor brightness levels
-- ✅ Use the base animation class's smart color detection
-- ✅ Consider accessibility standards for color contrast
-
-## Features
-
-### 🧪 Brownian Motion Simulation
-- **Interactive Controls**: Adjust particle count, animation speed, temperature, and trail visibility
-- **Real-time Statistics**: Track active particles, average speed, and simulation time
-- **Color-coded Particles**: Each particle has a unique color for easy tracking
-- **Physics-based Movement**: Realistic random motion with temperature effects
-
-### ⏰ Simple Pendulum Simulation
-- **Realistic Physics**: Accurate pendulum motion with gravity and damping
-- **Customizable Parameters**: Adjust length, speed, initial angle, gravity, and damping
-- **Path Visualization**: Optional trail showing pendulum's motion path
-- **Period Calculation**: Real-time period calculation based on length and gravity
-
-### 🌊 Diffusion Simulation
-- **Concentration Gradients**: Particles move from high to low concentration areas
-- **Heatmap Visualization**: Optional concentration heatmap overlay
-- **Fick's Laws**: Demonstrates diffusion principles
-- **Interactive Controls**: Adjust particle count, speed, diffusion rate, and gradient
-
-### 🌊 Wave Propagation Simulation
-- **Multiple Wave Types**: Transverse, longitudinal, interference, and standing waves
-- **Real-time Parameters**: Adjust frequency, amplitude, wavelength, and speed
-- **Visualization Options**: Toggle waveform and particle displays
-- **Educational Value**: Demonstrates wave physics concepts
-
-## Project Structure
-
-```
-scientific-animations/
-├── src/
-│   ├── index.html          # Main HTML file
-│   ├── styles/
-│   │   └── main.css        # All styles and responsive design
-│   └── js/
-│       ├── main.js         # Application entry point
-│       └── animations.js   # All simulation classes and logic
-├── public/                 # Static assets (if any)
-├── dist/                   # Build output (generated)
-├── package.json            # Dependencies and scripts
-├── vite.config.js          # Vite configuration
-├── .gitignore             # Git ignore rules
-├── .prettierrc            # Code formatting rules
-├── .eslintrc.json         # Code linting rules
-└── README.md              # This file
-```
-
-## Getting Started
-
-### Prerequisites
-- Node.js (version 16 or higher)
-- npm or yarn package manager
-
-### Installation
-
-1. **Clone or download the project**
-   ```bash
-   git clone <repository-url>
-   cd scientific-animations
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**
-   The application will automatically open at `http://localhost:3000`
-
-### Development Workflow
-
-The project is set up with modern development tools for the best experience:
-
-- **Hot Reloading**: Changes to HTML, CSS, or JavaScript automatically refresh the browser
-- **Fast Build**: Vite provides extremely fast development server and build times
-- **Code Quality**: ESLint and Prettier ensure consistent code formatting
-- **Modern JavaScript**: Full ES6+ support with modules
-
-### Available Scripts
+## Running
 
 ```bash
-# Start development server with hot reloading
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code for errors
-npm run lint
-
-# Format code with Prettier
-npm run format
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build in dist/
+npm test         # smoke-test every simulation (desktop + phone) against the production build
+npm run deploy   # publish dist/ to GitHub Pages
 ```
 
-## 🚀 Deployment
+The first `npm test` needs a browser: `npx playwright install chromium`. Run one simulation with `npm test -- -g cpu`.
 
-### GitHub Pages Deployment
+Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
 
-This project is deployed to GitHub Pages using the `gh-pages` branch. Follow these steps to deploy your changes:
+## Architecture
 
-#### **1. Prepare for Deployment**
-```bash
-# Make sure all changes are committed
-git add .
-git commit -m "Your commit message"
+No runtime dependencies: plain ES modules, Canvas 2D and WebGL, bundled by Vite.
+
+```
+src/
+  index.html
+  styles/main.css          design system (dark, glass panels, responsive)
+  js/
+    main.js                hash router: #/ (gallery) and #/sim/<id>
+    gallery.js             hero, filters, search, cards with real rendered thumbnails (cached in localStorage)
+    player.js              stage, story card, controls, live stats and charts
+    categories.js          fields, colours and icons
+    core/
+      engine.js            Runner: canvas + DPR, frame loop, params & tweening, pointer input
+      gl.js                fullscreen fragment-shader helper
+      util.js              maths, colour maps, glow sprites, drawing helpers, spatial hash
+    sims/
+      index.js             registers every sims/<field>/<name>.js (lazy-loaded) and sets display order
+      physics/ astronomy/ chemistry/ biology/ math/ cs/ tech/ earth/
+tools/
+  sim-manifest.js          Vite plugin: reads each sim's gallery metadata at build time
+tests/
+  smoke.spec.js            Playwright: opens every sim, plays every chapter, pokes every control
 ```
 
-#### **2. Build the Project**
-```bash
-# Build the project for production
-npm run build
+Each simulation is its own code chunk, downloaded only when it is opened (or when the gallery renders its thumbnail), so the first page load stays small however large the library grows.
+
+### Adding a simulation
+
+Create `src/js/sims/<field>/<id>.js` exporting a definition; it is picked up automatically (add the id to `ORDER` in `sims/index.js` to place it). `id`, `title`, `category`, `tagline` and `blurb` (and `keywords`, if used) must be plain string literals, because the gallery reads them at build time without loading the simulation. Restart `npm run dev` after adding a new file.
+
+```js
+export default {
+  id: 'my-sim',
+  title: 'My Simulation',
+  category: 'physics',                 // a key from categories.js
+  tagline: 'One line for the gallery card.',
+  blurb: 'A short paragraph for the side panel.',
+  ideas: ['Key idea one', 'Key idea two'],
+  hint: 'What the viewer can do with the mouse',
+  renderer: '2d',                      // or 'webgl'
+  params: [
+    { key: 'speed', label: 'Speed', type: 'range', min: 0, max: 10, step: 0.1, value: 1 },
+    { key: 'trails', label: 'Trails', type: 'toggle', value: true },
+    { key: 'mode', label: 'Mode', type: 'select', value: 'a', options: [{ value: 'a', label: 'A' }] },
+    { key: 'reset', label: 'Reset', type: 'button', action: (sim) => sim.reset() },
+  ],
+  story: [
+    { title: 'Chapter one', text: 'Narration…', formula: 'E = mc²', params: { speed: 2 }, duration: 10, enter: (sim) => {} },
+  ],
+  create(api) {
+    // api: ctx | gl, params (live), pointer, runner, w, h, time, frame, thumbnail
+    return {
+      resize(w, h) {},
+      update(dt) {},
+      draw() {},
+      stats: () => [{ label: 'Value', value: '42' }],
+      charts: () => [{ title: 'Over time', series: [{ data: [], color: '#5b8cff' }] }],
+      pointerDown(p) {}, pointerMove(p) {}, pointerUp(p) {},
+      onParam(key, value) {},
+      reset() {},
+    };
+  },
+};
 ```
 
-#### **3. Deploy to GitHub Pages**
-```bash
-# Switch to the gh-pages branch
-git checkout gh-pages
-
-# Copy built files to root directory (Windows)
-xcopy dist\* . /E /Y
-
-# For Linux/Mac users, use:
-# cp -r dist/* .
-
-# Add and commit the built files
-git add .
-git commit -m "Deploy built version with latest changes"
-
-# Push to GitHub Pages
-git push origin gh-pages
-
-# Switch back to develop branch
-git checkout develop
-```
-
-#### **4. Handle Merge Conflicts (if needed)**
-If you encounter merge conflicts during deployment:
-```bash
-# Pull latest changes from remote
-git pull origin gh-pages --allow-unrelated-histories
-
-# Resolve conflicts manually or use:
-git checkout --ours <conflicted-file>
-git add <conflicted-file>
-
-# Commit the merge
-git commit -m "Merge develop into gh-pages for deployment"
-
-# Push the changes
-git push origin gh-pages
-```
-
-#### **5. Verify Deployment**
-- Visit: [https://nahamus.github.io/ScienceAnim/](https://nahamus.github.io/ScienceAnim/)
-- Check that all animations are working correctly
-- Test responsive design on different devices
-- Clear browser cache if changes don't appear immediately
-
-### **Deployment Notes**
-- **Branch**: Uses `gh-pages` branch for deployment
-- **Build Required**: Must run `npm run build` before deployment
-- **Built Files**: Deploy the contents of the `dist/` folder
-- **Updates**: Changes are live immediately after push
-- **Cache**: GitHub Pages may take 1-2 minutes to update
-
-### **Troubleshooting**
-- **Changes not visible**: Clear browser cache or wait 1-2 minutes
-- **Build errors**: Check for syntax errors in source files
-- **Merge conflicts**: Use `git checkout --ours` for config files
-- **404 errors**: Ensure `index.html` is in the root of gh-pages branch
-
-### **Quick Deployment Script**
-For faster deployment, you can create a batch file (Windows) or shell script:
-
-**deploy.bat** (Windows):
-```batch
-@echo off
-echo Building project...
-npm run build
-echo Switching to gh-pages branch...
-git checkout gh-pages
-echo Copying built files...
-xcopy dist\* . /E /Y
-echo Committing changes...
-git add .
-git commit -m "Deploy built version with latest changes"
-echo Pushing to GitHub Pages...
-git push origin gh-pages
-echo Switching back to develop...
-git checkout develop
-echo Deployment complete!
-```
-
-**deploy.sh** (Linux/Mac):
-```bash
-#!/bin/bash
-echo "Building project..."
-npm run build
-echo "Switching to gh-pages branch..."
-git checkout gh-pages
-echo "Copying built files..."
-cp -r dist/* .
-echo "Committing changes..."
-git add .
-git commit -m "Deploy built version with latest changes"
-echo "Pushing to GitHub Pages..."
-git push origin gh-pages
-echo "Switching back to develop..."
-git checkout develop
-echo "Deployment complete!"
-```
-
-## Development Best Practices
-
-### Code Organization
-- **Modular Structure**: Each animation is a separate class for maintainability
-- **ES6 Modules**: Clean import/export structure
-- **Separation of Concerns**: UI, logic, and styling are properly separated
-
-### Performance Optimization
-- **Canvas Rendering**: Efficient 2D canvas for smooth animations
-- **RequestAnimationFrame**: Optimized animation loop
-- **Program Execution**: Proper cleanup and resource management
-
-### Responsive Design
-- **Mobile-First**: Responsive layout that works on all devices
-- **Flexible Grid**: CSS Grid for adaptive layouts
-- **Touch-Friendly**: Optimized controls for touch devices
-
-## Customization
-
-### Adding New Animations
-1. Create a new class in `src/js/animations.js`
-2. Implement `update()`, `render()`, and `getStats()` methods
-3. Add controls to the HTML
-4. Update the main controller to handle the new animation
-
-### Styling
-- All styles are in `src/styles/main.css`
-- Uses CSS custom properties for easy theming
-- Responsive breakpoints for different screen sizes
-
-### Configuration
-- Animation parameters can be adjusted in the respective classes
-- Vite configuration in `vite.config.js` for build optimization
-- ESLint and Prettier configurations for code quality
-
-## Browser Support
-
-- **Modern Browsers**: Chrome, Firefox, Safari, Edge (latest versions)
-- **Mobile Browsers**: iOS Safari, Chrome Mobile
-- **Features Used**: Canvas API, ES6 Modules, CSS Grid, Flexbox
-
-## Performance
-
-- **60 FPS Animations**: Smooth, optimized rendering
-- **Efficient Algorithms**: Optimized physics calculations
-- **Program Execution**: Proper cleanup and resource management
-- **Fast Loading**: Minimal bundle size with Vite
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run `npm run lint` and `npm run format`
-5. Test your changes
-6. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Educational Value
-
-This application is designed for:
-- **Physics Education**: Demonstrates fundamental physics concepts
-- **Interactive Learning**: Hands-on exploration of scientific principles
-- **Visual Learning**: Visual representation of abstract concepts
-- **Parameter Experimentation**: Safe environment to test different scenarios
-
-Perfect for students, teachers, and anyone interested in understanding scientific phenomena through interactive simulations. 
+Numeric params tween smoothly when a story chapter changes them; mark a param `instant: true` if changing it rebuilds the scene.

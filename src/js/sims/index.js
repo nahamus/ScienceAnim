@@ -1,0 +1,52 @@
+// Registers every simulation in this folder tree. Gallery metadata (id, title, category, tagline,
+// blurb, keywords) comes from a build-time manifest; each simulation's code is its own chunk,
+// downloaded only when it is opened or its thumbnail is rendered.
+// Display order follows ORDER; anything not listed is appended.
+
+import MANIFEST from 'virtual:sim-manifest';
+
+const loaders = import.meta.glob('./*/*.js', { import: 'default' });
+
+const ORDER = [
+  // physics
+  'projectile', 'double-pendulum', 'pendulum-wave', 'resonance', 'ripple-tank', 'standing-waves', 'doppler',
+  'refraction', 'double-slit', 'quantum-tunneling', 'electric-field', 'circuits', 'induction', 'em-radiation',
+  'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity',
+  // astronomy
+  'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole',
+  // chemistry
+  'phases', 'molecule-shapes', 'orbitals', 'equilibrium',
+  // biology
+  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'flocking',
+  // math
+  'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis',
+  // cs
+  'neural-network', 'gradient-descent', 'kmeans', 'sorting', 'pathfinding', 'tsp', 'life',
+  // technology
+  'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'power-grid',
+  // earth
+  'seasons', 'coriolis', 'greenhouse', 'seismic-waves',
+];
+
+const rank = (id) => {
+  const i = ORDER.indexOf(id);
+  return i < 0 ? 999 : i;
+};
+
+/** Gallery entries: metadata plus `load()`, which resolves to the full definition (cached). */
+export const SIMS = MANIFEST.map(({ file, ...meta }) => {
+  let pending;
+  const entry = {
+    ...meta,
+    def: null,
+    load: () =>
+      (pending ??= loaders[file]().then((def) => {
+        if (def.id !== meta.id) throw new Error(`manifest mismatch for ${file}`);
+        return (entry.def = def);
+      }).catch((err) => {
+        pending = null;
+        throw err;
+      })),
+  };
+  return entry;
+}).sort((a, b) => rank(a.id) - rank(b.id));
