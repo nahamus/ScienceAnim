@@ -1,6 +1,7 @@
 // Shareable links: #/sim/<id>?ch=3&angle=45&drag=1
 //   ch      1-based story chapter (as shown on the story card)
 //   <key>   a control's value, only where it differs from what that chapter sets by itself
+//   embed=1 stripped-down player for iframes (no gallery navigation)
 // Unknown keys and out-of-range values are ignored or clamped, so old or hand-edited links still open.
 
 /** Controls whose values can travel in a link. */
@@ -53,8 +54,11 @@ export function parseShare(def, query) {
   return q.has('ch') || Object.keys(out.params).length ? out : null;
 }
 
+/** Whether a link asks for the embedded player. */
+export const isEmbed = (query) => new URLSearchParams(query || '').get('embed') === '1';
+
 /** Build "#/sim/<id>?…" for the given chapter and current control values. */
-export function buildShare(def, chapter, values) {
+export function buildShare(def, chapter, values, { embed = false } = {}) {
   const q = new URLSearchParams();
   if (def.story?.length) q.set('ch', String(chapter + 1));
   const base = chapterBaseline(def, Math.max(0, chapter));
@@ -65,6 +69,7 @@ export function buildShare(def, chapter, values) {
     if (base[p.key] !== undefined && encode(p, base[p.key]) === enc) continue;
     q.set(p.key, enc);
   }
+  if (embed) q.set('embed', '1');
   const s = q.toString();
   return `#/sim/${def.id}${s ? '?' + s : ''}`;
 }

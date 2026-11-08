@@ -1,7 +1,7 @@
 import { SIMS } from './sims/index.js';
 import { Gallery } from './gallery.js';
 import { Player } from './player.js';
-import { parseShare } from './share.js';
+import { parseShare, isEmbed } from './share.js';
 
 const root = document.getElementById('app');
 let view = null;
@@ -39,6 +39,7 @@ async function route() {
       prev: SIMS[i - 1],
       next: SIMS[i + 1],
       start: parseShare(def, m[2]),
+      embed: isEmbed(m[2]),
     });
     SIMS[i + 1]?.load().catch(() => {}); // warm up the likely next stop
   } else {

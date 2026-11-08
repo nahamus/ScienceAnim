@@ -14,7 +14,7 @@ const h = (tag, cls, html) => {
 const pad = (n) => String(n).padStart(2, '0');
 
 export class Player {
-  constructor(root, def, { onBack, next, prev, start }) {
+  constructor(root, def, { onBack, next, prev, start, embed = false }) {
     this.def = def;
     this.cat = CATEGORY[def.category];
     this.story = def.story || [];
@@ -22,13 +22,18 @@ export class Player {
     this.chapterTime = 0;
     this.auto = this.story.length > 0;
     this.onBack = onBack;
+    this.embed = embed; // inside someone else's page (an iframe): no way back to the gallery
 
-    const el = (this.el = h('div', 'player'));
+    const el = (this.el = h('div', embed ? 'player embed' : 'player'));
     el.style.setProperty('--accent', this.cat.color);
     el.style.setProperty('--accent-soft', rgba(this.cat.color, 0.16));
     el.innerHTML = `
       <header class="p-top">
-        <button class="icon-btn" data-act="back" title="All simulations (Esc)">${ICONS.back}</button>
+        ${
+          embed
+            ? `<a class="icon-btn" data-act="open" target="_blank" rel="noopener" title="Open in ScienceAnim">${ICONS.external}</a>`
+            : `<button class="icon-btn" data-act="back" title="All simulations (Esc)">${ICONS.back}</button>`
+        }
         <div class="p-title">
           <span class="chip"><i>${this.cat.icon}</i>${this.cat.name}</span>
           <h1>${def.title}</h1>
@@ -39,7 +44,13 @@ export class Player {
           </div>
           <button class="icon-btn" data-act="play" title="Play / pause (Space)">${ICONS.pause}</button>
           <button class="icon-btn" data-act="restart" title="Restart (R)">${ICONS.restart}</button>
-          <button class="icon-btn" data-act="share" title="Copy a link to this view">${ICONS.link}</button>
+          <div class="share">
+            <button class="icon-btn" data-act="share" title="Share this view" aria-haspopup="menu" aria-expanded="false">${ICONS.link}</button>
+            <div class="share-menu" role="menu" hidden>
+              <button role="menuitem" data-share="link">${ICONS.link}<span>Copy link</span></button>
+              <button role="menuitem" data-share="embed">${ICONS.code}<span>Copy embed code</span></button>
+            </div>
+          </div>
           <button class="icon-btn" data-act="full" title="Fullscreen (F)">${ICONS.expand}</button>
           <button class="icon-btn" data-act="panel" title="Controls & data (C)">${ICONS.sliders}</button>
         </div>
@@ -59,10 +70,14 @@ export class Player {
             <section class="sec-controls"><h3>Controls</h3><div class="controls"></div></section>
             <section class="sec-data"><h3>Live data</h3><div class="stats"></div><div class="charts"></div></section>
             ${def.ideas ? `<section class="sec-ideas"><h3>Key ideas</h3><ul>${def.ideas.map((i) => `<li>${i}</li>`).join('')}</ul></section>` : ''}
-            <nav class="sec-nav">
+            ${
+              embed
+                ? ''
+                : `<nav class="sec-nav">
               ${prev ? `<a href="#/sim/${prev.id}"><small>Previous</small>${prev.title}</a>` : '<span></span>'}
               ${next ? `<a href="#/sim/${next.id}" class="r"><small>Next</small>${next.title}</a>` : '<span></span>'}
-            </nav>
+            </nav>`
+            }
           </div>
         </aside>
       </div>`;
@@ -70,7 +85,8 @@ export class Player {
 
     this.$ = (s) => el.querySelector(s);
     this.stageHost = this.$('.stage-host');
-    if (window.innerWidth < 900) el.classList.add('panel-closed');
+    // embedded players are usually small, so give the animation the room
+    if (embed || window.innerWidth < 900) el.classList.add('panel-closed');
 
     try {
       this.runner = new Runner(this.stageHost, def);
@@ -91,6 +107,8 @@ export class Player {
     if (this.story.length) this.goto(0, true);
     else this.$('.story-card').remove();
     if (start) this.openAt(start);
+    // a short embed (a class page, a slide) shows the animation first; the story is one tap away
+    if (embed && window.innerHeight < 560) this.$('.story-card')?.classList.add('min');
     this.runner.start();
     setTimeout(() => this.$('.hint')?.classList.add('gone'), 9000);
   }
@@ -108,10 +126,15 @@ export class Player {
   }
 
   /** The link for what's on screen now (sliders mid-tween count as their destination). */
-  shareHash() {
+  shareHash(embed = this.embed) {
     const values = { ...this.runner.params };
     for (const [k, tw] of this.runner.tweens) values[k] = tw.to;
-    return buildShare(this.def, this.chapter, values);
+    return buildShare(this.def, this.chapter, values, { embed });
+  }
+
+  /** Full URL of the current view, as a normal page or as an embeddable one. */
+  shareUrl(embed = false) {
+    return location.href.split('#')[0] + this.shareHash(embed);
   }
 
   /** Keep the address bar pointing at the current view, without adding history entries. */
@@ -119,11 +142,36 @@ export class Player {
     if (!location.hash.startsWith(`#/sim/${this.def.id}`)) return;
     const hash = this.shareHash();
     if (hash !== location.hash) history.replaceState(history.state, '', hash);
+    const open = this.$('[data-act=open]');
+    if (open) open.href = this.shareUrl(false); // "Open in ScienceAnim" lands on this exact view
   }
 
-  async copyLink() {
+  /** An <iframe> snippet for class pages, slide decks and learning platforms. */
+  embedCode() {
+    const title = `${this.def.title} · ScienceAnim`.replace(/"/g, '&quot;');
+    return (
+      `<iframe src="${this.shareUrl(true)}" title="${title}" width="800" height="500" ` +
+      `style="width:100%;max-width:100%;aspect-ratio:16/10;height:auto;border:0;border-radius:12px" ` +
+      `allow="fullscreen; clipboard-write" loading="lazy"></iframe>`
+    );
+  }
+
+  toggleShareMenu(open = this.$('.share-menu').hidden) {
+    const menu = this.$('.share-menu');
+    menu.hidden = !open;
+    this.$('[data-act=share]').setAttribute('aria-expanded', String(open));
+    if (open) menu.querySelector('button').focus({ preventScroll: true });
+  }
+
+  async share(kind) {
+    this.toggleShareMenu(false);
     this.syncUrl();
-    const url = location.href.split('#')[0] + this.shareHash();
+    const blocked = 'Your browser blocked copying';
+    if (kind === 'embed') {
+      const ok = await copyText(this.embedCode());
+      return this.toast(ok ? 'Embed code copied' : blocked);
+    }
+    const url = this.shareUrl(false);
     // phones and tablets: hand the link to the system share sheet (Messages, Classroom, mail…)
     if (navigator.share && matchMedia('(pointer: coarse)').matches) {
       try {
@@ -133,21 +181,8 @@ export class Player {
         if (err.name === 'AbortError') return; // the viewer closed the sheet
       }
     }
-    let ok = false;
-    try {
-      await navigator.clipboard.writeText(url);
-      ok = true;
-    } catch {
-      // clipboard API unavailable (insecure context or denied): fall back to a hidden textarea
-      const ta = h('textarea');
-      ta.value = url;
-      ta.style.cssText = 'position:fixed;opacity:0';
-      document.body.appendChild(ta);
-      ta.select();
-      ok = document.execCommand?.('copy') ?? false;
-      ta.remove();
-    }
-    this.toast(ok ? 'Link copied' : 'Copy the link from the address bar');
+    const ok = await copyText(url);
+    this.toast(ok ? 'Link copied' : this.embed ? blocked : 'Copy the link from the address bar');
   }
 
   toast(text) {
@@ -380,11 +415,21 @@ export class Player {
   // ------------------------------------------------------------------ chrome
   bind() {
     const el = this.el;
-    el.querySelector('[data-act=back]').addEventListener('click', () => this.onBack());
+    el.querySelector('[data-act=back]')?.addEventListener('click', () => this.onBack());
+    el.querySelector('[data-act=open]')?.addEventListener('click', (e) => {
+      e.currentTarget.href = this.shareUrl(false);
+      if (!this.runner.paused) this.togglePlay(); // it carries on in the new tab
+    });
     el.querySelector('[data-act=play]').addEventListener('click', () => this.togglePlay());
     el.querySelector('[data-act=restart]').addEventListener('click', () => this.restart());
     el.querySelector('[data-act=full]').addEventListener('click', () => this.fullscreen());
-    el.querySelector('[data-act=share]').addEventListener('click', () => this.copyLink());
+    el.querySelector('[data-act=share]').addEventListener('click', () => this.toggleShareMenu());
+    el.querySelectorAll('[data-share]').forEach((b) => b.addEventListener('click', () => this.share(b.dataset.share)));
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) this.$('[data-share=link] span').textContent = 'Share link…';
+    this.onDocPointer = (e) => {
+      if (!e.target.closest('.share')) this.toggleShareMenu(false);
+    };
+    document.addEventListener('pointerdown', this.onDocPointer);
     el.querySelectorAll('[data-act=panel]').forEach((b) => b.addEventListener('click', () => el.classList.toggle('panel-closed')));
     el.querySelectorAll('[data-speed]').forEach((b) =>
       b.addEventListener('click', () => {
@@ -403,7 +448,8 @@ export class Player {
       else if (e.key === 'f' || e.key === 'F') this.fullscreen();
       else if (e.key === 'c' || e.key === 'C') el.classList.toggle('panel-closed');
       else if (e.key === 'h' || e.key === 'H') el.classList.toggle('ui-hidden');
-      else if (e.key === 'Escape' && !document.fullscreenElement) this.onBack();
+      else if (e.key === 'Escape' && !this.$('.share-menu').hidden) this.toggleShareMenu(false);
+      else if (e.key === 'Escape' && !document.fullscreenElement && !this.embed) this.onBack();
     };
     window.addEventListener('keydown', this.onKey);
     // panel slide transitions change the stage size; keep canvas in sync
@@ -432,8 +478,26 @@ export class Player {
 
   destroy() {
     window.removeEventListener('keydown', this.onKey);
+    document.removeEventListener('pointerdown', this.onDocPointer);
     this.runner?.destroy();
     this.el.remove();
+  }
+}
+
+/** Copy text, falling back to a hidden textarea where the clipboard API is unavailable. */
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const ta = h('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand?.('copy') ?? false;
+    ta.remove();
+    return ok;
   }
 }
 

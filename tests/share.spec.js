@@ -80,13 +80,65 @@ test.describe('opening links', () => {
     expect(errors).toEqual([]);
   });
 
-  test('the link button copies the current view', async ({ page, context, browserName }, info) => {
+  test('the share menu copies the link and the embed code', async ({ page, context }, info) => {
     test.skip(info.project.name.startsWith('phone'), 'phones use the system share sheet');
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto('./#/sim/projectile?ch=2&angle=30');
+    const clip = () => page.evaluate(() => navigator.clipboard.readText());
+
     await page.locator('[data-act=share]').click();
+    await page.getByRole('menuitem', { name: 'Copy link' }).click();
     await expect(page.locator('.toast')).toHaveText('Link copied');
-    const copied = await page.evaluate(() => navigator.clipboard.readText());
-    expect(copied, browserName).toMatch(/\/ScienceAnim\/#\/sim\/projectile\?ch=2&angle=30$/);
+    expect(await clip()).toMatch(/\/ScienceAnim\/#\/sim\/projectile\?ch=2&angle=30$/);
+    await expect(page.locator('.share-menu')).toBeHidden();
+
+    await page.locator('[data-act=share]').click();
+    await page.getByRole('menuitem', { name: 'Copy embed code' }).click();
+    await expect(page.locator('.toast')).toHaveText('Embed code copied');
+    const code = await clip();
+    expect(code).toMatch(/^<iframe src="http:\/\/localhost:\d+\/ScienceAnim\/#\/sim\/projectile\?ch=2&angle=30&embed=1" title="Projectile Motion · ScienceAnim"/);
+    expect(code).toContain('allow="fullscreen');
+  });
+
+  test('the share menu closes on Escape or a click elsewhere', async ({ page }) => {
+    await page.goto('./#/sim/projectile');
+    const menu = page.locator('.share-menu');
+    await page.locator('[data-act=share]').click();
+    await expect(menu).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(page.locator('.player')).toBeVisible(); // Escape closed the menu, not the player
+    await page.locator('[data-act=share]').click();
+    await page.locator('.p-title h1').click();
+    await expect(menu).toBeHidden();
+  });
+});
+
+test.describe('embed mode', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route((url) => !/^https?:\/\/(localhost|127\.0\.0\.1)[:/]/.test(url.href), (r) => r.abort());
+  });
+
+  test('works inside an iframe, without gallery navigation', async ({ page }) => {
+    await page.goto('./#/');
+    await page.evaluate(() => {
+      document.body.innerHTML = '<iframe id="f" src="./#/sim/projectile?ch=2&angle=30&embed=1" style="width:680px;height:425px;border:0"></iframe>';
+    });
+    const f = page.frameLocator('#f');
+    await expect(f.locator('.sc-step')).toHaveText('02 / 06');
+    await expect(f.locator('[data-act=back]')).toHaveCount(0);
+    await expect(f.locator('.sec-nav')).toHaveCount(0);
+    await expect(f.locator('.player')).toHaveClass(/panel-closed/);
+    await expect(f.locator('.story-card')).toHaveClass(/\bmin\b/); // short embed: animation first
+    await expect(f.locator('[data-act=open]')).toHaveAttribute('href', /#\/sim\/projectile\?ch=2&angle=30$/);
+    await expect(f.locator('[data-act=open]')).toHaveAttribute('target', '_blank');
+  });
+
+  test('stays embedded as the view changes, and Escape does not leave', async ({ page }) => {
+    await page.goto('./#/sim/projectile?embed=1');
+    await page.locator('.sc-dots button[data-ch="3"]').dispatchEvent('click');
+    await expect(page).toHaveURL(/\?ch=4&embed=1$/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.player.embed')).toBeVisible();
   });
 });
