@@ -41,7 +41,7 @@ const LUT = colormap(['#050816', '#0d1b4a', '#123f7a', '#1f7a8c', '#3fb07a', '#c
 export default {
   id: 'gradient-descent',
   title: 'How Machines Learn: Gradient Descent',
-  category: 'cs',
+  category: 'ai',
   tagline: 'Every AI model learns by rolling downhill. Watch three strategies race to the bottom.',
   ages: ['16+'],
   topics: ['Machine learning', 'Calculus'],

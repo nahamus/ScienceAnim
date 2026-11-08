@@ -5,7 +5,7 @@ const PAL = ['#5b8cff', '#ff5fa2', '#2ee6a6', '#ffb547', '#a78bfa', '#38d6f5', '
 export default {
   id: 'kmeans',
   title: 'Finding Clusters (k-means)',
-  category: 'cs',
+  category: 'ai',
   tagline: 'How a computer sorts a cloud of data into groups — with no labels at all.',
   ages: ['14-16', '16+'],
   topics: ['Machine learning', 'Data'],
