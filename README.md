@@ -22,10 +22,12 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build in dist/
 npm test         # smoke-test every simulation (desktop + phone) against the production build
-npm run deploy   # publish dist/ to GitHub Pages
+npm run deploy   # publish dist/ to GitHub Pages by hand (CI normally does this)
 ```
 
 The first `npm test` needs a browser: `npx playwright install chromium`. Run one simulation with `npm test -- -g cpu`.
+
+GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every push and pull request, split across 4 parallel jobs. When a push to `master` passes, it builds the site and publishes it to the `gh-pages` branch. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution.
 
 Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
 
