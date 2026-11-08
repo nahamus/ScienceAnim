@@ -33,6 +33,8 @@ Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart �
 
 **Shareable links.** The address bar always describes what's on screen, e.g. `#/sim/projectile?ch=2&angle=30&drag=0.01`: `ch` is the story chapter (1-based, as on the story card), and each control appears by its `key` only when it differs from what that chapter sets. Opening such a link jumps to that chapter with those settings and turns auto-play off. The link button in the player copies it (or opens the share sheet on phones). Unknown keys are ignored and out-of-range values are clamped, so renaming a control's `key` breaks old links to that control only. The format lives in `src/js/share.js`.
 
+**Embedding.** Add `embed=1` to a link (or use **Copy embed code** in the share menu) to get a stripped-down player for an `<iframe>` in a class page, slide deck or learning platform. It has no gallery navigation, and Esc doesn't leave the sim. Controls start closed, the story card starts collapsed in short frames, and an "Open in ScienceAnim" button opens the same view in a new tab.
+
 ## Architecture
 
 No runtime dependencies: plain ES modules, Canvas 2D and WebGL, bundled by Vite.
