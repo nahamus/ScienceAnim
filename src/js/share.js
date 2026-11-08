@@ -30,11 +30,16 @@ function decode(p, raw) {
   return undefined;
 }
 
-/** Param values in effect once the story has been stepped through to chapter `ch` (0-based). */
-export function chapterBaseline(def, ch) {
+/**
+ * Param values in effect once the story has been stepped through to chapter `ch` (0-based).
+ * With `asking`, that chapter's quick check is still open, so its setup scene shows instead.
+ */
+export function chapterBaseline(def, ch, asking = false) {
   const base = {};
+  const story = def.story || [];
   for (const p of def.params || []) if ('value' in p) base[p.key] = p.value;
-  for (const c of (def.story || []).slice(0, ch + 1)) Object.assign(base, c.params);
+  for (const c of story.slice(0, asking ? ch : ch + 1)) Object.assign(base, c.params);
+  if (asking) Object.assign(base, story[ch]?.check?.setup);
   return base;
 }
 
@@ -58,10 +63,10 @@ export function parseShare(def, query) {
 export const isEmbed = (query) => new URLSearchParams(query || '').get('embed') === '1';
 
 /** Build "#/sim/<id>?…" for the given chapter and current control values. */
-export function buildShare(def, chapter, values, { embed = false } = {}) {
+export function buildShare(def, chapter, values, { embed = false, asking = false } = {}) {
   const q = new URLSearchParams();
   if (def.story?.length) q.set('ch', String(chapter + 1));
-  const base = chapterBaseline(def, Math.max(0, chapter));
+  const base = chapterBaseline(def, Math.max(0, chapter), asking);
   for (const p of shareable(def)) {
     const v = values[p.key];
     if (v === undefined) continue;

@@ -3,7 +3,7 @@
 import { Runner } from './core/engine.js';
 import { CATEGORY, ICONS } from './categories.js';
 import { FONT, MONO, rgba } from './core/util.js';
-import { buildShare } from './share.js';
+import { buildShare, chapterBaseline } from './share.js';
 
 const h = (tag, cls, html) => {
   const el = document.createElement(tag);
@@ -130,7 +130,7 @@ export class Player {
   shareHash(embed = this.embed) {
     const values = { ...this.runner.params };
     for (const [k, tw] of this.runner.tweens) values[k] = tw.to;
-    return buildShare(this.def, this.chapter, values, { embed });
+    return buildShare(this.def, this.chapter, values, { embed, asking: this.pendingCheck() });
   }
 
   /** Full URL of the current view, as a normal page or as an embeddable one. */
@@ -349,8 +349,9 @@ export class Player {
     if (this.pausedForCheck && this.runner.paused) this.togglePlay();
     this.pausedForCheck = false;
     if (ch.check && !this.answers.has(i)) {
-      // quick check: set the scene, then hold still until the viewer predicts what happens
-      this.runner.applyParams(ch.check.setup, instant ? 0 : ch.tween ?? 1.4);
+      // quick check: set the scene (the same however you got here), then hold still until the
+      // viewer predicts what happens
+      this.runner.applyParams(chapterBaseline(this.def, i, true), instant ? 0 : ch.tween ?? 1.4);
       if (!this.runner.paused) {
         this.togglePlay();
         this.pausedForCheck = true;
