@@ -21,8 +21,11 @@ Cinematic, interactive simulations of the ideas behind science, all running live
 npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build in dist/
+npm test         # smoke-test every simulation (desktop + phone) against the production build
 npm run deploy   # publish dist/ to GitHub Pages
 ```
+
+The first `npm test` needs a browser: `npx playwright install chromium`. Run one simulation with `npm test -- -g cpu`.
 
 Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
 
@@ -44,13 +47,19 @@ src/
       gl.js                fullscreen fragment-shader helper
       util.js              maths, colour maps, glow sprites, drawing helpers, spatial hash
     sims/
-      index.js             auto-registers every sims/<field>/<name>.js and sets display order
+      index.js             registers every sims/<field>/<name>.js (lazy-loaded) and sets display order
       physics/ astronomy/ chemistry/ biology/ math/ cs/ tech/ earth/
+tools/
+  sim-manifest.js          Vite plugin: reads each sim's gallery metadata at build time
+tests/
+  smoke.spec.js            Playwright: opens every sim, plays every chapter, pokes every control
 ```
+
+Each simulation is its own code chunk, downloaded only when it is opened (or when the gallery renders its thumbnail), so the first page load stays small however large the library grows.
 
 ### Adding a simulation
 
-Create `src/js/sims/<field>/<id>.js` exporting a definition; it is picked up automatically (add the id to `ORDER` in `sims/index.js` to place it).
+Create `src/js/sims/<field>/<id>.js` exporting a definition; it is picked up automatically (add the id to `ORDER` in `sims/index.js` to place it). `id`, `title`, `category`, `tagline` and `blurb` (and `keywords`, if used) must be plain string literals, because the gallery reads them at build time without loading the simulation. Restart `npm run dev` after adding a new file.
 
 ```js
 export default {

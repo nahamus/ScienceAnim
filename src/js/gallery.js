@@ -22,14 +22,26 @@ let thumbBusy = false;
 let activeGallery = null;
 
 /** Render queued thumbnails one at a time, only while a gallery is on screen. */
-function pumpThumbs() {
-  const g = activeGallery;
+async function pumpThumbs() {
+  let g = activeGallery;
   const s = g && g.el.isConnected ? thumbQueue.shift() : null;
   if (!s) {
     thumbBusy = false;
     return;
   }
-  const url = renderThumb(s);
+  let def = null;
+  try {
+    def = await s.load();
+  } catch (err) {
+    console.warn('could not load', s.id, err);
+  }
+  g = activeGallery;
+  if (!g || !g.el.isConnected) {
+    thumbQueue.unshift(s);
+    thumbBusy = false;
+    return;
+  }
+  const url = def && renderThumb(def);
   if (url) {
     thumbCache.set(s.id, url);
     try {
@@ -125,8 +137,12 @@ export class Gallery {
     const cached = cachedThumb(s.id);
     if (cached) a.querySelector('.thumb-img').style.backgroundImage = `url(${cached})`;
     let timer;
+    const warm = () => s.load().catch(() => {});
+    a.addEventListener('pointerdown', warm);
+    a.addEventListener('focus', warm);
     a.addEventListener('pointerenter', (e) => {
       if (e.pointerType !== 'mouse') return;
+      warm();
       timer = setTimeout(() => this.preview(a, s), 280);
     });
     a.addEventListener('pointerleave', () => {
@@ -136,8 +152,16 @@ export class Gallery {
     return a;
   }
 
-  preview(card, s) {
+  async preview(card, entry) {
     this.stopPreview(card);
+    const token = (card._previewToken = {});
+    let s;
+    try {
+      s = await entry.load();
+    } catch {
+      return;
+    }
+    if (card._previewToken !== token || !card.matches(':hover') || !this.el.isConnected) return;
     const host = card.querySelector('.thumb-live');
     try {
       const r = new Runner(host, s, { interactive: false, thumbnail: true, maxDpr: 1.5 });
@@ -155,6 +179,7 @@ export class Gallery {
   }
 
   stopPreview(card) {
+    card._previewToken = null;
     card.classList.remove('live');
     if (card._runner) {
       const r = card._runner;
@@ -178,7 +203,9 @@ export class Gallery {
 
   queueThumbs() {
     activeGallery = this;
-    thumbQueue = this.sims.filter((s) => !cachedThumb(s.id));
+    const visible = (s) => !this.cards[this.sims.indexOf(s)].hidden;
+    // cards in the current filter first, so the visible grid fills in before the rest
+    thumbQueue = this.sims.filter((s) => !cachedThumb(s.id)).sort((a, b) => visible(b) - visible(a));
     if (!thumbBusy) {
       thumbBusy = true;
       setTimeout(pumpThumbs, 150);

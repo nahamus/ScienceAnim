@@ -1,7 +1,11 @@
-// Auto-registers every simulation module in this folder tree (Vite glob import).
+// Registers every simulation in this folder tree. Gallery metadata (id, title, category, tagline,
+// blurb, keywords) comes from a build-time manifest; each simulation's code is its own chunk,
+// downloaded only when it is opened or its thumbnail is rendered.
 // Display order follows ORDER; anything not listed is appended.
 
-const modules = import.meta.glob('./*/*.js', { eager: true });
+import MANIFEST from 'virtual:sim-manifest';
+
+const loaders = import.meta.glob('./*/*.js', { import: 'default' });
 
 const ORDER = [
   // physics
@@ -24,8 +28,25 @@ const ORDER = [
   'seasons', 'coriolis', 'greenhouse', 'seismic-waves',
 ];
 
-const all = Object.values(modules).map((m) => m.default).filter(Boolean);
-export const SIMS = all.sort((a, b) => {
-  const ia = ORDER.indexOf(a.id), ib = ORDER.indexOf(b.id);
-  return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
-});
+const rank = (id) => {
+  const i = ORDER.indexOf(id);
+  return i < 0 ? 999 : i;
+};
+
+/** Gallery entries: metadata plus `load()`, which resolves to the full definition (cached). */
+export const SIMS = MANIFEST.map(({ file, ...meta }) => {
+  let pending;
+  const entry = {
+    ...meta,
+    def: null,
+    load: () =>
+      (pending ??= loaders[file]().then((def) => {
+        if (def.id !== meta.id) throw new Error(`manifest mismatch for ${file}`);
+        return (entry.def = def);
+      }).catch((err) => {
+        pending = null;
+        throw err;
+      })),
+  };
+  return entry;
+}).sort((a, b) => rank(a.id) - rank(b.id));

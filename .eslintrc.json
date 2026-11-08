@@ -20,7 +20,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.config.js", "vite.config.js"],
+      "files": ["**/*.config.js", "vite.config.js", "tools/**/*.js", "tests/**/*.js"],
       "env": { "node": true }
     }
   ]

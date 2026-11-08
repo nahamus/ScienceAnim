@@ -134,7 +134,14 @@ export function tag(ctx, str, x, y, color = C.ink, o = {}) {
   ctx.font = `600 ${o.size || 11}px ${FONT}`;
   const w = ctx.measureText(str).width + 14;
   const h = (o.size || 11) + 9;
-  const ax = o.align === 'center' ? x - w / 2 : o.align === 'right' ? x - w : x;
+  let ax = o.align === 'center' ? x - w / 2 : o.align === 'right' ? x - w : x;
+  // keep the pill on screen (narrow phones): nudge it inside the canvas edges
+  const m = ctx.getTransform();
+  if (m.b === 0 && m.c === 0 && m.a > 0) {
+    const left = m.a * ax + m.e, pad = 4 * m.a, wd = w * m.a;
+    const shift = Math.max(pad - left, 0) + Math.min(ctx.canvas.width - pad - (left + wd), 0);
+    if (wd + 2 * pad <= ctx.canvas.width) ax += shift / m.a;
+  }
   ctx.fillStyle = 'rgba(8,11,22,0.78)';
   ctx.strokeStyle = rgba(color.startsWith('#') ? color : '#ffffff', 0.45);
   ctx.lineWidth = 1;

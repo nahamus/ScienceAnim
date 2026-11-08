@@ -191,7 +191,7 @@ export default {
             ctx.restore();
           }
         }
-        if (!api.thumbnail) tag(ctx, `generating ${s.G.toFixed(0)} MW`, sx, G0 + 24, C.amber, { align: 'center', size: 10 });
+        if (!api.thumbnail) tag(ctx, `generating ${s.G.toFixed(0)} MW`, sx, G0 + (api.w < 600 ? 50 : 24), C.amber, { align: 'center', size: 10 });
 
         // --- line route: station → step-up → pylons → substation → homes
         const tx1 = X(0.2), tx2 = X(0.74), hx0 = X(0.82), hx1 = X(0.98);

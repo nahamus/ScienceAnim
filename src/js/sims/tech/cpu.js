@@ -302,7 +302,7 @@ export default {
         ctx.roundRect ? ctx.roundRect(G.cpuX, G.cpuY, G.cpuW, G.cpuH, 14) : ctx.rect(G.cpuX, G.cpuY, G.cpuW, G.cpuH);
         ctx.fill();
         ctx.stroke();
-        if (!api.thumbnail) text(ctx, 'PROCESSOR', G.cpuX + 12, G.cpuY + 14, { size: 11, weight: 700, color: C.dim });
+        if (!api.thumbnail && G.wide) text(ctx, 'PROCESSOR', G.cpuX + 12, G.cpuY + 14, { size: 11, weight: 700, color: C.dim });
         const reg = (name, val, col, sub) => {
           const [x, y] = G.anchors[name];
           const bw = Math.min(110, G.cpuW * 0.26), bh = 46;

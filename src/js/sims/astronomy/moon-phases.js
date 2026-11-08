@@ -75,10 +75,10 @@ export default {
       const wide = w > 760;
       return {
         ex: wide ? w * 0.62 : w * 0.5,
-        ey: wide ? h * 0.42 : h * 0.3,
+        ey: wide ? h * 0.42 : h * 0.27,
         R: wide ? Math.min(w * 0.22, h * 0.3) : Math.min(w * 0.33, h * 0.17),
         mx: wide ? w * 0.18 : w * 0.5,
-        my: wide ? h * 0.36 : h * 0.62,
+        my: wide ? h * 0.36 : h * 0.66,
         mr: wide ? Math.min(w * 0.12, h * 0.17) : Math.min(w * 0.2, h * 0.09),
         wide,
       };

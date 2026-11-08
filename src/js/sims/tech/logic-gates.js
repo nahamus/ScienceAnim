@@ -145,7 +145,8 @@ export default {
       const P = {};
       if (params.mode === 'gates') {
         const x0 = w * 0.12, xg = w * (w > 760 ? 0.42 : 0.5), xo = w * (w > 760 ? 0.6 : 0.8);
-        const top = 110, step = Math.min(78, (h * 0.75 - top) / 5);
+        // narrow screens put the truth table underneath, so keep the gates in the upper part
+        const top = 110, step = Math.min(78, (h * (w > 760 ? 0.75 : 0.56) - top) / 5);
         P.A = [x0, top + step * 1];
         P.B = [x0, top + step * 3];
         ['and', 'or', 'xor', 'nand', 'not'].forEach((t, i) => (P[t] = [xg, top + i * step]));
@@ -323,7 +324,7 @@ export default {
             const fns = params.mode === 'gates' ? [(a, b) => a & b, (a, b) => a | b, (a, b) => a ^ b, (a, b) => 1 - (a & b), (a) => 1 - a] : [(a, b) => a ^ b, (a, b) => a & b];
             const cw = 46, rh = 24;
             const tx = w > 760 ? w - cols.length * cw - 24 : (w - cols.length * cw) / 2;
-            const ty = w > 760 ? 110 : h * 0.62;
+            const ty = w > 760 ? 110 : Math.max(h * 0.62, (P.not?.[1] ?? 0) + s + 30);
             ctx.fillStyle = 'rgba(10,14,30,0.8)';
             ctx.fillRect(tx - 8, ty - 18, cols.length * cw + 16, rh * 5 + 14);
             cols.forEach((c, i) => text(ctx, c, tx + (i + 0.5) * cw, ty, { size: 10, align: 'center', color: C.dim, weight: 700 }));
