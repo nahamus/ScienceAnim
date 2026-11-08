@@ -50,7 +50,7 @@ export default {
     },
     {
       title: 'Concentrated sunlight',
-      text: 'Look at the beam on the right. When the Sun is high, a beam of light lands on a small patch of ground and heats it strongly. When the Sun is low the same beam smears across a large area. That, plus long days, is summer.',
+      text: 'Look at the sunbeam close-up. When the Sun is high, a beam of light lands on a small patch of ground and heats it strongly. When the Sun is low the same beam smears across a large area. That, plus long days, is summer.',
       formula: 'heating ∝ sin(Sun’s elevation)',
       params: { day: 172, lat: 45, run: false, tilt: 23.4 },
       duration: 14,

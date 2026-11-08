@@ -265,6 +265,13 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 7px var(--ac
   .story-card .sc-nav { margin-top: 8px; }
   .story-card.min { height: auto; }
   .player.ui-hidden .story-card { display: none; }
+  /* the hint sits at the foot of the animation (just above the story card), clear of the labels most
+     sims draw along the top; negative top margin overlaps it onto the stage without taking space */
+  .stage .hint {
+    position: relative; z-index: 2; top: auto; left: auto; transform: none; align-self: center;
+    margin: -46px 0 12px; flex: none;
+  }
+  .stage .hint.gone { transform: translateY(8px); }
 }
 @media (max-width: 520px) {
   .p-actions [data-act='full'] { display: none; }

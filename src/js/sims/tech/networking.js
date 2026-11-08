@@ -30,7 +30,7 @@ export default {
   story: [
     {
       title: 'Chopped into packets',
-      text: 'Your laptop (left) is sending a message to a server on the far side of the network. It does not send one long stream: it slices the message into small numbered <b>packets</b>, each stamped with the destination address.',
+      text: 'Your laptop is sending a message to a server on the far side of the network. It does not send one long stream: it slices the message into small numbered <b>packets</b>, each stamped with the destination address.',
       params: { size: 4, rate: 3, loss: 0, adaptive: true },
       enter: (s) => {
         s.heal();

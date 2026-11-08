@@ -73,7 +73,7 @@ export default {
     },
     {
       title: 'The butterfly effect',
-      text: 'The chart on the right tracks the gap between the first and last pendulum on a log scale. It climbs in a straight line — <b>exponential growth</b>. Making the initial error 1000× smaller only buys a little more time.',
+      text: 'The Live data chart tracks the gap between the first and last pendulum on a log scale. It climbs in a straight line — <b>exponential growth</b>. Making the initial error 1000× smaller only buys a little more time.',
       params: { count: 200, spread: -7, trail: 40 },
       duration: 16,
     },

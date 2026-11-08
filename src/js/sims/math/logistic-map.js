@@ -31,14 +31,14 @@ export default {
   story: [
     {
       title: 'A population with limits',
-      text: 'Each year the population grows by a factor r, but crowding holds it back. Follow it on the cobweb (left): up to the curve gives next year, across to the diagonal makes that this year, and repeat. At r = 2.8 it spirals in to a <b>steady</b> value.',
+      text: 'Each year the population grows by a factor r, but crowding holds it back. Follow it on the cobweb plot: up to the curve gives next year, across to the diagonal makes that this year, and repeat. At r = 2.8 it spirals in to a <b>steady</b> value.',
       formula: 'xₙ₊₁ = r · xₙ · (1 − xₙ)',
       params: { r: 2.8, zoom: 'full', twin: false, speed: 6 },
       duration: 13,
     },
     {
       title: 'Boom and bust',
-      text: 'Raise r past 3 and the steady state splits: the population now <b>alternates</b> between a high year and a low year forever. The diagram on the right shows where the population ends up for every r.',
+      text: 'Raise r past 3 and the steady state splits: the population now <b>alternates</b> between a high year and a low year forever. The bifurcation diagram shows where the population ends up for every r.',
       params: { r: 3.2, zoom: 'full', twin: false },
       tween: 3,
       duration: 12,
