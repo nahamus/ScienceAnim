@@ -82,7 +82,7 @@ export default {
   ],
   create(api) {
     const { ctx, params } = api;
-    let phaseDrive = 0, held = null, sweepT = -1;
+    let phaseDrive = 0, held = null, sweepT = -1, sweepStep = -1;
     const n = 6;
     const xs = new Float32Array(n), vs = new Float32Array(n);
     const trace = [];
@@ -93,6 +93,7 @@ export default {
     const count = () => (params.mode === 'barton' ? n : 1);
 
     function rest() {
+      sweepT = -1; // leaving the sweep chapter (or switching setup) ends the automatic sweep
       xs.fill(0);
       vs.fill(0);
       trace.length = 0;
@@ -115,6 +116,7 @@ export default {
       pluck,
       sweep() {
         sweepT = 0;
+        sweepStep = -1;
       },
       reset: rest,
       onParam(k) {
@@ -140,7 +142,9 @@ export default {
           sweepT += dt;
           const seq = [1.25, 0.75, 1.5];
           const i = Math.floor(sweepT / 6);
-          if (i < seq.length && Math.abs(params.f - seq[i]) > 1e-3) api.runner.set('f', seq[i], 1.5);
+          // retune once per step, so a viewer who moves the slider mid-sweep isn't overridden every frame
+          if (i < seq.length && i !== sweepStep) api.runner.set('f', seq[i], 1.5);
+          sweepStep = i;
           if (i >= seq.length) sweepT = -1;
         }
         const sub = 8, h = dt / sub;

@@ -27,9 +27,11 @@ npm run deploy   # publish dist/ to GitHub Pages by hand (CI normally does this)
 
 The first `npm test` needs a browser: `npx playwright install chromium`. Run one simulation with `npm test -- -g cpu`.
 
-GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every push and pull request, split across 4 parallel jobs. When a push to `master` passes, it builds the site and publishes it to the `gh-pages` branch. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution.
+**Workflow:** make a short-lived branch for each change and open a pull request into `master`. GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every pull request, split across 4 parallel jobs. Merging into `master` runs them again, and if they pass, it builds the site and publishes it to the `gh-pages` branch. That makes `master` exactly what's live. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution.
 
 Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
+
+**Shareable links.** The address bar always describes what's on screen, e.g. `#/sim/projectile?ch=2&angle=30&drag=0.01`: `ch` is the story chapter (1-based, as on the story card), and each control appears by its `key` only when it differs from what that chapter sets. Opening such a link jumps to that chapter with those settings and turns auto-play off. The link button in the player copies it (or opens the share sheet on phones). Unknown keys are ignored and out-of-range values are clamped, so renaming a control's `key` breaks old links to that control only. The format lives in `src/js/share.js`.
 
 ## Architecture
 
