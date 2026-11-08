@@ -62,6 +62,9 @@ test.describe('simulations', () => {
 function simTest(sim) {
     test(sim.id, { tag: sim.renderer === 'webgl' ? '@webgl' : [] }, async ({ page }, info) => {
       const errors = await watchErrors(page);
+      // no GPU on CI: software WebGL can't draw these shaders at full size, so draw them at 1/8
+      if (sim.renderer === 'webgl') test.slow(); // heavy shaders; slower still when two run side by side
+      if (process.env.CI && sim.renderer === 'webgl') await page.addInitScript(() => (window.__SIM_RENDER_SCALE = 0.125));
       await page.goto(`./#/sim/${sim.id}`);
       await expect(page).toHaveTitle(`${sim.title} · ScienceAnim`);
       await page.locator('.player .stage-host canvas').first().waitFor();

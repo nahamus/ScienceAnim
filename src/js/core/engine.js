@@ -77,7 +77,8 @@ export class Runner {
     if (w === this.w && h === this.h) return;
     this.w = w;
     this.h = h;
-    const s = this.def.renderScale || 1;
+    // window.__SIM_RENDER_SCALE lets the smoke tests shrink WebGL sims on GPU-less CI runners
+    const s = (this.def.renderScale || 1) * (this.gl && window.__SIM_RENDER_SCALE || 1);
     this.canvas.width = Math.round(w * this.dpr * s);
     this.canvas.height = Math.round(h * this.dpr * s);
     this.canvas.style.width = w + 'px';
