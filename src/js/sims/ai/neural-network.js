@@ -109,7 +109,7 @@ const input = (p) => (useSquares ? [p.x, p.y, p.x * p.x, p.y * p.y] : [p.x, p.y]
 export default {
   id: 'neural-network',
   title: 'How a Neural Network Learns',
-  category: 'cs',
+  category: 'ai',
   tagline: 'Watch a tiny artificial brain bend its decision boundary to separate the data.',
   ages: ['16+'],
   topics: ['Machine learning'],

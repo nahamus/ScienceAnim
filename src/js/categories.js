@@ -11,6 +11,12 @@ export const CATEGORIES = [
     icon: svg('<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>'),
   },
   {
+    id: 'ai',
+    name: 'AI',
+    color: '#ff6b6b',
+    icon: svg('<path d="M10 3l1.9 5.1L17 10l-5.1 1.9L10 17l-1.9-5.1L3 10l5.1-1.9z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/>'),
+  },
+  {
     id: 'astronomy',
     name: 'Astronomy',
     color: '#a78bfa',
