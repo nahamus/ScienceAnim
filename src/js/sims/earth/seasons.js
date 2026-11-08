@@ -64,6 +64,12 @@ export default {
     },
     {
       title: 'Not distance',
+      check: {
+        q: 'Earth is closest to the Sun in early January. What season is it then in the northern hemisphere?',
+        options: ['Summer', 'Winter'],
+        answer: 1,
+        explain: 'Northern winter. The north leans away from the Sun in January. Our distance from the Sun changes by only about 3%, far too little to matter next to the tilt.',
+      },
       text: 'Earth’s orbit is slightly oval, and we are actually <b>closest to the Sun in early January</b> — northern winter. The 3% change in distance is tiny compared with the effect of the tilt.',
       params: { day: 3, lat: 45, run: false, tilt: 23.4 },
       tween: 2,
@@ -71,6 +77,12 @@ export default {
     },
     {
       title: 'What if there were no tilt?',
+      check: {
+        q: 'If Earth’s axis had no tilt at all, what would happen to the seasons?',
+        options: ['They would be stronger', 'They would almost vanish', 'They would swap hemispheres'],
+        answer: 1,
+        explain: 'With no tilt, the Sun would climb to the same height every day of the year and days would always last 12 hours. Only the tiny effect of distance would remain.',
+      },
       text: 'Set the tilt to zero. Every place now has 12-hour days all year and the Sun follows the same path every day: <b>no seasons</b>. Crank it up to 60° and seasons become extreme.',
       params: { tilt: 0, run: true },
       tween: 3,

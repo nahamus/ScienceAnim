@@ -82,6 +82,13 @@ export default {
     },
     {
       title: 'Which angle goes farthest?',
+      check: {
+        q: 'Same speed, no air. Which launch angle sends the ball farthest?',
+        options: ['30°', '45°', '60°', '75°'],
+        answer: 1,
+        setup: { parts: false, auto: false, angle: 30, drag: 0, g: 9.81 },
+        explain: '45° shares the speed evenly between going up (which buys time in the air) and going along (distance each second). 30° and 60° land in the same place: complementary angles always tie.',
+      },
       text: 'Fire at 15°, 30°, 45°, 60° and 75°. The 45° shot lands farthest. And look closely: 30° and 60° land at the <b>same spot</b>, as do 15° and 75°.',
       formula: 'range = v₀² · sin 2θ / g',
       params: { parts: false, auto: false, angle: 45, drag: 0, g: 9.81 },
@@ -90,6 +97,13 @@ export default {
     },
     {
       title: 'Now add air',
+      check: {
+        q: 'Now add air resistance. What happens to the best angle?',
+        options: ['It rises above 45°', 'It stays at 45°', 'It drops below 45°'],
+        answer: 2,
+        setup: { drag: 0, angle: 45, g: 9.81, auto: false, parts: false },
+        explain: 'Drag steals speed the whole way, and a shot that stays up longer loses more. Flatter, quicker shots waste less, so the best angle drops below 45°.',
+      },
       text: 'Real air pushes back harder the faster you go. Every shot falls short, the arcs become lopsided — steeper on the way down — and the best angle drops below 45°. See the chart: dashed is vacuum, solid is with air.',
       params: { drag: 0.012, angle: 45, g: 9.81, auto: false, parts: false },
       enter: (s) => s.fan(),
@@ -97,6 +111,13 @@ export default {
     },
     {
       title: 'Other worlds',
+      check: {
+        q: 'Gravity on the Moon is about one-sixth of Earth’s. The same throw goes…',
+        options: ['about as far', 'about 2× as far', 'about 6× as far', 'about 36× as far'],
+        answer: 2,
+        setup: { g: 9.81, drag: 0, angle: 45, parts: false },
+        explain: 'Range = v² sin 2θ / g. One-sixth the gravity means six times the hang time and six times the distance.',
+      },
       text: 'On the Moon gravity is six times weaker. The same throw sails about six times farther and hangs in the sky six times longer. On Jupiter it barely leaves the barrel.',
       params: { g: 1.62, drag: 0, auto: true, angle: 45, parts: false },
       enter: (s) => s.clear(),

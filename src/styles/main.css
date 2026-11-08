@@ -328,3 +328,23 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 7px var(--ac
 
 /* embedded in another page: no gallery chrome, title can take the room */
 .player.embed .p-top { padding: 10px 12px; }
+
+/* quick checks: a prediction question inside a story chapter */
+.sc-dots button.q { position: relative; }
+.sc-dots button.q::after { content: ''; position: absolute; left: 50%; top: -1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); opacity: 0.8; }
+.sc-check { margin-top: 10px; }
+.sc-check[hidden] { display: none; }
+.sc-q { font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+.sc-q b { display: inline-block; margin-right: 6px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 2px; }
+.sc-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sc-options button {
+  padding: 7px 12px; border-radius: 10px; border: 1px solid var(--line2); background: rgba(255, 255, 255, 0.04);
+  color: var(--ink); font: inherit; font-size: 13.5px; cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.sc-options button:not(:disabled):hover { background: var(--accent-soft); border-color: var(--accent); }
+.sc-options button:disabled { cursor: default; opacity: 0.5; }
+.sc-options button.right { opacity: 1; border-color: #34d399; background: rgba(52, 211, 153, 0.14); }
+.sc-options button.wrong { opacity: 1; border-color: #f87171; background: rgba(248, 113, 113, 0.12); text-decoration: line-through; text-decoration-color: rgba(248, 113, 113, 0.6); }
+.sc-explain { margin: 10px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--ink2); }
+.sc-explain b { color: var(--ink); }
+.sc-check.answered .sc-q { color: var(--ink2); }
