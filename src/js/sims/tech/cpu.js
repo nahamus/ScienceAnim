@@ -51,7 +51,7 @@ export default {
   story: [
     {
       title: 'A tiny computer',
-      text: 'On the left is <b>memory</b>: 32 numbered boxes, each holding one byte. The program sits at the top as numbers (shown with their meanings). On the right is the <b>processor</b>: a program counter (PC), an instruction register (IR), a working register (A) and an arithmetic unit (ALU).',
+      text: 'First, <b>memory</b>: 32 numbered boxes, each holding one byte. The program sits at the top as numbers (shown with their meanings). Then the <b>processor</b>: a program counter (PC), an instruction register (IR), a working register (A) and an arithmetic unit (ALU).',
       params: { prog: 'countdown', speed: 0.6, run: true },
       enter: (s) => s.boot(),
       duration: 13,

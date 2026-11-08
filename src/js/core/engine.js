@@ -12,6 +12,9 @@
 import { clamp, easeInOut } from './util.js';
 
 export class Runner {
+  /** Lowest adaptive resolution: a third of full keeps shapes readable while cutting pixels ~9×. */
+  static MIN_QUALITY = 0.34;
+
   constructor(host, def, opts = {}) {
     this.def = def;
     this.host = host;
@@ -40,6 +43,11 @@ export class Runner {
       this.ctx = this.canvas.getContext('2d');
     }
     this.dpr = Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2);
+    // Adaptive resolution: WebGL sims are fill-rate bound, so on a slow GPU (school Chromebooks,
+    // older phones) drawing fewer pixels keeps them smooth. Fixed-size canvases (thumbnails) opt out.
+    this.quality = 1;
+    this.adaptive = !!this.gl && !opts.width && def.adaptive !== false;
+    this.perf = { sum: 0, n: 0, wait: 2, slow: 0, ceiling: 1, prev: 1, raised: false };
     this.w = 0;
     this.h = 0;
     const self = this;
@@ -77,14 +85,57 @@ export class Runner {
     if (w === this.w && h === this.h) return;
     this.w = w;
     this.h = h;
-    // window.__SIM_RENDER_SCALE lets the smoke tests shrink WebGL sims on GPU-less CI runners
-    const s = (this.def.renderScale || 1) * (this.gl && window.__SIM_RENDER_SCALE || 1);
-    this.canvas.width = Math.round(w * this.dpr * s);
-    this.canvas.height = Math.round(h * this.dpr * s);
+    this.sizeCanvas();
     this.canvas.style.width = w + 'px';
     this.canvas.style.height = h + 'px';
     this.sim?.resize?.(w, h);
     if (this.paused && this.sim) this.render();
+  }
+
+  /** Backing-store size: CSS size × device pixels × the sim's own scale × adaptive quality. */
+  sizeCanvas() {
+    // window.__SIM_RENDER_SCALE lets the smoke tests shrink WebGL sims on GPU-less CI runners
+    const s = (this.def.renderScale || 1) * this.quality * ((this.gl && window.__SIM_RENDER_SCALE) || 1);
+    this.canvas.width = Math.max(1, Math.round(this.w * this.dpr * s));
+    this.canvas.height = Math.max(1, Math.round(this.h * this.dpr * s));
+  }
+
+  /**
+   * About twice a second (or every 30 frames), compare the average frame time with the display's
+   * pace: below ~45 fps drop the resolution (by half when it is crawling under 20 fps, else by a
+   * quarter); at a steady ~58+ fps raise it again, up to full or to the last level that proved too
+   * slow, so it settles instead of see-sawing.
+   */
+  adapt(dt) {
+    const q = this.perf;
+    if (dt > 2) return; // back from a pause in the browser, not a measure of rendering cost
+    q.sum += dt;
+    if (++q.n < 30 && (q.sum < 0.5 || q.n < 2)) return;
+    const avg = q.sum / q.n;
+    q.sum = q.n = 0;
+    if (q.wait > 0) return void q.wait--; // let a change settle (and skip start-up jank)
+    let next = this.quality;
+    const crawling = avg > 1 / 20;
+    q.slow = avg > 1 / 45 ? q.slow + 1 : 0;
+    // one slow window can be a hiccup (garbage collection, another tab); two in a row is the GPU
+    if ((crawling || q.slow >= 2) && this.quality > Runner.MIN_QUALITY) {
+      q.slow = 0;
+      if (q.raised) q.ceiling = q.prev; // the last step up was one too many
+      next = Math.max(Runner.MIN_QUALITY, this.quality * (crawling ? 0.5 : 0.75));
+      q.raised = false;
+      q.wait = 1;
+    } else if (q.slow) {
+      // wait for the next window before deciding
+    } else if (avg < 1 / 58 && this.quality < q.ceiling) {
+      q.prev = this.quality;
+      next = Math.min(q.ceiling, this.quality * 1.2);
+      q.raised = true;
+      q.wait = 3;
+    } else q.raised = false;
+    if (next !== this.quality) {
+      this.quality = next;
+      this.sizeCanvas();
+    }
   }
 
   bindPointer() {
@@ -187,6 +238,7 @@ export class Runner {
       const dt = (now - last) / 1000;
       last = now;
       if (document.hidden) return;
+      if (this.adaptive) this.adapt(dt);
       this.step(dt);
       this.onFrame?.(dt);
     };

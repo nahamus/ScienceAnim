@@ -28,7 +28,7 @@ export default {
   story: [
     {
       title: 'The journey',
-      text: 'A power station (left) spins a generator — magnets turning inside coils of wire, just like the induction simulation. The electricity is stepped up by a transformer, carried along pylons, stepped down at a substation and delivered to homes.',
+      text: 'A power station spins a generator — magnets turning inside coils of wire, just like the induction simulation. The electricity is stepped up by a transformer, carried along pylons, stepped down at a substation and delivered to homes.',
       params: { kv: 400, source: 'thermal', clock: 18, run: false },
       duration: 13,
     },

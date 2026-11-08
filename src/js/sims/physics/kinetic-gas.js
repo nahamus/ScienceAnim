@@ -32,7 +32,7 @@ export default {
     },
     {
       title: 'A spread of speeds',
-      text: 'No two molecules move at the same speed. Yet the histogram on the right settles into a precise shape — the <b>Maxwell–Boltzmann distribution</b> (dashed line) predicted in the 1860s.',
+      text: 'No two molecules move at the same speed. Yet the speed histogram in Live data settles into a precise shape — the <b>Maxwell–Boltzmann distribution</b> (dashed line) predicted in the 1860s.',
       params: { T: 300 },
       duration: 13,
     },
