@@ -1,6 +1,7 @@
 import { SIMS } from './sims/index.js';
 import { Gallery } from './gallery.js';
 import { Player } from './player.js';
+import { parseShare } from './share.js';
 
 const root = document.getElementById('app');
 let view = null;
@@ -10,7 +11,7 @@ let routeId = 0;
 
 async function route() {
   const id = ++routeId;
-  const m = location.hash.match(/^#\/sim\/([\w-]+)/);
+  const m = location.hash.match(/^#\/sim\/([\w-]+)(?:\?(.*))?/);
   const entry = m && SIMS.find((s) => s.id === m[1]);
   if (view instanceof Gallery) galleryScroll = window.scrollY;
   view?.destroy();
@@ -37,6 +38,7 @@ async function route() {
       onBack: () => (location.hash = '#/'),
       prev: SIMS[i - 1],
       next: SIMS[i + 1],
+      start: parseShare(def, m[2]),
     });
     SIMS[i + 1]?.load().catch(() => {}); // warm up the likely next stop
   } else {

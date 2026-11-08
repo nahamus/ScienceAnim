@@ -116,6 +116,35 @@ function simTest(sim) {
       await page.mouse.click(...at(0.6, 0.4));
       await page.waitForTimeout(400);
 
+      // shareable link: the address bar tracks the view, and reopening it restores what it names
+      await frames(page, 20); // the URL syncs every 15 frames
+      const hash = await page.evaluate(() => location.hash);
+      expect(hash).toMatch(new RegExp(`^#/sim/${sim.id}(\\?|$)`));
+      await page.reload();
+      await page.locator('.player .stage-host canvas').first().waitFor();
+      const controlValues = () =>
+        page.evaluate(() =>
+          Object.fromEntries(
+            [...document.querySelectorAll('.player .controls .ctl[data-key]')].map((row) => {
+              const r = row.querySelector('input[type=range]');
+              const c = row.querySelector('input[type=checkbox]');
+              const on = row.querySelector('.seg button.on');
+              return [row.dataset.key, r ? [+r.value, +r.step || 0] : c ? (c.checked ? '1' : '0') : on?.dataset.v];
+            }),
+          ),
+        );
+      const first = await controlValues();
+      await page.waitForTimeout(300);
+      const now = await controlValues();
+      const shared = Object.fromEntries(new URLSearchParams(hash.split('?')[1] || ''));
+      for (const [key, want] of Object.entries(shared)) {
+        if (key === 'ch' || !(key in now)) continue;
+        if (JSON.stringify(first[key]) !== JSON.stringify(now[key])) continue; // the sim animates this one itself
+        const got = now[key];
+        if (Array.isArray(got)) expect(Math.abs(got[0] - +want), `${key} from ${hash}`).toBeLessThanOrEqual(got[1] / 2 + 1e-9);
+        else expect(got, `${key} from ${hash}`).toBe(want);
+      }
+
       if (info.project.name === 'phone') {
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
         expect(overflow, 'page scrolls sideways').toBeLessThanOrEqual(1);

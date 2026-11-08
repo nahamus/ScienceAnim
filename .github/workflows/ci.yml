@@ -1,9 +1,10 @@
-# Lint + smoke-test every push and pull request; publish master to GitHub Pages once tests pass.
+# Lint + smoke-test every pull request and every push to master; publish master to GitHub Pages
+# once tests pass. Work happens on short-lived branches merged into master by pull request.
 name: CI
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master]
   pull_request:
   workflow_dispatch:
 
@@ -68,4 +69,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          commit_message: 'Deploy ${{ github.sha }}'
+          full_commit_message: 'Deploy ${{ github.sha }}'

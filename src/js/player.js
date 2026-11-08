@@ -3,6 +3,7 @@
 import { Runner } from './core/engine.js';
 import { CATEGORY, ICONS } from './categories.js';
 import { FONT, MONO, rgba } from './core/util.js';
+import { buildShare } from './share.js';
 
 const h = (tag, cls, html) => {
   const el = document.createElement(tag);
@@ -13,7 +14,7 @@ const h = (tag, cls, html) => {
 const pad = (n) => String(n).padStart(2, '0');
 
 export class Player {
-  constructor(root, def, { onBack, next, prev }) {
+  constructor(root, def, { onBack, next, prev, start }) {
     this.def = def;
     this.cat = CATEGORY[def.category];
     this.story = def.story || [];
@@ -38,6 +39,7 @@ export class Player {
           </div>
           <button class="icon-btn" data-act="play" title="Play / pause (Space)">${ICONS.pause}</button>
           <button class="icon-btn" data-act="restart" title="Restart (R)">${ICONS.restart}</button>
+          <button class="icon-btn" data-act="share" title="Copy a link to this view">${ICONS.link}</button>
           <button class="icon-btn" data-act="full" title="Fullscreen (F)">${ICONS.expand}</button>
           <button class="icon-btn" data-act="panel" title="Controls & data (C)">${ICONS.sliders}</button>
         </div>
@@ -88,8 +90,73 @@ export class Player {
     this.bind();
     if (this.story.length) this.goto(0, true);
     else this.$('.story-card').remove();
+    if (start) this.openAt(start);
     this.runner.start();
     setTimeout(() => this.$('.hint')?.classList.add('gone'), 9000);
+  }
+
+  // ------------------------------------------------------------------ links
+  /** Recreate the view a shared link describes: its chapter, then its control values. */
+  openAt({ chapter, params }) {
+    if (this.story.length) {
+      // step through earlier chapters' settings so the state matches reading the story to here
+      for (let j = 0; j < chapter; j++) this.runner.applyParams(this.story[j].params, 0);
+      this.goto(chapter, true);
+      this.setAuto(false); // stay on the chapter that was shared
+    }
+    this.runner.applyParams(params, 0);
+  }
+
+  /** The link for what's on screen now (sliders mid-tween count as their destination). */
+  shareHash() {
+    const values = { ...this.runner.params };
+    for (const [k, tw] of this.runner.tweens) values[k] = tw.to;
+    return buildShare(this.def, this.chapter, values);
+  }
+
+  /** Keep the address bar pointing at the current view, without adding history entries. */
+  syncUrl() {
+    if (!location.hash.startsWith(`#/sim/${this.def.id}`)) return;
+    const hash = this.shareHash();
+    if (hash !== location.hash) history.replaceState(history.state, '', hash);
+  }
+
+  async copyLink() {
+    this.syncUrl();
+    const url = location.href.split('#')[0] + this.shareHash();
+    // phones and tablets: hand the link to the system share sheet (Messages, Classroom, mail…)
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try {
+        await navigator.share({ title: document.title, url });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return; // the viewer closed the sheet
+      }
+    }
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(url);
+      ok = true;
+    } catch {
+      // clipboard API unavailable (insecure context or denied): fall back to a hidden textarea
+      const ta = h('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      ok = document.execCommand?.('copy') ?? false;
+      ta.remove();
+    }
+    this.toast(ok ? 'Link copied' : 'Copy the link from the address bar');
+  }
+
+  toast(text) {
+    let t = this.$('.toast');
+    if (!t) this.$('.stage').appendChild((t = h('div', 'toast')));
+    t.textContent = text;
+    t.classList.remove('show');
+    void t.offsetWidth;
+    t.classList.add('show');
   }
 
   // ------------------------------------------------------------------ controls
@@ -100,6 +167,7 @@ export class Player {
     if (!params.length) this.$('.sec-controls').remove();
     for (const p of params) {
       const row = h('div', 'ctl ctl-' + p.type);
+      row.dataset.key = p.key;
       if (p.type === 'range') {
         row.innerHTML = `<label><span>${p.label}</span><output></output></label><input type="range" min="${p.min}" max="${p.max}" step="${p.step || 'any'}">`;
         const input = row.querySelector('input');
@@ -254,6 +322,7 @@ export class Player {
     // stats at ~6 Hz, charts every other frame
     const f = this.runner.frame;
     if (f % 10 === 0) this.drawStats();
+    if (f % 15 === 0) this.syncUrl();
     if (f % 2 === 0) this.drawCharts();
   }
 
@@ -315,6 +384,7 @@ export class Player {
     el.querySelector('[data-act=play]').addEventListener('click', () => this.togglePlay());
     el.querySelector('[data-act=restart]').addEventListener('click', () => this.restart());
     el.querySelector('[data-act=full]').addEventListener('click', () => this.fullscreen());
+    el.querySelector('[data-act=share]').addEventListener('click', () => this.copyLink());
     el.querySelectorAll('[data-act=panel]').forEach((b) => b.addEventListener('click', () => el.classList.toggle('panel-closed')));
     el.querySelectorAll('[data-speed]').forEach((b) =>
       b.addEventListener('click', () => {
