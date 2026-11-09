@@ -7,11 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && npm run thumbs",
     "deploy": "gh-pages -d dist --repo https://github.com/nahamus/ScienceAnim.git",
     "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
-    "test": "playwright test"
+    "test": "playwright test",
+    "thumbs": "node tools/render-thumbs.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",

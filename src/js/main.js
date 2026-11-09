@@ -1,5 +1,5 @@
 import { SIMS } from './sims/index.js';
-import { Gallery } from './gallery.js';
+import { Gallery, EXPORTING, renderThumb } from './gallery.js';
 import { Player } from './player.js';
 import { parseShare, isEmbed } from './share.js';
 
@@ -64,3 +64,11 @@ function showLoadError(entry) {
 
 window.addEventListener('hashchange', route);
 route();
+
+// Build-time thumbnail export (tools/render-thumbs.mjs opens the built site with ?export-thumbs)
+if (EXPORTING) {
+  window.__saExport = {
+    ids: SIMS.map((s) => s.id),
+    render: async (id) => renderThumb(await SIMS.find((s) => s.id === id).load()),
+  };
+}

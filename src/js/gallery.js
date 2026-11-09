@@ -21,6 +21,19 @@ let thumbQueue = [];
 let thumbBusy = false;
 let activeGallery = null;
 
+// Thumbnails rendered at build time (tools/render-thumbs.mjs) live in thumbs/, listed with content
+// hashes in thumbs/index.json. Without that manifest (dev server, tests) they render in the browser.
+export const EXPORTING = typeof location !== 'undefined' && new URLSearchParams(location.search).has('export-thumbs');
+let prebuilt = null;
+function loadPrebuilt() {
+  if (EXPORTING) return Promise.resolve(null);
+  prebuilt ??= fetch(`${import.meta.env.BASE_URL}thumbs/index.json`, { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => j?.files || null)
+    .catch(() => null);
+  return prebuilt;
+}
+
 /** Render queued thumbnails one at a time, only while a gallery is on screen. */
 async function pumpThumbs() {
   let g = activeGallery;
@@ -257,15 +270,38 @@ export class Gallery {
     this.el.querySelector('.empty').hidden = shown > 0;
   }
 
-  queueThumbs() {
+  async queueThumbs() {
     activeGallery = this;
+    if (EXPORTING) return;
+    const files = await loadPrebuilt();
+    if (activeGallery !== this) return;
+    const startPump = () => {
+      if (!thumbBusy && thumbQueue.length) {
+        thumbBusy = true;
+        setTimeout(pumpThumbs, 150);
+      }
+    };
+    const prebuiltFor = (s) => files?.[s.id];
+    this.sims.forEach((s, i) => {
+      const file = prebuiltFor(s);
+      if (!file) return;
+      const el = this.cards[i].querySelector('.thumb-img');
+      const img = new Image();
+      img.onload = () => {
+        el.style.backgroundImage = `url(${img.src})`;
+        el.classList.add('ready');
+      };
+      img.onerror = () => {
+        // missing from this deploy: render it here instead
+        if (!cachedThumb(s.id)) thumbQueue.unshift(s);
+        startPump();
+      };
+      img.src = `${import.meta.env.BASE_URL}thumbs/${file}`;
+    });
     const visible = (s) => !this.cards[this.sims.indexOf(s)].hidden;
     // cards in the current filter first, so the visible grid fills in before the rest
-    thumbQueue = this.sims.filter((s) => !cachedThumb(s.id)).sort((a, b) => visible(b) - visible(a));
-    if (!thumbBusy) {
-      thumbBusy = true;
-      setTimeout(pumpThumbs, 150);
-    }
+    thumbQueue = this.sims.filter((s) => !prebuiltFor(s) && !cachedThumb(s.id)).sort((a, b) => visible(b) - visible(a));
+    startPump();
   }
 
   destroy() {
@@ -277,7 +313,7 @@ export class Gallery {
 }
 
 /** Run a simulation off-screen for a moment and snapshot it. */
-function renderThumb(s) {
+export function renderThumb(s) {
   const host = document.createElement('div');
   host.style.cssText = 'position:fixed;left:-9999px;top:0;width:560px;height:350px;pointer-events:none';
   document.body.appendChild(host);

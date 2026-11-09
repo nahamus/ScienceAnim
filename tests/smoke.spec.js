@@ -50,6 +50,23 @@ test.describe('gallery', () => {
     expect(errors).toEqual([]);
   });
 
+  test('uses thumbnails rendered at build time, and renders any that are missing', async ({ page }) => {
+    test.setTimeout(60_000 + SIMS.length * 1_500);
+    // the test build has no thumbs/ folder, so serve a manifest: one image present, one missing
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
+    const [have, missing] = SIMS;
+    await page.route((url) => !isLocal(url.href), (route) => route.abort());
+    await page.route('**/thumbs/index.json', (r) => r.fulfill({ json: { files: { [have.id]: 'have.png?v=1', [missing.id]: 'missing.jpg?v=1' } } }));
+    await page.route('**/thumbs/have.png*', (r) => r.fulfill({ body: png, contentType: 'image/png' }));
+    await page.route('**/thumbs/missing.jpg*', (r) => r.fulfill({ status: 404 }));
+    await page.goto('./');
+    const img = (id) => page.locator(`.card[data-id="${id}"] .thumb-img`);
+    await expect(img(have.id)).toHaveClass(/ready/);
+    expect(await img(have.id).getAttribute('style')).toContain('thumbs/have.png');
+    await expect(img(missing.id)).toHaveClass(/ready/, { timeout: Math.max(75_000, SIMS.length * 1_200) }); // rendered live instead
+    expect(await img(missing.id).getAttribute('style')).toContain('data:image/jpeg');
+  });
+
   test('every simulation has curriculum tags', () => {
     const bands = ['11-14', '14-16', '16+'];
     for (const s of SIMS) {
