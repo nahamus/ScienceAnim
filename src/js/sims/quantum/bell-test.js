@@ -338,7 +338,7 @@ export default {
 
         // the graph: agreement against angle (fixed), or the S meter (CHSH)
         const box = narrow
-          ? { x: 46, y: ty + 2 * cs + 50, w: w - 70, h: Math.max(120, h - (ty + 2 * cs + 50) - 40) }
+          ? { x: 46, y: ty + 2 * cs + 50, w: w - 70, h: Math.max(110, h - (ty + 2 * cs + 50) - 82) } // clear of the hint at the foot of the stage
           : { x: w * 0.56, y: ty + 2 * cs + 56, w: w * 0.38, h: Math.max(120, h - (ty + 2 * cs + 56) - 50) };
         if (chshMode) drawS(box);
         else drawCurve(box);

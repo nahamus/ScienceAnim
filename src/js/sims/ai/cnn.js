@@ -250,9 +250,11 @@ export default {
       resize(w, h) {
         const narrow = w < 700;
         if (narrow) {
-          const S = Math.min((w - 32 - 26) / 2, 190);
+          // input, kernel and output in one row, so the filter bank fits above the hint and story card
+          const cell = 24;
+          const S = Math.min((w - 32 - 3 * cell - 24) / 2, 190);
           const y0 = 104;
-          L = { narrow, inp: { x: 16, y: y0, s: S }, outp: { x: w - 16 - S, y: y0, s: S }, cell: 30, kx: w / 2 - 45, ky: y0 + S + 34, bankY: y0 + S + 34 + 90 + 40, bankS: (w - 32 - 3 * 10) / 4, bankX: 16 };
+          L = { narrow, inp: { x: 16, y: y0, s: S }, outp: { x: w - 16 - S, y: y0, s: S }, cell, kx: w / 2 - 1.5 * cell, ky: y0 + S / 2 - 1.5 * cell - 8, bankY: y0 + S + 54, bankS: (w - 32 - 3 * 10) / 4, bankX: 16 };
         } else {
           // the image row runs full width above the story card; the filter bank sits under the output
           const x0 = 40, avail = w - 80;
@@ -338,10 +340,11 @@ export default {
             roundRect(ctx, x + 1, y + 1, cs - 2, cs - 2, 5);
             ctx.fill();
             const wl = params.filter === 'blur' ? '1/9' : String(wv);
-            text(ctx, wl, x + cs / 2, y + cs / 2 - (cur >= 0 ? 5 : 0), { size: cs > 36 ? 15 : 13, weight: 700, align: 'center', mono: true });
-            if (cur >= 0) text(ctx, `×${pv.toFixed(1)}`, x + cs / 2, y + cs / 2 + 11, { size: 10, align: 'center', mono: true, color: C.dim });
+            const roomy = cs >= 30;
+            text(ctx, wl, x + cs / 2, y + cs / 2 - (cur >= 0 && roomy ? 5 : 0), { size: cs > 36 ? 15 : roomy ? 13 : 11, weight: 700, align: 'center', mono: true });
+            if (cur >= 0 && roomy) text(ctx, `×${pv.toFixed(1)}`, x + cs / 2, y + cs / 2 + 11, { size: 10, align: 'center', mono: true, color: C.dim });
           }
-        lbl(K.name, kx + cs * 1.5, ky - 16, C.cyan);
+        lbl(K.name, kx + cs * 1.5, L.narrow ? inp.y - 16 : ky - 16, C.cyan);
         if (cur >= 0) {
           const v = params.relu ? Math.max(0, sum) : sum;
           text(ctx, `sum = ${sum.toFixed(2)}${params.relu && sum < 0 ? ' → 0' : ''}`, kx + cs * 1.5, ky + cs * 3 + 16, { size: 13, align: 'center', mono: true, color: v > 0.05 ? C.amber : v < -0.05 ? C.blue : C.ink });
