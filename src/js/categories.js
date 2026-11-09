@@ -17,6 +17,12 @@ export const CATEGORIES = [
     icon: svg('<path d="M10 3l1.9 5.1L17 10l-5.1 1.9L10 17l-1.9-5.1L3 10l5.1-1.9z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/>'),
   },
   {
+    id: 'quantum',
+    name: 'Quantum',
+    color: '#e879f9',
+    icon: svg('<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.2"/><path d="M12 12l4.5-6.5"/><circle cx="16.5" cy="5.5" r="1.2" fill="currentColor"/>'),
+  },
+  {
     id: 'astronomy',
     name: 'Astronomy',
     color: '#a78bfa',

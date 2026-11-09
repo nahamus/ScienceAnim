@@ -10,10 +10,12 @@ const loaders = import.meta.glob('./*/*.js', { import: 'default' });
 const ORDER = [
   // physics
   'projectile', 'double-pendulum', 'pendulum-wave', 'resonance', 'ripple-tank', 'standing-waves', 'doppler',
-  'refraction', 'double-slit', 'quantum-tunneling', 'electric-field', 'circuits', 'induction', 'em-radiation',
+  'refraction', 'electric-field', 'circuits', 'induction', 'em-radiation',
   'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity',
   // artificial intelligence
   'transformer', 'llm-sampling', 'embeddings', 'diffusion', 'neural-network', 'gradient-descent', 'kmeans',
+  // quantum
+  'qubit', 'bell-test', 'teleportation', 'grover', 'double-slit', 'quantum-tunneling',
   // astronomy
   'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole',
   // chemistry
