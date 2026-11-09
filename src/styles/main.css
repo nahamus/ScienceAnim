@@ -83,7 +83,8 @@ kbd { font-family: var(--mono); font-size: 0.85em; padding: 1px 6px; border: 1px
 .pills button:hover { color: var(--ink); border-color: var(--line2); }
 .pills button.on { color: var(--ink); background: color-mix(in srgb, var(--c) 14%, transparent); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
 .tools { display: flex; gap: 10px; align-items: center; }
-.tools .search { flex: 1; }
+/* a 260px basis (not flex: 1's zero) so the row is sized to hold the search box */
+.tools .search { flex: 1 1 260px; min-width: 0; }
 .age select {
   height: 36px; padding: 0 30px 0 12px; border-radius: 12px; border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 13.5px;
   background: rgba(255, 255, 255, 0.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%239aa3bd' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E") no-repeat right 11px center;
@@ -256,8 +257,11 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 7px var(--ac
   .icon-btn { width: 34px; height: 34px; padding: 9px; }
 }
 @media (max-width: 600px) {
-  .filters { flex-direction: column; align-items: stretch; }
-  .pills { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+  /* no wrap: a wrapping column sizes its width to the longest row (all the pills in one line),
+     which pushed the pill row and the search box far past the edge of the screen */
+  .filters { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  /* the pill row scrolls edge to edge: bleed out by exactly the page gutter (.browse padding) */
+  .pills { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 5vw, 72px)); padding: 0 clamp(16px, 5vw, 72px); }
   .pills::-webkit-scrollbar { display: none; }
   .pills button { flex: none; }
 }
