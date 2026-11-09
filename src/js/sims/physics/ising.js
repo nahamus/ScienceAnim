@@ -29,7 +29,7 @@ export default {
   hint: 'Drag across the grid to paint spins',
   renderScale: 1,
   thumbChapter: 2,
-  thumbFrames: 200,
+  thumbFrames: 90,
   params: [
     { key: 'T', label: 'Temperature T', type: 'range', min: 0.5, max: 5, step: 0.01, value: 2.27 },
     { key: 'h', label: 'Outside magnetic field', type: 'range', min: -1, max: 1, step: 0.01, value: 0 },

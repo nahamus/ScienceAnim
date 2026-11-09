@@ -25,7 +25,7 @@ const ORDER = [
   // math
   'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis',
   // cs
-  'sorting', 'pathfinding', 'tsp', 'life',
+  'sorting', 'pathfinding', 'tsp', 'huffman', 'hamming', 'rsa', 'blockchain', 'life',
   // technology
   'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'power-grid',
   // earth
