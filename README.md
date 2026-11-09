@@ -2,12 +2,12 @@
 
 Cinematic, interactive simulations of the ideas behind science, all running live in the browser. Every simulation tells a short **guided story** (narrated chapters that set up the scene and change parameters smoothly), then hands you the controls to explore.
 
-**75 simulations across 10 fields:**
+**79 simulations across 10 fields:**
 
 | Field | Simulations |
 | --- | --- |
 | Physics | Projectile motion & air drag · Double-pendulum chaos · Pendulum waves · Springs & resonance · Waves & interference (ripple tank) · Strings & harmonics · Doppler effect & sonic booms · Light, lenses & rainbows (ray tracing) · Electric fields · Electric circuits (series & parallel) · Electromagnetic induction · How light is made (EM radiation) · Kinetic theory of gases · Brownian motion · Bernoulli’s principle · How wings fly (Joukowski airfoil) · Fluid dynamics (Navier–Stokes) · Radioactive decay & half-life · Nuclear chain reaction · Special relativity · Ising model & phase transitions (Metropolis, Onsager curve) · Sandpile avalanches (self-organised criticality, power laws) |
-| AI | How transformers pay attention (real QKV attention, 2 layers, causal mask) · How a chatbot picks its next word (temperature, top-k, top-p) · Word embeddings (vector analogies, PCA) · Diffusion models (exact denoiser, DDPM/DDIM, prompt guidance) · Neural network training · Gradient descent (SGD, momentum, Adam) · k-means clustering |
+| AI | How transformers pay attention (real QKV attention, 2 layers, causal mask) · How a chatbot picks its next word (temperature, top-k, top-p) · Tokens (live byte-pair encoding, UTF-8 byte fallback) · Word embeddings (vector analogies, PCA) · Diffusion models (exact denoiser, DDPM/DDIM, prompt guidance) · Neural network training · Backpropagation step by step (XOR, every gradient shown) · Gradient descent (SGD, momentum, Adam) · Convolution (edge filters, ReLU, max pooling, draw your own) · Reinforcement learning (tabular Q-learning, exploration vs exploitation, cliff walking) · k-means clustering |
 | Quantum | Qubits & quantum gates (Bloch sphere) · Bell’s theorem (CHSH test, quantum vs hidden variables) · Quantum teleportation (exact 3-qubit state vector) · Grover’s search (amplitude amplification, up to 64 items) · Bose–Einstein condensate (exact Bose/Fermi occupations, time of flight) · Quantum double slit · Quantum tunnelling (split-step Schrödinger) |
 | Astronomy | Moon phases & eclipses · Orbits & gravity (Kepler, three-body, sandbox) · Orbital manoeuvres (Hohmann transfer, rendezvous) · The life of stars (H–R diagram) · Hunting exoplanets (transits & wobble) · Ray-traced black hole (WebGL) · Gravitational waves from merging black holes (chirp, ring-down) |
 | Chemistry | Solid, liquid, gas (Lennard-Jones) · Molecule shapes (VSEPR, 3D) · Hydrogen orbitals · Reactions & equilibrium |
