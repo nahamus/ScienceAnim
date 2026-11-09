@@ -43,7 +43,7 @@ function fft(re, im, inverse) {
 export default {
   id: 'quantum-tunneling',
   title: 'Quantum Tunnelling',
-  category: 'physics',
+  category: 'quantum',
   tagline: 'A particle walks through a wall it can’t climb. Quantum mechanics says it can.',
   ages: ['16+'],
   topics: ['Quantum'],

@@ -3,7 +3,7 @@ import { C, CMAPS, clamp, drawGlow, rgba, tag, TAU } from '../../core/util.js';
 export default {
   id: 'double-slit',
   title: 'The Quantum Double Slit',
-  category: 'physics',
+  category: 'quantum',
   tagline: 'Fire electrons one at a time. Each lands as a dot — yet together they paint a wave.',
   ages: ['16+'],
   topics: ['Quantum', 'Waves'],
