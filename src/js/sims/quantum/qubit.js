@@ -244,8 +244,11 @@ export default {
           PALETTE.forEach((g, i) => buttons.push({ g, x: x0, y: 86 + i * (s + 8), s }));
           circY = 84;
           // sit right of centre and high, clear of the story card (bottom left)
-          R = Math.min(h * 0.27, w * 0.18);
-          cx = w * 0.6;
+          // keep the sphere between the story card (x 20–490) and the gate palette
+          const room = x0 - 24 - 510;
+          R = Math.max(70, Math.min(h * 0.27, w * 0.18, room / 2.5));
+          cx = Math.max(w * 0.6, 510 + R * 1.25);
+          if (cx + R * 1.25 > x0 - 16) cx = (510 + x0 - 16) / 2;
           cy = Math.max(circY + 40 + R * 1.2, h * 0.44);
           meter = { x: w * 0.1, y: 116, w: Math.min(220, w * 0.2), vertical: true };
         }

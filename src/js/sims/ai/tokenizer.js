@@ -221,7 +221,7 @@ export default {
         const narrow = w < 700;
         L = narrow
           ? { narrow, x0: 16, x1: w - 16, y0: 104, fs: 15, lx: 16, lw: w - 32 }
-          : { narrow, x0: Math.max(w * 0.37, 380), x1: w - 36, y0: 96, fs: clamp(w / 64, 16, 21), lx: 30, lw: Math.max(w * 0.37, 380) - 70, ly: 96, rows: clamp(Math.floor((h - 340 - 96) / 27), 3, 12) };
+          : { narrow, x0: Math.max(w * 0.37, 380), x1: w - 36, y0: 96, fs: clamp(w / 64, 16, 21), lx: 30, lw: Math.max(w * 0.37, 380) - 70, ly: 96, rows: clamp(Math.floor((h - 420 - 96) / 27), 3, 12) };
       },
       onParam(key) {
         if (key === 'text') retext();
