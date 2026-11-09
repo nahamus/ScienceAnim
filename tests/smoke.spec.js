@@ -35,12 +35,14 @@ const frames = (page, n = 2) =>
 
 test.describe('gallery', () => {
   test('lists every simulation and renders its thumbnail', async ({ page }) => {
+    // thumbnails render one after another, so the time needed grows with the number of simulations
+    test.setTimeout(60_000 + SIMS.length * 1_500);
     const errors = await watchErrors(page);
     await page.goto('./');
     await expect(page.locator('.card')).toHaveCount(SIMS.length);
     await expect(page.locator('.pills button[data-f=all] small')).toHaveText(String(SIMS.length));
     // thumbnails render one at a time in the background
-    await expect(page.locator('.thumb-img.ready')).toHaveCount(SIMS.length, { timeout: 75_000 });
+    await expect(page.locator('.thumb-img.ready')).toHaveCount(SIMS.length, { timeout: Math.max(75_000, SIMS.length * 1_200) });
     for (const f of await page.locator('.pills button').all()) {
       await f.dispatchEvent('click'); // the pill row scrolls sideways on phones
       await expect(page.locator('.card:not([hidden])')).toHaveCount(+(await f.locator('small').innerText()));
