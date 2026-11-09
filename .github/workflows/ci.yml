@@ -64,6 +64,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # Render every gallery thumbnail once here, so visitors download small JPEGs instead of
+      # running each simulation in their browser. If this fails the site still works: the gallery
+      # renders any thumbnail missing from dist/thumbs/index.json live, as before.
+      - run: npx playwright install --with-deps chromium
+        continue-on-error: true
+      - run: npm run thumbs
+        continue-on-error: true
       # The site is served from the gh-pages branch (same as `npm run deploy`).
       - uses: peaceiris/actions-gh-pages@v4
         with:

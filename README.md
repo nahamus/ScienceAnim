@@ -23,13 +23,14 @@ Cinematic, interactive simulations of the ideas behind science, all running live
 npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build in dist/
+npm run thumbs   # render every gallery thumbnail into dist/thumbs/ (needs the build and a Playwright browser)
 npm test         # smoke-test every simulation (desktop + phone) against the production build
-npm run deploy   # publish dist/ to GitHub Pages by hand (CI normally does this)
+npm run deploy   # build, render thumbnails and publish dist/ to GitHub Pages by hand (CI normally does this)
 ```
 
 The first `npm test` needs a browser: `npx playwright install chromium`. Run one simulation with `npm test -- -g cpu`.
 
-**Workflow:** make a short-lived branch for each change and open a pull request into `master`. GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every pull request, split across 4 parallel jobs. Merging into `master` runs them again, and if they pass, it builds the site and publishes it to the `gh-pages` branch. That makes `master` exactly what's live. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution.
+**Workflow:** make a short-lived branch for each change and open a pull request into `master`. GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every pull request, split across 4 parallel jobs. Merging into `master` runs them again, and if they pass, it builds the site and publishes it to the `gh-pages` branch. That makes `master` exactly what's live. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution. Before publishing, CI renders every gallery thumbnail once (`npm run thumbs`), so visitors download small images instead of running each simulation; any thumbnail missing from `dist/thumbs/index.json` is rendered live in the browser.
 
 Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
 
