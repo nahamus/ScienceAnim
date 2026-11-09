@@ -86,7 +86,7 @@ export default {
   ],
   create(api) {
     const { ctx, params } = api;
-    let parts = [], spawnAcc = 0, group = 0, groupT = 0, field = null, fieldKey = '', drag = null;
+    let parts = [], spawnAcc = 0, group = 0, groupT = 0, field = null, fieldKey = '', fieldFrame = 0, drag = null;
 
     function geo() {
       const eps = params.thick * 0.9, del = params.camber;
@@ -216,8 +216,11 @@ export default {
         // pressure field (cached)
         if (params.pressure) {
           const key = `${params.alpha}|${params.camber}|${params.thick}|${w}|${h}`;
-          if (key !== fieldKey) {
+          // rebuilding is ~8000 flow evaluations, so while the angle is still sliding (a story
+          // tween or a dragged slider) refresh it every sixth frame rather than every frame
+          if (key !== fieldKey && (!field || api.frame - fieldFrame >= 6)) {
             fieldKey = key;
+            fieldFrame = api.frame;
             const gw = 110, gh = Math.round((110 * h) / w);
             field = document.createElement('canvas');
             field.width = gw;

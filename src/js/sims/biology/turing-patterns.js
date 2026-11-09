@@ -162,12 +162,12 @@ export default {
           const cx = Math.floor((p.x / api.w) * W), cy = Math.floor((p.y / api.h) * H);
           blob(cx, cy, 3);
         }
-        // run the requested steps, but never spend more than ~9 ms per frame on them
+        // run the requested steps, but never spend more than ~6 ms per frame on them
         const n = Math.round(params.speed);
         const t0 = performance.now();
         for (let s = 0; s < n; s++) {
           step();
-          if (!api.thumbnail && performance.now() - t0 > 9) break;
+          if (!api.thumbnail && performance.now() - t0 > 6) break;
         }
       },
       draw() {

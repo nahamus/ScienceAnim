@@ -12,7 +12,8 @@
     "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
     "test": "playwright test",
-    "thumbs": "node tools/render-thumbs.mjs"
+    "thumbs": "node tools/render-thumbs.mjs",
+    "profile": "node tools/profile-sims.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",

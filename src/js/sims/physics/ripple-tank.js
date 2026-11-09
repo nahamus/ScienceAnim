@@ -198,8 +198,14 @@ export default {
         dragging = false;
       },
       update(dt) {
+        // two wave steps per 60th of a second, but within ~5 ms: on a slow device the waves run a
+        // little slower instead of each slow frame asking for even more steps
         const n = clamp(Math.round(dt * 60 * 2), 1, 6);
-        for (let i = 0; i < n; i++) stepWave();
+        const t0 = performance.now();
+        for (let i = 0; i < n; i++) {
+          stepWave();
+          if (!api.thumbnail && performance.now() - t0 > 5) break;
+        }
         if (params.mode === 'free' && api.thumbnail && api.frame % 40 === 0) drop(Math.round(W * (0.3 + Math.random() * 0.4)), Math.round(H * (0.3 + Math.random() * 0.4)), 4, 3);
         if (params.mode === 'free' && !api.thumbnail && api.frame % 150 === 0 && !dragging && api.runner.pointer.x === 0)
           drop(Math.round(W * (0.25 + Math.random() * 0.5)), Math.round(H * (0.25 + Math.random() * 0.5)), 4, 3);

@@ -78,12 +78,12 @@ export default {
     let W, H, S, u, v, u0, v0, p, div, r, g, b, r0, g0, b0, solid, img, off, octx, t = 0, hue = 0;
     let lastP = null;
     // pressure-solver passes: fewer is slightly less exact but far cheaper; tuned live to the device
-    let iters = 22, cost = 0;
+    let iters = 14, cost = 0, cells = 19000, strain = 0;
     const IX = (i, j) => i + S * j;
 
     function alloc() {
       const aspect = api.w / api.h;
-      W = Math.round(clamp(Math.sqrt(19000 * aspect), 60, 240));
+      W = Math.round(clamp(Math.sqrt(cells * aspect), 40, 240));
       H = Math.round(W / aspect);
       S = W + 2;
       const n = S * (H + 2);
@@ -156,7 +156,8 @@ export default {
         for (let j = 1; j <= H; j++)
           for (let i = 1; i <= W; i++) {
             const k = IX(i, j);
-            p[k] = (div[k] + p[k - 1] + p[k + 1] + p[k - S] + p[k + S]) / 4;
+            // over-relaxed Gauss–Seidel: converges in far fewer passes than plain averaging
+            p[k] += 1.6 * ((div[k] + p[k - 1] + p[k + 1] + p[k - S] + p[k + S]) / 4 - p[k]);
           }
         bnd(0, p);
       }
@@ -304,10 +305,18 @@ export default {
       update(dt) {
         const t0 = performance.now();
         step(Math.min(dt, 1 / 30));
-        // keep the physics within ~8 ms a frame so slower laptops and tablets stay smooth
+        // keep the physics within ~6 ms a frame so slower laptops and tablets stay smooth: first
+        // with fewer solver passes, then (on a really slow device) with a coarser grid
         cost = cost * 0.9 + (performance.now() - t0) * 0.1;
-        if (cost > 8 && iters > 8) iters--;
-        else if (cost < 5 && iters < 22) iters++;
+        if (cost > 6 && iters > 6) iters--;
+        else if (cost < 4 && iters < 14) iters++;
+        strain = iters <= 6 && cost > 8 ? strain + 1 : 0;
+        if (strain > 90 && cells > 5000 && !api.thumbnail) {
+          cells *= 0.6;
+          strain = 0;
+          cost = 0;
+          alloc();
+        }
       },
       draw() {
         const d = img.data;

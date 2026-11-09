@@ -143,6 +143,8 @@ export default {
         if (many) {
           // batch trails into a few hue buckets
           const B = 8;
+          ctx.lineCap = 'butt'; // round joins on thousands of tiny segments are slow to paint
+          ctx.lineJoin = 'bevel';
           for (let b = 0; b < B; b++) {
             ctx.strokeStyle = `hsla(${180 + (b / B) * 160},90%,62%,0.55)`;
             ctx.lineWidth = 1.1;

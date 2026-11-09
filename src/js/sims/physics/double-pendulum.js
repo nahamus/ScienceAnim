@@ -163,8 +163,8 @@ export default {
               ctx.lineTo(tr[i * 2], tr[i * 2 + 1]);
               ctx.stroke();
             }
-          } else {
-            ctx.strokeStyle = hsl(p.hue, 90, 60, n > 100 ? 0.35 : 0.55);
+          } else if (n <= 20) {
+            ctx.strokeStyle = hsl(p.hue, 90, 60, 0.55);
             ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.moveTo(tr[0], tr[1]);
@@ -172,10 +172,36 @@ export default {
             ctx.stroke();
           }
         }
+        // a swarm: group the trails into a dozen colour bands, one stroke each instead of 200
+        if (n > 20) {
+          const bands = 12;
+          ctx.lineWidth = 1.2;
+          for (let b = 0; b < bands; b++) {
+            ctx.strokeStyle = hsl(200 + (160 * (b + 0.5)) / bands, 90, 60, n > 100 ? 0.35 : 0.55);
+            ctx.beginPath();
+            for (let k = Math.floor((b * n) / bands); k < Math.floor(((b + 1) * n) / bands); k++) {
+              const tr = pends[k].trail;
+              if (tr.length < 4) continue;
+              ctx.moveTo(tr[0], tr[1]);
+              for (let i = 2; i < tr.length; i += 2) ctx.lineTo(tr[i], tr[i + 1]);
+            }
+            ctx.stroke();
+          }
+        }
         // rods
         if (params.rods) {
           ctx.lineWidth = n > 20 ? 1 : 3;
-          for (const p of pends) {
+          if (n > 20) {
+            ctx.strokeStyle = hsl(280, 70, 75, 0.18);
+            ctx.beginPath();
+            for (const p of pends) {
+              if (p.x1 === undefined) continue;
+              ctx.moveTo(cx, cy);
+              ctx.lineTo(p.x1, p.y1);
+              ctx.lineTo(p.x2, p.y2);
+            }
+            ctx.stroke();
+          } else for (const p of pends) {
             if (p.x1 === undefined) continue;
             ctx.strokeStyle = hsl(p.hue, 70, 75, n > 20 ? 0.18 : 0.75);
             ctx.beginPath();
@@ -186,9 +212,23 @@ export default {
           }
         }
         // bobs
-        for (const p of pends) {
+        if (n > 20) {
+          // a swarm: small batched dots, one fill per colour band
+          const bands = 12;
+          for (let b = 0; b < bands; b++) {
+            ctx.fillStyle = hsl(200 + (160 * (b + 0.5)) / bands, 95, 68, 0.9);
+            ctx.beginPath();
+            for (let k = Math.floor((b * n) / bands); k < Math.floor(((b + 1) * n) / bands); k++) {
+              const p = pends[k];
+              if (p.x1 === undefined) continue;
+              ctx.moveTo(p.x2 + 2.2, p.y2);
+              ctx.arc(p.x2, p.y2, 2.2, 0, TAU);
+            }
+            ctx.fill();
+          }
+        } else for (const p of pends) {
           if (p.x1 === undefined) continue;
-          const r = n > 20 ? 7 : 22;
+          const r = 22;
           if (n <= 20) drawGlow(ctx, p.x1, p.y1, r * 0.8, '#9fb4ff');
           drawGlow(ctx, p.x2, p.y2, r, n === 1 ? '#7fe3ff' : '#ffffff', 0.12);
           if (n > 1) {

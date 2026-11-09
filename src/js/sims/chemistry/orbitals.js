@@ -186,8 +186,9 @@ export default {
           const g2 = cv.getContext('2d');
           buf = { w: BW, h: BH, cv, g2, img: g2.createImageData(BW, BH), acc: new Float32Array(BW * BH * 3) };
         }
+        // only the cloud's bounding box is touched: clear, accumulate and convert just that region
         const acc = buf.acc;
-        acc.fill(0);
+        let x0 = BW, y0 = BH, x1m = -1, y1m = -1;
         for (let i = 0; i < n; i++) {
           let x = pts[i * 4], y = pts[i * 4 + 1], z = pts[i * 4 + 2];
           if (from && e < 1) {
@@ -200,25 +201,36 @@ export default {
           const persp = 1 / (1.8 - z2 * 0.5);
           const X = (cx + x1 * S * persp * 1.8) | 0, Y = (cy - y2 * S * persp * 1.8) | 0;
           if (X < 0 || Y < 0 || X >= BW - 1 || Y >= BH - 1) continue;
+          if (X < x0) x0 = X;
+          if (X > x1m) x1m = X;
+          if (Y < y0) y0 = Y;
+          if (Y > y1m) y1m = Y;
           const c = pts[i * 4 + 3] > 0 ? colP : colN;
           const a = dense * (0.45 + 0.55 * (z2 * 0.5 + 0.5));
           const r = c[0] * a, g = c[1] * a, b = c[2] * a;
-          for (const o of [Y * BW + X, Y * BW + X + 1, (Y + 1) * BW + X, (Y + 1) * BW + X + 1]) {
-            acc[o * 3] += r;
-            acc[o * 3 + 1] += g;
-            acc[o * 3 + 2] += b;
+          let o = (Y * BW + X) * 3;
+          acc[o] += r; acc[o + 1] += g; acc[o + 2] += b;
+          acc[o + 3] += r; acc[o + 4] += g; acc[o + 5] += b;
+          o += BW * 3;
+          acc[o] += r; acc[o + 1] += g; acc[o + 2] += b;
+          acc[o + 3] += r; acc[o + 4] += g; acc[o + 5] += b;
+        }
+        if (x1m >= 0) {
+          const bw = x1m - x0 + 2, bh = y1m - y0 + 2;
+          const d = buf.img.data;
+          for (let yy = y0; yy < y0 + bh; yy++) {
+            for (let k = yy * BW + x0, end = k + bw; k < end; k++) {
+              const r = acc[k * 3], g = acc[k * 3 + 1], b = acc[k * 3 + 2];
+              d[k * 4] = r;
+              d[k * 4 + 1] = g;
+              d[k * 4 + 2] = b;
+              d[k * 4 + 3] = r || g || b ? 255 : 0;
+              acc[k * 3] = acc[k * 3 + 1] = acc[k * 3 + 2] = 0; // ready for the next frame
+            }
           }
+          buf.g2.putImageData(buf.img, 0, 0, x0, y0, bw, bh);
+          ctx.drawImage(buf.cv, x0, y0, bw, bh, x0, y0, bw, bh);
         }
-        const d = buf.img.data;
-        for (let k = 0, m = BW * BH; k < m; k++) {
-          const r = acc[k * 3], g = acc[k * 3 + 1], b = acc[k * 3 + 2];
-          d[k * 4] = r;
-          d[k * 4 + 1] = g;
-          d[k * 4 + 2] = b;
-          d[k * 4 + 3] = r || g || b ? 255 : 0;
-        }
-        buf.g2.putImageData(buf.img, 0, 0);
-        ctx.drawImage(buf.cv, 0, 0, BW, BH);
         drawGlow(ctx, cx, cy, 16, '#ffffff', 0.25);
         ctx.globalCompositeOperation = 'source-over';
         if (!api.thumbnail) {

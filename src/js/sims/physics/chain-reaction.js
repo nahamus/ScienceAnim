@@ -157,6 +157,19 @@ export default {
             if (singleTimer <= 0) fire(w * 0.05, h * 0.42, 0);
           }
         }
+        // bucket the nuclei on a coarse grid so each neutron only checks the few nearby
+        // (a runaway reactor has ~1800 neutrons and ~1000 nuclei: 1.8 million pairs otherwise)
+        const CELL = 40, cols = Math.ceil((w + 80) / CELL) + 1;
+        const grid = new Map();
+        let bigR = 0;
+        for (const nu of nuclei) {
+          const key = Math.floor((nu.y + 40) / CELL) * cols + Math.floor((nu.x + 40) / CELL);
+          const cell = grid.get(key);
+          if (cell) cell.push(nu);
+          else grid.set(key, [nu]);
+          if (nu.r > bigR) bigR = nu.r;
+        }
+        const reach = Math.ceil(bigR / CELL);
         for (const n of neutrons) {
           n.x += n.vx * dt;
           n.y += n.vy * dt;
@@ -164,17 +177,23 @@ export default {
           for (const r of rods) if (n.x > r.x && n.x < r.x + r.w && n.y > r.y && n.y < r.y + r.h) n.dead = true;
           if (n.x < -20 || n.y < -20 || n.x > w + 20 || n.y > h + 20 || n.life < 0) n.dead = true;
           if (n.dead) continue;
-          for (const nu of nuclei) {
-            if (nu.dead) continue;
-            if ((n.x - nu.x) ** 2 + (n.y - nu.y) ** 2 < nu.r * nu.r) {
-              if (Math.random() < 0.9) {
-                nu.dead = true;
-                n.dead = true;
-                fission(nu);
+          const gx = Math.floor((n.x + 40) / CELL), gy = Math.floor((n.y + 40) / CELL);
+          search: for (let dy = -reach; dy <= reach; dy++)
+            for (let dx = -reach; dx <= reach; dx++) {
+              const cell = grid.get((gy + dy) * cols + gx + dx);
+              if (!cell) continue;
+              for (const nu of cell) {
+                if (nu.dead) continue;
+                if ((n.x - nu.x) ** 2 + (n.y - nu.y) ** 2 < nu.r * nu.r) {
+                  if (Math.random() < 0.9) {
+                    nu.dead = true;
+                    n.dead = true;
+                    fission(nu);
+                  }
+                  break search;
+                }
               }
-              break;
             }
-          }
         }
         neutrons = neutrons.filter((n) => !n.dead);
         nuclei = nuclei.filter((n) => !n.dead);
@@ -264,15 +283,21 @@ export default {
           ctx.stroke();
           drawGlow(ctx, f.x, f.y, (f.big ? 160 : 38) * (1 - k * 0.6), '#ffd27a', 0.15 + (1 - k) * 0.2);
         }
+        const fragGlow = frags.length < 200;
         for (const f of frags) {
-          drawGlow(ctx, f.x, f.y, f.r * 2.6, f.c, 0.3);
+          if (fragGlow) drawGlow(ctx, f.x, f.y, f.r * 2.6, f.c, 0.3);
           ctx.fillStyle = rgba(f.c, f.life);
           ctx.beginPath();
           ctx.arc(f.x, f.y, f.r * 0.8, 0, TAU);
           ctx.fill();
         }
-        for (const n of neutrons) {
-          drawGlow(ctx, n.x, n.y, single ? 14 : 8, '#cfe3ff', 0.3);
+        if (neutrons.length < 250) for (const n of neutrons) drawGlow(ctx, n.x, n.y, single ? 14 : 8, '#cfe3ff', 0.3);
+        else {
+          // a swarm: one batched path of dots instead of hundreds of glow sprites
+          ctx.fillStyle = 'rgba(207,227,255,0.55)';
+          ctx.beginPath();
+          for (const n of neutrons) ctx.rect(n.x - 2, n.y - 2, 4, 4);
+          ctx.fill();
         }
         ctx.globalCompositeOperation = 'source-over';
         if (!api.thumbnail && single) {

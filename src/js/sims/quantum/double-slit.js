@@ -132,6 +132,7 @@ export default {
       waveImg = waveCtx.createImageData(WG, HG);
     }
 
+    let geo = null, geoKey = '';
     function drawWave() {
       // ψ beyond the barrier: two cylindrical waves; before it: a plane wave
       const { w, h } = api;
@@ -139,24 +140,34 @@ export default {
       const d = waveImg.data;
       const lut = CMAPS.ice;
       const det = params.detector;
+      // each pixel's distance to the two slits (and the fall-off) only changes with the geometry
+      const key = `${w}|${h}|${WG}|${HG}|${bx}|${slitY(0)}|${slitY(1)}`;
+      if (key !== geoKey) {
+        geoKey = key;
+        geo = [0, 1, 2, 3].map(() => new Float32Array(WG * HG));
+        for (let j = 0; j < HG; j++)
+          for (let i = 0; i < WG; i++) {
+            const x = (i / WG) * w, y = (j / HG) * h, q = j * WG + i;
+            for (let s = 0; s < 2; s++) {
+              const r = Math.hypot(x - bx, y - slitY(s)) + 1;
+              geo[s][q] = r;
+              geo[2 + s][q] = 1 / Math.sqrt(r / 60 + 1);
+            }
+          }
+      }
+      const [R0, R1, A0, A1] = geo;
+      const ot = om * t;
       for (let j = 0; j < HG; j++)
         for (let i = 0; i < WG; i++) {
-          const x = (i / WG) * w, y = (j / HG) * h;
+          const x = (i / WG) * w, q = j * WG + i;
           let v = 0;
           if (x < gx || x > sx) v = 0;
           else if (x < bx) {
-            const re = Math.cos(k * (x - gx) - om * t);
+            const re = Math.cos(k * (x - gx) - ot);
             v = re * re * 0.5;
           } else {
-            let re = 0, i1 = 0;
-            for (let s = 0; s < 2; s++) {
-              const r = Math.hypot(x - bx, y - slitY(s)) + 1;
-              const a = 1 / Math.sqrt(r / 60 + 1);
-              const ph = k * r - om * t;
-              re += a * Math.cos(ph);
-              i1 += a * a * Math.pow(Math.cos(ph), 2) * 2;
-            }
-            v = det ? i1 * 0.35 : (re * re) * 0.35;
+            const c0 = A0[q] * Math.cos(k * R0[q] - ot), c1 = A1[q] * Math.cos(k * R1[q] - ot);
+            v = det ? (c0 * c0 + c1 * c1) * 0.7 : (c0 + c1) * (c0 + c1) * 0.35;
           }
           const li = (clamp(v, 0, 1) * 255) | 0;
           const o = (j * WG + i) * 4;

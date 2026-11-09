@@ -264,7 +264,8 @@ export default {
         // close-up globe (wide layouts)
         if (g.wide && g.gR > 30) {
           const R = g.gR;
-          const img = renderGlobe(R);
+          // ray-cast at most 200 px across (every pixel is an asin and an atan2), then scale up
+          const img = renderGlobe(Math.min(R, 100));
           // sunbeams from the left
           ctx.globalCompositeOperation = 'lighter';
           for (let k = -4; k <= 4; k++) {
