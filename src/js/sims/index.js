@@ -11,13 +11,13 @@ const ORDER = [
   // physics
   'projectile', 'double-pendulum', 'pendulum-wave', 'resonance', 'ripple-tank', 'standing-waves', 'doppler',
   'refraction', 'electric-field', 'circuits', 'induction', 'em-radiation',
-  'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity',
+  'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity', 'ising', 'sandpile',
   // artificial intelligence
   'transformer', 'llm-sampling', 'embeddings', 'diffusion', 'neural-network', 'gradient-descent', 'kmeans',
   // quantum
-  'qubit', 'bell-test', 'teleportation', 'grover', 'double-slit', 'quantum-tunneling',
+  'qubit', 'bell-test', 'teleportation', 'grover', 'bec', 'double-slit', 'quantum-tunneling',
   // astronomy
-  'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole',
+  'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole', 'gravitational-waves',
   // chemistry
   'phases', 'molecule-shapes', 'orbitals', 'equilibrium',
   // biology
