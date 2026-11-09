@@ -347,7 +347,7 @@ export default {
         lbl(K.name, kx + cs * 1.5, L.narrow ? inp.y - 16 : ky - 16, C.cyan);
         if (cur >= 0) {
           const v = params.relu ? Math.max(0, sum) : sum;
-          text(ctx, `sum = ${sum.toFixed(2)}${params.relu && sum < 0 ? ' → 0' : ''}`, kx + cs * 1.5, ky + cs * 3 + 16, { size: 13, align: 'center', mono: true, color: v > 0.05 ? C.amber : v < -0.05 ? C.blue : C.ink });
+          text(ctx, `sum = ${sum.toFixed(2)}${params.relu && sum < 0 ? ' → 0' : ''}`, kx + cs * 1.5, L.narrow ? inp.y + inp.s + 14 : ky + cs * 3 + 16, { size: L.narrow ? 12 : 13, align: 'center', mono: true, color: v > 0.05 ? C.amber : v < -0.05 ? C.blue : C.ink });
           // window on the input, pixel on the output
           const c = inp.s / N;
           ctx.strokeStyle = C.cyan;
