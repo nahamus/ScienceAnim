@@ -11,7 +11,7 @@ const ORDER = [
   // physics
   'projectile', 'double-pendulum', 'pendulum-wave', 'resonance', 'ripple-tank', 'standing-waves', 'doppler',
   'refraction', 'electric-field', 'circuits', 'induction', 'em-radiation',
-  'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity', 'ising', 'sandpile',
+  'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'tokamak', 'laser', 'accelerator', 'relativity', 'curved-spacetime', 'ising', 'sandpile',
   // artificial intelligence
   'transformer', 'llm-sampling', 'tokenizer', 'embeddings', 'diffusion', 'neural-network', 'backprop', 'gradient-descent', 'cnn', 'q-learning', 'kmeans',
   // quantum
