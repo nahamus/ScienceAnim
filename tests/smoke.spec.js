@@ -43,6 +43,11 @@ test.describe('gallery', () => {
     await expect(page.locator('.pills button[data-f=all] small')).toHaveText(String(SIMS.length));
     // thumbnails render one at a time in the background
     await expect(page.locator('.thumb-img.ready')).toHaveCount(SIMS.length, { timeout: Math.max(75_000, SIMS.length * 1_200) });
+    if (test.info().project.name === 'phone') {
+      // the filter bar's pill row scrolls inside the screen; it must never widen the page
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      expect(overflow, 'gallery scrolls sideways').toBeLessThanOrEqual(1);
+    }
     for (const f of await page.locator('.pills button').all()) {
       await f.dispatchEvent('click'); // the pill row scrolls sideways on phones
       await expect(page.locator('.card:not([hidden])')).toHaveCount(+(await f.locator('small').innerText()));

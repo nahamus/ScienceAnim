@@ -218,10 +218,23 @@ export default {
             ctx.arc(x, y, R, 0, TAU);
             ctx.fill();
           };
-          circ(cx, cy - R * 0.55, `rgb(${params.R},0,0)`);
-          circ(cx - R * 0.55, cy + R * 0.4, `rgb(0,${params.G},0)`);
-          circ(cx + R * 0.55, cy + R * 0.4, `rgb(0,0,${params.B})`);
+          const lights = [
+            [cx, cy - R * 0.55, `rgb(${params.R},0,0)`, '255,107,107'],
+            [cx - R * 0.55, cy + R * 0.4, `rgb(0,${params.G},0)`, '107,255,122'],
+            [cx + R * 0.55, cy + R * 0.4, `rgb(0,0,${params.B})`, '107,155,255'],
+          ];
+          for (const [x, y, col] of lights) circ(x, y, col);
           ctx.globalCompositeOperation = 'source-over';
+          // outline each light, so one turned down to 0 is still visible (dark) instead of vanishing
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([6, 6]);
+          for (const [x, y, , rgb] of lights) {
+            ctx.strokeStyle = `rgba(${rgb},0.45)`;
+            ctx.beginPath();
+            ctx.arc(x, y, R, 0, TAU);
+            ctx.stroke();
+          }
+          ctx.setLineDash([]);
           const sw = Math.min(140, w * 0.2);
           const col = `rgb(${params.R},${params.G},${params.B})`;
           ctx.fillStyle = col;
@@ -230,9 +243,9 @@ export default {
           ctx.fill();
           if (!api.thumbnail) {
             tag(ctx, `mixed: (${params.R}, ${params.G}, ${params.B})`, w - sw / 2 - 24, 110 + sw + 22, C.ink, { align: 'center', size: 11 });
-            text(ctx, 'red', cx, cy - R * 1.7, { size: 12, align: 'center', color: '#ff6b6b', weight: 700 });
-            text(ctx, 'green', cx - R * 1.6, cy + R * 1.45, { size: 12, align: 'center', color: '#6bff7a', weight: 700 });
-            text(ctx, 'blue', cx + R * 1.6, cy + R * 1.45, { size: 12, align: 'center', color: '#6b9bff', weight: 700 });
+            text(ctx, params.R > 0 ? 'red' : 'red (off)', cx, cy - R * 1.7, { size: 12, align: 'center', color: '#ff6b6b', weight: 700 });
+            text(ctx, params.G > 0 ? 'green' : 'green (off)', cx - R * 1.6, cy + R * 1.45, { size: 12, align: 'center', color: '#6bff7a', weight: 700 });
+            text(ctx, params.B > 0 ? 'blue' : 'blue (off)', cx + R * 1.6, cy + R * 1.45, { size: 12, align: 'center', color: '#6b9bff', weight: 700 });
           }
         } else {
           // CRT raster scan with phosphor persistence
