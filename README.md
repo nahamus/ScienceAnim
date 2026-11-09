@@ -2,7 +2,7 @@
 
 Cinematic, interactive simulations of the ideas behind science, all running live in the browser. Every simulation tells a short **guided story** (narrated chapters that set up the scene and change parameters smoothly), then hands you the controls to explore.
 
-**79 simulations across 10 fields:**
+**83 simulations across 10 fields:**
 
 | Field | Simulations |
 | --- | --- |
@@ -13,7 +13,7 @@ Cinematic, interactive simulations of the ideas behind science, all running live
 | Chemistry | Solid, liquid, gas (Lennard-Jones) · Molecule shapes (VSEPR, 3D) · Hydrogen orbitals · Reactions & equilibrium |
 | Biology | DNA (helix, replication, transcription, translation) · Natural selection · Predators & prey · Epidemics (SIR) · Turing patterns (reaction–diffusion) · Neuron action potential (Hodgkin–Huxley) · Flocking |
 | Mathematics | Galton board & the bell curve · Fourier epicycles · Logistic map & the road to chaos · Lorenz attractor · Mandelbrot & Julia sets (WebGL) · Golden angle / phyllotaxis |
-| Computer science | Sorting race · Pathfinding (BFS, Dijkstra, A*, greedy) · Travelling salesperson (greedy, 2-opt, annealing) · Game of Life |
+| Computer science | Sorting race · Pathfinding (BFS, Dijkstra, A*, greedy) · Travelling salesperson (greedy, 2-opt, annealing) · Huffman compression (tree building, entropy limit) · Error-correcting codes (Hamming(7,4), noisy picture) · Public-key encryption (RSA with BigInt, square-and-multiply, factoring attack) · Hashing & blockchains (real SHA-256, proof of work, tampering) · Game of Life |
 | Technology | Binary numbers · Logic gates & adders · Inside a CPU (fetch–decode–execute) · How the internet works (packet routing) · Radio, TV & wireless (AM/FM/digital) · How screens make pictures · The power grid |
 | Earth & climate | Why we have seasons · The Coriolis effect & hurricanes · Greenhouse effect · Seismic waves & Earth's core |
 
