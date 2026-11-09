@@ -13,7 +13,7 @@ const ORDER = [
   'refraction', 'electric-field', 'circuits', 'induction', 'em-radiation',
   'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'relativity', 'ising', 'sandpile',
   // artificial intelligence
-  'transformer', 'llm-sampling', 'embeddings', 'diffusion', 'neural-network', 'gradient-descent', 'kmeans',
+  'transformer', 'llm-sampling', 'tokenizer', 'embeddings', 'diffusion', 'neural-network', 'backprop', 'gradient-descent', 'cnn', 'q-learning', 'kmeans',
   // quantum
   'qubit', 'bell-test', 'teleportation', 'grover', 'bec', 'double-slit', 'quantum-tunneling',
   // astronomy
