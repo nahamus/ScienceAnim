@@ -43,10 +43,12 @@ export class Runner {
       this.ctx = this.canvas.getContext('2d');
     }
     this.dpr = Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2);
-    // Adaptive resolution: WebGL sims are fill-rate bound, so on a slow GPU (school Chromebooks,
-    // older phones) drawing fewer pixels keeps them smooth. Fixed-size canvases (thumbnails) opt out.
+    // Adaptive resolution: on a slow device (school Chromebooks, older phones) drawing fewer pixels
+    // keeps a simulation smooth. WebGL shaders may drop far; canvas drawing stays at least 0.75 of
+    // a CSS pixel so text and lines stay crisp enough to read. Fixed-size canvases (thumbnails) opt out.
     this.quality = 1;
-    this.adaptive = !!this.gl && !opts.width && def.adaptive !== false;
+    this.minQuality = this.gl ? Runner.MIN_QUALITY : Math.min(1, 0.75 / this.dpr);
+    this.adaptive = !opts.width && def.adaptive !== false;
     this.perf = { sum: 0, n: 0, wait: 2, slow: 0, ceiling: 1, prev: 1, raised: false };
     this.w = 0;
     this.h = 0;
@@ -98,6 +100,7 @@ export class Runner {
     const s = (this.def.renderScale || 1) * this.quality * ((this.gl && window.__SIM_RENDER_SCALE) || 1);
     this.canvas.width = Math.max(1, Math.round(this.w * this.dpr * s));
     this.canvas.height = Math.max(1, Math.round(this.h * this.dpr * s));
+    this.scale = this.dpr * s; // canvas pixels per CSS pixel, for 2D drawing
   }
 
   /**
@@ -118,10 +121,10 @@ export class Runner {
     const crawling = avg > 1 / 20;
     q.slow = avg > 1 / 45 ? q.slow + 1 : 0;
     // one slow window can be a hiccup (garbage collection, another tab); two in a row is the GPU
-    if ((crawling || q.slow >= 2) && this.quality > Runner.MIN_QUALITY) {
+    if ((crawling || q.slow >= 2) && this.quality > this.minQuality) {
       q.slow = 0;
       if (q.raised) q.ceiling = q.prev; // the last step up was one too many
-      next = Math.max(Runner.MIN_QUALITY, this.quality * (crawling ? 0.5 : 0.75));
+      next = Math.max(this.minQuality, this.quality * (crawling ? 0.5 : 0.75));
       q.raised = false;
       q.wait = 1;
     } else if (q.slow) {
@@ -226,7 +229,7 @@ export class Runner {
   }
 
   render() {
-    if (this.ctx) this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    if (this.ctx) this.ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
     this.sim.draw?.();
   }
 

@@ -45,3 +45,6 @@ temp/
 # Playwright
 test-results/
 playwright-report/
+
+# Performance profile (npm run profile)
+profile.json

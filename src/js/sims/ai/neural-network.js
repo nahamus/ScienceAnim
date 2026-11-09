@@ -63,6 +63,22 @@ class MLP {
     }
     return acts;
   }
+  /** The output for one input, without allocating: used for the 64×64 decision surface. */
+  predict(inp) {
+    if (!this.buf) this.buf = [Float64Array.from(inp), ...this.sizes.slice(1).map((n) => new Float64Array(n))];
+    const buf = this.buf;
+    buf[0].set(inp);
+    for (let l = 0; l < this.W.length; l++) {
+      const last = l === this.W.length - 1, a = buf[l], out = buf[l + 1], W = this.W[l], b = this.b[l];
+      for (let j = 0; j < W.length; j++) {
+        const row = W[j];
+        let z = b[j];
+        for (let i = 0; i < row.length; i++) z += row[i] * a[i];
+        out[j] = last ? 1 / (1 + Math.exp(-z)) : Math.tanh(z);
+      }
+    }
+    return buf[buf.length - 1][0];
+  }
   train(batch, lr) {
     const gW = this.W.map((L) => L.map((r) => r.map(() => 0)));
     const gb = this.b.map((L) => L.map(() => 0));
@@ -179,7 +195,7 @@ export default {
   create(api) {
     const { ctx, params } = api;
     let pts = dataset(params.data), net, loss = new Series(400), epoch = 0, lastLoss = 0, acc = 0;
-    let plot = { x: 0, y: 0, s: 100 }, pulse = 0, sampleIdx = 0;
+    let plot = { x: 0, y: 0, s: 100 }, pulse = 0, sampleIdx = 0, surfNet = null;
     const G = 64;
     const off = document.createElement('canvas');
     off.width = off.height = G;
@@ -243,10 +259,17 @@ export default {
         ctx.fillRect(0, 0, w, h);
         // decision surface
         const d = img.data;
+        // the surface changes slowly, so refresh it every third frame
+        if (api.frame % 3 === 0 || surfNet !== net) {
+        surfNet = net;
+        const inp = useSquares ? [0, 0, 0, 0] : [0, 0];
         for (let j = 0; j < G; j++)
           for (let i = 0; i < G; i++) {
             const x = (i / (G - 1)) * 2 - 1, y = -((j / (G - 1)) * 2 - 1);
-            const o = net.forward(input({ x, y })).at(-1)[0];
+            inp[0] = x;
+            inp[1] = y;
+            if (useSquares) (inp[2] = x * x), (inp[3] = y * y);
+            const o = net.predict(inp);
             const t = o * 2 - 1;
             const k = (j * G + i) * 4;
             // orange for class 1, blue for class 0
@@ -255,6 +278,7 @@ export default {
             d[k + 3] = 255;
           }
         octx.putImageData(img, 0, 0);
+        }
         ctx.save();
         roundRect(ctx, plot.x, plot.y, plot.s, plot.s, 14);
         ctx.clip();

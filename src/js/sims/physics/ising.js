@@ -124,19 +124,37 @@ export default {
     }
 
     /** One Metropolis sweep, checkerboard order (each colour updates using the other's spins). */
+    // acceptance probability exp(−ΔE/T) for each (spin, neighbour sum) pair, rebuilt per sweep
+    const accept = new Float64Array(18);
+    let seed = (Math.random() * 2 ** 32) >>> 0 || 1;
     function sweep() {
       const T = params.T, h = params.h;
       // ΔE for flipping spin σ with neighbour sum n: 2σ(n + h); n ∈ {−4,…,4}
+      for (let n = -4; n <= 4; n++)
+        for (const sg of [-1, 1]) {
+          const dE = 2 * sg * (n + h);
+          accept[(n + 4) * 2 + (sg > 0 ? 1 : 0)] = dE <= 0 ? 2 : Math.exp(-dE / T);
+        }
+      let r = seed;
       for (let colour = 0; colour < 2; colour++)
         for (let y = 0; y < L; y++) {
           const up = ((y + L - 1) % L) * L, dn = ((y + 1) % L) * L, row = y * L;
           for (let x = (y + colour) & 1; x < L; x += 2) {
             const i = row + x;
-            const n = s[up + x] + s[dn + x] + s[row + ((x + 1) % L)] + s[row + ((x + L - 1) % L)];
-            const dE = 2 * s[i] * (n + h);
-            if (dE <= 0 || Math.random() < Math.exp(-dE / T)) s[i] = -s[i];
+            const right = x === L - 1 ? row : i + 1, left = x === 0 ? row + L - 1 : i - 1;
+            const n = s[up + x] + s[dn + x] + s[right] + s[left];
+            const p = accept[(n + 4) * 2 + (s[i] > 0 ? 1 : 0)];
+            if (p >= 1) s[i] = -s[i];
+            else {
+              // xorshift32: a fast random number in [0, 1)
+              r ^= r << 13;
+              r ^= r >>> 17;
+              r ^= r << 5;
+              if ((r >>> 0) / 4294967296 < p) s[i] = -s[i];
+            }
           }
         }
+      seed = r;
     }
 
     function measure() {

@@ -24,6 +24,7 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build in dist/
 npm run thumbs   # render every gallery thumbnail into dist/thumbs/ (needs the build and a Playwright browser)
+npm run profile  # time every simulation's frames, chapter by chapter; worst first (add -- --phone, -- --only a,b)
 npm test         # smoke-test every simulation (desktop + phone) against the production build
 npm run deploy   # build, render thumbnails and publish dist/ to GitHub Pages by hand (CI normally does this)
 ```
