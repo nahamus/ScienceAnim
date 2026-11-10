@@ -71,6 +71,9 @@ jobs:
         continue-on-error: true
       - run: npm run thumbs
         continue-on-error: true
+      # Carry the live build's code files forward one deploy, so tabs opened before this deploy can still
+      # load simulations they haven't opened yet (file names carry content hashes, so nothing collides).
+      - run: node tools/keep-previous.mjs
       # The site is served from the gh-pages branch (same as `npm run deploy`).
       - uses: peaceiris/actions-gh-pages@v4
         with:

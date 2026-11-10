@@ -8,7 +8,9 @@ test.describe('link pages and offline', () => {
     desktopOnly(info);
     const html = await (await request.get('./sim/projectile/?ch=2&angle=30')).text();
     expect(html).toContain('<title>Projectile Motion · ScienceAnim</title>');
-    expect(html).toMatch(/<meta property="og:image" content="https:\/\/[^"]+\/thumbs\/projectile\.jpg"/);
+    // the site-wide card until the deploy renders this simulation's own preview (tools/render-thumbs.mjs)
+    expect(html).toMatch(/<meta property="og:image" content="https:\/\/[^"]+\/og\/(site\.png|projectile\.jpg)"/);
+    expect(html).toContain('<meta property="og:image:width" content="1200" />');
     expect(html).toMatch(/<link rel="canonical" href="https:\/\/[^"]+\/sim\/projectile\/"/);
 
     await page.goto('./sim/projectile/?ch=2&angle=30');
@@ -18,6 +20,13 @@ test.describe('link pages and offline', () => {
     await page.locator('[data-act=back]').click();
     await expect(page).toHaveURL(/\/ScienceAnim\/#\/$/);
     await expect(page.locator('.card').first()).toBeVisible();
+  });
+
+  test('the fallback preview image is published', async ({ request }, info) => {
+    desktopOnly(info);
+    const res = await request.get('./og/site.png');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type']).toContain('image/png');
   });
 
   test('the sitemap lists every simulation page', async ({ request }, info) => {

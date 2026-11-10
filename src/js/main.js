@@ -114,6 +114,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator && (!navigator.webdrive
 if (EXPORTING) {
   window.__saExport = {
     ids: SIMS.map((s) => s.id),
-    render: async (id) => renderThumb(await SIMS.find((s) => s.id === id).load()),
+    // gallery thumbnail by default; 1200×630 for the link preview (Open Graph) image
+    render: async (id, w, h) => renderThumb(await SIMS.find((s) => s.id === id).load(), w, h),
   };
 }
