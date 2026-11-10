@@ -21,13 +21,13 @@ const ORDER = [
   // chemistry
   'phases', 'molecule-shapes', 'orbitals', 'equilibrium',
   // biology
-  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'flocking',
+  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking',
   // math
   'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis',
   // cs
   'sorting', 'pathfinding', 'tsp', 'huffman', 'hamming', 'rsa', 'blockchain', 'life',
   // technology
-  'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'power-grid', 'turbines',
+  'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'semiconductors', 'power-grid', 'turbines',
   // earth
   'seasons', 'coriolis', 'lightning', 'tornado', 'rainbows', 'greenhouse', 'seismic-waves',
 ];
