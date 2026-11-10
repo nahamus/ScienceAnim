@@ -12,9 +12,13 @@ const h = (tag, cls, html) => {
   return el;
 };
 const pad = (n) => String(n).padStart(2, '0');
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Recording a clip needs a canvas stream and a recorder that can encode it.
+const CAN_RECORD = typeof MediaRecorder !== 'undefined' && !!HTMLCanvasElement.prototype.captureStream;
+const CLIP_MAX = 60; // seconds
 
 export class Player {
-  constructor(root, def, { onBack, next, prev, start, embed = false }) {
+  constructor(root, def, { onBack, next, prev, start, embed = false, lesson = null }) {
     this.def = def;
     this.cat = CATEGORY[def.category];
     this.story = def.story || [];
@@ -50,6 +54,8 @@ export class Player {
             <div class="share-menu" role="menu" hidden>
               <button role="menuitem" data-share="link">${ICONS.link}<span>Copy link</span></button>
               <button role="menuitem" data-share="embed">${ICONS.code}<span>Copy embed code</span></button>
+              ${CAN_RECORD ? `<button role="menuitem" data-share="clip">${ICONS.record}<span>Record a clip</span></button>` : ''}
+              ${def.story?.length ? `<a role="menuitem" data-share="sheet" href="#/sheet/${def.id}"${embed ? ' target="_blank" rel="noopener"' : ''}>${ICONS.print}<span>Printable worksheet</span></a>` : ''}
             </div>
           </div>
           <button class="icon-btn" data-act="full" title="Fullscreen (F)">${ICONS.expand}</button>
@@ -75,13 +81,14 @@ export class Player {
               embed
                 ? ''
                 : `<nav class="sec-nav">
-              ${prev ? `<a href="#/sim/${prev.id}"><small>Previous</small>${prev.title}</a>` : '<span></span>'}
-              ${next ? `<a href="#/sim/${next.id}" class="r"><small>Next</small>${next.title}</a>` : '<span></span>'}
+              ${prev ? `<a href="${prev.href || '#/sim/' + prev.id}"><small>Previous${lesson ? ' in lesson' : ''}</small>${esc(prev.title)}</a>` : '<span></span>'}
+              ${next ? `<a href="${next.href || '#/sim/' + next.id}" class="r"><small>Next${lesson ? ' in lesson' : ''}</small>${esc(next.title)}</a>` : '<span></span>'}
             </nav>`
             }
           </div>
         </aside>
-      </div>`;
+      </div>
+      ${lesson ? lessonBar(lesson) : ''}`;
     root.appendChild(el);
 
     this.$ = (s) => el.querySelector(s);
@@ -171,6 +178,8 @@ export class Player {
 
   async share(kind) {
     this.toggleShareMenu(false);
+    if (kind === 'sheet') return; // a plain link
+    if (kind === 'clip') return this.record();
     this.syncUrl();
     const blocked = 'Your browser blocked copying';
     if (kind === 'embed') {
@@ -189,6 +198,58 @@ export class Player {
     }
     const ok = await copyText(url);
     this.toast(ok ? 'Link copied' : this.embed ? blocked : 'Copy the link from the address bar');
+  }
+
+  // ------------------------------------------------------------------ clips
+  /** Start recording the animation (not the interface) to a video file; call again to stop and save it. */
+  record() {
+    if (this.recorder) return this.recorder.stop();
+    const type = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'].find((t) =>
+      MediaRecorder.isTypeSupported(t),
+    );
+    let rec, stream;
+    try {
+      stream = this.runner.canvas.captureStream(30);
+      rec = new MediaRecorder(stream, { ...(type && { mimeType: type }), videoBitsPerSecond: 8e6 });
+    } catch (err) {
+      console.warn(err);
+      stream?.getTracks().forEach((t) => t.stop());
+      return this.toast('This browser can’t record the animation');
+    }
+    const chunks = [];
+    const started = performance.now();
+    const pill = h('div', 'rec', `<i></i><span>0:00</span><button>Stop &amp; save</button>`);
+    pill.querySelector('button').addEventListener('click', () => rec.stop());
+    this.$('.stage').appendChild(pill);
+    this.el.classList.add('recording');
+    const timer = setInterval(() => {
+      const s = (performance.now() - started) / 1000;
+      pill.querySelector('span').textContent = `${Math.floor(s / 60)}:${pad(Math.floor(s % 60))}`;
+      if (s >= CLIP_MAX) rec.stop();
+    }, 250);
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    rec.onstop = () => {
+      clearInterval(timer);
+      stream.getTracks().forEach((t) => t.stop());
+      pill.remove();
+      this.el.classList.remove('recording');
+      this.recorder = null;
+      if (this.destroyed || !chunks.length) return;
+      const mime = rec.mimeType || type || 'video/webm';
+      const blob = new Blob(chunks, { type: mime });
+      const a = h('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${this.def.id}-clip.${mime.includes('mp4') ? 'mp4' : 'webm'}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 30_000);
+      this.toast('Clip saved to your downloads');
+    };
+    this.recorder = rec;
+    rec.start(500);
+    if (this.runner.paused) this.togglePlay();
+    this.toast(`Recording: up to ${CLIP_MAX} s`);
   }
 
   toast(text) {
@@ -557,6 +618,8 @@ export class Player {
   }
 
   destroy() {
+    this.destroyed = true;
+    if (this.recorder?.state === 'recording') this.recorder.stop();
     window.removeEventListener('keydown', this.onKey);
     document.removeEventListener('pointerdown', this.onDocPointer);
     this.runner?.destroy();
@@ -564,8 +627,27 @@ export class Player {
   }
 }
 
+/** The strip under the header in a lesson: its title, a numbered step for each simulation, and Next. */
+function lessonBar({ title, step, items }) {
+  const next = items[step + 1];
+  return `<nav class="lesson-bar" aria-label="Lesson">
+    <span class="lb-title">${ICONS.book}<b>${esc(title || 'Lesson')}</b><em>${step + 1} of ${items.length}</em></span>
+    <ol>${items
+      .map(
+        (it, k) =>
+          `<li><a href="${it.href}" title="${esc(it.title)}" class="${k === step ? 'on' : k < step ? 'done' : ''}"${k === step ? ' aria-current="step"' : ''}>${k + 1}</a></li>`,
+      )
+      .join('')}</ol>
+    ${
+      next
+        ? `<a class="btn primary lb-next" href="${next.href}"><span>Next: ${esc(next.title)}</span>${ICONS.next}</a>`
+        : `<a class="btn lb-next" href="#/"><span>Lesson complete</span></a>`
+    }
+  </nav>`;
+}
+
 /** Copy text, falling back to a hidden textarea where the clipboard API is unavailable. */
-async function copyText(text) {
+export async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
     return true;

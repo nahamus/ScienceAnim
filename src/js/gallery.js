@@ -3,6 +3,8 @@
 import { Runner } from './core/engine.js';
 import { CATEGORIES, CATEGORY, ICONS } from './categories.js';
 import { drawGlow, rgba, TAU } from './core/util.js';
+import { lessonHash, MAX_STEPS } from './lesson.js';
+import { copyText } from './player.js';
 
 const THUMB_VERSION = 'v2';
 const thumbCache = new Map();
@@ -79,7 +81,7 @@ const AGE_BANDS = [
 ];
 
 /** "Ages 11–16", "Ages 14+" … from a sim's bands. */
-function agesLabel(ages) {
+export function agesLabel(ages) {
   const bands = AGE_BANDS.filter((b) => ages?.includes(b.id));
   if (!bands.length) return '';
   const from = bands[0].from, to = bands[bands.length - 1].to;
@@ -144,11 +146,25 @@ export class Gallery {
               </select>
             </label>
             <label class="search">${ICONS.search}<input type="search" placeholder="Search simulations or topics…" aria-label="Search simulations"></label>
+            <button class="btn lesson-toggle" aria-pressed="false" title="Pick simulations to teach in order, then share one link">${ICONS.book}<span>Make a lesson</span></button>
           </div>
         </div>
         <div class="grid"></div>
         <p class="empty" hidden>No simulations match those filters.</p>
       </section>
+      <div class="lesson-tray" role="region" aria-label="Lesson builder" hidden>
+        <div class="lt-head">
+          <input class="lt-title" placeholder="Lesson title (optional)" maxlength="80" aria-label="Lesson title">
+          <button class="icon-btn" data-lt="close" title="Close the lesson builder">${ICONS.close}</button>
+        </div>
+        <ol class="lt-items"></ol>
+        <p class="lt-empty">Tap simulations to add them, in the order you’ll teach them (up to ${MAX_STEPS}).</p>
+        <div class="lt-acts">
+          <button class="btn" data-lt="clear">Clear</button>
+          <button class="btn" data-lt="copy">${ICONS.link}<span>Copy lesson link</span></button>
+          <a class="btn primary" data-lt="start">Start lesson ${ICONS.next}</a>
+        </div>
+      </div>
       <footer class="foot">
         <span>Built with plain JavaScript, Canvas and WebGL. Every frame is computed live.</span>
         <span>Tip: in a simulation, press <kbd>Space</kbd> to pause, <kbd>←</kbd>/<kbd>→</kbd> to change chapters, <kbd>H</kbd> to hide the interface.</span>
@@ -178,6 +194,7 @@ export class Gallery {
       this.apply();
     });
     this.apply();
+    this.initLesson();
     this.hero = new HeroField(el.querySelector('.hero-bg'));
     this.queueThumbs();
   }
@@ -190,7 +207,7 @@ export class Gallery {
     a.style.setProperty('--c', cat.color);
     a.dataset.id = s.id;
     a.innerHTML = `
-      <div class="thumb"><div class="thumb-img"></div><div class="thumb-live"></div><span class="play">${ICONS.play}</span></div>
+      <div class="thumb"><div class="thumb-img"></div><div class="thumb-live"></div><span class="play">${ICONS.play}</span><span class="pick" aria-hidden="true"></span></div>
       <div class="meta">
         <span class="cat"><i>${cat.icon}</i>${cat.name}${s.ages ? `<em>${agesLabel(s.ages)}</em>` : ''}</span>
         <h3>${s.title}</h3>
@@ -199,6 +216,11 @@ export class Gallery {
       </div>`;
     const cached = cachedThumb(s.id);
     if (cached) a.querySelector('.thumb-img').style.backgroundImage = `url(${cached})`;
+    a.addEventListener('click', (e) => {
+      if (!this.picking) return;
+      e.preventDefault(); // building a lesson: a card adds or removes itself instead of opening
+      this.togglePick(s.id);
+    });
     let timer;
     const warm = () => s.load().catch(() => {});
     a.addEventListener('pointerdown', warm);
@@ -213,6 +235,94 @@ export class Gallery {
       this.stopPreview(a);
     });
     return a;
+  }
+
+  // ------------------------------------------------------------------ lesson builder
+  initLesson() {
+    let saved = null;
+    try {
+      saved = JSON.parse(session.get('sa-lesson'));
+    } catch {
+      /* none yet */
+    }
+    const known = new Set(this.sims.map((s) => s.id));
+    this.plan = { title: String(saved?.title || ''), ids: (saved?.ids || []).filter((id) => known.has(id)) };
+    const $ = (q) => this.el.querySelector(q);
+    this.tray = $('.lesson-tray');
+    $('.lesson-toggle').addEventListener('click', () => this.setPicking(!this.picking));
+    $('[data-lt=close]').addEventListener('click', () => this.setPicking(false));
+    $('[data-lt=clear]').addEventListener('click', () => {
+      this.plan.ids = [];
+      this.saveLesson();
+    });
+    const title = $('.lt-title');
+    title.value = this.plan.title;
+    title.addEventListener('input', () => {
+      this.plan.title = title.value;
+      this.saveLesson();
+    });
+    $('[data-lt=copy]').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const url = location.origin + location.pathname.replace(/[^/]*$/, '') + lessonHash(this.plan);
+      const ok = await copyText(url);
+      btn.querySelector('span').textContent = ok ? 'Link copied' : 'Copy failed';
+      setTimeout(() => (btn.querySelector('span').textContent = 'Copy lesson link'), 1800);
+    });
+    this.tray.querySelector('.lt-items').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      const k = +b.closest('li').dataset.k;
+      if (b.dataset.do === 'rm') this.plan.ids.splice(k, 1);
+      else if (b.dataset.do === 'up' && k > 0) this.plan.ids.splice(k - 1, 2, this.plan.ids[k], this.plan.ids[k - 1]);
+      this.saveLesson();
+    });
+    this.setPicking(session.get('sa-picking') === '1');
+  }
+
+  setPicking(on) {
+    this.picking = on;
+    session.set('sa-picking', on ? '1' : '0');
+    this.el.classList.toggle('picking', on);
+    this.tray.hidden = !on;
+    const t = this.el.querySelector('.lesson-toggle');
+    t.setAttribute('aria-pressed', String(on));
+    t.classList.toggle('on', on);
+    this.renderLesson();
+  }
+
+  togglePick(id) {
+    const k = this.plan.ids.indexOf(id);
+    if (k >= 0) this.plan.ids.splice(k, 1);
+    else if (this.plan.ids.length < MAX_STEPS) this.plan.ids.push(id);
+    this.saveLesson();
+  }
+
+  saveLesson() {
+    session.set('sa-lesson', JSON.stringify(this.plan));
+    this.renderLesson();
+  }
+
+  renderLesson() {
+    const { ids } = this.plan;
+    this.cards.forEach((c) => {
+      const k = ids.indexOf(c.dataset.id);
+      c.classList.toggle('picked', k >= 0);
+      c.querySelector('.pick').textContent = k >= 0 ? k + 1 : '+';
+    });
+    const byId = (id) => this.sims.find((s) => s.id === id);
+    this.tray.querySelector('.lt-items').innerHTML = ids
+      .map(
+        (id, k) => `<li data-k="${k}"><b>${k + 1}</b><span>${byId(id).title}</span>
+          ${k ? `<button data-do="up" title="Move earlier" aria-label="Move ${byId(id).title} earlier">${ICONS.prev}</button>` : ''}
+          <button data-do="rm" title="Remove" aria-label="Remove ${byId(id).title}">${ICONS.close}</button></li>`,
+      )
+      .join('');
+    this.tray.querySelector('.lt-empty').hidden = ids.length > 0;
+    this.tray.classList.toggle('has-items', ids.length > 0);
+    const start = this.tray.querySelector('[data-lt=start]');
+    if (ids.length) start.href = lessonHash(this.plan);
+    else start.removeAttribute('href');
+    this.tray.querySelector('[data-lt=copy]').disabled = !ids.length;
   }
 
   async preview(card, entry) {

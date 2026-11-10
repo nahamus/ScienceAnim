@@ -1,7 +1,9 @@
 import { SIMS } from './sims/index.js';
-import { Gallery, EXPORTING, renderThumb } from './gallery.js';
+import { Gallery, EXPORTING, renderThumb, agesLabel } from './gallery.js';
 import { Player } from './player.js';
 import { parseShare, isEmbed } from './share.js';
+import { Worksheet } from './worksheet.js';
+import { parseLesson, lessonHash } from './lesson.js';
 
 // A simulation's link page (…/sim/<id>/?ch=3, built by tools/site-pages.js) is the same app with its own
 // preview tags. Swap the address for the usual in-app one before anything loads relative to it.
@@ -17,17 +19,36 @@ let galleryScroll = 0;
 
 let routeId = 0;
 
+/** A simulation's link page address, used for links that leave the app (worksheets, lessons). */
+const simPage = (id) => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}sim/${id}/`;
+
 async function route() {
   const id = ++routeId;
-  const m = location.hash.match(/^#\/sim\/([\w-]+)(?:\?(.*))?/);
-  const entry = m && SIMS.find((s) => s.id === m[1]);
+  const hash = location.hash;
+  const m = hash.match(/^#\/(sim|sheet)\/([\w-]+)(?:\?(.*))?/);
+  const lm = hash.match(/^#\/lesson\/(\d+)(?:\?(.*))?/);
+  let lesson = null;
+  let entry = m && SIMS.find((s) => s.id === m[2]);
+  if (lm) {
+    const plan = parseLesson(lm[2], new Set(SIMS.map((s) => s.id)));
+    if (plan.ids.length) {
+      const step = Math.min(plan.ids.length, Math.max(1, +lm[1])) - 1;
+      const items = plan.ids.map((sid, k) => {
+        const e = SIMS.find((s) => s.id === sid);
+        return { id: sid, title: e.title, href: lessonHash(plan, k), load: () => e.load() };
+      });
+      lesson = { title: plan.title, step, items };
+      entry = SIMS.find((s) => s.id === plan.ids[step]);
+    }
+  }
   if (view instanceof Gallery) galleryScroll = window.scrollY;
   view?.destroy();
   view = null;
   if (entry) {
     const i = SIMS.indexOf(entry);
-    document.title = `${entry.title} · ScienceAnim`;
-    document.body.classList.add('in-player');
+    const sheet = m?.[1] === 'sheet';
+    document.title = `${sheet ? 'Worksheet: ' : ''}${entry.title} · ScienceAnim`;
+    document.body.classList.toggle('in-player', !sheet);
     let def = entry.def;
     if (!def) {
       root.classList.add('loading');
@@ -42,14 +63,24 @@ async function route() {
       }
       if (id !== routeId) return; // the user navigated away while it loaded
     }
+    if (sheet) {
+      view = new Worksheet(root, def, {
+        onBack: () => (location.hash = `#/sim/${entry.id}`),
+        url: simPage(entry.id),
+        ages: agesLabel(entry.ages),
+      });
+      return;
+    }
+    const steps = lesson?.items;
     view = new Player(root, def, {
       onBack: () => (location.hash = '#/'),
-      prev: SIMS[i - 1],
-      next: SIMS[i + 1],
-      start: parseShare(def, m[2]),
-      embed: isEmbed(m[2]),
+      prev: steps ? steps[lesson.step - 1] : SIMS[i - 1],
+      next: steps ? steps[lesson.step + 1] : SIMS[i + 1],
+      lesson,
+      start: m ? parseShare(def, m[3]) : null,
+      embed: m ? isEmbed(m[3]) : false,
     });
-    SIMS[i + 1]?.load().catch(() => {}); // warm up the likely next stop
+    (steps ? steps[lesson.step + 1] : SIMS[i + 1])?.load().catch(() => {}); // warm up the likely next stop
   } else {
     document.title = 'ScienceAnim · Interactive science, beautifully animated';
     document.body.classList.remove('in-player');
