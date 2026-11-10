@@ -37,7 +37,7 @@ export default {
       params: { k: 4, blobs: 4, spread: 0.06, init: 'random', speed: 0.6, regions: false },
       enter: (s) => {
         s.data(3);
-        s.start(true);
+        s.start(true, 21); // a random-looking start that converges cleanly (bad starts are chapter 5's lesson)
       },
       duration: 11,
     },
