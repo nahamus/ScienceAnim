@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import simManifest from './tools/sim-manifest.js'
+import sitePages from './tools/site-pages.js'
 
 export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/ScienceAnim/' : '/',
   root: 'src',
-  plugins: [simManifest({ dir: 'js/sims' })],
+  plugins: [simManifest({ dir: 'js/sims' }), sitePages({ sims: 'js/sims' })],
   publicDir: '../public',
   build: {
     outDir: '../dist',

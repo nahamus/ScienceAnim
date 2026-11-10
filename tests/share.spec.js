@@ -89,7 +89,7 @@ test.describe('opening links', () => {
     await page.locator('[data-act=share]').click();
     await page.getByRole('menuitem', { name: 'Copy link' }).click();
     await expect(page.locator('.toast')).toHaveText('Link copied');
-    expect(await clip()).toMatch(/\/ScienceAnim\/#\/sim\/projectile\?ch=2&angle=30$/);
+    expect(await clip()).toMatch(/\/ScienceAnim\/sim\/projectile\/\?ch=2&angle=30$/);
     await expect(page.locator('.share-menu')).toBeHidden();
 
     await page.locator('[data-act=share]').click();
@@ -130,7 +130,7 @@ test.describe('embed mode', () => {
     await expect(f.locator('.sec-nav')).toHaveCount(0);
     await expect(f.locator('.player')).toHaveClass(/panel-closed/);
     await expect(f.locator('.story-card')).toHaveClass(/\bmin\b/); // short embed: animation first
-    await expect(f.locator('[data-act=open]')).toHaveAttribute('href', /#\/sim\/projectile\?ch=2&angle=30$/);
+    await expect(f.locator('[data-act=open]')).toHaveAttribute('href', /\/ScienceAnim\/sim\/projectile\/\?ch=2&angle=30$/);
     await expect(f.locator('[data-act=open]')).toHaveAttribute('target', '_blank');
   });
 
