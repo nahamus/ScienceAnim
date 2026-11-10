@@ -37,6 +37,13 @@ Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart �
 
 **Shareable links.** The address bar always describes what's on screen, e.g. `#/sim/projectile?ch=2&angle=30&drag=0.01`: `ch` is the story chapter (1-based, as on the story card), and each control appears by its `key` only when it differs from what that chapter sets. Opening such a link jumps to that chapter with those settings and turns auto-play off. The link button in the player copies it as the simulation's own page, e.g. `…/ScienceAnim/sim/projectile/?ch=2&angle=30` (or opens the share sheet on phones). Each of those pages is built from `index.html` with that simulation's title, description and thumbnail as Open Graph tags, so links preview properly in chat apps, social posts and search results; the app then swaps the address back to the `#/sim/` form. `dist/sitemap.xml` lists every page. Unknown keys are ignored and out-of-range values are clamped, so renaming a control's `key` breaks old links to that control only. The format lives in `src/js/share.js`.
 
+**For classrooms.** The share menu also offers:
+
+- **Printable worksheet** (`#/sheet/<id>`, `src/js/worksheet.js`): the story as numbered sections, each with a picture of that chapter rendered on the spot, the quick checks as *Predict* questions with lines for working, key ideas, space for notes and an answer key on its own page. Pictures, notes and answers can each be left out before printing.
+- **Record a clip**: records the animation (not the interface) for up to 60 s and downloads it as MP4 or WebM, for slides or a class page.
+
+**Lessons.** *Make a lesson* in the gallery lets a teacher pick simulations in order, give the lesson a title and copy one link, e.g. `#/lesson/1?t=Light%20and%20sight&s=refraction,rainbows,vision` (`src/js/lesson.js`). Learners get a lesson bar under the player with the steps and a *Next* button. Unknown ids are dropped, so old lesson links keep working.
+
 **Offline and installable.** After one visit, a service worker (`src/sw.js`) has cached the app and every simulation's code, so the whole site works without a connection; thumbnails and fonts are cached as they load. Each deploy gets a new cache, and the old one is dropped. A web manifest and icons in `public/` let it be installed as an app. Automated browsers skip the service worker unless the URL has `?sw`, so tests always see the fresh build.
 
 **Embedding.** Add `embed=1` to a link (or use **Copy embed code** in the share menu) to get a stripped-down player for an `<iframe>` in a class page, slide deck or learning platform. It has no gallery navigation, and Esc doesn't leave the sim. Controls start closed, the story card starts collapsed in short frames, and an "Open in ScienceAnim" button opens the same view in a new tab.
@@ -53,7 +60,9 @@ src/
   js/
     main.js                hash router: #/ (gallery) and #/sim/<id>; registers the service worker
     gallery.js             hero, filters, search, cards with real rendered thumbnails (cached in localStorage)
-    player.js              stage, story card, controls, live stats and charts
+    player.js              stage, story card, controls, live stats and charts, clip recording
+    worksheet.js           printable worksheet built from a sim's story and quick checks
+    lesson.js              lesson links: an ordered list of sims with a title
     categories.js          fields, colours and icons
     core/
       engine.js            Runner: canvas + DPR, frame loop, params & tweening, pointer input
