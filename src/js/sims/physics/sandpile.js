@@ -39,19 +39,21 @@ export default {
     ] },
     { key: 'empty', label: 'Empty the table', type: 'button', action: (sim) => sim.clear() },
     { key: 'prime', label: 'Jump to the critical state', type: 'button', action: (sim) => sim.prime() },
+    // story only: makes sure a critical pile is on the table while the quick check asks about one
+    { key: 'critical', type: 'toggle', value: false, hidden: true },
   ],
   story: [
     {
       title: 'Grain by grain',
       text: 'One rule: when a square holds <b>4 grains</b> it <b>topples</b>, passing one grain to each neighbour. Pour sand onto the centre and that rule alone grows this intricate, four-fold <b>fractal</b>. Colours show 0, 1, 2 and 3 grains.',
-      params: { drop: 'center', rate: 700, slow: false },
+      params: { drop: 'center', rate: 700, slow: false, critical: false },
       enter: (s) => s.clear(),
       duration: 14,
     },
     {
       title: 'Random rain',
       text: 'Now grains fall at random spots. At first nothing much happens: squares fill up quietly and an occasional grain causes a small slide (flashing white). The table is slowly getting fuller.',
-      params: { drop: 'random', rate: 300, slow: false },
+      params: { drop: 'random', rate: 300, slow: false, critical: false },
       enter: (s) => s.clear(),
       duration: 13,
     },
@@ -62,10 +64,10 @@ export default {
         q: 'The pile is critical. You add one more grain. How big will the avalanche be?',
         options: ['Always tiny', 'Always huge', 'Usually tiny, occasionally enormous'],
         answer: 2,
-        setup: { drop: 'random', slow: true, rate: 6 },
+        setup: { drop: 'random', slow: true, rate: 6, critical: true },
         explain: 'There is no typical size. Most grains cause small slides, but avalanches of every size up to the whole table keep happening, with steadily falling odds.',
       },
-      params: { drop: 'random', slow: true, rate: 6 },
+      params: { drop: 'random', slow: true, rate: 6, critical: true },
       enter: (s) => s.prime(),
       duration: 18,
     },
@@ -216,6 +218,7 @@ export default {
       },
       onParam(k) {
         if (k === 'size') sim.clear();
+        if (k === 'critical' && params.critical) sim.primeIfEmpty();
         if (k === 'slow' && !params.slow && current) {
           for (const i of current.active) current.size += relax(i);
           record(current.size);

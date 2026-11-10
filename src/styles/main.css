@@ -237,7 +237,8 @@ input[type='range']:hover::-webkit-slider-thumb { box-shadow: 0 0 0 7px var(--ac
 .player.ui-hidden .p-top > * { pointer-events: none; }
 .player.ui-hidden .story-card, .player.ui-hidden .hint { opacity: 0; pointer-events: none; transform: translateY(10px); }
 .player.ui-hidden .p-body { grid-template-columns: 1fr 0px; }
-.player.paused .stage::after { content: 'Paused'; position: absolute; top: 72px; right: 18px; padding: 5px 10px; border-radius: 8px; background: var(--glass); border: 1px solid var(--line); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); pointer-events: none; }
+/* bottom right: the top right is where simulations put their own labels */
+.player.paused .stage::after { content: 'Paused'; position: absolute; bottom: 18px; right: 18px; padding: 5px 10px; border-radius: 8px; background: var(--glass); border: 1px solid var(--line); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); pointer-events: none; }
 
 /* ------------------------------------------------------------ responsive */
 @media (max-width: 900px) {

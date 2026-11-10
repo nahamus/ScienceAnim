@@ -62,7 +62,7 @@ export default {
     },
     {
       title: 'Identical twins',
-      text: 'Now two pendulums start just <em>0.001 radians</em> apart — far less than the width of a hair at arm’s length. For a few seconds they move as one…',
+      text: 'Now two pendulums start just <em>0.001 radians</em> apart — about the width of a pencil line seen at arm’s length. For a few seconds they move as one…',
       params: { count: 2, spread: -3, angle: 125, trail: 160 },
       duration: 14,
     },

@@ -98,7 +98,7 @@ export default {
     },
     {
       title: 'Lasers everywhere',
-      text: 'Theodore Maiman built the first laser in 1960 from a ruby rod and a flash lamp. Today lasers read barcodes, carry the internet down optical fibres, reshape corneas, cut steel and, in LIGO, measure distances to a thousandth of a proton’s width. Laser pointers are tiny diode lasers, pumped by electric current.',
+      text: 'Theodore Maiman built the first laser in 1960 from a ruby rod and a flash lamp. Today lasers read barcodes, carry the internet down optical fibres, reshape corneas, cut steel and, in LIGO, measure distances to a ten-thousandth of a proton’s width. Laser pointers are tiny diode lasers, pumped by electric current.',
       params: { pump: 0.9, R: 0.7, mirrors: true, levels: 4 },
       enter: (s) => s.reset(),
       duration: 15,

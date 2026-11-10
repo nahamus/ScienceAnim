@@ -94,7 +94,7 @@ export default {
       title: 'The synchrotron',
       text: 'Fix the ring and change the magnets instead: as the energy rises, the bending field is <b>ramped up</b> to keep the particles on the same circle, and the voltage is retuned to match. The LHC at CERN is 27 km round, with 1,232 superconducting magnets reaching 8.3 tesla. It takes protons from 450 GeV to <b>6.8 TeV</b> in about 20 minutes; at the top they lap 11,245 times a second, just 3 m/s slower than light.',
       formula: 'p = q B r',
-      params: { mode: 'synchrotron', speed: 1 },
+      params: { mode: 'synchrotron', particle: 'proton', speed: 1 },
       enter: (s) => s.restart(),
       duration: 18,
     },
