@@ -302,7 +302,12 @@ export default {
           tag(ctx, '230 V homes', (hx0 + hx1) / 2, G0 + 24, C.amber, { align: 'center', size: 9 });
           const hh = Math.floor(hr), mm = Math.floor((hr % 1) * 60);
           tag(ctx, `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}  ·  demand ${s.D.toFixed(0)} MW`, w - 16, 84, C.ink, { align: 'right', size: 11 });
-          if (s.G < s.D - 1) tag(ctx, `SHORTFALL ${(s.D - s.G).toFixed(0)} MW — needs storage/backup`, w - 16, 110, C.red, { align: 'right', size: 11 });
+          // on narrow screens the top-right corner is where the line-loss tags sit, so warn under the ground line
+          if (s.G < s.D - 1) {
+            const msg = `SHORTFALL ${(s.D - s.G).toFixed(0)} MW — needs storage/backup`;
+            if (w >= 600) tag(ctx, msg, w - 16, 110, C.red, { align: 'right', size: 11 });
+            else tag(ctx, msg, w / 2, G0 + 80, C.red, { align: 'center', size: 11 });
+          }
         }
       },
       stats() {

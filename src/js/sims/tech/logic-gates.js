@@ -163,7 +163,8 @@ export default {
         P.out = (id) => [w * 0.72, P[id][1]];
         P.s = 54;
       } else {
-        const x0 = w * 0.1, x1 = w * 0.9, cy = Math.max(230, h * 0.42);
+        // narrow phones: leave room on the left for the final "carry" lamp and its label
+        const x0 = w < 600 ? 52 : w * 0.1, x1 = w < 600 ? w - 12 : w * 0.9, cy = Math.max(230, h * 0.42);
         const bw = (x1 - x0) / 4;
         for (let i = 0; i < 4; i++) P['fa' + i] = [x1 - (i + 0.5) * bw, cy, bw * 0.62];
         P.s = Math.min(40, bw * 0.25);
@@ -250,7 +251,10 @@ export default {
       reset: () => build(),
       onParam(k) {
         if (k === 'mode') build();
-        if ((k === 'A' || k === 'B') && params.mode === 'adder') loadNumbers();
+        if ((k === 'A' || k === 'B') && params.mode === 'adder') {
+          loadNumbers();
+          cycT = 0; // numbers someone just chose (or a shared link set) stay up for a full cycle
+        }
       },
       pointerDown(p) {
         const P = positions();
@@ -344,7 +348,10 @@ export default {
           }
           if (params.mode === 'half' && !api.thumbnail) {
             const a = nodes.A.v, b = nodes.B.v;
-            text(ctx, `${a} + ${b} = ${nodes.carry.v}${nodes.sum.v} (binary) = ${a + b}`, w * 0.48, Math.max(220, h * 0.4) + 150, { size: 18, align: 'center', mono: true, weight: 600 });
+            // wide screens: under the gates; narrow ones put the truth table there, so go below the table
+            const tableY = Math.max(h * 0.62, (P.not?.[1] ?? 0) + P.s + 30);
+            const ey = w > 760 ? Math.max(220, h * 0.4) + 150 : tableY + 24 * 5 + 22;
+            text(ctx, `${a} + ${b} = ${nodes.carry.v}${nodes.sum.v} (binary) = ${a + b}`, w * 0.5, ey, { size: w > 760 ? 18 : 15, align: 'center', mono: true, weight: 600 });
           }
         } else {
           // 4-bit ripple-carry adder
@@ -359,8 +366,9 @@ export default {
             ctx.fill();
             ctx.stroke();
             if (!api.thumbnail) {
-              text(ctx, 'full adder', x, y - 14, { size: 11, align: 'center', color: C.dim });
-              text(ctx, `bit ${i} · worth ${1 << i}`, x, y + 6, { size: 10, align: 'center', color: C.dim });
+              const tight = bw < 80; // phones: shorter labels that fit inside the box
+              text(ctx, tight ? 'adder' : 'full adder', x, y - 14, { size: tight ? 10 : 11, align: 'center', color: C.dim });
+              text(ctx, tight ? `bit ${i}` : `bit ${i} · worth ${1 << i}`, x, y + 6, { size: 10, align: 'center', color: C.dim });
               // tiny internal gate lights
               ['x', 'a1', 's', 'a2', 'co'].forEach((g, k) => {
                 const n = nodes[g + i];
@@ -383,7 +391,8 @@ export default {
             const nx = i < 3 ? P['fa' + (i + 1)][0] + bw / 2 : x - bw / 2 - 40;
             wire(x - bw / 2, y, nx, y, nodes['co' + i].v);
             if (i === 3) lamp(nx - 6, y, nodes.co3.v, 'carry', 14);
-            else if (!api.thumbnail && nodes['co' + i].v) tag(ctx, 'carry 1', (x - bw / 2 + nx) / 2, y - 14, C.amber, { align: 'center', size: 9 });
+            else if (!api.thumbnail && nodes['co' + i].v && nx - (x - bw / 2) < -50)
+              tag(ctx, 'carry 1', (x - bw / 2 + nx) / 2, y - 14, C.amber, { align: 'center', size: 9 }); // only where the gap fits it
           }
           if (!api.thumbnail) {
             let S = 0;

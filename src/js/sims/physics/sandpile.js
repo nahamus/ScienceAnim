@@ -293,11 +293,12 @@ export default {
         const lx = narrow ? 24 : 64, ly = narrow ? y0 + size + 42 : y0 + size - 8;
         if (!narrow || ly < h - 20)
           ['0', '1', '2', '3'].forEach((lab, k) => {
+            const x = lx + k * 46 + (k ? 34 : 0); // the first item also says "grains", so the rest start further on
             ctx.fillStyle = `rgb(${COLORS[k].join(',')})`;
-            ctx.fillRect(lx + k * 46, ly - 6, 12, 12);
+            ctx.fillRect(x, ly - 6, 12, 12);
             ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-            ctx.strokeRect(lx + k * 46 - 0.5, ly - 6.5, 13, 13);
-            text(ctx, lab + (k === 0 ? ' grains' : ''), lx + k * 46 + 17, ly, { size: 10, color: C.dim });
+            ctx.strokeRect(x - 0.5, ly - 6.5, 13, 13);
+            text(ctx, lab + (k === 0 ? ' grains' : ''), x + 17, ly, { size: 10, color: C.dim });
           });
 
         // the avalanche-size histogram on log-log axes

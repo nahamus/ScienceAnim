@@ -44,8 +44,8 @@ export class Player {
           <h1>${def.title}</h1>
         </div>
         <div class="p-actions">
-          <div class="seg speed" title="Simulation speed">
-            ${[0.25, 0.5, 1, 2, 4].map((s) => `<button data-speed="${s}" class="${s === 1 ? 'on' : ''}">${s}×</button>`).join('')}
+          <div class="seg speed" title="Simulation speed" role="group" aria-label="Simulation speed">
+            ${[0.25, 0.5, 1, 2, 4].map((s) => `<button data-speed="${s}" class="${s === 1 ? 'on' : ''}" aria-pressed="${s === 1}">${s}×</button>`).join('')}
           </div>
           <button class="icon-btn" data-act="play" title="Play / pause (Space)">${ICONS.pause}</button>
           <button class="icon-btn" data-act="restart" title="Restart (R)">${ICONS.restart}</button>
@@ -108,6 +108,12 @@ export class Player {
       this.$('.hint')?.classList.add('gone');
     };
     this.runner.onFrame = (dt) => this.tick(dt);
+    // the animation itself, for screen readers: what it is and how to interact (the story card is read aloud)
+    this.runner.canvas.setAttribute('role', 'img');
+    this.runner.canvas.setAttribute(
+      'aria-label',
+      `${def.title}: interactive animation. ${def.hint ? def.hint.replace(/<[^>]*>/g, '') + '. ' : ''}Use the controls panel to change it.`,
+    );
 
     this.buildControls();
     this.buildStory();
@@ -271,12 +277,13 @@ export class Player {
       const row = h('div', 'ctl ctl-' + p.type);
       row.dataset.key = p.key;
       if (p.type === 'range') {
-        row.innerHTML = `<label><span>${p.label}</span><output></output></label><input type="range" min="${p.min}" max="${p.max}" step="${p.step || 'any'}">`;
+        row.innerHTML = `<label><span>${p.label}</span><output></output></label><input type="range" min="${p.min}" max="${p.max}" step="${p.step || 'any'}" aria-label="${esc(p.label.replace(/<[^>]*>/g, ''))}">`;
         const input = row.querySelector('input');
         const out = row.querySelector('output');
         const show = (v) => {
           input.value = v;
           out.textContent = p.format ? p.format(v) : `${(+v).toFixed(p.digits ?? (p.step && p.step < 1 ? 2 : 0))}${p.unit ? ' ' + p.unit : ''}`;
+          input.setAttribute('aria-valuetext', out.textContent); // screen readers read "45.0 °", not "45"
           input.style.setProperty('--fill', ((v - p.min) / (p.max - p.min)) * 100 + '%');
         };
         input.addEventListener('input', () => {
@@ -294,8 +301,8 @@ export class Player {
         });
         this.controls[p.key] = (v) => (input.checked = !!v);
       } else if (p.type === 'select') {
-        row.innerHTML = `<label><span>${p.label}</span></label><div class="seg wrap">${p.options
-          .map((o) => `<button data-v="${o.value}">${o.label}</button>`)
+        row.innerHTML = `<label><span>${p.label}</span></label><div class="seg wrap" role="group" aria-label="${esc(p.label.replace(/<[^>]*>/g, ''))}">${p.options
+          .map((o) => `<button data-v="${o.value}" aria-pressed="false">${o.label}</button>`)
           .join('')}</div>`;
         const btns = [...row.querySelectorAll('button')];
         btns.forEach((b, i) =>
@@ -304,7 +311,11 @@ export class Player {
             this.runner.set(p.key, p.options[i].value);
           }),
         );
-        this.controls[p.key] = (v) => btns.forEach((b, i) => b.classList.toggle('on', p.options[i].value === v));
+        this.controls[p.key] = (v) =>
+          btns.forEach((b, i) => {
+            b.classList.toggle('on', p.options[i].value === v);
+            b.setAttribute('aria-pressed', String(p.options[i].value === v));
+          });
       } else if (p.type === 'button') {
         row.innerHTML = `<button class="btn">${p.label}</button>`;
         row.querySelector('button').addEventListener('click', () => {
@@ -344,12 +355,15 @@ export class Player {
       <div class="sc-head">
         <span class="sc-step"></span>
         <div class="sc-dots">${this.story
-          .map((c, i) => `<button data-ch="${i}" title="${c.title}${c.check ? ' (quick check)' : ''}"${c.check ? ' class="q"' : ''}><i></i></button>`)
+          .map(
+            (c, i) =>
+              `<button data-ch="${i}" title="${c.title}${c.check ? ' (quick check)' : ''}" aria-label="Chapter ${i + 1}: ${esc(c.title)}${c.check ? ' (quick check)' : ''}"${c.check ? ' class="q"' : ''}><i></i></button>`,
+          )
           .join('')}</div>
         <button class="sc-mode" title="Toggle auto-play of the guided story"></button>
         <button class="icon-btn sm sc-min" title="Collapse">${ICONS.minimize}</button>
       </div>
-      <div class="sc-body">
+      <div class="sc-body" aria-live="polite">
         <h2></h2><p class="sc-text"></p><div class="sc-check"></div><div class="formula"></div>
       </div>
       <div class="sc-nav">
@@ -357,6 +371,7 @@ export class Player {
         <button class="btn primary" data-act="next">Next ${ICONS.next}</button>
       </div>`;
     card.querySelectorAll('.sc-dots button').forEach((b) => b.addEventListener('click', () => this.goto(+b.dataset.ch)));
+    card.querySelector('.sc-body').addEventListener('scroll', () => this.markOverflow(), { passive: true });
     card.querySelector('[data-act=prev]').addEventListener('click', () => this.goto(this.chapter - 1));
     card.querySelector('[data-act=next]').addEventListener('click', () => this.next());
     card.querySelector('.sc-min').addEventListener('click', () => card.classList.toggle('min'));
@@ -437,6 +452,8 @@ export class Player {
     body.classList.remove('in');
     void body.offsetWidth;
     body.classList.add('in');
+    if (this.shownChapter !== i) body.scrollTop = 0; // a new chapter starts at its top (an answer keeps your place)
+    this.shownChapter = i;
     card.querySelector('.sc-step').textContent = `${pad(i + 1)} / ${pad(this.story.length)}`;
     card.querySelector('h2').textContent = ch.title;
     const pending = this.pendingCheck();
@@ -450,10 +467,19 @@ export class Player {
     card.querySelectorAll('.sc-dots button').forEach((b, j) => {
       b.classList.toggle('done', j < i);
       b.classList.toggle('on', j === i);
+      if (j === i) b.setAttribute('aria-current', 'step');
+      else b.removeAttribute('aria-current');
       b.style.setProperty('--p', j < i ? 1 : 0);
     });
+    requestAnimationFrame(() => this.markOverflow());
     const next = card.querySelector('[data-act=next]');
     next.innerHTML = pending ? 'Show me' : i === this.story.length - 1 ? 'Explore freely' : `Next ${ICONS.next}`;
+  }
+
+  /** Fade the foot of the story text while part of it is scrolled out of view (phones). */
+  markOverflow() {
+    const body = this.$('.sc-body');
+    if (body) body.classList.toggle('more', body.scrollHeight - body.scrollTop - body.clientHeight > 4);
   }
 
   /** A prediction question with its options, or (once answered) the verdict and explanation. */
@@ -574,7 +600,10 @@ export class Player {
     el.querySelectorAll('[data-speed]').forEach((b) =>
       b.addEventListener('click', () => {
         this.runner.speed = +b.dataset.speed;
-        el.querySelectorAll('[data-speed]').forEach((x) => x.classList.toggle('on', x === b));
+        el.querySelectorAll('[data-speed]').forEach((x) => {
+          x.classList.toggle('on', x === b);
+          x.setAttribute('aria-pressed', String(x === b));
+        });
       }),
     );
     this.onKey = (e) => {
