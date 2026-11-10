@@ -35,7 +35,9 @@ The first `npm test` needs a browser: `npx playwright install chromium`. Run one
 
 Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
 
-**Shareable links.** The address bar always describes what's on screen, e.g. `#/sim/projectile?ch=2&angle=30&drag=0.01`: `ch` is the story chapter (1-based, as on the story card), and each control appears by its `key` only when it differs from what that chapter sets. Opening such a link jumps to that chapter with those settings and turns auto-play off. The link button in the player copies it (or opens the share sheet on phones). Unknown keys are ignored and out-of-range values are clamped, so renaming a control's `key` breaks old links to that control only. The format lives in `src/js/share.js`.
+**Shareable links.** The address bar always describes what's on screen, e.g. `#/sim/projectile?ch=2&angle=30&drag=0.01`: `ch` is the story chapter (1-based, as on the story card), and each control appears by its `key` only when it differs from what that chapter sets. Opening such a link jumps to that chapter with those settings and turns auto-play off. The link button in the player copies it as the simulation's own page, e.g. `…/ScienceAnim/sim/projectile/?ch=2&angle=30` (or opens the share sheet on phones). Each of those pages is built from `index.html` with that simulation's title, description and thumbnail as Open Graph tags, so links preview properly in chat apps, social posts and search results; the app then swaps the address back to the `#/sim/` form. `dist/sitemap.xml` lists every page. Unknown keys are ignored and out-of-range values are clamped, so renaming a control's `key` breaks old links to that control only. The format lives in `src/js/share.js`.
+
+**Offline and installable.** After one visit, a service worker (`src/sw.js`) has cached the app and every simulation's code, so the whole site works without a connection; thumbnails and fonts are cached as they load. Each deploy gets a new cache, and the old one is dropped. A web manifest and icons in `public/` let it be installed as an app. Automated browsers skip the service worker unless the URL has `?sw`, so tests always see the fresh build.
 
 **Embedding.** Add `embed=1` to a link (or use **Copy embed code** in the share menu) to get a stripped-down player for an `<iframe>` in a class page, slide deck or learning platform. It has no gallery navigation, and Esc doesn't leave the sim. Controls start closed, the story card starts collapsed in short frames, and an "Open in ScienceAnim" button opens the same view in a new tab.
 
@@ -46,9 +48,10 @@ No runtime dependencies: plain ES modules, Canvas 2D and WebGL, bundled by Vite.
 ```
 src/
   index.html
+  sw.js                    offline service worker (versioned and filled in at build time)
   styles/main.css          design system (dark, glass panels, responsive)
   js/
-    main.js                hash router: #/ (gallery) and #/sim/<id>
+    main.js                hash router: #/ (gallery) and #/sim/<id>; registers the service worker
     gallery.js             hero, filters, search, cards with real rendered thumbnails (cached in localStorage)
     player.js              stage, story card, controls, live stats and charts
     categories.js          fields, colours and icons
@@ -61,6 +64,7 @@ src/
       physics/ ai/ astronomy/ chemistry/ biology/ math/ cs/ tech/ earth/
 tools/
   sim-manifest.js          Vite plugin: reads each sim's gallery metadata at build time
+  site-pages.js            Vite plugin: per-sim link pages with preview tags, sitemap.xml, sw.js
 tests/
   smoke.spec.js            Playwright: opens every sim, plays every chapter, pokes every control
 ```

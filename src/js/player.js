@@ -133,9 +133,14 @@ export class Player {
     return buildShare(this.def, this.chapter, values, { embed, asking: this.pendingCheck() });
   }
 
-  /** Full URL of the current view, as a normal page or as an embeddable one. */
+  /**
+   * Full URL of the current view. Normal links go to the simulation's own page (…/sim/<id>/?ch=3), whose
+   * tags give it a proper preview in chat apps and search results; embeds use the in-app address.
+   */
   shareUrl(embed = false) {
-    return location.href.split('#')[0] + this.shareHash(embed);
+    const app = location.origin + location.pathname.replace(/[^/]*$/, ''); // drop a trailing index.html
+    const hash = this.shareHash(embed);
+    return app + (embed ? hash : hash.replace(/^#\/sim\/([\w-]+)/, 'sim/$1/'));
   }
 
   /** Keep the address bar pointing at the current view, without adding history entries. */

@@ -3,6 +3,14 @@ import { Gallery, EXPORTING, renderThumb } from './gallery.js';
 import { Player } from './player.js';
 import { parseShare, isEmbed } from './share.js';
 
+// A simulation's link page (…/sim/<id>/?ch=3, built by tools/site-pages.js) is the same app with its own
+// preview tags. Swap the address for the usual in-app one before anything loads relative to it.
+const linkPage = location.pathname.match(/^(.*\/)sim\/([\w-]+)\/?$/);
+if (linkPage && !location.hash.startsWith('#/')) {
+  const q = location.search.slice(1);
+  history.replaceState(null, '', `${linkPage[1]}#/sim/${linkPage[2]}${q ? '?' + q : ''}`);
+}
+
 const root = document.getElementById('app');
 let view = null;
 let galleryScroll = 0;
@@ -64,6 +72,12 @@ function showLoadError(entry) {
 
 window.addEventListener('hashchange', route);
 route();
+
+// Work offline after the first visit. Automated browsers (tests, thumbnail rendering) skip it unless
+// the page asks with ?sw, so cached code never hides a fresh build from them.
+if (import.meta.env.PROD && 'serviceWorker' in navigator && (!navigator.webdriver || /[?&]sw\b/.test(location.search))) {
+  addEventListener('load', () => navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {}));
+}
 
 // Build-time thumbnail export (tools/render-thumbs.mjs opens the built site with ?export-thumbs)
 if (EXPORTING) {
