@@ -424,13 +424,13 @@ export class Gallery {
 }
 
 /** Run a simulation off-screen for a moment and snapshot it. */
-export function renderThumb(s) {
+export function renderThumb(s, width = 560, height = 350) {
   const host = document.createElement('div');
-  host.style.cssText = 'position:fixed;left:-9999px;top:0;width:560px;height:350px;pointer-events:none';
+  host.style.cssText = `position:fixed;left:-9999px;top:0;width:${width}px;height:${height}px;pointer-events:none`;
   document.body.appendChild(host);
   let r;
   try {
-    r = new Runner(host, s, { width: 560, height: 350, interactive: false, thumbnail: true, maxDpr: 1, preserve: true });
+    r = new Runner(host, s, { width, height, interactive: false, thumbnail: true, maxDpr: 1, preserve: true });
     const ch = s.story?.[s.thumbChapter ?? 0];
     if (ch) {
       r.applyParams(ch.params, 0);

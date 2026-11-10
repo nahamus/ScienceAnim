@@ -23,7 +23,7 @@ Cinematic, interactive simulations of the ideas behind science, all running live
 npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build in dist/
-npm run thumbs   # render every gallery thumbnail into dist/thumbs/ (needs the build and a Playwright browser)
+npm run thumbs   # render gallery thumbnails (dist/thumbs/) and 1200×630 link previews (dist/og/); needs the build and a Playwright browser
 npm run profile  # time every simulation's frames, chapter by chapter; worst first (add -- --phone, -- --only a,b)
 npm test         # smoke-test every simulation (desktop + phone) against the production build
 npm run deploy   # build, render thumbnails and publish dist/ to GitHub Pages by hand (CI normally does this)
@@ -31,7 +31,7 @@ npm run deploy   # build, render thumbnails and publish dist/ to GitHub Pages by
 
 The first `npm test` needs a browser: `npx playwright install chromium`. Run one simulation with `npm test -- -g cpu`.
 
-**Workflow:** make a short-lived branch for each change and open a pull request into `master`. GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every pull request, split across 4 parallel jobs. Merging into `master` runs them again, and if they pass, it builds the site and publishes it to the `gh-pages` branch. That makes `master` exactly what's live. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution. Before publishing, CI renders every gallery thumbnail once (`npm run thumbs`), so visitors download small images instead of running each simulation; any thumbnail missing from `dist/thumbs/index.json` is rendered live in the browser.
+**Workflow:** make a short-lived branch for each change and open a pull request into `master`. GitHub Actions (`.github/workflows/ci.yml`) lints and runs the smoke tests on every pull request, split across 4 parallel jobs. Merging into `master` runs them again, and if they pass, it builds the site and publishes it to the `gh-pages` branch. That makes `master` exactly what's live. CI runners have no GPU, so there the two WebGL simulations are tested at reduced resolution. Before publishing, CI renders every gallery thumbnail once (`npm run thumbs`), so visitors download small images instead of running each simulation; any thumbnail missing from `dist/thumbs/index.json` is rendered live in the browser. The same step renders each simulation's 1200×630 link preview and points its page at it; a page whose preview fails keeps the site-wide card (`public/og/site.png`). Finally `tools/keep-previous.mjs` copies the live build's code files (listed in its `build-files.json`) into the new one, so a tab opened before the deploy can still load simulations it hasn't opened yet; only one previous build is ever kept.
 
 Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart · `F` fullscreen · `C` controls panel · `H` hide interface · `Esc` back.
 
