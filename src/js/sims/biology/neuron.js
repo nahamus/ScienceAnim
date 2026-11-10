@@ -131,7 +131,7 @@ export default {
     return {
       stimulate,
       resize(w, h) {
-        ax0 = w * 0.06;
+        ax0 = Math.max(w * 0.06, 52); // room for the "−65 mV" axis labels on narrow phones
         ax1 = w * 0.94;
         ay = h * 0.4;
         ar = clamp(h * 0.035, 12, 22);

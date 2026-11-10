@@ -46,6 +46,8 @@ Keyboard in a simulation: `Space` pause · `←`/`→` chapters · `R` restart �
 
 **Offline and installable.** After one visit, a service worker (`src/sw.js`) has cached the app and every simulation's code, so the whole site works without a connection; thumbnails and fonts are cached as they load. Each deploy gets a new cache, and the old one is dropped. A web manifest and icons in `public/` let it be installed as an app. Automated browsers skip the service worker unless the URL has `?sw`, so tests always see the fresh build.
 
+**Accessibility.** Every control has an accessible name and pressed or current state, each animation canvas is labelled with what it is and how to interact, and the story card is a polite live region, so screen readers follow the chapters. Keyboard focus shows a clear ring, text meets WCAG AA contrast, and the gallery's moving background stays still when the device asks for reduced motion. `tests/a11y.spec.js` runs axe-core over the main screens and every simulation's controls.
+
 **Embedding.** Add `embed=1` to a link (or use **Copy embed code** in the share menu) to get a stripped-down player for an `<iframe>` in a class page, slide deck or learning platform. It has no gallery navigation, and Esc doesn't leave the sim. Controls start closed, the story card starts collapsed in short frames, and an "Open in ScienceAnim" button opens the same view in a new tab.
 
 ## Architecture
@@ -76,6 +78,8 @@ tools/
   site-pages.js            Vite plugin: per-sim link pages with preview tags, sitemap.xml, sw.js
 tests/
   smoke.spec.js            Playwright: opens every sim, plays every chapter, pokes every control
+  a11y.spec.js             axe-core accessibility checks (WCAG 2.1 A/AA)
+  share.spec.js, story.spec.js, site.spec.js, classroom.spec.js   links, quick checks, offline, worksheets and lessons
 ```
 
 Each simulation is its own code chunk, downloaded only when it is opened (or when the gallery renders its thumbnail), so the first page load stays small however large the library grows.

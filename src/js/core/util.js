@@ -150,6 +150,7 @@ export function tag(ctx, str, x, y, color = C.ink, o = {}) {
   ctx.stroke();
   ctx.fillStyle = color;
   ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left'; // the pill is already placed; don't inherit the caller's alignment
   ctx.fillText(str, ax + 7, y + 0.5);
   ctx.restore();
 }

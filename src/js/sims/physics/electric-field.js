@@ -214,6 +214,10 @@ export default {
             dirty = false;
           }
           const d = img.data, lut = CMAPS.diverge;
+          // contour level of a cell; a line is drawn where the level changes between neighbours, so wide
+          // flat regions (potential near one level everywhere) stay clear instead of filling solid
+          // (capped, so the steep potential right next to a charge doesn't become a solid knot of lines)
+          const level = (k) => Math.floor(clamp(pot[k] * 18, -2.2, 2.2) * 3); // lines at v = k/3, including the zero line
           for (let k = 0; k < GW * GH; k++) {
             const v = pot[k] * 18;
             let li = (clamp(Math.tanh(v) * 0.5 + 0.5, 0, 1) * 255) | 0;
@@ -222,8 +226,8 @@ export default {
               r = lut[li * 3]; g = lut[li * 3 + 1]; b = lut[li * 3 + 2]; a = 150;
             }
             if (params.contours) {
-              const f = Math.abs(((v * 3) % 1 + 1) % 1 - 0.5);
-              if (f > 0.44) {
+              const i = k % GW, L = level(k);
+              if ((i < GW - 1 && level(k + 1) !== L) || (k + GW < GW * GH && level(k + GW) !== L)) {
                 r = Math.max(r, 230); g = Math.max(g, 236); b = Math.max(b, 255); a = Math.max(a, 120);
               }
             }

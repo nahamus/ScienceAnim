@@ -146,7 +146,7 @@ export class Gallery {
               </select>
             </label>
             <label class="search">${ICONS.search}<input type="search" placeholder="Search simulations or topics…" aria-label="Search simulations"></label>
-            <button class="btn lesson-toggle" aria-pressed="false" title="Pick simulations to teach in order, then share one link">${ICONS.book}<span>Make a lesson</span></button>
+            <button class="btn lesson-toggle" aria-pressed="false" aria-label="Make a lesson" title="Pick simulations to teach in order, then share one link">${ICONS.book}<span>Make a lesson</span></button>
           </div>
         </div>
         <div class="grid"></div>
@@ -366,6 +366,7 @@ export class Gallery {
     // pill counts follow the age filter, so each pill says how many it will show
     this.el.querySelectorAll('.pills button').forEach((b) => {
       b.classList.toggle('on', b.dataset.f === this.filter);
+      b.setAttribute('aria-pressed', String(b.dataset.f === this.filter));
       const n = this.sims.filter((s) => forAge(s) && (b.dataset.f === 'all' || s.category === b.dataset.f)).length;
       b.querySelector('small').textContent = n;
     });
@@ -470,8 +471,10 @@ class HeroField {
     };
     window.addEventListener('pointermove', this.onMove);
     let last = performance.now();
+    // "reduce motion" in the device's settings: draw the starfield once and leave it still
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const loop = (t) => {
-      this.raf = requestAnimationFrame(loop);
+      if (!still) this.raf = requestAnimationFrame(loop);
       const dt = Math.min(0.05, (t - last) / 1000);
       last = t;
       this.draw(dt, t / 1000);
