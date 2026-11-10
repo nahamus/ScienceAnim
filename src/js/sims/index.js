@@ -27,9 +27,9 @@ const ORDER = [
   // cs
   'sorting', 'pathfinding', 'tsp', 'huffman', 'hamming', 'rsa', 'blockchain', 'life',
   // technology
-  'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'power-grid',
+  'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'power-grid', 'turbines',
   // earth
-  'seasons', 'coriolis', 'greenhouse', 'seismic-waves',
+  'seasons', 'coriolis', 'lightning', 'tornado', 'rainbows', 'greenhouse', 'seismic-waves',
 ];
 
 const rank = (id) => {
