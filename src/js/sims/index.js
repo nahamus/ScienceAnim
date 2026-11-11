@@ -15,13 +15,13 @@ const ORDER = [
   // artificial intelligence
   'transformer', 'llm-sampling', 'tokenizer', 'embeddings', 'diffusion', 'neural-network', 'backprop', 'gradient-descent', 'cnn', 'adversarial', 'q-learning', 'kmeans',
   // quantum
-  'qubit', 'bell-test', 'teleportation', 'quantum-error-correction', 'grover', 'bec', 'double-slit', 'quantum-tunneling',
+  'qubit', 'bell-test', 'teleportation', 'quantum-error-correction', 'grover', 'bec', 'double-slit', 'quantum-tunneling', 'schrodingers-cat',
   // astronomy
   'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole', 'gravitational-waves', 'expanding-universe', 'galaxy-collisions', 'dark-matter', 'tides',
   // chemistry
   'phases', 'molecule-shapes', 'orbitals', 'equilibrium', 'bz-reaction', 'battery', 'spectra', 'acids-bases', 'protein-folding', 'enzymes', 'snowflakes', 'self-assembly',
   // biology
-  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking', 'fireflies', 'antibiotic-resistance',
+  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking', 'fireflies', 'antibiotic-resistance', 'crispr', 'red-blood-cells',
   // math
   'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis', 'traffic', 'cooperation', 'small-world', 'bayes', 'monte-carlo',
   // cs
