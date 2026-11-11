@@ -393,9 +393,8 @@ export class Gallery {
       }
     };
     const prebuiltFor = (s) => files?.[s.id];
-    this.sims.forEach((s, i) => {
-      const file = prebuiltFor(s);
-      if (!file) return;
+    const fetchThumb = (i) => {
+      const s = this.sims[i];
       const el = this.cards[i].querySelector('.thumb-img');
       const img = new Image();
       img.onload = () => {
@@ -407,7 +406,27 @@ export class Gallery {
         if (!cachedThumb(s.id)) thumbQueue.unshift(s);
         startPump();
       };
-      img.src = `${import.meta.env.BASE_URL}thumbs/${file}`;
+      img.src = `${import.meta.env.BASE_URL}thumbs/${prebuiltFor(s)}`;
+    };
+    // Fetch each image only as its card nears the screen: the first screenful arrives at once and the
+    // rest of the library costs nothing until someone scrolls (or filters) to it.
+    const lazy = typeof IntersectionObserver !== 'undefined';
+    if (lazy) {
+      this.thumbObserver = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            this.thumbObserver.unobserve(e.target);
+            fetchThumb(this.cards.indexOf(e.target));
+          }
+        },
+        { rootMargin: '800px 0px' },
+      );
+    }
+    this.sims.forEach((s, i) => {
+      if (!prebuiltFor(s)) return;
+      if (lazy) this.thumbObserver.observe(this.cards[i]);
+      else fetchThumb(i);
     });
     const visible = (s) => !this.cards[this.sims.indexOf(s)].hidden;
     // cards in the current filter first, so the visible grid fills in before the rest
@@ -417,6 +436,7 @@ export class Gallery {
 
   destroy() {
     if (activeGallery === this) activeGallery = null;
+    this.thumbObserver?.disconnect();
     this.hero.destroy();
     this.cards.forEach((c) => this.stopPreview(c));
     this.el.remove();

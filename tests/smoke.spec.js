@@ -66,10 +66,31 @@ test.describe('gallery', () => {
     await page.route('**/thumbs/missing.jpg*', (r) => r.fulfill({ status: 404 }));
     await page.goto('./');
     const img = (id) => page.locator(`.card[data-id="${id}"] .thumb-img`);
+    await img(have.id).scrollIntoViewIfNeeded(); // images load as their cards come near the screen
     await expect(img(have.id)).toHaveClass(/ready/);
     expect(await img(have.id).getAttribute('style')).toContain('thumbs/have.png');
+    await img(missing.id).scrollIntoViewIfNeeded();
     await expect(img(missing.id)).toHaveClass(/ready/, { timeout: Math.max(75_000, SIMS.length * 1_200) }); // rendered live instead
     expect(await img(missing.id).getAttribute('style')).toContain('data:image/jpeg');
+  });
+
+  test('fetches thumbnails only as their cards come near the screen', async ({ page }) => {
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
+    const asked = new Set();
+    await page.route((url) => !isLocal(url.href), (route) => route.abort());
+    await page.route('**/thumbs/index.json', (r) => r.fulfill({ json: { files: Object.fromEntries(SIMS.map((s) => [s.id, `${s.id}.png?v=1`])) } }));
+    await page.route('**/thumbs/*.png*', (r) => {
+      asked.add(new URL(r.request().url()).pathname.split('/').pop().replace('.png', ''));
+      return r.fulfill({ body: png, contentType: 'image/png' });
+    });
+    await page.goto('./');
+    const first = await page.locator('.card').first().getAttribute('data-id');
+    const last = await page.locator('.card').last().getAttribute('data-id');
+    await expect(page.locator(`.card[data-id="${first}"] .thumb-img`)).toHaveClass(/ready/);
+    expect(asked.size).toBeLessThan(SIMS.length / 2); // most of the library has not been downloaded
+    expect(asked.has(last)).toBe(false);
+    await page.locator(`.card[data-id="${last}"]`).scrollIntoViewIfNeeded();
+    await expect(page.locator(`.card[data-id="${last}"] .thumb-img`)).toHaveClass(/ready/);
   });
 
   test('every simulation has curriculum tags', () => {
