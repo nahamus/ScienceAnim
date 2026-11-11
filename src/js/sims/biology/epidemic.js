@@ -49,8 +49,8 @@ export default {
     },
     {
       title: 'Flatten the curve',
-      text: 'Same disease, but 75% of people stay home. Infections still happen, but slowly. The peak is <b>lower and later</b> — and stays under hospital capacity.',
-      params: { distancing: 0.75, vax: 0 },
+      text: 'Same disease, but 80% of people stay home. Infections still happen, but slowly. The peak is <b>lower and later</b> — and stays under hospital capacity.',
+      params: { distancing: 0.8, vax: 0 },
       enter: (s) => s.init(),
       duration: 16,
     },
@@ -73,18 +73,25 @@ export default {
     const { ctx, params } = api;
     const DAY = 0.5; // seconds per day
     const RAD = 11;
+    // The town lives in a world of fixed area, scaled to fit the stage, so crowding (and so R₀) is the same on
+    // every screen. On a wide desktop stage the raw pixels made people so sparse the outbreak usually fizzled.
+    const AREA = 300000;
+    let k = 1, W = 1, H = 1;
+    const fit = () => ((k = Math.sqrt((api.w * api.h) / AREA) || 1), (W = api.w / k), (H = api.h / k));
     let people = [], sS = new Series(500), sI = new Series(500), sR = new Series(500), sparks = [], day = 0, peak = 0;
     const hash = new SpatialHash(RAD * 2);
 
     function init() {
-      const { w, h } = api;
+      fit();
+      const w = W, h = H;
       people = [];
       const n = Math.round(params.N);
       for (let i = 0; i < n; i++) {
         const a = rand(TAU), s = rand(25, 45);
         people.push({ x: rand(10, w - 10), y: rand(10, h - 10), vx: Math.cos(a) * s, vy: Math.sin(a) * s, st: Math.random() < params.vax ? 'V' : 'S', t: 0, home: Math.random(), pulse: 0 });
       }
-      const z = people.find((p) => p.st === 'S') || people[0];
+      // patient zero is someone still out and about, so a distanced town still gets an outbreak to slow down
+      const z = people.find((p) => p.st === 'S' && p.home >= params.distancing) || people.find((p) => p.st === 'S') || people[0];
       z.st = 'I';
       z.t = 0;
       sS.clear();
@@ -98,8 +105,9 @@ export default {
     return {
       init,
       resize() {
-        if (!people.length) init();
-        else for (const p of people) (p.x = Math.min(p.x, api.w - 5)), (p.y = Math.min(p.y, api.h - 5));
+        if (!people.length) return init();
+        fit();
+        for (const p of people) (p.x = Math.min(p.x, W - 5)), (p.y = Math.min(p.y, H - 5));
       },
       reset: init,
       onParam(k) {
@@ -108,7 +116,7 @@ export default {
       pointerDown(pt) {
         let best = null, bd = 900;
         for (const p of people) {
-          const d = (p.x - pt.x) ** 2 + (p.y - pt.y) ** 2;
+          const d = (p.x * k - pt.x) ** 2 + (p.y * k - pt.y) ** 2;
           if (d < bd && p.st === 'S') (bd = d), (best = p);
         }
         if (best) {
@@ -118,7 +126,7 @@ export default {
         }
       },
       update(dt) {
-        const { w, h } = api;
+        const w = W, h = H;
         day += dt / DAY;
         hash.clear();
         for (const p of people) {
@@ -176,17 +184,17 @@ export default {
             ctx.strokeStyle = 'rgba(255,77,109,0.18)';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, RAD, 0, TAU);
+            ctx.arc(p.x * k, p.y * k, RAD * k, 0, TAU);
             ctx.stroke();
-            drawGlow(ctx, p.x, p.y, 16 + p.pulse * 30, '#ff4d6d', 0.25);
+            drawGlow(ctx, p.x * k, p.y * k, 16 + p.pulse * 30, '#ff4d6d', 0.25);
           }
         }
         for (const s of sparks) {
           ctx.strokeStyle = `rgba(255,140,160,${1 - s.t / 0.5})`;
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(s.x1, s.y1);
-          ctx.lineTo(s.x2, s.y2);
+          ctx.moveTo(s.x1 * k, s.y1 * k);
+          ctx.lineTo(s.x2 * k, s.y2 * k);
           ctx.stroke();
         }
         ctx.globalCompositeOperation = 'source-over';
@@ -194,13 +202,13 @@ export default {
           ctx.fillStyle = COL[p.st];
           ctx.globalAlpha = p.st === 'R' ? 0.75 : 1;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.st === 'I' ? 4 : 3.4, 0, TAU);
+          ctx.arc(p.x * k, p.y * k, p.st === 'I' ? 4 : 3.4, 0, TAU);
           ctx.fill();
           if (p.home < params.distancing && p.st !== 'I') {
             ctx.strokeStyle = 'rgba(255,255,255,0.25)';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 6, 0, TAU);
+            ctx.arc(p.x * k, p.y * k, 6, 0, TAU);
             ctx.stroke();
           }
         }

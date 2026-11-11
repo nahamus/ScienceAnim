@@ -149,7 +149,7 @@ export default {
     {
       title: 'The accretion disk',
       text: 'Gas spiralling inward is heated to millions of degrees and glows fiercely. Inner regions orbit fastest and shine hottest. Nothing is stable closer than 3 rₛ — there the gas plunges in.',
-      params: { disk: true, beam: false, tilt: 22, dist: 22 },
+      params: { lens: 1, disk: true, beam: false, tilt: 22, dist: 22 },
       duration: 13,
     },
     {

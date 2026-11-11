@@ -234,7 +234,7 @@ export default {
         drawGlow(ctx, cx, cy, 16, '#ffffff', 0.25);
         ctx.globalCompositeOperation = 'source-over';
         if (!api.thumbnail) {
-          tag(ctx, `${ORBITALS[params.orb].label} orbital  ·  n = ${ORBITALS[params.orb].n}`, cx, Math.max(80, cy - S * 1.05), C.teal, { align: 'center', size: 12 });
+          tag(ctx, `${ORBITALS[params.orb].label} orbital  ·  n = ${ORBITALS[params.orb].n}`, cx, Math.max(124, cy - S * 1.05), C.teal, { align: 'center', size: 12 });
           tag(ctx, 'nucleus', cx + 20, cy + 22, C.ink);
         }
       },
