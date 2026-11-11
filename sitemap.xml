@@ -25,6 +25,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/star-life/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/tides/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/antibiotic-resistance/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/crispr/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/dna/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/ecosystem/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/epidemic/</loc></url>
@@ -32,6 +33,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/flocking/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/natural-selection/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/neuron/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/red-blood-cells/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/turing-patterns/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/vision/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/white-blood-cells/</loc></url>
@@ -110,6 +112,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/grover/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/quantum-tunneling/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/qubit/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/schrodingers-cat/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/teleportation/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/binary/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/cpu/</loc></url>
