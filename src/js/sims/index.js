@@ -21,15 +21,15 @@ const ORDER = [
   // chemistry
   'phases', 'molecule-shapes', 'orbitals', 'equilibrium', 'bz-reaction', 'battery', 'spectra', 'acids-bases', 'protein-folding', 'enzymes', 'snowflakes', 'self-assembly',
   // biology
-  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking',
+  'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking', 'fireflies',
   // math
-  'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis',
+  'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis', 'traffic',
   // cs
   'sorting', 'pathfinding', 'tsp', 'huffman', 'hamming', 'rsa', 'blockchain', 'life',
   // technology
   'binary', 'logic-gates', 'cpu', 'networking', 'radio', 'screens', 'semiconductors', 'power-grid', 'turbines',
   // earth
-  'seasons', 'coriolis', 'lightning', 'tornado', 'rainbows', 'greenhouse', 'seismic-waves',
+  'seasons', 'coriolis', 'lightning', 'tornado', 'rainbows', 'greenhouse', 'forest-fire', 'seismic-waves',
 ];
 
 const rank = (id) => {
