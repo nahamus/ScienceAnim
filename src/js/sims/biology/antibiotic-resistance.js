@@ -42,6 +42,8 @@ export default {
       options: [{ value: 'steps', label: 'Gentle steps' }, { value: 'jump', label: 'One big jump' }],
     },
     { key: 'speed', label: 'Speed', type: 'range', min: 0.5, max: 6, step: 0.5, value: 2, format: (v) => v + '×' },
+    // the quick check shows a plate that has already evolved for a few days
+    { key: 'ff', type: 'toggle', value: false, hidden: true },
     { key: 'restart', label: 'Restart the plate', type: 'button', action: (s) => s.restart() },
   ],
   story: [
@@ -66,10 +68,10 @@ export default {
         q: 'Where did the bacteria’s resistance come from?',
         options: ['Random mutations, selected because the antibiotic killed everything else', 'The antibiotic changed the bacteria to protect them', 'Bacteria decided to become resistant'],
         answer: 0,
-        setup: { mut: 0.002, cost: 0.05, bands: 'steps', speed: 3 },
+        setup: { mut: 0.002, cost: 0.05, bands: 'steps', speed: 3, ff: true },
         explain: 'Mutations happen at random, all the time, whether there is antibiotic or not. The antibiotic doesn’t cause them; it acts as a filter, killing everything except the rare mutants that happen to resist. That is natural selection.',
       },
-      params: { mut: 0.002, cost: 0.05, bands: 'steps', speed: 3 },
+      params: { mut: 0.002, cost: 0.05, bands: 'steps', speed: 3, ff: false },
       enter: (s) => s.restart(),
       duration: 18,
     },
@@ -100,12 +102,14 @@ export default {
     const grid = new Uint16Array(GW * GH); // 0 = empty, else lineage index + 1
     let lineages = [], hours = 0, acc = 0, mutations = 0, best = 0;
     const img = { canvas: null, data: null };
+    const cols = [];
     const bandOf = (x) => Math.min(8, Math.floor((x / GW) * 9));
     const level = (x) => BANDS[params.bands][bandOf(x)];
 
     function restart() {
       grid.fill(0);
       lineages = [{ r: 0, hue: 205, parent: -1 }, { r: 0, hue: 205, parent: -1 }];
+      cols.length = 0;
       for (let y = 0; y < GH; y++) {
         grid[y * GW] = 1;
         grid[y * GW + GW - 1] = 2;
@@ -156,8 +160,12 @@ export default {
     return {
       restart,
       reset: restart,
-      onParam(k) {
+      onParam(k, v) {
         if (k === 'bands') restart();
+        if (k === 'ff' && v) {
+          restart();
+          for (let s = 0; s < 220; s++) step();
+        }
       },
       update(dt) {
         acc += dt * params.speed * 6;
@@ -191,15 +199,18 @@ export default {
           img.canvas.height = GH;
           img.data = img.canvas.getContext('2d').createImageData(GW, GH);
         }
-        const cols = lineages.map((L) => {
-          const s = 0.75, l = 0.42 + L.r * 0.08;
-          const a = s * Math.min(l, 1 - l);
+        // colours are worked out once per lineage
+        if (cols.length > lineages.length) cols.length = 0;
+        for (let k = cols.length; k < lineages.length; k++) {
+          const L = lineages[k];
+          const sat = 0.75, l = 0.42 + L.r * 0.08;
+          const a = sat * Math.min(l, 1 - l);
           const f = (n) => {
-            const k = (n + L.hue / 30) % 12;
-            return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
+            const q = (n + L.hue / 30) % 12;
+            return Math.round(255 * (l - a * Math.max(-1, Math.min(q - 3, 9 - q, 1))));
           };
-          return [f(0), f(8), f(4)];
-        });
+          cols.push([f(0), f(8), f(4)]);
+        }
         const D = img.data.data;
         for (let i = 0; i < grid.length; i++) {
           const id = grid[i];

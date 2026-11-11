@@ -39,6 +39,8 @@ export default {
     { key: 'speed', label: 'Growth speed', type: 'range', min: 0.2, max: 3, step: 0.1, value: 1, format: (v) => v.toFixed(1) + '×' },
     { key: 'vapour', label: 'Show the water vapour', type: 'toggle', value: false },
     { key: 'diary', label: 'Weather keeps changing', type: 'toggle', value: false },
+    // a quick-check screen shows a finished flake instead of a bare seed
+    { key: 'pregrow', label: 'pregrow', type: 'range', min: 0, max: 1, step: 1, value: 0, hidden: true, instant: true },
     { key: 'again', label: 'New flake', type: 'button', action: (s) => s.seed() },
   ],
   story: [
@@ -70,10 +72,10 @@ export default {
         q: 'Why are the six arms of a snowflake so alike?',
         options: ['They all grew at the same time in the same conditions', 'Each arm copies the shape of the others', 'The wind shapes them all equally'],
         answer: 0,
-        setup: { kind: 'stellar', speed: 1 },
+        setup: { kind: 'stellar', speed: 1, pregrow: 1 },
         explain: 'The arms can’t communicate: the flake is far too small for that to matter. But they are all only a millimetre apart, so they feel the same temperature and humidity at every moment, and respond in the same way.',
       },
-      params: { kind: 'fern', speed: 1.2 },
+      params: { kind: 'fern', speed: 1.2, pregrow: 0 },
       enter: (s) => s.seed(),
       duration: 15,
     },
@@ -84,10 +86,10 @@ export default {
         q: 'A snowflake has long branching arms with flat plates on their tips. What happened as it fell?',
         options: ['The conditions changed late in its growth', 'It broke and was glued back together', 'Nothing: all snowflakes look like this'],
         answer: 0,
-        setup: { kind: 'stellar', speed: 1, diary: false },
+        setup: { kind: 'stellar', speed: 1, diary: false, pregrow: 1 },
         explain: 'The arms branch while conditions favour branching; when the air changes, every tip switches to growing plates at the same moment. Reading a flake from the middle out tells you the weather it fell through.',
       },
-      params: { speed: 1, diary: true },
+      params: { speed: 1, diary: true, pregrow: 0 },
       enter: (s) => s.seed(),
       duration: 18,
     },
@@ -185,6 +187,15 @@ export default {
       return m;
     }
 
+    function growAll() {
+      seed();
+      const t0 = performance.now();
+      for (let k = 0; R < c - 8 && performance.now() - t0 < 700; k++) {
+        step();
+        if (k % 20 === 0) R = radius();
+      }
+    }
+
     return {
       seed,
       reset: seed,
@@ -192,12 +203,14 @@ export default {
         if (!N) {
           alloc();
           seed();
+          if (params.pregrow) growAll();
         }
       },
       onParam(k, v) {
         if (k === 'kind' && N) setKind(v);
         if (k === 'diary' && v && N) (diaryT = 0), (diaryI = 0), setKind(DIARY[0]);
         if (k === 'diary' && !v && N) setKind(params.kind);
+        if (k === 'pregrow' && v && N) growAll();
       },
       pointerDown() {
         seed();

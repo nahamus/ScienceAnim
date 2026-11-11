@@ -353,8 +353,8 @@ export default {
               roundRect(ctx, x - bw * 0.45, yTop - bw * 0.42, bw * 0.9, bw * 0.84, 4);
               ctx.fill();
             }
-            text(ctx, b, x, yTop, { size: bw * 0.62, weight: 700, align: 'center', color: colr, mono: true });
-            text(ctx, p, x, yBot, { size: bw * 0.62, weight: 700, align: 'center', color: 'rgba(233,237,247,0.45)', mono: true });
+            text(ctx, b, x, yTop, { size: bw * 0.62, weight: 700, align: 'center', color: colr, mono: true, shadow: false });
+            text(ctx, p, x, yBot, { size: bw * 0.62, weight: 700, align: 'center', color: 'rgba(233,237,247,0.45)', mono: true, shadow: false });
           }
         }
         // Cas9 and its guide
@@ -381,7 +381,7 @@ export default {
               let col = 'rgba(233,237,247,0.85)';
               if (state !== 'hop' && fromPam < checkK) col = matchFlags[fromPam] === false ? C.red : C.teal;
               if (state === 'check' && fromPam >= matchFlags.length) col = 'rgba(233,237,247,0.35)';
-              text(ctx, gd[k] === 'T' ? 'U' : gd[k], x, gy, { size: bw * 0.62, weight: 700, align: 'center', color: col, mono: true });
+              text(ctx, gd[k] === 'T' ? 'U' : gd[k], x, gy, { size: bw * 0.62, weight: 700, align: 'center', color: col, mono: true, shadow: false });
             }
             text(ctx, 'guide RNA', xOf(pos) - bw, gy, { size: 10, align: 'right', color: C.dim });
             if (!g.phone && state !== 'hop') {

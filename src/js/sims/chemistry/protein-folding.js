@@ -39,6 +39,8 @@ export default {
     { key: 'water', label: 'Show water', type: 'toggle', value: true },
     // chapter 1 grows the chain on the ribosome; every later chapter (including links straight to it) starts from a whole chain
     { key: 'grow', type: 'toggle', value: false, hidden: true },
+    // the 'inside and out' quick check shows a chain that has already folded
+    { key: 'fold', type: 'toggle', value: false, hidden: true },
     { key: 'stretch', label: 'Stretch it out', type: 'button', action: (s) => s.stretch() },
     { key: 'mutate', label: 'Mutate one bead', type: 'button', action: (s) => s.mutate() },
   ],
@@ -63,10 +65,10 @@ export default {
         q: 'In a folded protein, where do most of the oily (hydrophobic) amino acids end up?',
         options: ['Buried in the core, away from water', 'On the surface, touching water', 'Spread evenly everywhere'],
         answer: 0,
-        setup: { seq: 'designed', temp: 0.5 },
+        setup: { seq: 'designed', temp: 0.5, fold: true },
         explain: 'Water molecules would rather bond with each other than sit next to oil, so the chain settles with oily beads inside and water-loving beads outside. It is the same reason oil drops merge in salad dressing.',
       },
-      params: { seq: 'designed', temp: 0.5 },
+      params: { seq: 'designed', temp: 0.5, fold: false },
       duration: 13,
     },
     {
@@ -267,6 +269,11 @@ export default {
       onParam(k, v) {
         if (k === 'seq') stretch();
         if (k === 'grow') v ? synthesize() : finish();
+        if (k === 'fold' && v) {
+          finish();
+          const t0 = performance.now();
+          while (performance.now() - t0 < 600) step();
+        }
       },
       pointerDown(p) {
         let best = -1, bd = 30 * 30;

@@ -20,7 +20,7 @@ export default {
   topics: ['Human body', 'Blood', 'Respiration'],
   keywords: ['red blood cells', 'erythrocytes', 'haemoglobin', 'hemoglobin', 'oxygen', 'circulation', 'capillaries', 'oxygen dissociation curve', 'Bohr effect', 'cooperative binding', 'sickle cell', 'carbon monoxide', 'altitude', 'EPO', 'anaemia', 'blood is not blue'],
   blurb:
-    'A quarter of all the cells in your body are red blood cells: about 25 trillion flexible discs packed with haemoglobin. Each lap of your body takes about a minute. They load up with oxygen in the lungs, squeeze single-file through capillaries narrower than themselves, and hand the oxygen over exactly where it’s needed most. See how, and what happens with sickle-cell disease, carbon monoxide and thin mountain air.',
+    'Most of the cells in your body are red blood cells: about 25 trillion of the 30 trillion or so, each a flexible disc packed with haemoglobin. Each lap of your body takes about a minute. They load up with oxygen in the lungs, squeeze single-file through capillaries narrower than themselves, and hand the oxygen over exactly where it’s needed most. See how, and what happens with sickle-cell disease, carbon monoxide and thin mountain air.',
   ideas: [
     'Red blood cells have <b>no nucleus</b>, leaving room for about 270 million haemoglobin molecules each.',
     'Each haemoglobin has <b>four seats</b> for oxygen. Seats fill more easily once others are taken, which gives an <b>S-shaped</b> loading curve.',
@@ -47,7 +47,7 @@ export default {
   story: [
     {
       title: '25 trillion couriers',
-      text: 'About a quarter of all the cells in your body are red blood cells. Each is a squashy disc, dimpled on both sides, with no nucleus: that leaves room for about 270 million molecules of haemoglobin, the red, iron-containing protein that carries oxygen. Each cell lasts about 120 days, so you make roughly 2.5 million new ones every second.',
+      text: 'Red blood cells are by far the most common cells in your body: about 25 trillion of the roughly 30 trillion. Each is a squashy disc, dimpled on both sides, with no nucleus: that leaves room for about 270 million molecules of haemoglobin, the red, iron-containing protein that carries oxygen. Each cell lasts about 120 days, so you make roughly 2.5 million new ones every second.',
       params: { scene: 'loop', exercise: 0, altitude: 0, acclim: false, sickle: 0, co: 0, speed: 1 },
       duration: 14,
     },

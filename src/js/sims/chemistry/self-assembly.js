@@ -34,6 +34,8 @@ export default {
     { key: 'temp', label: 'Temperature', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.3, format: (v) => (v < 0.25 ? 'cool' : v < 0.5 ? 'warm' : v < 0.75 ? 'hot' : 'very hot') },
     // builds the membrane bubble (also for the quick check, which shows the scene before its chapter starts)
     { key: 'bubble', type: 'toggle', value: false, hidden: true },
+    // lets the quick-check scene settle into micelles before the question is asked
+    { key: 'settle', type: 'toggle', value: false, hidden: true },
     { key: 'shuffle', label: 'Scatter them', type: 'button', action: (s) => s.scatter() },
     { key: 'bubble', label: 'Make a membrane bubble', type: 'button', action: (s) => s.vesicle() },
     { key: 'poke', label: 'Poke a hole', type: 'button', action: (s) => s.poke() },
@@ -59,10 +61,10 @@ export default {
         q: 'In a micelle floating in water, which part of each soap molecule faces outwards, into the water?',
         options: ['The water-loving head', 'The oily tail', 'It is random'],
         answer: 0,
-        setup: { kind: 'soap', count: 110, oil: 0, temp: 0.3 },
+        setup: { kind: 'soap', count: 110, oil: 0, temp: 0.3, settle: true },
         explain: 'Heads face the water and tails hide in the middle. Turn it around in oil (as in some cosmetics) and you get reverse micelles, with the heads inside.',
       },
-      params: { kind: 'soap', count: 110, oil: 0, temp: 0.3 },
+      params: { kind: 'soap', count: 110, oil: 0, temp: 0.3, settle: false },
       duration: 13,
     },
     {
@@ -198,6 +200,26 @@ export default {
         }
     }
 
+    /** Soap already gathered into micelles (heads out, tails in), as it would be after a while, then relaxed. */
+    function settle() {
+      if (!api.w) return;
+      layout();
+      clear();
+      const n = Math.round(params.count), per = 9, groups = Math.floor(n / per);
+      const cols = Math.ceil(Math.sqrt((groups * W) / H));
+      const rows = Math.ceil(groups / cols);
+      for (let g = 0; g < groups; g++) {
+        const cx = W * ((g % cols) + 0.5) / cols + rand(-1, 1), cy = H * (0.12 + 0.76 * ((Math.floor(g / cols) + 0.5) / rows)) + rand(-1, 1);
+        for (let j = 0; j < per; j++) {
+          const a = (j / per) * TAU + rand(-0.1, 0.1);
+          addMol(params.kind, cx + Math.cos(a) * 2.4, cy + Math.sin(a) * 2.4, a + Math.PI);
+        }
+      }
+      for (let i = groups * per; i < n; i++) addMol(params.kind, rand(2, W - 2), rand(2, H - 2), rand(TAU));
+      const t0 = performance.now();
+      while (performance.now() - t0 < 250) step();
+      census();
+    }
     function step() {
       const n = P.length, fx = new Float64Array(n), fy = new Float64Array(n);
       for (const [i, j] of bonds) {
@@ -285,6 +307,15 @@ export default {
       return sizes;
     }
     let stats = { micelles: 0, loose: 0, droplets: 0, coated: 0 }, statT = 0;
+    function census() {
+      const cl = clusters();
+      stats = {
+        micelles: cl.filter((c) => c.mols >= 4 && !c.oil).length,
+        loose: cl.filter((c) => c.mols === 1 && !c.oil).length,
+        droplets: cl.filter((c) => c.oil >= 6).length,
+        coated: cl.filter((c) => c.oil >= 6 && c.mols >= 4).length,
+      };
+    }
 
     return {
       scatter,
@@ -295,8 +326,11 @@ export default {
         const had = P.length;
         layout();
         if (!had) scatter();
+        if (!had && params.settle) settle();
+
       },
       onParam(key, v) {
+        if (key === 'settle' && v) return settle();
         if (key === 'bubble' && v) return vesicle();
         if (key === 'kind' || key === 'count' || key === 'oil') {
           // add or remove molecules and oil to match the sliders without starting again
@@ -332,13 +366,7 @@ export default {
         statT -= dt;
         if (statT <= 0 && !api.thumbnail) {
           statT = 0.5;
-          const cl = clusters();
-          stats = {
-            micelles: cl.filter((c) => c.mols >= 4 && !c.oil).length,
-            loose: cl.filter((c) => c.mols === 1 && !c.oil).length,
-            droplets: cl.filter((c) => c.oil >= 6).length,
-            coated: cl.filter((c) => c.oil >= 6 && c.mols >= 4).length,
-          };
+          census();
         }
       },
       draw() {

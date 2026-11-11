@@ -55,6 +55,8 @@ export default {
       options: [{ value: 'darts', label: 'Darts and a circle' }, { value: 'needle', label: 'Buffon’s needles' }, { value: 'area', label: 'Area of the Mandelbrot set' }],
     },
     { key: 'rate', label: 'Throws per second', type: 'range', min: 1, max: 4000, step: 1, value: 5, format: (v) => String(Math.round(v)) },
+    // the quick check shows a board with darts already on it
+    { key: 'prefill', type: 'toggle', value: false, hidden: true },
     { key: 'clear', label: 'Start again', type: 'button', action: (s) => s.clear() },
     { key: 'more', label: 'Throw 100,000 at once', type: 'button', action: (s) => s.burst(100000) },
   ],
@@ -81,10 +83,10 @@ export default {
         q: 'To make the estimate ten times more accurate, how many more darts do you need?',
         options: ['100 times as many', '10 times as many', '1,000 times as many'],
         answer: 0,
-        setup: { scene: 'darts', rate: 600 },
+        setup: { scene: 'darts', rate: 600, prefill: true },
         explain: 'The error shrinks with the square root of the number of throws. √100 = 10, so a hundred times more darts buys ten times more accuracy. That is why Monte Carlo is easy to start but expensive to perfect.',
       },
-      params: { scene: 'darts', rate: 3000 },
+      params: { scene: 'darts', rate: 3000, prefill: false },
       duration: 15,
     },
     {
@@ -252,8 +254,9 @@ export default {
         const m = params.scene === 'area' ? Math.min(k, 30000) : k;
         for (let i = 0; i < m; i++) throwOne(false);
       },
-      onParam(k) {
+      onParam(k, v) {
         if (k === 'scene') layer = null;
+        if (k === 'prefill' && v) this.burst(3000);
       },
       update(dt) {
         const g = geom();

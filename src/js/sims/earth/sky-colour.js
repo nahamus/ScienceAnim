@@ -337,6 +337,15 @@ export default {
         // inset: light being scattered
         if (params.inset) {
           const ix = g.inset;
+          // a still frame (a paused quick check) still shows sunlight streaming in
+          if (!photons.length) {
+            for (let k = 0; k < 70; k++) {
+              spawnPhoton(g);
+              const ph = photons[photons.length - 1], d = Math.random() * ix.h * 0.7;
+              ph.x += ph.vx * d;
+              ph.y += ph.vy * d;
+            }
+          }
           ctx.fillStyle = 'rgba(6,9,20,0.86)';
           ctx.strokeStyle = 'rgba(255,255,255,0.12)';
           roundRect(ctx, ix.x, ix.y, ix.w, ix.h, 12);

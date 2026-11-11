@@ -90,7 +90,7 @@ export default {
     },
     {
       title: 'The problem with putting fires out',
-      text: 'In 1988 a third of Yellowstone National Park burned. One cause was decades of putting out every small fire.',
+      text: 'In 1988 a third of Yellowstone National Park burned in an extremely dry, windy summer. In many forests, decades of putting out every small fire had also let fuel build up.',
       check: {
         q: 'Why can stopping every small fire make giant fires more likely?',
         options: ['The forest keeps filling in until it is far above the tipping point, so the next fire connects everything', 'Small fires make the trees fireproof', 'It doesn’t: it always makes fires smaller'],
