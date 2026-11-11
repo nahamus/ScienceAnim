@@ -19,7 +19,7 @@ const ORDER = [
   // astronomy
   'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole', 'gravitational-waves',
   // chemistry
-  'phases', 'molecule-shapes', 'orbitals', 'equilibrium', 'bz-reaction', 'battery', 'spectra', 'acids-bases',
+  'phases', 'molecule-shapes', 'orbitals', 'equilibrium', 'bz-reaction', 'battery', 'spectra', 'acids-bases', 'protein-folding', 'enzymes', 'snowflakes', 'self-assembly',
   // biology
   'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking',
   // math
