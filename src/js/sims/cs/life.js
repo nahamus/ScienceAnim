@@ -203,7 +203,8 @@ export default {
           step();
         }
         for (let i = 0; i < heat.length; i++) if (heat[i] > 0) heat[i] = Math.max(0, heat[i] - dt * 1.2);
-        if (n && api.frame % 2 === 0) {
+        // sample after every step: gating on frame parity could miss every step at some speeds (count stuck at 0)
+        if (n) {
           let pop = 0;
           for (let i = 0; i < cur.length; i++) pop += cur[i];
           popS.push(pop);

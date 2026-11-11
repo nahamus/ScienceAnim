@@ -1,7 +1,7 @@
 import { C, TAU, clamp, tag, text, backdrop, rand } from '../../core/util.js';
 
 // Refractive index of water across the visible spectrum (Cauchy fit), and a rough colour for each.
-const nWater = (nm) => 1.3195 + 3.0e3 / (nm * nm) + 2.2e8 / nm ** 4;
+const nWater = (nm) => 1.3245 + 2986 / (nm * nm); // 1.3428 at 404 nm, 1.3330 at 589 nm, 1.3306 at 700 nm
 const SPECTRUM = [
   { nm: 700, col: '#ff3b3b', name: 'red' },
   { nm: 620, col: '#ff8a1f', name: 'orange' },

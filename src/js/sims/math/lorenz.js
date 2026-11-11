@@ -61,7 +61,7 @@ export default {
     },
     {
       title: 'Explore',
-      text: 'Drag to rotate. Try ρ = 99.96 territory by maxing it out, or tweak σ and β to find periodic orbits hidden among the chaos.',
+      text: 'Drag to rotate. Try ρ just above 24.7, where chaos only just survives, or push it to 50, or tweak σ and β to find periodic orbits hidden among the chaos.',
       params: { rho: 28, count: 300, trail: 60 },
       duration: 20,
     },

@@ -118,7 +118,7 @@ export default {
         q: 'The wind speed doubles from 5 m/s to 10 m/s. How much more power does the wind carry?',
         options: ['Twice as much', 'Four times as much', 'Eight times as much'],
         answer: 2,
-        explain: 'Power goes as the cube of wind speed: 2 × 2 × 2 = 8. At 5 m/s these blades sweep about 0.5 MW of wind; at 10 m/s, 3.8 MW.',
+        explain: 'Power goes as the cube of wind speed: 2 × 2 × 2 = 8. At 5 m/s these blades sweep about 0.6 MW of wind; at 10 m/s, 4.8 MW.',
       },
       enter: (s, r) => s.later(3.5, () => r.set('wind', 10, 4)),
       duration: 16,

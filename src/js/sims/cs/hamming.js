@@ -106,7 +106,7 @@ export default {
     },
     {
       title: 'A clean picture through a noisy line',
-      text: 'Each 4 pixels travel as a 7-bit block and the receiver fixes any single flip. At 3% noise the unprotected picture has dozens of wrong pixels; the coded one usually has none, at the cost of sending 75% more bits.',
+      text: 'Each 4 pixels travel as a 7-bit block and the receiver fixes any single flip. At 3% noise the unprotected picture has about two dozen wrong pixels; the coded one only a few (blocks that were hit twice), at the cost of sending 75% more bits.',
       params: { noise: 0.03, checks: 3, errors: 1, auto: true, speed: 1.2 },
       enter: (s) => s.resend(),
       duration: 14,
@@ -127,7 +127,7 @@ export default {
     },
     {
       title: 'Codes are everywhere',
-      text: 'Hamming invented his code in 1950, fed up with Bell Labs’ computer halting on errors over weekends. Today server memory corrects flipped bits on the fly; <b>QR codes</b> use Reed–Solomon codes and still scan with up to 30% damaged; Voyager’s photos crossed 20 billion km; and your phone’s 5G link uses LDPC and polar codes close to Shannon’s theoretical limit.',
+      text: 'Hamming invented his code in 1950, fed up with Bell Labs’ computer halting on errors over weekends. Today server memory corrects flipped bits on the fly; <b>QR codes</b> use Reed–Solomon codes and still scan with up to 30% damaged; Voyager still sends data home across more than 20 billion km; and your phone’s 5G link uses LDPC and polar codes close to Shannon’s theoretical limit.',
       params: { noise: 0.05, checks: 3, errors: 1, auto: true, speed: 1.2 },
       enter: (s) => (s.restartDemo(), s.resend()),
       duration: 17,
