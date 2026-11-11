@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://nahamus.github.io/ScienceAnim/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/adversarial/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/backprop/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/cnn/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/diffusion/</loc></url>
@@ -22,6 +23,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/dna/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/ecosystem/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/epidemic/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/fireflies/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/flocking/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/natural-selection/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/neuron/</loc></url>
@@ -49,6 +51,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/sorting/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/tsp/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/coriolis/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/forest-fire/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/greenhouse/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/lightning/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/rainbows/</loc></url>
@@ -61,6 +64,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/lorenz/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/mandelbrot/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/phyllotaxis/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/traffic/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/accelerator/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/bernoulli/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/brownian/</loc></url>
@@ -90,6 +94,7 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/bec/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/bell-test/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/double-slit/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/quantum-error-correction/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/grover/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/quantum-tunneling/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/qubit/</loc></url>
