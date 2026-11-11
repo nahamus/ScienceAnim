@@ -14,12 +14,16 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/tokenizer/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/transformer/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/black-hole/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/dark-matter/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/exoplanets/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/expanding-universe/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/galaxy-collisions/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/gravitational-waves/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/gravity/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/moon-phases/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/orbital-transfer/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/star-life/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/tides/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/dna/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/ecosystem/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/epidemic/</loc></url>
@@ -58,12 +62,16 @@
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/seasons/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/seismic-waves/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/tornado/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/bayes/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/cooperation/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/fourier/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/galton/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/logistic-map/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/lorenz/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/mandelbrot/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/monte-carlo/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/phyllotaxis/</loc></url>
+  <url><loc>https://nahamus.github.io/ScienceAnim/sim/small-world/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/traffic/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/accelerator/</loc></url>
   <url><loc>https://nahamus.github.io/ScienceAnim/sim/bernoulli/</loc></url>
