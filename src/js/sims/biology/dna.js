@@ -50,7 +50,7 @@ export default {
     },
     {
       title: 'A four-letter alphabet',
-      text: 'There are four bases: <b style="color:#ff5f6d">A</b>, <b style="color:#ffc145">T</b>, <b style="color:#38d6f5">G</b> and <b style="color:#2ee6a6">C</b>. They pair only one way — A with T, G with C — so each strand is a mirror-image backup of the other. The order of letters is the genetic code.',
+      text: 'There are four bases: <b style="color:#ff5f6d">A</b>, <b style="color:#ffc145">T</b>, <b style="color:#38d6f5">G</b> and <b style="color:#2ee6a6">C</b>. They pair only one way — A with T, G with C — so each strand is a matching backup of the other. The order of letters is the genetic code.',
       formula: 'A ═ T      G ≡ C',
       params: { mode: 'helix', letters: true },
       duration: 13,

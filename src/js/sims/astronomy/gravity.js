@@ -95,7 +95,7 @@ export default {
     },
     {
       title: 'Binary stars',
-      text: 'Most stars have a partner. Two suns circle their shared centre of mass, while a planet orbits both — a real-life Tatooine.',
+      text: 'About half of Sun-like stars have a partner. Two suns circle their shared centre of mass, while a planet orbits both — a real-life Tatooine.',
       params: { scene: 'binary', trail: 600 },
       duration: 13,
     },
@@ -107,7 +107,7 @@ export default {
     },
     {
       title: '…and its collapse',
-      text: 'Nudge one star by a hair and the dance falls apart. Within a few loops the motion becomes <b>chaotic</b>, and one star may be flung away entirely.',
+      text: 'The figure-eight shrugs off tiny nudges, but give one star a firm push and the dance falls apart. Within a few loops the motion becomes <b>chaotic</b>, and one star may be flung away entirely.',
       params: { scene: 'eight', trail: 600 },
       enter: (s) => s.nudge(),
       duration: 16,
@@ -175,9 +175,10 @@ export default {
       nudge() {
         const b = bodies[bodies.length - 1];
         if (b) {
-          b.vx *= 1.004;
-          b.vy *= 0.996;
-          b.x += 0.5;
+          // the figure-eight is stable against tiny nudges (it just wobbles), so this has to be a real shove
+          b.vx *= 1.12;
+          b.vy *= 0.88;
+          b.x += 10;
         }
       },
       resize(w, h) {

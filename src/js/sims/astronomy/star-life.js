@@ -253,7 +253,7 @@ export default {
         }
 
         // the star itself
-        const cx = wide ? w * 0.25 : w * 0.5, cy = wide ? h * 0.42 : h * 0.24;
+        const cx = wide ? w * 0.25 : w * 0.5, cy = wide ? h * 0.45 : h * 0.24;
         const maxR = wide ? Math.min(w * 0.2, h * 0.3) : Math.min(w * 0.3, h * 0.14);
         const rpx = clamp(14 + Math.log10(Math.max(1e-5, s.rad) * 100) * (maxR / 4.6), 2, maxR);
         const col = tempColor(Math.min(s.lt, 4.7));
@@ -314,8 +314,10 @@ export default {
           }
         }
         if (!api.thumbnail) {
-          tag(ctx, s.stage, cx, Math.min(h - 30, cy + maxR + 30), s.stage === 'SUPERNOVA' ? C.red : C.amber, { align: 'center', size: 13 });
-          if (s.note) text(ctx, s.note, cx, Math.min(h - 8, cy + maxR + 56), { size: 11, align: 'center', color: C.dim });
+          // wide: label above the star, clear of the story card that covers the lower left
+          const ty = wide ? Math.max(126, cy - maxR - 40) : Math.min(h - 30, cy + maxR + 30);
+          tag(ctx, s.stage, cx, ty, s.stage === 'SUPERNOVA' ? C.red : C.amber, { align: 'center', size: 13 });
+          if (s.note) text(ctx, s.note, cx, wide ? ty + 22 : Math.min(h - 8, ty + 26), { size: 11, align: 'center', color: C.dim });
         }
       },
       stats() {

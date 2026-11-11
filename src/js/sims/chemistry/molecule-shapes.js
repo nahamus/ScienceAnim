@@ -79,7 +79,7 @@ export default {
     },
     {
       title: 'Four: a tetrahedron',
-      text: 'With four regions, a flat square (90°) is not the best you can do. Going 3D, they reach <b>109.5°</b> apart: a tetrahedron. This is the shape of methane and of the carbon in every living thing.',
+      text: 'With four regions, a flat square (90°) is not the best you can do. Going 3D, they reach <b>109.5°</b> apart: a tetrahedron. This is the shape of methane, and of most carbon atoms in living things.',
       params: { mol: 'ch4' },
       enter: (s) => s.scramble(),
       duration: 12,
@@ -287,8 +287,8 @@ export default {
           }
         }
         if (!api.thumbnail) {
-          tag(ctx, m.name, cx, Math.max(84, cy - S * 1.9), C.ink, { align: 'center', size: 13 });
-          tag(ctx, `${m.shape}  ·  ${bondAngle().toFixed(1)}°`, cx, Math.max(112, cy - S * 1.9 + 28), C.amber, { align: 'center', size: 12 });
+          tag(ctx, m.name, cx, Math.max(126, cy - S * 1.9), C.ink, { align: 'center', size: 13 });
+          tag(ctx, `${m.shape}  ·  ${bondAngle().toFixed(1)}°`, cx, Math.max(154, cy - S * 1.9 + 28), C.amber, { align: 'center', size: 12 });
         }
       },
       stats() {
