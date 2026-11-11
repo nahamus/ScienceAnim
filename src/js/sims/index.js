@@ -17,7 +17,7 @@ const ORDER = [
   // quantum
   'qubit', 'bell-test', 'teleportation', 'quantum-error-correction', 'grover', 'bec', 'double-slit', 'quantum-tunneling',
   // astronomy
-  'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole', 'gravitational-waves',
+  'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole', 'gravitational-waves', 'expanding-universe', 'galaxy-collisions', 'dark-matter', 'tides',
   // chemistry
   'phases', 'molecule-shapes', 'orbitals', 'equilibrium', 'bz-reaction', 'battery', 'spectra', 'acids-bases', 'protein-folding', 'enzymes', 'snowflakes', 'self-assembly',
   // biology
