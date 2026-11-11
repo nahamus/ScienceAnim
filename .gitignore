@@ -48,3 +48,6 @@ playwright-report/
 
 # Performance profile (npm run profile)
 profile.json
+
+# local Claude Code session settings
+.claude/

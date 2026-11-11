@@ -308,7 +308,7 @@ export default {
     },
     {
       title: 'The first light',
-      text: 'For its first 380,000 years the universe was a glowing fog of nuclei and electrons, as hot as the Sun’s surface or hotter. Light kept bouncing off the free electrons, and sound waves rippled through the fog. Once it cooled to about 3,000 °C, electrons joined nuclei to make atoms and the fog cleared. That light is still all around us, now stretched 1,100 times into microwaves: the <b>cosmic microwave background</b>.',
+      text: 'For its first 380,000 years the universe was a glowing fog of nuclei and electrons, as hot as the Sun’s surface or hotter. Light kept bouncing off the free electrons, and sound waves rippled through the fog. Once it cooled to about 3,000 K (2,700 °C), electrons joined nuclei to make atoms and the fog cleared. That light is still all around us, now stretched 1,100 times into microwaves: the <b>cosmic microwave background</b>.',
       formula: 'temperature = 2.7 K ÷ (size relative to today)',
       check: {
         q: 'Why does this afterglow come at us from every direction in the sky?',

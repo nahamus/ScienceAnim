@@ -53,7 +53,7 @@ export default {
     },
     {
       title: 'A lower barrier',
-      text: 'Like every catalyst, the enzyme doesn’t add energy: it offers an easier route with a much lower energy hill (the panel). Lactase handles hundreds of sugars a second; the fastest enzyme, catalase, breaks down tens of millions of hydrogen peroxide molecules a second.',
+      text: 'Like every catalyst, the enzyme doesn’t add energy: it offers an easier route with a much lower energy hill (the panel). Lactase handles dozens of sugars a second; the fastest enzyme, catalase, breaks down tens of millions of hydrogen peroxide molecules a second.',
       params: { sugar: 40, nEnz: 6, temp: 37 },
       duration: 14,
     },

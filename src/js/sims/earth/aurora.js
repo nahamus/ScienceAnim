@@ -98,7 +98,7 @@ export default {
     const { ctx, params } = api;
     const wind = [];
     const entering = [];
-    let ovalGlow = 0, t = 0, boost = 0;
+    let ovalGlow = 0, t = 0, boost = 0, strip = null, stripKey = '', glow = null;
 
     const geom = () => {
       const { w, h } = api;
@@ -295,7 +295,37 @@ export default {
         const lift = dist <= 0 ? 0 : clamp(dist / 8, 0, 1);
         const base0 = horizon - (horizon - 120) * (0.62 - 0.6 * lift);
         const bright = clamp(0.25 + kp * 0.09, 0, 1);
-        ctx.globalCompositeOperation = 'lighter';
+        // curtains are soft glows, so they are drawn at half resolution and scaled up
+        const half = 0.5;
+        glow ??= document.createElement('canvas');
+        if (glow.width !== Math.ceil(w * half) || glow.height !== Math.ceil(h * half)) {
+          glow.width = Math.ceil(w * half);
+          glow.height = Math.ceil(h * half);
+        }
+        const gx = glow.getContext('2d');
+        gx.setTransform(1, 0, 0, 1, 0, 0);
+        gx.clearRect(0, 0, glow.width, glow.height);
+        gx.setTransform(half, 0, 0, half, 0, 0);
+        gx.globalCompositeOperation = 'lighter';
+        // one vertical colour strip (bottom = lower edge of the curtain), stretched for every column
+        const purple = clamp((kp - 5) / 4, 0, 1);
+        const key = `${purple.toFixed(2)}|${greenVis.toFixed(2)}|${redVis.toFixed(2)}|${kp.toFixed(1)}`;
+        if (key !== stripKey) {
+          stripKey = key;
+          strip ??= document.createElement('canvas');
+          strip.width = 1;
+          strip.height = 128;
+          const sc = strip.getContext('2d');
+          sc.clearRect(0, 0, 1, 128);
+          const gr = sc.createLinearGradient(0, 128, 0, 0);
+          gr.addColorStop(0, `rgba(190,90,255,${(0.2 + 0.7 * purple) * greenVis})`);
+          gr.addColorStop(0.08, `rgba(80,255,140,${greenVis})`);
+          gr.addColorStop(0.5, `rgba(60,230,120,${0.55 * greenVis})`);
+          gr.addColorStop(0.75, `rgba(255,60,90,${(0.25 + 0.5 * clamp((kp - 3) / 6, 0, 1)) * redVis})`);
+          gr.addColorStop(1, 'rgba(255,40,80,0)');
+          sc.fillStyle = gr;
+          sc.fillRect(0, 0, 1, 128);
+        }
         const curtains = 3;
         for (let c = 0; c < curtains; c++) {
           const amp = 30 + c * 18, ph = c * 2.1;
@@ -303,19 +333,14 @@ export default {
           for (let x = -10; x < w + 10; x += 3) {
             const base = base0 - c * 26 + Math.sin(x * 0.004 + t * 0.25 + ph) * amp + Math.sin(x * 0.011 - t * 0.4 + ph) * amp * 0.35;
             const ray = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(x * 0.09 + t * 1.7 + c * 5) * Math.sin(x * 0.023 - t * 0.6));
-            const a = bright * ray * (0.55 - c * 0.12);
             const top = base - heightPx * (0.8 + 0.3 * Math.sin(x * 0.007 + ph));
-            const gr = ctx.createLinearGradient(0, base, 0, top - heightPx * 0.6);
-            const purple = clamp((kp - 5) / 4, 0, 1);
-            gr.addColorStop(0, `rgba(190,90,255,${a * (0.2 + 0.7 * purple) * greenVis})`);
-            gr.addColorStop(0.08, `rgba(80,255,140,${a * greenVis})`);
-            gr.addColorStop(0.5, `rgba(60,230,120,${a * 0.55 * greenVis})`);
-            gr.addColorStop(0.75, `rgba(255,60,90,${a * (0.25 + 0.5 * clamp((kp - 3) / 6, 0, 1)) * redVis})`);
-            gr.addColorStop(1, 'rgba(255,40,80,0)');
-            ctx.fillStyle = gr;
-            ctx.fillRect(x, top - heightPx * 0.6, 3, base - top + heightPx * 0.6);
+            gx.globalAlpha = clamp(bright * ray * (0.55 - c * 0.12), 0, 1);
+            gx.drawImage(strip, x, top - heightPx * 0.6, 3, base - top + heightPx * 0.6);
           }
         }
+        gx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.drawImage(glow, 0, 0, w, h);
         ctx.globalCompositeOperation = 'source-over';
         // snowy ground and trees
         ctx.fillStyle = '#0a0f1c';

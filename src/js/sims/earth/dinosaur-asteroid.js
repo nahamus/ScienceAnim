@@ -93,7 +93,7 @@ export default {
     },
     {
       title: 'A mountain falls from the sky',
-      text: 'The asteroid, taller than Mount Everest and far wider than any airliner flies, crosses the whole atmosphere in about a second. It is moving at around 20 km/s, sixty times faster than a bullet, and carries the energy of more than a billion Hiroshima bombs.',
+      text: 'The asteroid, taller than Mount Everest and far wider than any airliner flies, crosses the whole atmosphere in a few seconds. It is moving at around 20 km/s, about twenty times faster than a rifle bullet, and carries the energy of more than a billion Hiroshima bombs.',
       formula: 'energy = ½ × mass × speed²',
       params: { scene: 'impact', size: 10, speed: 20 },
       enter: (s) => s.launch(),
