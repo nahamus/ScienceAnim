@@ -23,7 +23,7 @@ const ORDER = [
   // biology
   'dna', 'natural-selection', 'ecosystem', 'epidemic', 'turing-patterns', 'neuron', 'vision', 'white-blood-cells', 'flocking', 'fireflies',
   // math
-  'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis', 'traffic',
+  'galton', 'fourier', 'logistic-map', 'lorenz', 'mandelbrot', 'phyllotaxis', 'traffic', 'cooperation', 'small-world', 'bayes', 'monte-carlo',
   // cs
   'sorting', 'pathfinding', 'tsp', 'huffman', 'hamming', 'rsa', 'blockchain', 'life',
   // technology
