@@ -13,9 +13,9 @@ const ORDER = [
   'refraction', 'electric-field', 'circuits', 'induction', 'em-radiation',
   'kinetic-gas', 'brownian', 'bernoulli', 'lift', 'fluid', 'radioactive-decay', 'chain-reaction', 'tokamak', 'laser', 'accelerator', 'relativity', 'curved-spacetime', 'ising', 'sandpile',
   // artificial intelligence
-  'transformer', 'llm-sampling', 'tokenizer', 'embeddings', 'diffusion', 'neural-network', 'backprop', 'gradient-descent', 'cnn', 'q-learning', 'kmeans',
+  'transformer', 'llm-sampling', 'tokenizer', 'embeddings', 'diffusion', 'neural-network', 'backprop', 'gradient-descent', 'cnn', 'adversarial', 'q-learning', 'kmeans',
   // quantum
-  'qubit', 'bell-test', 'teleportation', 'grover', 'bec', 'double-slit', 'quantum-tunneling',
+  'qubit', 'bell-test', 'teleportation', 'quantum-error-correction', 'grover', 'bec', 'double-slit', 'quantum-tunneling',
   // astronomy
   'moon-phases', 'gravity', 'orbital-transfer', 'star-life', 'exoplanets', 'black-hole', 'gravitational-waves',
   // chemistry
