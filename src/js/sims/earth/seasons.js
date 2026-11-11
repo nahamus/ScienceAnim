@@ -45,7 +45,7 @@ export default {
     },
     {
       title: 'June: the north leans in',
-      text: 'In June the northern half tilts toward the Sun. At 45° N the Sun climbs high and stays up about 15½ hours. Below the Arctic Circle the Sun never sets at all: the <b>midnight sun</b>.',
+      text: 'In June the northern half tilts toward the Sun. At 45° N the Sun climbs high and stays up about 15½ hours. Inside the Arctic Circle the Sun never sets at all: the <b>midnight sun</b>.',
       params: { day: 172, run: false, lat: 45, tilt: 23.4 },
       tween: 3,
       duration: 13,

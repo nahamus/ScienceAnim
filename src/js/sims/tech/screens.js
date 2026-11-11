@@ -185,7 +185,8 @@ export default {
             }
           } else {
             // individual pixels drawn as RGB subpixel stripes
-            const blend = clamp((px - 14) / 30, 0, 1);
+            // subpixels appear only as you magnify; at 1× a low-resolution picture should just look blocky
+            const blend = clamp((px - 14) / 30, 0, 1) * clamp((z - 1) / 2, 0, 1);
             for (let j = Math.floor(y0); j < Math.min(IH, y0 + vh + 1); j++)
               for (let i = Math.floor(x0); i < Math.min(IW, x0 + vw + 1); i++) {
                 const k = (j * IW + i) * 4;

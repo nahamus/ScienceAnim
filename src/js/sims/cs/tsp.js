@@ -67,7 +67,7 @@ export default {
     },
     {
       title: 'Simulated annealing',
-      text: 'Borrowed from metalworking: start “hot”, accepting even worse routes now and then so you can escape dead ends, then slowly cool until only improvements are accepted. Here with 120 cities — a route count with 196 digits.',
+      text: 'Borrowed from metalworking: start “hot”, accepting even worse routes now and then so you can escape dead ends, then slowly cool until only improvements are accepted. Here with 120 cities — a route count with 197 digits.',
       params: { n: 120, algo: 'anneal', speed: 1.5 },
       enter: (s) => {
         s.cities(21);

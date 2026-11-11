@@ -134,7 +134,7 @@ export default {
     },
     {
       title: 'The S-wave shadow',
-      text: 'S waves cannot travel through liquid. Every S wave that meets the outer core is stopped, leaving a huge <b>shadow</b> on the far side of the planet. In 1906 this told scientists that Earth’s outer core is molten iron.',
+      text: 'S waves cannot travel through liquid. Every S wave that meets the outer core is stopped, leaving a huge <b>shadow</b> on the far side of the planet. In the 1920s this told scientists that Earth’s outer core is liquid: molten iron.',
       params: { P: false, S: true, trails: true, speed: 120 },
       enter: (s) => s.quake(0),
       duration: 15,
