@@ -68,7 +68,7 @@ export default {
     {
       title: 'Back in step',
       text: 'In one minute the longest pendulum swings 51 times, the next 52, … the shortest 66. Each has completed a whole number of swings, so at 60 seconds they <b>all line up again</b>.',
-      formula: 'fₙ = (51 + n) / 60 s',
+      formula: 'swings per minute = 51 + n,   n = 0, 1, … 15',
       params: { speed: 1, view: 30 },
       enter: (s) => s.setT(52),
       duration: 14,

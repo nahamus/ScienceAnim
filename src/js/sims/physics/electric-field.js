@@ -228,7 +228,7 @@ export default {
             if (params.contours) {
               const i = k % GW, L = level(k);
               if ((i < GW - 1 && level(k + 1) !== L) || (k + GW < GW * GH && level(k + GW) !== L)) {
-                r = Math.max(r, 230); g = Math.max(g, 236); b = Math.max(b, 255); a = Math.max(a, 120);
+                r = Math.max(r, 200); g = Math.max(g, 212); b = Math.max(b, 245); a = Math.max(a, 70); // thin, quiet lines
               }
             }
             d[k * 4] = r; d[k * 4 + 1] = g; d[k * 4 + 2] = b; d[k * 4 + 3] = a;

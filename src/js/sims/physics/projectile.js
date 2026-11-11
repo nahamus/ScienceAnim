@@ -120,7 +120,7 @@ export default {
         setup: { g: 9.81, drag: 0, angle: 45, parts: false },
         explain: 'Range = v² sin 2θ / g. One-sixth the gravity means six times the hang time and six times the distance.',
       },
-      text: 'On the Moon gravity is six times weaker. The same throw sails about six times farther and hangs in the sky six times longer. On Jupiter it barely leaves the barrel.',
+      text: 'On the Moon gravity is six times weaker. The same throw sails about six times farther and hangs in the sky six times longer. On Jupiter, with two and a half times Earth’s gravity, it lands well short.',
       params: { g: 1.62, drag: 0, auto: true, angle: 45, parts: false },
       enter: (s) => s.clear(),
       duration: 13,
