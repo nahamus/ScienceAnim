@@ -14,11 +14,11 @@ test.describe('link pages and offline', () => {
     expect(html).toMatch(/<link rel="canonical" href="https:\/\/[^"]+\/sim\/projectile\/"/);
 
     await page.goto('./sim/projectile/?ch=2&angle=30');
-    await expect(page).toHaveURL(/\/ScienceAnim\/#\/sim\/projectile\?ch=2&angle=30$/);
+    await expect(page).toHaveURL(/:\d+\/#\/sim\/projectile\?ch=2&angle=30$/);
     await expect(page.locator('.story-card')).toBeVisible();
     // the gallery and other sims work as usual from here
     await page.locator('[data-act=back]').click();
-    await expect(page).toHaveURL(/\/ScienceAnim\/#\/$/);
+    await expect(page).toHaveURL(/:\d+\/#\/$/);
     await expect(page.locator('.card').first()).toBeVisible();
   });
 

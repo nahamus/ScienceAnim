@@ -1,4 +1,4 @@
-// Smoke tests run against the production build (same base path and lazy chunks as GitHub Pages).
+// Smoke tests run against the production build (same root path and lazy chunks as the live site).
 //   npm test                 every simulation, desktop + phone
 //   npm test -- -g cpu       just one simulation
 import { defineConfig, devices } from '@playwright/test';
@@ -19,7 +19,7 @@ export default defineConfig({
   retries: CI ? 1 : 0,
   reporter: CI ? 'github' : [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: `http://localhost:${PORT}/ScienceAnim/`,
+    baseURL: `http://localhost:${PORT}/`,
     trace: 'retain-on-failure',
   },
   projects: [
@@ -32,7 +32,7 @@ export default defineConfig({
   ],
   webServer: {
     command: `npm run build && npx vite preview --port ${PORT} --strictPort --open false`,
-    url: `http://localhost:${PORT}/ScienceAnim/`,
+    url: `http://localhost:${PORT}/`,
     reuseExistingServer: !CI,
     timeout: 120_000,
   },

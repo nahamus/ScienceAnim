@@ -3,7 +3,7 @@
 //   sim/<id>/index.html  a copy of the app page whose <head> describes that simulation (title, description,
 //                        Open Graph / Twitter card with its 1200×630 preview image). Chat apps and search engines read
 //                        these tags without running JavaScript; the app then boots straight into the sim
-//                        (see main.js). Share links point here: https://…/ScienceAnim/sim/<id>/?ch=3
+//                        (see main.js). Share links point here: https://scienceanim.nahamus.com/sim/<id>/?ch=3
 //   sitemap.xml          every page, for search engines (submit it in Search Console: a project site's
 //                        robots.txt isn't read, as it isn't at the domain root)
 //   sw.js                service worker that precaches the app and every simulation's code (see src/sw.js)
@@ -17,7 +17,7 @@ import { join, resolve, relative } from 'node:path';
 import { readSimMeta } from './sim-manifest.js';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
-export const SITE = pkg.homepage.replace(/\/?$/, '/'); // https://nahamus.github.io/ScienceAnim/
+export const SITE = pkg.homepage.replace(/\/?$/, '/'); // https://scienceanim.nahamus.com/
 const SITE_TITLE = 'ScienceAnim · Interactive science, beautifully animated';
 const SITE_DESC =
   'Cinematic, interactive simulations of the ideas behind physics, chemistry, biology, astronomy, mathematics and computer science.';
