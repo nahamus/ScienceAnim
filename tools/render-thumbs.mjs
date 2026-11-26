@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto';
 import { chromium } from '@playwright/test';
 import { OG_W, OG_H, ogFallback, ogFor, SITE_IMAGE } from './site-pages.js';
 
-process.env.NODE_ENV = 'production'; // vite.config picks the /ScienceAnim/ base from this
+process.env.NODE_ENV = 'production';
 const { preview } = await import('vite');
 
 const PORT = 4190;
@@ -24,7 +24,7 @@ if (!existsSync('dist/index.html')) {
 }
 
 const server = await preview({ preview: { port: PORT, strictPort: true, open: false } });
-const base = `http://localhost:${PORT}/ScienceAnim/`;
+const base = `http://localhost:${PORT}/`;
 // On a machine with a GPU, WebGL simulations render on it; CI runners fall back to SwiftShader.
 const browser = await chromium.launch(process.env.CI ? {} : { args: ['--enable-gpu', '--ignore-gpu-blocklist'] });
 const jpeg = (url) => {

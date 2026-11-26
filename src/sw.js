@@ -33,7 +33,7 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-const scope = () => self.registration.scope; // https://…/ScienceAnim/
+const scope = () => self.registration.scope; // https://scienceanim.nahamus.com/
 
 async function page(req) {
   try {

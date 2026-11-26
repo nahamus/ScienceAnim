@@ -72,7 +72,7 @@ test.describe('classroom', () => {
 
     await page.getByRole('button', { name: 'Copy lesson link' }).click();
     const link = await page.evaluate(() => navigator.clipboard.readText());
-    expect(link).toMatch(/\/ScienceAnim\/#\/lesson\/1\?t=Light\+%26\+sight&s=refraction,vision,rainbows$/);
+    expect(link).toMatch(/:\d+\/#\/lesson\/1\?t=Light\+%26\+sight&s=refraction,vision,rainbows$/);
 
     await page.goto(link);
     const bar = page.locator('.lesson-bar');

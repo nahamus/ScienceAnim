@@ -3,7 +3,8 @@ import simManifest from './tools/sim-manifest.js'
 import sitePages from './tools/site-pages.js'
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/ScienceAnim/' : '/',
+  // Served from the root of https://scienceanim.nahamus.com (see public/CNAME), in dev and production alike
+  base: '/',
   root: 'src',
   plugins: [simManifest({ dir: 'js/sims' }), sitePages({ sims: 'js/sims' })],
   publicDir: '../public',

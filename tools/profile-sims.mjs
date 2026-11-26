@@ -27,7 +27,7 @@ if (!existsSync('dist/index.html')) {
 }
 const PORT = 4191;
 const server = await preview({ preview: { port: PORT, strictPort: true, open: false } });
-const base = `http://localhost:${PORT}/ScienceAnim/`;
+const base = `http://localhost:${PORT}/`;
 
 // time every requestAnimationFrame callback: that is the simulation's update + draw for the frame
 const hook = () => {
